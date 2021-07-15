@@ -1,0 +1,113 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/notification/ans_standard/notification.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+module_output_path = "ans_standard/unittest"
+
+config("test_ans_config") {
+  include_dirs = [
+    "${services_path}/ans/include",
+    "//foundation/appexecfwk/adapter/interfaces/innerkits/libeventhandler/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "${kits_path}/native/include",
+  ]
+}
+
+config("json_config") {
+  cflags_cc = [ "-fexceptions" ]
+}
+
+ohos_unittest("ans_unit_test") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "include",
+    "${innerkits_path}/base/include",
+    "${innerkits_path}/core/include",
+    "${kits_path}/native/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/appexecfwk/standard/libs/libeventhandler/src",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "//base/notification/ans_standard/services/ans/include",
+    "//third_party/json/include",
+    "//base/notification/ans_standard/services/ans/test/unittest/mock/include",
+  ]
+
+  sources = [
+    "//base/notification/ans_standard/innerkits/core/src/ans_manager_stub.cpp",
+    "//base/notification/ans_standard/kits/native/src/notification.cpp",
+    "//base/notification/ans_standard/services/ans/src/advanced_notification_service.cpp",
+    "//base/notification/ans_standard/services/ans/src/advanced_notification_service_ability.cpp",
+    "//base/notification/ans_standard/services/ans/src/bundle_manager_helper.cpp",
+    "//base/notification/ans_standard/services/ans/src/disturb_filter.cpp",
+    "//base/notification/ans_standard/services/ans/src/notification_preferences.cpp",
+    "//base/notification/ans_standard/services/ans/src/notification_slot_filter.cpp",
+    "//base/notification/ans_standard/services/ans/src/notification_subscriber_manager.cpp",
+    "//base/notification/ans_standard/services/ans/src/permission_filter.cpp",
+    "advanced_notification_service_ability_test.cpp",
+    "advanced_notification_service_test.cpp",
+    "bundle_manager_helper_test.cpp",
+    "disturb_filter_test.cpp",
+    "mock/mock_bundle_manager.cpp",
+    "mock/mock_bundle_mgr_proxy.cpp",
+    "mock/mock_event_handler.cpp",
+    "mock/mock_ipc.cpp",
+    "notification_preferences_test.cpp",
+    "notification_slot_filter_test.cpp",
+    "notification_subscriber_manager_test.cpp",
+    "permission_filter_test.cpp",
+  ]
+
+  configs = [
+    "//utils/native/base:utils_config",
+    "${innerkits_path}:public_ans_innerkits_config",
+    ":test_ans_config",
+    ":json_config",
+  ]
+
+  deps = [
+    "${innerkits_path}:ans_innerkits",
+    "${kits_path}/native:ans_kits",
+    "${kits_path}/native/wantagent:wantagent_kits",
+    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
+    "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [
+    "aafwk_standard:want",
+    "appexecfwk_standard:appexecfwk_base",
+    "appexecfwk_standard:appexecfwk_core",
+    "appexecfwk_standard:libeventhandler",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_L2:samgr_proxy",
+  ]
+
+  subsystem_name = "notification"
+  part_name = "ans_standard"
+}
+
+group("unittest") {
+  testonly = true
+  deps = []
+
+  deps += [ ":ans_unit_test" ]
+}
