@@ -1,0 +1,21 @@
+{
+  "parts": {
+    "ans_standard": {
+      "module_list": [
+        "//base/notification/ans_standard/innerkits:innerkits_target",
+        "//base/notification/ans_standard/kits:kits_target",
+        "//base/notification/ans_standard/sa_profile:ans_sa_profile",
+        "//base/notification/ans_standard/services:services_target",
+        "//base/notification/ans_standard/tools:tools_target"
+      ],
+      "inner_kits": [
+      ],
+      "test_list": [
+        "//base/notification/ans_standard/services/ans/test/unittest:ans_unit_test",
+        "//base/notification/ans_standard/services/test/moduletest:ans_module_test",
+        "//base/notification/ans_standard/kits/native/wantagent/test/:unittest"
+      ]
+    }
+  },
+  "subsystem": "notification"
+}
