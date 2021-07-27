@@ -35,8 +35,6 @@ napi_value NotificationInit(napi_env env, napi_value exports)
     ANS_LOGI("notificationInit start");
 
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_FUNCTION("createSubscriber", CreateSubscriber),
-        DECLARE_NAPI_FUNCTION("subscribe", Subscribe),
         DECLARE_NAPI_FUNCTION("unsubscribe", Unsubscribe),
         DECLARE_NAPI_FUNCTION("publish", Publish),
         DECLARE_NAPI_FUNCTION("getAllActiveNotifications", GetAllActiveNotifications),
