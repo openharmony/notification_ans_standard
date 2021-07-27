@@ -16,6 +16,7 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_ADVANCED_NOTIFICATION_SERVICE_H
 #define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_ADVANCED_NOTIFICATION_SERVICE_H
 
+#include <ctime>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -25,8 +26,12 @@
 #include "refbase.h"
 
 #include "ans_manager_stub.h"
+#include "distributed_kv_data_manager.h"
+#include "distributed_kvstore_death_recipient.h"
 #include "notification.h"
+#include "notification_record.h"
 #include "notification_sorting_map.h"
+#include "system_event_observer.h"
 
 namespace OHOS {
 namespace Notification {
@@ -38,6 +43,7 @@ public:
 
     static sptr<AdvancedNotificationService> GetInstance();
 
+    // AnsManagerStub
     ErrCode Publish(const std::string &label, const sptr<NotificationRequest> &request) override;
     ErrCode Cancel(int notificationId, const std::string &label) override;
     ErrCode CancelAll() override;
@@ -84,27 +90,42 @@ public:
     ErrCode IsAllowedNotify(bool &allowed) override;
     ErrCode IsSpecialBundleAllowedNotify(const std::string &bundle, bool &allowed) override;
 
+    ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
+
+    // SystemEvent
+    void OnBundleRemoved(const std::string &bundle);
+
+    // Distributed KvStore
+    void OnDistributedKvStoreDeathRecipient();
+
 private:
+    struct RecentInfo;
     AdvancedNotificationService();
 
     void StartFilters();
     void StopFilters();
-    ErrCode Filter(const sptr<Notification> &notification);
+    ErrCode Filter(const std::shared_ptr<NotificationRecord> &record);
 
-    void AddToNotificationList(const sptr<Notification> &notification);
-    void UpdateInNotificationList(const sptr<Notification> &notification);
-    ErrCode RemoveFromNotificationList(
-        const std::string &bundle, const std::string &label, int notificationId, sptr<Notification> &notification);
-    ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification);
-    std::vector<std::string> GetRemovableNotificationKeys(const std::string &bundle);
+    void AddToNotificationList(const std::shared_ptr<NotificationRecord> &record);
+    void UpdateInNotificationList(const std::shared_ptr<NotificationRecord> &record);
+    ErrCode RemoveFromNotificationList(const std::string &bundle, const std::string &label, int notificationId,
+        sptr<Notification> &notification, bool isCancel = false);
+    ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification, bool isCancel = false);
+    std::vector<std::string> GetNotificationKeys(const std::string &bundle);
     bool IsNotificationExists(const std::string &key);
     void SortNotificationList();
-    static bool NotificationCompare(const sptr<Notification> &first, const sptr<Notification> &second);
+    static bool NotificationCompare(
+        const std::shared_ptr<NotificationRecord> &first, const std::shared_ptr<NotificationRecord> &second);
+    ErrCode FlowControl(const std::shared_ptr<NotificationRecord> &record);
 
     sptr<NotificationSortingMap> GenerateSortingMap();
 
-    std::string GetClientBundleName();
-    bool IsSystemApp();
+    std::string TimeToString(int64_t time);
+    int64_t GetNowSysTime();
+    ErrCode ActiveNotificationDump(std::vector<std::string> &dumpInfo);
+    ErrCode RecentNotificationDump(std::vector<std::string> &dumpInfo);
+    ErrCode SetRecentNotificationCount(const std::string arg);
+    void UpdateRecentNotification(sptr<Notification> &notification, bool isDelete, int reason);
 
 private:
     static sptr<AdvancedNotificationService> instance_;
@@ -112,7 +133,12 @@ private:
 
     std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner_ = nullptr;
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ = nullptr;
-    std::list<sptr<Notification>> notificationList_;
+    std::list<std::shared_ptr<NotificationRecord>> notificationList_;
+    std::list<std::chrono::system_clock::time_point> flowControlTimestampList_;
+    std::shared_ptr<RecentInfo> recentInfo_ = nullptr;
+    std::shared_ptr<DistributedKvStoreDeathRecipient> distributedKvStoreDeathRecipient_ = nullptr;
+    SystemEventObserver systemEventObserver_;
+    DistributedKv::DistributedKvDataManager dataManager_;
 };
 
 }  // namespace Notification

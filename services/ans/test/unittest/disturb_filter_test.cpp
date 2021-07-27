@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "disturb_filter.h"
 #include <functional>
 #include <gtest/gtest.h>
+
+#include "disturb_filter.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -71,9 +72,11 @@ HWTEST_F(DisturbFilterTest, DisturbFilterTest_00200, Function | SmallTest | Leve
 HWTEST_F(DisturbFilterTest, DisturbFilterTest_00300, Function | SmallTest | Level1)
 {
     DisturbFilter disturbFilter;
-    sptr<NotificationRequest> request = new NotificationRequest();
-    auto objptr = new Notification(request);
-    disturbFilter.OnPublish(objptr);
+    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->request = new NotificationRequest();
+    record->notification = new Notification(record->request);
+    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    disturbFilter.OnPublish(record);
 }
 }  // namespace Notification
 }  // namespace OHOS

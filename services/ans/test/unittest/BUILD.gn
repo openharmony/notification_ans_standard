@@ -17,16 +17,6 @@ import("//build/test.gni")
 
 module_output_path = "ans_standard/unittest"
 
-config("test_ans_config") {
-  include_dirs = [
-    "${services_path}/ans/include",
-    "//foundation/appexecfwk/adapter/interfaces/innerkits/libeventhandler/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "${kits_path}/native/include",
-  ]
-}
-
 config("json_config") {
   cflags_cc = [ "-fexceptions" ]
 }
@@ -35,39 +25,48 @@ ohos_unittest("ans_unit_test") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
-    "${innerkits_path}/base/include",
-    "${innerkits_path}/core/include",
-    "${kits_path}/native/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/appexecfwk/standard/libs/libeventhandler/src",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
-    "//base/notification/ans_standard/services/ans/include",
-    "//third_party/json/include",
-    "//base/notification/ans_standard/services/ans/test/unittest/mock/include",
+    "/${services_path}/ans/include",
+    "${services_path}/ans/test/unittest/mock/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
+    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
   ]
 
   sources = [
-    "//base/notification/ans_standard/innerkits/core/src/ans_manager_stub.cpp",
-    "//base/notification/ans_standard/kits/native/src/notification.cpp",
-    "//base/notification/ans_standard/services/ans/src/advanced_notification_service.cpp",
-    "//base/notification/ans_standard/services/ans/src/advanced_notification_service_ability.cpp",
-    "//base/notification/ans_standard/services/ans/src/bundle_manager_helper.cpp",
-    "//base/notification/ans_standard/services/ans/src/disturb_filter.cpp",
-    "//base/notification/ans_standard/services/ans/src/notification_preferences.cpp",
-    "//base/notification/ans_standard/services/ans/src/notification_slot_filter.cpp",
-    "//base/notification/ans_standard/services/ans/src/notification_subscriber_manager.cpp",
-    "//base/notification/ans_standard/services/ans/src/permission_filter.cpp",
+    "${services_path}/ans/src/advanced_notification_service.cpp",
+    "${services_path}/ans/src/advanced_notification_service_ability.cpp",
+    "${services_path}/ans/src/bundle_manager_helper.cpp",
+    "${services_path}/ans/src/disturb_filter.cpp",
+    "${services_path}/ans/src/notification_preferences.cpp",
+    "${services_path}/ans/src/notification_preferences_database.cpp",
+    "${services_path}/ans/src/notification_preferences_info.cpp",
+    "${services_path}/ans/src/notification_slot_filter.cpp",
+    "${services_path}/ans/src/notification_subscriber_manager.cpp",
+    "${services_path}/ans/src/permission_filter.cpp",
+    "${services_path}/ans/src/system_event_observer.cpp",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src/ikvstore_snapshot.cpp",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/autils/src/constant.cpp",
     "advanced_notification_service_ability_test.cpp",
     "advanced_notification_service_test.cpp",
     "bundle_manager_helper_test.cpp",
     "disturb_filter_test.cpp",
+    "mock/blob.cpp",
+    "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_event_handler.cpp",
     "mock/mock_ipc.cpp",
+    "mock/mock_single_kv_store.cpp",
+    "notification_preferences_database_test.cpp",
     "notification_preferences_test.cpp",
     "notification_slot_filter_test.cpp",
     "notification_subscriber_manager_test.cpp",
@@ -76,15 +75,13 @@ ohos_unittest("ans_unit_test") {
 
   configs = [
     "//utils/native/base:utils_config",
-    "${innerkits_path}:public_ans_innerkits_config",
-    ":test_ans_config",
     ":json_config",
   ]
 
   deps = [
-    "${innerkits_path}:ans_innerkits",
-    "${kits_path}/native:ans_kits",
-    "${kits_path}/native/wantagent:wantagent_kits",
+    "${core_path}:ans_core",
+    "${frameworks_path}/ans/native:ans_innerkits",
+    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -95,6 +92,7 @@ ohos_unittest("ans_unit_test") {
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
+    "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

@@ -15,6 +15,8 @@
 
 #include "permission_filter.h"
 
+#include "ans_inner_errors.h"
+#include "ans_log_wrapper.h"
 #include "notification_preferences.h"
 
 namespace OHOS {
@@ -26,21 +28,22 @@ void PermissionFilter::OnStart()
 void PermissionFilter::OnStop()
 {}
 
-ErrCode PermissionFilter::OnPublish(const sptr<Notification> &notification)
+ErrCode PermissionFilter::OnPublish(const std::shared_ptr<NotificationRecord> &record)
 {
     bool enable = false;
-    ErrCode result =
-        NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(notification->GetBundleName(), enable);
+    ErrCode result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(
+        record->notification->GetBundleName(), enable);
     if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
         result = ERR_OK;
         enable = true;
     }
     if (result == ERR_OK) {
         if (!enable) {
-            result = ERR_ANS_NOT_ALLOWED;
+            ANS_LOGE("Enable notifications for bundle is OFF");
+            return ERR_ANS_NOT_ALLOWED;
         }
 
-        if (notification->GetBundleName() != notification->GetCreateBundle()) {
+        if (record->notification->GetBundleName() != record->notification->GetCreateBundle()) {
             // Publish as bundle
         }
     }

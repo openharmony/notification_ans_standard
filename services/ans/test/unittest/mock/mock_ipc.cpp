@@ -13,21 +13,28 @@
  * limitations under the License.
  */
 
-#include "ipc_skeleton.h"
+#include "mock_ipc_skeleton.h"
 
 namespace OHOS {
 #ifdef CONFIG_IPC_SINGLE
 using namespace IPC_SINGLE;
 #endif
+
+pid_t uid_ = 1;
+
 pid_t IPCSkeleton::GetCallingUid()
 {
-    pid_t uid = 1;
-    return uid;
+    return uid_;
 }
 
 pid_t IPCSkeleton::GetCallingPid()
 {
-    pid_t uid = 1;
-    return uid;
+    uid_ = 1;
+    return uid_;
+}
+
+void IPCSkeleton::SetCallingUid(pid_t uid)
+{
+  uid_ = uid;
 }
 }  // namespace OHOS

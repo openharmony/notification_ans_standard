@@ -38,9 +38,6 @@ config("json_config") {
 ohos_shared_library("libans") {
   include_dirs = [
     "include",
-    "${innerkits_path}/base/include",
-    "${innerkits_path}/core/include",
-    "${kits_path}/native/include",
     "//third_party/json/include",
   ]
 
@@ -50,24 +47,26 @@ ohos_shared_library("libans") {
     "src/bundle_manager_helper.cpp",
     "src/disturb_filter.cpp",
     "src/notification_preferences.cpp",
+    "src/notification_preferences_database.cpp",
+    "src/notification_preferences_info.cpp",
     "src/notification_slot_filter.cpp",
     "src/notification_subscriber_manager.cpp",
     "src/permission_filter.cpp",
+    "src/system_event_observer.cpp",
   ]
 
   configs = [
     ":public_ans_config",
     "//utils/native/base:utils_config",
-    "${innerkits_path}:public_ans_innerkits_config",
     ":json_config",
   ]
 
   deps = [
-    "${innerkits_path}:ans_innerkits",
-    "${kits_path}/native:ans_kits",
-    "${kits_path}/native/wantagent:wantagent_kits",
-    "${kits_path}/native/wantagent:wantagent_kits",
+    "${core_path}:ans_core",
+    "${frameworks_path}/ans/native:ans_innerkits",
+    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "//utils/native/base:utils",
   ]
 

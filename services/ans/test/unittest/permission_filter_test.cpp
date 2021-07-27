@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "permission_filter.h"
 #include <functional>
 #include <gtest/gtest.h>
 
 #include "ans_inner_errors.h"
 #include "notification_preferences.h"
 #include "notification_slot.h"
+#include "permission_filter.h"
 #include "string_ex.h"
 
 using namespace testing::ext;
@@ -80,9 +80,11 @@ HWTEST_F(PermissionFilterTest, PermissionFilterTest_00200, Function | SmallTest 
 HWTEST_F(PermissionFilterTest, PermissionFilterTest_00300, Function | SmallTest | Level1)
 {
     PermissionFilter permissionFilter;
-    sptr<NotificationRequest> request = new NotificationRequest();
-    auto objptr = new Notification(request);
-    EXPECT_EQ(permissionFilter.OnPublish(objptr), (int)ERR_ANS_INVALID_PARAM);
+    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->request = new NotificationRequest();
+    record->notification = new Notification(record->request);
+    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    EXPECT_EQ(permissionFilter.OnPublish(record), (int)ERR_ANS_INVALID_PARAM);
 }
 
 /**
@@ -98,10 +100,12 @@ HWTEST_F(PermissionFilterTest, PermissionFilterTest_00400, Function | SmallTest 
     std::vector<sptr<NotificationSlot>> slots;
     slots.push_back(slot);
     NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots);
-    sptr<NotificationRequest> request = new NotificationRequest();
-    request->SetOwnerBundleName(bundleName);
-    sptr<Notification> notification = new Notification(request);
-    EXPECT_EQ(permissionFilter.OnPublish(notification), ERR_OK);
+    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->request = new NotificationRequest();
+    record->request->SetOwnerBundleName(bundleName);
+    record->notification = new Notification(record->request);
+    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    EXPECT_EQ(permissionFilter.OnPublish(record), ERR_OK);
 }
 
 /**
@@ -117,10 +121,12 @@ HWTEST_F(PermissionFilterTest, PermissionFilterTest_00500, Function | SmallTest 
     std::vector<sptr<NotificationSlot>> slots;
     slots.push_back(slot);
     NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots);
-    sptr<NotificationRequest> request = new NotificationRequest();
-    request->SetOwnerBundleName("bundleName1");
-    sptr<Notification> notification = new Notification(request);
-    EXPECT_EQ((int)permissionFilter.OnPublish(notification), (int)ERR_OK);
+    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->request = new NotificationRequest();
+    record->request->SetOwnerBundleName("bundleName1");
+    record->notification = new Notification(record->request);
+    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    EXPECT_EQ((int)permissionFilter.OnPublish(record), (int)ERR_OK);
 }
 
 /**
@@ -137,10 +143,13 @@ HWTEST_F(PermissionFilterTest, PermissionFilterTest_00600, Function | SmallTest 
     slots.push_back(slot);
     NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots);
     NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(bundleName, false);
-    sptr<NotificationRequest> request = new NotificationRequest();
-    request->SetOwnerBundleName(bundleName);
-    sptr<Notification> notification = new Notification(request);
-    EXPECT_EQ((int)permissionFilter.OnPublish(notification), (int)ERR_ANS_NOT_ALLOWED);
+    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->request = new NotificationRequest();
+    record->request->SetOwnerBundleName(bundleName);
+    record->notification = new Notification(record->request);
+    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+
+    EXPECT_EQ((int)permissionFilter.OnPublish(record), (int)ERR_ANS_NOT_ALLOWED);
 }
 }  // namespace Notification
 }  // namespace OHOS
