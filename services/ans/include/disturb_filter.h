@@ -29,7 +29,7 @@ public:
     void OnStart() override;
     void OnStop() override;
 
-    ErrCode OnPublish(const sptr<Notification> &notification) override;
+    ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) override;
 };
 
 }  // namespace Notification

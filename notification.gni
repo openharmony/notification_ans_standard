@@ -15,13 +15,17 @@ ans_standard_path = "//base/notification/ans_standard"
 
 services_path = "${ans_standard_path}/services"
 
-kits_path = "${ans_standard_path}/kits"
+frameworks_path = "${ans_standard_path}/frameworks"
 
-innerkits_path = "${ans_standard_path}/innerkits"
+interfaces_path = "${ans_standard_path}/interfaces"
+
+core_path = "${frameworks_path}/ans/core"
 
 test_path = "${ans_standard_path}/test"
 
 tools_path = "${ans_standard_path}/tools"
+
+aafwk_path = "//foundation/aafwk/standard"
 
 ans_standard_external_deps = [
   "aafwk_standard:base",
@@ -29,6 +33,7 @@ ans_standard_external_deps = [
   "appexecfwk_standard:appexecfwk_base",
   "appexecfwk_standard:appexecfwk_core",
   "appexecfwk_standard:libeventhandler",
+  "ces_standard:cesfwk_innerkits",
   "dmsfwk_standard:zuri",
   "hiviewdfx_hilog_native:libhilog",
   "ipc:ipc_core",

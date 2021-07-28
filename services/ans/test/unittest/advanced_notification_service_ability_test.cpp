@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "advanced_notification_service_ability.h"
 #include <functional>
 #include <gtest/gtest.h>
+
+#include "advanced_notification_service_ability.h"
 
 using namespace testing::ext;
 namespace OHOS {

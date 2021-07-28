@@ -33,12 +33,12 @@ void BundleManagerHelper::OnRemoteDied(const wptr<IRemoteObject> &object)
 
 std::string BundleManagerHelper::GetBundleNameByUid(uid_t uid)
 {
-    return "bundleName";
+    return 1000 < uid && uid < 1500 ? "" : "bundleName";
 }
 
 bool BundleManagerHelper::IsSystemApp(uid_t uid)
 {
-    return true;
+    return 500 < uid && uid < 1000 ? false : true;
 }
 
 void BundleManagerHelper::Connect()

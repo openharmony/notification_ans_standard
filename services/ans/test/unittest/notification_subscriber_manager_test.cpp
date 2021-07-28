@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-#include "notification_subscriber_manager.h"
 #include <gtest/gtest.h>
 #include <iostream>
+
 #define private public
 #include "notification_subscriber.h"
+#include "notification_subscriber_manager.h"
+
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {

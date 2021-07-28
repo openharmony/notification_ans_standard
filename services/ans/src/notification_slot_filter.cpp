@@ -15,6 +15,8 @@
 
 #include "notification_slot_filter.h"
 
+#include "ans_inner_errors.h"
+#include "ans_log_wrapper.h"
 #include "notification_preferences.h"
 
 namespace OHOS {
@@ -26,26 +28,26 @@ void NotificationSlotFilter::OnStart()
 void NotificationSlotFilter::OnStop()
 {}
 
-ErrCode NotificationSlotFilter::OnPublish(const sptr<Notification> &notification)
+ErrCode NotificationSlotFilter::OnPublish(const std::shared_ptr<NotificationRecord> &record)
 {
-    sptr<NotificationSlot> slot;
-    ErrCode result = NotificationPreferences::GetInstance().GetNotificationSlot(
-        notification->GetBundleName(), notification->request_->GetSlotType(), slot);
-    if (result == ERR_OK && slot != nullptr) {
-        if (slot->CanEnableLight()) {
-            notification->SetLedLightColor(slot->GetLedLightColor());
+    if (record->slot != nullptr) {
+        if (record->slot->CanEnableLight()) {
+            record->notification->SetLedLightColor(record->slot->GetLedLightColor());
         }
 
-        if (slot->CanVibrate()) {
-            notification->SetVibrationStyle(slot->GetVibrationStyle());
+        if (record->slot->CanVibrate()) {
+            record->notification->SetVibrationStyle(record->slot->GetVibrationStyle());
         }
 
-        notification->SetSound(slot->GetSound());
+        record->notification->SetSound(record->slot->GetSound());
 
-        notification->request_->SetVisibleness(slot->GetLockScreenVisibleness());
+        record->request->SetVisibleness(record->slot->GetLockScreenVisibleness());
+    } else {
+        ANS_LOGE("Non valid slot!");
+        return ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_NOT_EXIST;
     }
 
-    return result;
+    return ERR_OK;
 }
 
 }  // namespace Notification

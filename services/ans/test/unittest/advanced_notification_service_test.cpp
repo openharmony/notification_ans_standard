@@ -13,12 +13,16 @@
  * limitations under the License.
  */
 
-#include "advanced_notification_service.h"
-#include "notification_preferences.h"
 #include <functional>
 #include <gtest/gtest.h>
+
 #define private public
+#include "advanced_notification_service.h"
+#include "mock_ipc_skeleton.h"
+#include "notification_preferences.h"
 #include "notification_subscriber.h"
+
+#include "ans_inner_errors.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -45,11 +49,14 @@ void AdvancedNotificationServiceTest::TearDownTestCase()
 void AdvancedNotificationServiceTest::SetUp()
 {
     NotificationPreferences::GetInstance().ClearNotificationInRestoreFactorySettings();
+    IPCSkeleton::SetCallingUid(1);
+    g_advancedNotificationService->CancelAll();
 }
 
 void AdvancedNotificationServiceTest::TearDown()
 {
     NotificationPreferences::GetInstance().ClearNotificationInRestoreFactorySettings();
+    sleep(1);
 }
 
 class TestAnsSubscriber : public NotificationSubscriber {
@@ -76,11 +83,11 @@ public:
     {}
 };
 
-void TestAddSlots()
+void TestAddSlots(NotificationConstant::SlotType type)
 {
     std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slotOther = new NotificationSlot(NotificationConstant::OTHER);
-    slots.push_back(slotOther);
+    sptr<NotificationSlot> slot = new NotificationSlot(type);
+    slots.push_back(slot);
     g_advancedNotificationService->AddSlots(slots);
 }
 
@@ -91,194 +98,271 @@ void TestAddSlotGroups()
     groups.push_back(group);
     g_advancedNotificationService->AddSlotGroups(groups);
 }
-
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00100
- * @tc.name      : AMS_ANS_Publish_0100
- * @tc.desc      : Test the branch if notification not exists
+ * @tc.number    : AMS_ANS_Publish_00100
+ * @tc.name      : ANSPublish00100
+ * @tc.desc      : When there is no such notification in the notification queue,
+ * the test publish interface can successfully publish a normal text type notification.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00100, Function | SmallTest | Level1)
 {
     sptr<NotificationRequest> req = new NotificationRequest();
-    req->SetSlotType(NotificationConstant::OTHER);
-    TestAddSlots();
-    EXPECT_EQ(g_advancedNotificationService->Publish(std::string(), req), (int)ERR_OK);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00200
- * @tc.name      : AMS_ANS_Publish_0200
- * @tc.desc      : Test the branch if notification is exists
+ * @tc.number    : AMS_ANS_Publish_00200
+ * @tc.name      : ANSPublish00200
+ * @tc.desc      : When the notification is in the notification queue,
+ * the test publish interface can successfully publish a notification of normal text type.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00200, Function | SmallTest | Level1)
 {
-    int32_t notificationId = 1;
-    sptr<NotificationRequest> req = new NotificationRequest(notificationId);
-    req->SetSlotType(NotificationConstant::OTHER);
-    req->SetAlertOneTime(true);
-    TestAddSlots();
-    g_advancedNotificationService->Publish(std::string(), req);
-    EXPECT_EQ(g_advancedNotificationService->Publish(std::string(), req), (int)ERR_OK);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    g_advancedNotificationService->Publish(label, req);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00300
- * @tc.name      : AMS_ANS_Publish_0300
- * @tc.desc      : Publish notification when no slot is set 
+ * @tc.number    : AMS_ANS_Publish_00300
+ * @tc.name      : ANSPublish00300
+ * @tc.desc      : When slotType is CUSTOM and not systemApp, the notification publish fails,
+ * and the notification publish interface returns ERR_ANS_NON_SYSTEM_APP.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00300, Function | SmallTest | Level1)
 {
-    int32_t notificationId = 1;
-    sptr<NotificationRequest> req = new NotificationRequest(NULL, notificationId);
-    req->SetSlotType(NotificationConstant::OTHER);
-    EXPECT_EQ(g_advancedNotificationService->Publish(std::string(), req), (int)ERR_OK);
+    IPCSkeleton::SetCallingUid(750);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::CUSTOM);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00400
- * @tc.name      : AMS_ANS_Publish_0400
- * @tc.desc      : Test Publish function when no slotType
+ * @tc.number    : AMS_ANS_Publish_00400
+ * @tc.name      : ANSPublish00400
+ * @tc.desc      : When the obtained bundleName is empty, the notification publish interface returns
+ * ERR_ANS_INVALID_PARAM.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00400, Function | SmallTest | Level1)
 {
-    int32_t notificationId = 1;
-    sptr<NotificationRequest> req = new NotificationRequest(notificationId);
-    req->SetSlotType(NotificationConstant::CUSTOM);
-    TestAddSlots();
-    EXPECT_EQ((int)g_advancedNotificationService->Publish(std::string(), req), (int)ERR_OK);
+    IPCSkeleton::SetCallingUid(1250);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::CONTENT_INFORMATION);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00500
- * @tc.name      : AMS_ANS_Publish_0500
- * @tc.desc      : publish function when NotificationsEnabled is false
+ * @tc.number    : AMS_ANS_Publish_00500
+ * @tc.name      : ANSPublish00500
+ * @tc.desc      : When the obtained bundleName does not have a corresponding slot in the database,
+ * create the corresponding slot and publish a notification.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00500, Function | SmallTest | Level1)
 {
-    int32_t notificationId = 1;
-    sptr<NotificationRequest> req = new NotificationRequest(notificationId);
-    req->SetSlotType(NotificationConstant::OTHER);
-    TestAddSlots();
-    g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", false);
-    EXPECT_EQ(g_advancedNotificationService->Publish(std::string(), req), (int)ERR_ANS_NOT_ALLOWED);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::CONTENT_INFORMATION);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00600
- * @tc.name      : AMS_ANS_Cancel_0100
- * @tc.desc      : public two notification to cancel one of them 
+ * @tc.number    : AMS_ANS_Publish_00600
+ * @tc.name      : ANSPublish00600
+ * @tc.desc      : When the obtained bundleName have a corresponding slot in the database,
+ * the test publish interface can successfully publish a notification of normal text type.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00600, Function | SmallTest | Level1)
 {
-    int32_t notificationId = 2;
-    std::string label = "testLabel";
-    sptr<NotificationRequest> req = new NotificationRequest(NULL, notificationId);
-    req->SetSlotType(NotificationConstant::OTHER);
-    req->SetLabel(label);
-    TestAddSlots();
-    g_advancedNotificationService->Publish(label, req);
-    g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(g_advancedNotificationService->Cancel(notificationId, label), (int)ERR_OK);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00700
- * @tc.name      : AMS_ANS_Cancel_0200
- * @tc.desc      : Test Cancel function when notification no exists
+ * @tc.number    : AMS_ANS_Publish_00700
+ * @tc.name      : ANSPublish00700
+ * @tc.desc      : When the obtained bundleName have a corresponding slot in the database,
+ * create the corresponding slot and publish a notification.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00700, Function | SmallTest | Level1)
 {
-    int32_t notificationId = 0;
-    std::string label = "testLabel";
-    EXPECT_EQ((int)g_advancedNotificationService->Cancel(notificationId, label), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::CONTENT_INFORMATION);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00800
- * @tc.name      : AMS_ANS_CancelAll_0100
- * @tc.desc      : Test CancelAll function
+ * @tc.number    : AMS_ANS_Publish_00800
+ * @tc.name      : ANSPublish00800
+ * @tc.desc      : Create a slot of type SOCIAL_COMMUNICATION and successfully publish a notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00800, Function | SmallTest | Level1)
 {
-    EXPECT_EQ(g_advancedNotificationService->CancelAll(), (int)ERR_OK);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_00900
- * @tc.name      : AMS_ANS_Cancel_0100
- * @tc.desc      : Test Cancel function when unremovable is true
+ * @tc.number    : AMS_ANS_Publish_00900
+ * @tc.name      : ANSPublish00900
+ * @tc.desc      : Create a slot of type SERVICE_REMINDER and successfully publish a notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00900, Function | SmallTest | Level1)
 {
-    int32_t notificationId = 2;
-    std::string label = "testLabel";
-    sptr<NotificationRequest> req = new NotificationRequest(notificationId);
-    req->SetSlotType(NotificationConstant::OTHER);
-    req->SetLabel(label);
-    req->SetUnremovable(true);
-    TestAddSlots();
-    g_advancedNotificationService->Publish(label, req);
-    g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(g_advancedNotificationService->Cancel(notificationId, label), (int)ERR_ANS_NOTIFICATION_IS_UNREMOVABLE);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::SERVICE_REMINDER);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_01000
- * @tc.name      : AMS_ANS_AddSlots_0100
- * @tc.desc      : Test AddSlots function
+ * @tc.number    : AMS_ANS_Publish_01000
+ * @tc.name      : ANSPublish01000
+ * @tc.desc      : Create a slot of type CONTENT_INFORMATION and successfully publish a notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01000, Function | SmallTest | Level1)
 {
-    std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::OTHER);
-    sptr<NotificationSlot> slot1 = new NotificationSlot(NotificationConstant::OTHER);
-    slots.push_back(slot0);
-    slots.push_back(slot1);
-    EXPECT_EQ(g_advancedNotificationService->AddSlots(slots), ERR_OK);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::CONTENT_INFORMATION);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_01100
- * @tc.name      : AMS_ANS_RemoveSlotByType_0100
- * @tc.desc      : Test RemoveSlotByType function
+ * @tc.number    : AMS_ANS_Publish_01100
+ * @tc.name      : ANSPublish01100
+ * @tc.desc      : Create a slot of type OTHER and successfully publish a notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01100, Function | SmallTest | Level1)
 {
-    TestAddSlots();
-    EXPECT_EQ(g_advancedNotificationService->RemoveSlotByType(NotificationConstant::OTHER), ERR_OK);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_01200
- * @tc.name      : AMS_ANS_RemoveSlotByType_0200
- * @tc.desc      : Test RemoveSlotByType function when no type
+ * @tc.number    : AMS_ANS_Publish_01200
+ * @tc.name      : ANSPublish01200
+ * @tc.desc      : Create a slot of type CUSTOM and successfully publish a notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01200, Function | SmallTest | Level1)
 {
-    TestAddSlots();
-    EXPECT_EQ((int)g_advancedNotificationService->RemoveSlotByType(NotificationConstant::CUSTOM),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_ID_INVALID);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::CUSTOM);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_01300
- * @tc.name      : AMS_ANS_AddSlotGroups_0100
- * @tc.desc      : Test AddSlotGroups function
+ * @tc.number    : AMS_ANS_Publish_01300
+ * @tc.name      : ANSPublish01300
+ * @tc.desc      : When a bundle is not allowed to publish a notification, the notification publishing interface returns
+ * ERR_ANS_NOT_ALLOWED
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01300, Function | SmallTest | Level1)
 {
-    std::vector<sptr<NotificationSlotGroup>> groups;
-    sptr<NotificationSlotGroup> group0 = new NotificationSlotGroup("id0", "name0");
-    sptr<NotificationSlotGroup> group1 = new NotificationSlotGroup("id1", "name1");
-    groups.push_back(group0);
-    groups.push_back(group1);
-    EXPECT_EQ(g_advancedNotificationService->AddSlotGroups(groups), ERR_OK);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    req->SetLabel("req's label");
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", false);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_ANS_NOT_ALLOWED);
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_01400
- * @tc.name      : AMS_ANS_RemoveSlotGroups_0100
- * @tc.desc      : Test RemoveSlotGroups function
+ * @tc.number    : AMS_ANS_Publish_01400
+ * @tc.name      : ANSPublish01400
+ * @tc.desc      : When IsAlertOneTime, reset ColorEnabled, Sound, VibrationStyle, and publish the notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01400, Function | SmallTest | Level1)
 {
@@ -286,24 +370,6 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01400,
     std::vector<std::string> groupIds;
     groupIds.push_back("id0");
     EXPECT_EQ(g_advancedNotificationService->RemoveSlotGroups(groupIds), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_01500
- * @tc.name      : AMS_ANS_GetSlot_0100
- * @tc.desc      : Test GetSlot function for data
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01500, Function | SmallTest | Level1)
-{
-    std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::OTHER);
-    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::OTHER);
-    slots.push_back(slot0);
-    g_advancedNotificationService->AddSlots(slots);
-    EXPECT_EQ((int)g_advancedNotificationService->GetSlot("id0", slot), ERR_OK);
-    EXPECT_EQ(slot->GetName(), slot0->GetName());
-    EXPECT_EQ(slot->GetId(), slot0->GetId());
-    EXPECT_EQ(slot->GetLevel(), slot0->GetLevel());
 }
 
 /**
@@ -351,7 +417,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01700,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01800, Function | SmallTest | Level1)
 {
-    TestAddSlots();
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
     EXPECT_EQ((int)g_advancedNotificationService->SetNotificationBadgeNum(2), (int)ERR_OK);
 }
 
@@ -362,7 +428,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01800,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01900, Function | SmallTest | Level1)
 {
-    TestAddSlots();
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
     int importance;
     EXPECT_EQ((int)g_advancedNotificationService->GetBundleImportance(importance), (int)ERR_OK);
 }
@@ -374,7 +440,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01900,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02000, Function | SmallTest | Level1)
 {
-    TestAddSlots();
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
     EXPECT_EQ((int)g_advancedNotificationService->SetPrivateNotificationsAllowed(true), (int)ERR_OK);
 }
 
@@ -385,25 +451,11 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02000,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02100, Function | SmallTest | Level1)
 {
-    TestAddSlots();
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
     EXPECT_EQ((int)g_advancedNotificationService->SetPrivateNotificationsAllowed(true), (int)ERR_OK);
     bool allow;
     EXPECT_EQ((int)g_advancedNotificationService->GetPrivateNotificationsAllowed(allow), (int)ERR_OK);
     EXPECT_TRUE(allow);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_02200
- * @tc.name      : AMS_ANS_UpdateSlots_0100
- * @tc.desc      : Test UpdateSlots function when no slot
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02200, Function | SmallTest | Level1)
-{
-    std::string bundle = "bundleName";
-    std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::OTHER);
-    slots.push_back(slot0);
-    EXPECT_EQ((int)g_advancedNotificationService->UpdateSlots(bundle, slots), (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
 }
 
 /**
@@ -415,25 +467,10 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02300,
 {
     std::string bundle = "bundleName";
     std::vector<sptr<NotificationSlot>> slots;
-    TestAddSlots();
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
     sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::OTHER);
     slots.push_back(slot0);
     EXPECT_EQ((int)g_advancedNotificationService->UpdateSlots(bundle, slots), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_02400
- * @tc.name      : AMS_ANS_UpdateSlotGroups_0100
- * @tc.desc      : Test UpdateSlotGroups function when no group
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02400, Function | SmallTest | Level1)
-{
-    std::string bundle = "bundleName";
-    std::vector<sptr<NotificationSlotGroup>> groups;
-    sptr<NotificationSlotGroup> group2 = new NotificationSlotGroup("id2", "name2");
-    groups.push_back(group2);
-    EXPECT_EQ(
-        (int)g_advancedNotificationService->UpdateSlotGroups(bundle, groups), (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
 }
 
 /**
@@ -483,8 +520,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02800,
 {
     std::string bundle = "bundleName";
     bool allow;
-    EXPECT_EQ((int)g_advancedNotificationService->GetShowBadgeEnabledForBundle(bundle, allow),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+    EXPECT_EQ((int)g_advancedNotificationService->GetShowBadgeEnabledForBundle(bundle, allow), (int)ERR_OK);
 }
 
 /**
@@ -562,7 +598,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03400,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03500, Function | SmallTest | Level1)
 {
-    TestAddSlots();
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
     NotificationConstant::DisturbMode mode;
     EXPECT_EQ((int)g_advancedNotificationService->GetDisturbMode(mode), (int)ERR_OK);
 }
@@ -617,7 +653,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03900,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04000, Function | SmallTest | Level1)
 {
-    TestAddSlots();
+    TestAddSlots(NotificationConstant::SlotType::OTHER);
     std::string bundle = "bundleName";
     std::vector<sptr<NotificationSlot>> slots;
     EXPECT_EQ(g_advancedNotificationService->GetSlotsByBundle(bundle, slots), ERR_OK);
@@ -631,242 +667,19 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04000,
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04100, Function | SmallTest | Level1)
 {
     sptr<NotificationRequest> req = new NotificationRequest();
-    req->SetSlotType(NotificationConstant::OTHER);
-    TestAddSlots();
-    g_advancedNotificationService->Publish(std::string(), req);
-    EXPECT_EQ(g_advancedNotificationService->Publish(std::string(), req), (int)ERR_OK);
-    sptr<Notification> notification = new Notification(req);
-    std::vector<sptr<Notification>> notifications;
-    std::string key1 = notification->GetKey();
-    std::string key2 = "key2";
-    std::vector<std::string> keys;
-    keys.push_back(key1);
-    keys.push_back(key2);
-    EXPECT_EQ(g_advancedNotificationService->GetSpecialActiveNotifications(keys, notifications), ERR_OK);
+    req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    req->SetLabel("req's label");
+    req->SetAlertOneTime(true);
+    std::string label = "publish's label";
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    normalContent->SetText("normalContent's text");
+    normalContent->SetTitle("normalContent's title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    req->SetContent(content);
+    g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", true);
+    g_advancedNotificationService->Publish(label, req);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
 }
 
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04200
- * @tc.name      : AMS_ANS_Subscribe_0100
- * @tc.desc      : Test Subscribe function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04200, Function | SmallTest | Level1)
-{
-    auto subscriber = new TestAnsSubscriber();
-    sptr<NotificationSubscribeInfo> info = new NotificationSubscribeInfo();
-    EXPECT_EQ((int)g_advancedNotificationService->Subscribe(subscriber->GetImpl(), info), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04300
- * @tc.name      : AMS_ANS_Unsubscribe_0100
- * @tc.desc      : Test Unsubscribe function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04300, Function | SmallTest | Level1)
-{
-    auto subscriber = new TestAnsSubscriber();
-    sptr<NotificationSubscribeInfo> info = new NotificationSubscribeInfo();
-    EXPECT_EQ((int)g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), info), (int)ERR_OK);
-    ;
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04400
- * @tc.name      : AMS_ANS_SetNotificationsEnabledForBundle_0200
- * @tc.desc      : Test SetNotificationsEnabledForBundle function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04400, Function | SmallTest | Level1)
-{
-    std::string bundle = "bundleName";
-    TestAddSlots();
-    EXPECT_EQ((int)g_advancedNotificationService->SetNotificationsEnabledForBundle(bundle, true), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04500
- * @tc.name      : AMS_ANS_GetShowBadgeEnabledForBundle_0200
- * @tc.desc      : Test GetShowBadgeEnabledForBundle function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04500, Function | SmallTest | Level1)
-{
-    std::string bundle = "bundleName";
-    TestAddSlots();
-    EXPECT_EQ((int)g_advancedNotificationService->SetShowBadgeEnabledForBundle(bundle, true), (int)ERR_OK);
-    bool allow;
-    EXPECT_EQ((int)g_advancedNotificationService->GetShowBadgeEnabledForBundle(bundle, allow), (int)ERR_OK);
-    EXPECT_TRUE(allow);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04600
- * @tc.name      : AMS_ANS_GetSlotByType_0100
- * @tc.desc      : Test GetSlotByType function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04600, Function | SmallTest | Level1)
-{
-    std::string bundle = "bundleName";
-    TestAddSlots();
-    sptr<NotificationSlot> slot;
-    EXPECT_EQ((int)g_advancedNotificationService->GetSlotByType(NotificationConstant::OTHER, slot), (int)ERR_OK);
-    EXPECT_EQ(slot->GetId(), "OTHER");
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04700
- * @tc.name      : AMS_ANS_GetSlotByType_0200
- * @tc.desc      : Test the CreateSlot branch of the GetSlotByType function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04700, Function | SmallTest | Level1)
-{
-    std::string bundle = "bundleName";
-    sptr<NotificationSlot> slot;
-    g_advancedNotificationService->GetSlotByType(NotificationConstant::SOCIAL_COMMUNICATION, slot);
-    g_advancedNotificationService->GetSlotByType(NotificationConstant::SERVICE_REMINDER, slot);
-    g_advancedNotificationService->GetSlotByType(NotificationConstant::CONTENT_INFORMATION, slot);
-    g_advancedNotificationService->GetSlotByType(NotificationConstant::OTHER, slot);
-    EXPECT_EQ((int)g_advancedNotificationService->GetSlotByType(NotificationConstant::CUSTOM, slot), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04800
- * @tc.name      : AMS_ANS_GetSlotGroups_0100
- * @tc.desc      : Test GetSlotGroups function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04800, Function | SmallTest | Level1)
-{
-    std::vector<sptr<NotificationSlotGroup>> groups;
-    sptr<NotificationSlotGroup> group2 = new NotificationSlotGroup("id2", "name2");
-    group2->SetDescription("Description");
-    groups.push_back(group2);
-    g_advancedNotificationService->AddSlotGroups(groups);
-    std::vector<sptr<NotificationSlotGroup>> group;
-    EXPECT_EQ(g_advancedNotificationService->GetSlotGroups(group), ERR_OK);
-    EXPECT_EQ(groups.size(), group.size());
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_04900
- * @tc.name      : AMS_ANS_GetAllActiveNotifications_0100
- * @tc.desc      : Test GetAllActiveNotifications function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04900, Function | SmallTest | Level1)
-{
-    std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ(g_advancedNotificationService->GetAllActiveNotifications(notifications), ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05000
- * @tc.name      : AMS_ANS_SetNotificationsEnabledForAllBundles_0100
- * @tc.desc      : Test SetNotificationsEnabledForAllBundles function for else
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05000, Function | SmallTest | Level1)
-{
-    std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ((int)g_advancedNotificationService->SetNotificationsEnabledForAllBundles("test", true), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05100
- * @tc.name      : AMS_ANS_SetNotificationsEnabledForAllBundles_0200
- * @tc.desc      : Test SetNotificationsEnabledForAllBundles function for if
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05100, Function | SmallTest | Level1)
-{
-    TestAddSlots();
-    std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ(
-        (int)g_advancedNotificationService->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05200
- * @tc.name      : AMS_ANS_SetNotificationsEnabledForSpecialBundle_0100
- * @tc.desc      : Test SetNotificationsEnabledForSpecialBundle function for if
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05200, Function | SmallTest | Level1)
-{
-    TestAddSlots();
-    std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ(
-        (int)g_advancedNotificationService->SetNotificationsEnabledForSpecialBundle(std::string(), "bundleName", true),
-        (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05300
- * @tc.name      : AMS_ANS_SetNotificationsEnabledForSpecialBundle_0200
- * @tc.desc      : Test SetNotificationsEnabledForSpecialBundle function for else
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05300, Function | SmallTest | Level1)
-{
-    std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ((int)g_advancedNotificationService->SetNotificationsEnabledForSpecialBundle("test", "bundleName", true),
-        (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05400
- * @tc.name      : AMS_ANS_IsAllowedNotify_0100
- * @tc.desc      : Test IsAllowedNotify function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05400, Function | SmallTest | Level1)
-{
-    bool allowed = true;
-    EXPECT_EQ((int)g_advancedNotificationService->IsAllowedNotify(allowed), (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05500
- * @tc.name      : AMS_ANS_IsAllowedNotify_0200
- * @tc.desc      : Test IsAllowedNotify function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05500, Function | SmallTest | Level1)
-{
-    TestAddSlots();
-    bool allowed = true;
-    EXPECT_EQ((int)g_advancedNotificationService->IsAllowedNotify(allowed), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05600
- * @tc.name      : AMS_ANS_IsSpecialBundleAllowedNotify_0100
- * @tc.desc      : Test IsSpecialBundleAllowedNotify function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05600, Function | SmallTest | Level1)
-{
-    TestAddSlots();
-    std::vector<sptr<Notification>> notifications;
-    bool allowed = true;
-    std::string bundle = "bundleName";
-    EXPECT_EQ((int)g_advancedNotificationService->IsSpecialBundleAllowedNotify(bundle, allowed), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05700
- * @tc.name      : AMS_ANS_IsSpecialBundleAllowedNotify_0200
- * @tc.desc      : Test IsSpecialBundleAllowedNotify function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05700, Function | SmallTest | Level1)
-{
-    std::vector<sptr<Notification>> notifications;
-    bool allowed = true;
-    std::string bundle = "bundleName";
-    EXPECT_EQ((int)g_advancedNotificationService->IsSpecialBundleAllowedNotify(bundle, allowed),
-        (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_05800
- * @tc.name      : AMS_ANS_GetSlotsByBundle_0200
- * @tc.desc      : Test GetSlotsByBundle function when no bundle
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05800, Function | SmallTest | Level1)
-{
-    std::string bundle = "bundleName";
-    std::vector<sptr<NotificationSlot>> slots;
-    EXPECT_EQ(
-        (int)g_advancedNotificationService->GetSlotsByBundle(bundle, slots), (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
-}
 }  // namespace Notification
 }  // namespace OHOS

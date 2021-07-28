@@ -16,10 +16,11 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_NOTIFICATION_FILTER_H
 #define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_NOTIFICATION_FILTER_H
 
-#include "errors.h"
-#include "refbase.h"
+#include <memory>
 
-#include "notification.h"
+#include "errors.h"
+
+#include "notification_record.h"
 
 namespace OHOS {
 namespace Notification {
@@ -32,7 +33,7 @@ public:
     virtual void OnStart() = 0;
     virtual void OnStop() = 0;
 
-    virtual ErrCode OnPublish(const sptr<Notification> &notification) = 0;
+    virtual ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) = 0;
 };
 
 }  // namespace Notification

@@ -24,14 +24,11 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
 BundleMgrProxy::BundleMgrProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBundleMgr>(impl)
-{
-}
+{}
 
 BundleMgrProxy::~BundleMgrProxy()
-{
-}
+{}
 
 bool BundleMgrProxy::GetApplicationInfo(
     const std::string &appName, const ApplicationFlag flag, const int userId, ApplicationInfo &appInfo)
@@ -261,13 +258,13 @@ bool BundleMgrProxy::UnregisterPermissionsChanged(const sptr<OnPermissionChanged
     return true;
 }
 
-template<typename T>
+template <typename T>
 bool BundleMgrProxy::GetParcelableInfo(IBundleMgr::Message code, MessageParcel &data, T &parcelableInfo)
 {
     return true;
 }
 
-template<typename T>
+template <typename T>
 bool BundleMgrProxy::GetParcelableInfos(IBundleMgr::Message code, MessageParcel &data, std::vector<T> &parcelableInfos)
 {
     return true;
