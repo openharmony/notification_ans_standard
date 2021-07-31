@@ -15,6 +15,9 @@
 
 #include "disturb_filter.h"
 
+#include "ans_inner_errors.h"
+#include "notification_preferences.h"
+
 namespace OHOS {
 namespace Notification {
 
@@ -24,9 +27,51 @@ void DisturbFilter::OnStart()
 void DisturbFilter::OnStop()
 {}
 
-ErrCode DisturbFilter::OnPublish(const sptr<Notification> &notification)
+ErrCode DisturbFilter::OnPublish(const std::shared_ptr<NotificationRecord> &record)
 {
-    return ERR_OK;
+    NotificationConstant::DisturbMode mode;
+    ErrCode result = NotificationPreferences::GetInstance().GetDisturbMode(mode);
+    if (result != ERR_OK) {
+        return result;
+    }
+
+    bool disturb = false;
+
+    switch (mode) {
+        case NotificationConstant::DisturbMode::ALLOW_ALARMS:
+            if (record->request->GetClassification() == NotificationRequest::CLASSIFICATION_ALARM) {
+                disturb = true;
+            } else {
+                if (record->slot == nullptr) {
+                    result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_NOT_EXIST;
+                    break;
+                }
+                disturb = record->slot->IsEnableBypassDnd();
+            }
+            break;
+        case NotificationConstant::DisturbMode::ALLOW_ALL:
+            disturb = true;
+            break;
+        case NotificationConstant::DisturbMode::ALLOW_NONE:
+            if (record->slot == nullptr) {
+                result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_NOT_EXIST;
+                break;
+            }
+            disturb = record->slot->IsEnableBypassDnd();
+            break;
+        case NotificationConstant::DisturbMode::ALLOW_PRIORITY:
+            break;
+        default:
+            break;
+    }
+
+    if (!disturb) {
+        record->notification->SetEnableLight(false);
+        record->notification->SetEnableSound(false);
+        record->notification->SetEnableViration(false);
+    }
+
+    return result;
 }
 
 }  // namespace Notification

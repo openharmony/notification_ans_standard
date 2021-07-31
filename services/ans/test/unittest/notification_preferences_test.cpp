@@ -13,8 +13,10 @@
  * limitations under the License.
  */
 
-#include "notification_preferences.h"
 #include <gtest/gtest.h>
+
+#include "notification_preferences.h"
+#include "ans_inner_errors.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -35,9 +37,7 @@ void NotificationPreferencesTest::TearDownTestCase()
 {}
 
 void NotificationPreferencesTest::SetUp()
-{
-    NotificationPreferences::GetInstance().ClearNotificationInRestoreFactorySettings();
-}
+{}
 
 void NotificationPreferencesTest::TearDown()
 {
@@ -63,256 +63,102 @@ void TestAddNotificationSlotGroup()
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_00100
- * @tc.name      : AMS_ANS_AddNotificationSlots_0100
- * @tc.desc      : Test AddNotificationSlots function
+ * @tc.number    : 
+ * @tc.name      : 
+ * @tc.desc      : AddNotificationSlots_00100
  */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00100, Function | SmallTest | Level1)
 {
     std::string bundleName = "bundleName";
-    sptr<NotificationSlot> spSlot = new NotificationSlot(NotificationConstant::OTHER);
-    std::vector<sptr<NotificationSlot>> spSlots;
-    spSlots.push_back(spSlot);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, spSlots), (int)ERR_OK);
+    sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::SlotType::OTHER);
+    std::vector<sptr<NotificationSlot>> slots;
+    slots.push_back(slot);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_00200
- * @tc.name      : AMS_ANS_AddNotificationSlots_0200
- * @tc.desc      : Test AddNotificationSlots function when add two identical data
+ * @tc.number    : 
+ * @tc.name      : 
+ * @tc.desc      : AddNotificationSlots_00200
  */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00200, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00200, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName1";
-    sptr<NotificationSlot> spSlot = new NotificationSlot(NotificationConstant::OTHER);
-    spSlot->SetSlotGroup("test");
-    std::vector<sptr<NotificationSlot>> spSlots;
-    spSlots.push_back(spSlot);
-    NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, spSlots);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, spSlots), (int)ERR_OK);
+    sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::SlotType::OTHER);
+    std::vector<sptr<NotificationSlot>> slots;
+    slots.push_back(slot);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(std::string(), slots), (int)ERR_ANS_INVALID_PARAM);
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_00300
- * @tc.name      : AMS_ANS_AddNotificationSlots_0300
- * @tc.desc      : Test AddNotificationSlots function when the parameter is wrong
+ * @tc.number    : 
+ * @tc.name      : 
+ * @tc.desc      : AddNotificationSlots_00300
  */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00300, Function | SmallTest | Level1)
-{
-    std::vector<sptr<NotificationSlot>> spSlots;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(std::string(), spSlots),
-        (int)ERR_ANS_INVALID_PARAM);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_00400
- * @tc.name      : AMS_ANS_AddNotificationSlots_0100
- * @tc.desc      : Test AddNotificationSlotGroups function
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00400, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00300, Function | SmallTest | Level1)
 {
     std::string bundleName = "bundleName";
-    sptr<NotificationSlotGroup> spSlotGroup = new NotificationSlotGroup("id", "name");
-    std::vector<sptr<NotificationSlotGroup>> spSlotGroups;
-    spSlotGroups.push_back(spSlotGroup);
-    EXPECT_EQ(
-        (int)NotificationPreferences::GetInstance().AddNotificationSlotGroups(bundleName, spSlotGroups), (int)ERR_OK);
+    std::vector<sptr<NotificationSlot>> slots;
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots), (int)ERR_ANS_INVALID_PARAM);
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_00500
- * @tc.name      : AMS_ANS_AddNotificationSlotGroups_0200
- * @tc.desc      : Test AddNotificationSlotGroups function when the parameter is wrong
+ * @tc.number    : 
+ * @tc.name      : 
+ * @tc.desc      : AddNotificationSlots_00400
  */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00500, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00400, Function | SmallTest | Level1)
 {
     std::string bundleName = "bundleName";
-    sptr<NotificationSlotGroup> spSlotGroup = new NotificationSlotGroup("", "name");
-    std::vector<sptr<NotificationSlotGroup>> spSlotGroups;
-    spSlotGroups.push_back(spSlotGroup);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlotGroups(bundleName, spSlotGroups),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_ID_INVALID);
+    sptr<NotificationSlot> slot = nullptr;
+    std::vector<sptr<NotificationSlot>> slots;
+    slots.push_back(slot);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots), (int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_NOT_EXIST);
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_00600
- * @tc.name      : AMS_ANS_AddNotificationSlotGroups_0300
- * @tc.desc      : Test AddNotificationSlotGroups function when bundleName is not set
+ * @tc.number    : 
+ * @tc.name      : 
+ * @tc.desc      : AddNotificationSlots_00500
  */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00600, Function | SmallTest | Level1)
-{
-    std::vector<sptr<NotificationSlotGroup>> spSlotGroups;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlotGroups(std::string(), spSlotGroups),
-        (int)ERR_ANS_INVALID_PARAM);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_00700
- * @tc.name      : AMS_ANS_RemoveNotificationSlot_0100
- * @tc.desc      : Test RemoveNotificationSlot function
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00700, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00500, Function | SmallTest | Level1)
 {
     std::string bundleName = "bundleName";
-    sptr<NotificationSlot> spSlot = new NotificationSlot(NotificationConstant::OTHER);
-    std::vector<sptr<NotificationSlot>> spSlots;
-    spSlots.push_back(spSlot);
-    NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, spSlots);
-    std::vector<std::string> slotIds;
-    slotIds.push_back(spSlot->GetId());
-    EXPECT_EQ(
-        (int)NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleName, NotificationConstant::OTHER),
-        (int)ERR_OK);
+
+    sptr<NotificationSlot> slot1 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    sptr<NotificationSlot> slot2 = new NotificationSlot(NotificationConstant::SlotType::SERVICE_REMINDER);
+    sptr<NotificationSlot> slot3 = new NotificationSlot(NotificationConstant::SlotType::CONTENT_INFORMATION);
+    sptr<NotificationSlot> slot4 = new NotificationSlot(NotificationConstant::SlotType::OTHER);
+    sptr<NotificationSlot> slot5 = new NotificationSlot(NotificationConstant::SlotType::CUSTOM);
+
+    std::vector<sptr<NotificationSlot>> slots;
+    slots.push_back(slot1);
+    slots.push_back(slot2);
+    slots.push_back(slot3);
+    slots.push_back(slot4);
+    slots.push_back(slot5);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots), (int)ERR_OK);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_00800
- * @tc.name      : AMS_ANS_RemoveNotificationSlot_0200
- * @tc.desc      : Test RemoveNotificationSlot function when bundleName is not set
+ * @tc.number    : 
+ * @tc.name      : 
+ * @tc.desc      : AddNotificationSlots_00600
  */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00800, Function | SmallTest | Level1)
-{
-    std::string bundleName = "";
-    std::vector<std::string> slotIds;
-    EXPECT_EQ(
-        (int)NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleName, NotificationConstant::OTHER),
-        (int)ERR_ANS_INVALID_PARAM);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_00900
- * @tc.name      : AMS_ANS_RemoveNotificationSlot_0300
- * @tc.desc      : Test RemoveNotificationSlot function when slot not exist
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_00900, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00600, Function | SmallTest | Level1)
 {
     std::string bundleName = "bundleName";
-    std::string slotId = "id";
-    std::vector<std::string> slotIds;
-    slotIds.push_back(slotId);
-    TestAddNotificationSlot();
-    NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleName, NotificationConstant::OTHER);
-    EXPECT_EQ(
-        (int)NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleName, NotificationConstant::OTHER),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_NOT_EXIST);
+
+    sptr<NotificationSlot> slot1 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    sptr<NotificationSlot> slot2 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+
+    std::vector<sptr<NotificationSlot>> slots;
+    slots.push_back(slot1);
+    slots.push_back(slot2);
+
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots), (int)ERR_OK);
 }
 
-/**
- * @tc.number    : NotificationPreferencesTest_01000
- * @tc.name      : AMS_ANS_RemoveNotificationSlot_0400
- * @tc.desc      : Test RemoveNotificationSlot function when file is null
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01000, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    sptr<NotificationSlot> spSlot = new NotificationSlot(NotificationConstant::OTHER);
-    std::vector<sptr<NotificationSlot>> spSlots;
-    spSlots.push_back(spSlot);
-    std::vector<std::string> slotIds;
-    slotIds.push_back(spSlot->GetId());
-    EXPECT_EQ(
-        (int)NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleName, NotificationConstant::OTHER),
-        (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_01100
- * @tc.name      : AMS_ANS_RemoveNotificationSlotGroups_0100
- * @tc.desc      : Test RemoveNotificationSlotGroups function when bundle not exist
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01100, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName1";
-    sptr<NotificationSlotGroup> spSlotGroup = new NotificationSlotGroup("id1", "name");
-    std::vector<sptr<NotificationSlotGroup>> spSlotGroups;
-    spSlotGroups.push_back(spSlotGroup);
-    NotificationPreferences::GetInstance().AddNotificationSlotGroups("bundleName", spSlotGroups);
-    std::string groupId = "id1";
-    std::vector<std::string> groupIds;
-    groupIds.push_back(groupId);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundleName, groupIds),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_01200
- * @tc.name      : AMS_ANS_RemoveNotificationSlotGroups_0200
- * @tc.desc      : Test RemoveNotificationSlotGroups function the parameter is wrong
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01200, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    std::vector<std::string> groupIds;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundleName, groupIds),
-        (int)ERR_ANS_INVALID_PARAM);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_01300
- * @tc.name      : AMS_ANS_RemoveNotificationSlotGroups_0300
- * @tc.desc      : Test RemoveNotificationSlotGroups function
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01300, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    std::string groupId = "id";
-    std::vector<std::string> groupIds;
-    groupIds.push_back(groupId);
-    TestAddNotificationSlotGroup();
-    EXPECT_EQ(
-        (int)NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundleName, groupIds), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_01400
- * @tc.name      : AMS_ANS_RemoveNotificationSlotGroups_0400
- * @tc.desc      : Test RemoveNotificationSlotGroups function when slotid invalid
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01400, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    std::string groupId = "";
-    std::vector<std::string> groupIds;
-    groupIds.push_back(groupId);
-    TestAddNotificationSlotGroup();
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundleName, groupIds),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_ID_INVALID);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_01500
- * @tc.name      : AMS_ANS_UpdateNotificationSlotGroups_0100
- * @tc.desc      : Test UpdateNotificationSlotGroups function
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01500, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    sptr<NotificationSlotGroup> spSlotGroup = new NotificationSlotGroup("id1", "name");
-    std::vector<sptr<NotificationSlotGroup>> spSlotGroups;
-    spSlotGroups.push_back(spSlotGroup);
-    NotificationPreferences::GetInstance().AddNotificationSlotGroups(bundleName, spSlotGroups);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().UpdateNotificationSlotGroups(bundleName, spSlotGroups),
-        (int)ERR_OK);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_01600
- * @tc.name      : AMS_ANS_GetNotificationSlot_0100
- * @tc.desc      : Test GetNotificationSlot function
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01600, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    sptr<NotificationSlot> notificationSlot;
-    sptr<NotificationSlot> spSlot = new NotificationSlot(NotificationConstant::OTHER);
-    std::vector<sptr<NotificationSlot>> spSlots;
-    spSlots.push_back(spSlot);
-    NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, spSlots);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationSlot(
-                  bundleName, NotificationConstant::OTHER, notificationSlot),
-        (int)ERR_OK);
-    EXPECT_EQ(spSlot->GetName(), notificationSlot->GetName());
-}
 
 /**
  * @tc.number    : NotificationPreferencesTest_01700
@@ -329,7 +175,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01700, Functio
     std::vector<sptr<NotificationSlot>> slotsResult;
     EXPECT_EQ(
         (int)NotificationPreferences::GetInstance().GetNotificationAllSlots(bundleName, slotsResult), (int)ERR_OK);
-    EXPECT_EQ((int)slotsResult.size(), 1);
+    EXPECT_EQ((int)slotsResult.size(), 5);
 }
 
 /**
@@ -364,7 +210,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_01900, Functio
     std::vector<sptr<NotificationSlotGroup>> groups;
     EXPECT_EQ(
         (int)NotificationPreferences::GetInstance().GetNotificationAllSlotGroups(bundleName, groups), (int)ERR_OK);
-    EXPECT_EQ((int)groups.size(), 1);
+    EXPECT_EQ((int)groups.size(), 3);
 }
 
 /**
@@ -417,21 +263,6 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_02200, Functio
     std::string bundleName = "bundleName";
     TestAddNotificationSlot();
     EXPECT_EQ((int)NotificationPreferences::GetInstance().SetShowBadge(bundleName, false), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_02300
- * @tc.name      : AMS_ANS_RemoveNotificationSlotGroups_0200
- * @tc.desc      : Test RemoveNotificationSlotGroups function when bundle not exist
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_02300, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    std::string groupId = "id1";
-    std::vector<std::string> groupIds;
-    groupIds.push_back(groupId);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundleName, groupIds),
-        (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
 }
 
 /**
@@ -509,21 +340,6 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_02900, Functio
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_03000
- * @tc.name      : AMS_ANS_UpdateNotificationSlotGroups_0200
- * @tc.desc      : Test UpdateNotificationSlotGroups function when file is null
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_03000, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    sptr<NotificationSlotGroup> spGroup = new NotificationSlotGroup("groupId", "name");
-    std::vector<sptr<NotificationSlotGroup>> groups;
-    groups.push_back(spGroup);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().UpdateNotificationSlotGroups(bundleName, groups),
-        (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
-}
-
-/**
  * @tc.number    : NotificationPreferencesTest_03100
  * @tc.name      : AMS_ANS_RemoveNotificationForBundle_0100
  * @tc.desc      : Test RemoveNotificationForBundle function when bundleName is not set
@@ -533,17 +349,6 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_03100, Functio
     std::string bundleName = "";
     EXPECT_EQ((int)NotificationPreferences::GetInstance().RemoveNotificationForBundle(bundleName),
         (int)ERR_ANS_INVALID_PARAM);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_03200
- * @tc.name      : AMS_ANS_ClearNotificationInRestoreFactorySettings_0100
- * @tc.desc      : Test ClearNotificationInRestoreFactorySettings function when file is null
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_03200, Function | SmallTest | Level1)
-{
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().ClearNotificationInRestoreFactorySettings(),
-        (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
 }
 
 /**
@@ -624,7 +429,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_03700, Functio
     std::vector<sptr<NotificationSlotGroup>> groups;
     groups.push_back(spGroup);
     EXPECT_EQ((int)NotificationPreferences::GetInstance().UpdateNotificationSlotGroups(bundleName, groups),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_ID_INVALID);
+        (int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_NOT_EXIST);
 }
 
 /**
@@ -663,7 +468,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_04000, Functio
     std::string bundleName = "bundleName";
     int importanceResult;
     EXPECT_EQ((int)NotificationPreferences::GetInstance().GetImportance(bundleName, importanceResult),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        (int)ERR_OK);
 }
 
 /**
@@ -689,7 +494,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_04200, Functio
     std::string bundleName = "bundleName";
     int totalBadgeNum;
     EXPECT_EQ((int)NotificationPreferences::GetInstance().GetTotalBadgeNums(bundleName, totalBadgeNum),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        0);
 }
 
 /**
@@ -713,8 +518,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_04400, Functio
 {
     std::string bundleName = "bundleName";
     bool allow;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetPrivateNotificationsAllowed(bundleName, allow),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetPrivateNotificationsAllowed(bundleName, allow),0);
 }
 
 /**
@@ -738,8 +542,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_04600, Functio
 {
     std::string bundleName = "bundleName";
     bool enabled;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleName, enabled),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleName, enabled),0);
 }
 
 /**
@@ -778,21 +581,6 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_04800, Functio
 }
 
 /**
- * @tc.number    : NotificationPreferencesTest_04900
- * @tc.name      : AMS_ANS_UpdateNotificationSlots_0400
- * @tc.desc      : Test UpdateNotificationSlots function when file is null
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_04900, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
-    sptr<NotificationSlot> spSlot = new NotificationSlot(NotificationConstant::OTHER);
-    std::vector<sptr<NotificationSlot>> spSlots;
-    spSlots.push_back(spSlot);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().UpdateNotificationSlots(bundleName, spSlots),
-        (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
-}
-
-/**
  * @tc.number    : NotificationPreferencesTest_05000
  * @tc.name      : AMS_ANS_SetDisturbMode_0100
  * @tc.desc      : Test SetDisturbMode function
@@ -802,17 +590,6 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_05000, Functio
     TestAddNotificationSlot();
     EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_ALL),
         (int)ERR_OK);
-}
-
-/**
- * @tc.number    : NotificationPreferencesTest_05100
- * @tc.name      : AMS_ANS_GetDisturbMode_0100
- * @tc.desc      : Test GetDisturbMode function when file is null
- */
-HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_05100, Function | SmallTest | Level1)
-{
-    NotificationConstant::DisturbMode mode;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDisturbMode(mode), (int)ERR_ANS_PREFERENCES_FILE_IS_NULL);
 }
 
 /**

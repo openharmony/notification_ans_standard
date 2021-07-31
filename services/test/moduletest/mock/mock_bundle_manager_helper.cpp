@@ -21,18 +21,14 @@
 
 namespace OHOS {
 namespace Notification {
-
 BundleManagerHelper::BundleManagerHelper()
-{
-}
+{}
 
 BundleManagerHelper::~BundleManagerHelper()
-{
-}
+{}
 
 void BundleManagerHelper::OnRemoteDied(const wptr<IRemoteObject> &object)
-{
-}
+{}
 
 std::string BundleManagerHelper::GetBundleNameByUid(uid_t uid)
 {
@@ -45,12 +41,10 @@ bool BundleManagerHelper::IsSystemApp(uid_t uid)
 }
 
 void BundleManagerHelper::Connect()
-{
-}
+{}
 
 void BundleManagerHelper::Disconnect()
-{
-}
+{}
 
 }  // namespace Notification
 }  // namespace OHOS

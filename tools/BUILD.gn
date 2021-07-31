@@ -12,5 +12,5 @@
 # limitations under the License.
 
 group("tools_target") {
-  deps = []
+  deps = [ "dump:anm_target" ]
 }

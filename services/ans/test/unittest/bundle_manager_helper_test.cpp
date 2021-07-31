@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
+#include <functional>
+#include <gtest/gtest.h>
+
 #include "bundle_manager_helper.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include <functional>
-#include <gtest/gtest.h>
 
 using namespace testing::ext;
 namespace OHOS {
