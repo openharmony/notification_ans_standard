@@ -159,10 +159,6 @@ napi_value Publish(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("Publish napi_create_async_work start");
             AsyncCallbackInfoPublish *asynccallbackinfo = (AsyncCallbackInfoPublish *)data;
-            ANS_LOGI("==============Publish napi_create_async_work start notificationId = %{public}d,contentType = "
-                     "%{public}d",
-                asynccallbackinfo->notificationRequest.GetNotificationId(),
-                asynccallbackinfo->notificationRequest.GetContent()->GetContentType());
 
             asynccallbackinfo->errorCode = NotificationHelper::PublishNotification(
                 asynccallbackinfo->lable, asynccallbackinfo->notificationRequest);
