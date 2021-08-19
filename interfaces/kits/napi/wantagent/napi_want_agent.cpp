@@ -299,7 +299,7 @@ napi_value NAPI_GetBundleName(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    HILOG_INFO("argc = [%{public}d]", argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     napi_valuetype wantAgentType;
     napi_typeof(env, argv[0], &wantAgentType);
@@ -419,7 +419,7 @@ napi_value NAPI_GetUid(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    HILOG_INFO("argc = [%{public}d]", argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     napi_valuetype wantAgentType;
     napi_typeof(env, argv[0], &wantAgentType);
@@ -537,7 +537,7 @@ napi_value NAPI_GetWant(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    HILOG_INFO("argc = [%{public}d]", argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     napi_valuetype wantAgentType;
     napi_typeof(env, argv[0], &wantAgentType);
@@ -676,7 +676,7 @@ napi_value NAPI_Cancel(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    HILOG_INFO("argc = [%{public}d]", argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     napi_valuetype wantAgentType;
     napi_typeof(env, argv[0], &wantAgentType);
@@ -753,7 +753,7 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
     size_t argc = 3;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    HILOG_INFO("argc = [%{public}d]", argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     napi_valuetype wantAgentType;
     napi_typeof(env, argv[0], &wantAgentType);
@@ -924,7 +924,7 @@ napi_value NAPI_Equal(napi_env env, napi_callback_info info)
     size_t argc = 3;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    HILOG_INFO("argc = [%{public}d]", argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     napi_valuetype wantAgentFirstType;
     napi_typeof(env, argv[0], &wantAgentFirstType);
@@ -1062,7 +1062,7 @@ napi_value NAPI_GetWantAgentWrap(
             [](napi_env env, void *data) {
                 HILOG_INFO("GetWantAgent called(Promise Mode)...");
                 AsyncGetWantAgentCallbackInfo *asyncCallbackInfo = (AsyncGetWantAgentCallbackInfo *)data;
-                HILOG_INFO("GetWantAgent wants.size = [%{public}d], wantAgentFlags.size = [%{public}d]",
+                HILOG_INFO("GetWantAgent wants.size = [%{public}zu], wantAgentFlags.size = [%{public}zu]",
                     asyncCallbackInfo->wants.size(),
                     asyncCallbackInfo->wantAgentFlags.size());
 
@@ -1119,7 +1119,7 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    HILOG_INFO("argc = [%{public}d]", argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     napi_valuetype jsWantAgentInfoType;
     napi_value jsWantAgentInfo = argv[0];
