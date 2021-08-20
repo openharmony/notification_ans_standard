@@ -514,7 +514,7 @@ napi_value GetSlots(napi_env env, napi_callback_info info)
                         }
                     }
                 }
-                ANS_LOGI("getSlots count = %{public}d", count);
+                ANS_LOGI("getSlots count = %{public}zu", count);
                 if (count == 0) {
                     asynccallbackinfo->errorCode = ERROR;
                     asynccallbackinfo->result = Common::NapiGetNull(env);

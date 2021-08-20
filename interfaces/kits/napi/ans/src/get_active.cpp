@@ -92,7 +92,7 @@ napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
     if (ParseParametersByAllActive(env, argv, argc, hashcode, callback) == nullptr) {
         return Common::JSParaError(env, callback);
     }
-    ANS_LOGI("GetAllActiveNotifications hashcode.size = %{public}d", hashcode.size());
+    ANS_LOGI("GetAllActiveNotifications hashcode.size = %{public}zu", hashcode.size());
 
     AsyncCallbackInfoActive *asynccallbackinfo =
         new (std::nothrow) AsyncCallbackInfoActive{.env = env, .asyncWork = nullptr, .strValue = hashcode};

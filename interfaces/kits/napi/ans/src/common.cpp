@@ -14,6 +14,7 @@
  */
 
 #include "common.h"
+#include <cinttypes>
 #include "napi_common.h"
 #include "notification_long_text_content.h"
 #include "notification_multiline_content.h"
@@ -2449,7 +2450,7 @@ napi_value getConversationalMessage(const napi_env &env, const napi_value &conve
         NAPI_CALL(env, napi_typeof(env, timestampResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int64(env, timestampResult, &timestamp);
-        ANS_LOGI("conversationalMessage::timestamp = %{public}lld", timestamp);
+        ANS_LOGI("conversationalMessage::timestamp = %{public}" PRId64, timestamp);
     }
     // mimeType: string
     NAPI_CALL(env, napi_has_named_property(env, conversationalMessage, "mimeType", &hasProperty));
@@ -2877,7 +2878,7 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
                 NAPI_CALL(env, napi_typeof(env, nVibrationValue, &valuetype));
                 NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
                 napi_get_value_int64(env, nVibrationValue, &vibrationValue);
-                ANS_LOGI("vibrationValue is: %{public}lld", vibrationValue);
+                ANS_LOGI("vibrationValue is: %{public}" PRId64, vibrationValue);
                 vibrationValues.emplace_back(vibrationValue);
             }
             if (vibrationValues.size() > 0) {
