@@ -123,7 +123,7 @@ void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::No
         return;
     }
     ANS_LOGI("OnCanceled NotificationId = %{public}d", request->GetNotificationRequest().GetNotificationId());
-    ANS_LOGI("OnCanceled sortingMap size = %{public}d", sortingMap->GetKey().size());
+    ANS_LOGI("OnCanceled sortingMap size = %{public}zu", sortingMap->GetKey().size());
     ANS_LOGI("OnCanceled deleteReason = %{public}d", deleteReason);
 
     uv_loop_s *loop = nullptr;
@@ -196,7 +196,7 @@ void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::No
         return;
     }
     ANS_LOGI("OnConsumed NotificationId = %{public}d", request->GetNotificationRequest().GetNotificationId());
-    ANS_LOGI("OnConsumed sortingMap size = %{public}d", sortingMap->GetKey().size());
+    ANS_LOGI("OnConsumed sortingMap size = %{public}zu", sortingMap->GetKey().size());
 
     uv_loop_s *loop = nullptr;
 #if NAPI_VERSION >= 2
@@ -257,7 +257,7 @@ void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> 
         ANS_LOGE("sortingMap is null");
         return;
     }
-    ANS_LOGI("OnUpdate sortingMap size = %{public}d", sortingMap->GetKey().size());
+    ANS_LOGI("OnUpdate sortingMap size = %{public}zu", sortingMap->GetKey().size());
 
     uv_loop_s *loop = nullptr;
 #if NAPI_VERSION >= 2
@@ -784,7 +784,7 @@ bool AddAsyncCallbackInfo(SubscriberInstance *subscriber, AsyncCallbackInfoOn *a
     std::lock_guard<std::mutex> lock(mutex_);
     auto infoItem = g_SubscriberInstances.find(subscriber);
     if (infoItem != g_SubscriberInstances.end()) {
-        ANS_LOGI("AddAsyncCallbackInfo AsyncCallbackInfoOn size = %{public}d", infoItem->second.size());
+        ANS_LOGI("AddAsyncCallbackInfo AsyncCallbackInfoOn size = %{public}zu", infoItem->second.size());
         for (auto asyncCallbackInfoOn : infoItem->second) {
             ANS_LOGI("AddAsyncCallbackInfo AsyncCallbackInfoOn ptr = %{public}p", asyncCallbackInfoOn);
             ANS_LOGI("AsyncCallbackInfoOn->type = %{public}s", asyncCallbackInfoOn->type.c_str());
@@ -815,7 +815,7 @@ bool DelAsyncCallbackInfo(SubscriberInstance *subscriber, const std::string &typ
 
     auto infoItem = g_SubscriberInstances.find(subscriber);
     if (infoItem != g_SubscriberInstances.end()) {
-        ANS_LOGI("DelSubscriberInstance AsyncCallbackInfoOn size = %{public}d", infoItem->second.size());
+        ANS_LOGI("DelSubscriberInstance AsyncCallbackInfoOn size = %{public}zu", infoItem->second.size());
         if (type.empty()) {
             for (auto asyncCallbackInfoOn : infoItem->second) {
                 ANS_LOGI("DelSubscriberInstance AsyncCallbackInfoOn ptr = %{public}p", asyncCallbackInfoOn);
