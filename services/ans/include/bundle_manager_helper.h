@@ -32,8 +32,9 @@ namespace Notification {
 
 class BundleManagerHelper : public DelayedSingleton<BundleManagerHelper> {
 public:
-    std::string GetBundleNameByUid(uid_t uid);
-    bool IsSystemApp(uid_t uid);
+    std::string GetBundleNameByUid(int uid);
+    bool IsSystemApp(int uid);
+    int GetDefaultUidByBundleName(const std::string& bundle);
 
 private:
     void Connect();

@@ -111,7 +111,7 @@ ErrCode AnsSubscriberStub::HandleOnConsumedMap(MessageParcel &data, MessageParce
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    bool existMap;
+    bool existMap = false;
     if (!data.ReadBool(existMap)) {
         ANS_LOGW("[HandleOnConsumedMap] fail: read existMap failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -150,7 +150,7 @@ ErrCode AnsSubscriberStub::HandleOnCanceledMap(MessageParcel &data, MessageParce
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    bool existMap;
+    bool existMap = false;
     if (!data.ReadBool(existMap)) {
         ANS_LOGW("[HandleOnCanceledMap] fail: read existMap failed");
         return ERR_ANS_PARCELABLE_FAILED;

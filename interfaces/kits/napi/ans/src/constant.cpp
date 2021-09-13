@@ -78,6 +78,27 @@ napi_value SlotTypeInit(napi_env env, napi_value exports)
     return exports;
 }
 
+napi_value SlotLevelInit(napi_env env, napi_value exports)
+{
+    ANS_LOGI("%{public}s, called", __func__);
+
+    napi_value obj = nullptr;
+    napi_create_object(env, &obj);
+
+    SetNamedPropertyByInteger(env, obj, SlotLevel::LEVEL_NONE, "LEVEL_NONE");
+    SetNamedPropertyByInteger(env, obj, SlotLevel::LEVEL_MIN, "LEVEL_MIN");
+    SetNamedPropertyByInteger(env, obj, SlotLevel::LEVEL_LOW, "LEVEL_LOW");
+    SetNamedPropertyByInteger(env, obj, SlotLevel::LEVEL_DEFAULT, "LEVEL_DEFAULT");
+    SetNamedPropertyByInteger(env, obj, SlotLevel::LEVEL_HIGH, "LEVEL_HIGH");
+
+    napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("SlotLevel", obj),
+    };
+
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    return exports;
+}
+
 napi_value SemanticActionButtonInit(napi_env env, napi_value exports)
 {
     ANS_LOGI("%{public}s, called", __func__);
@@ -123,7 +144,7 @@ napi_value InputsSourceInit(napi_env env, napi_value exports)
     return exports;
 }
 
-napi_value DisturbModeInit(napi_env env, napi_value exports)
+napi_value DoNotDisturbMode(napi_env env, napi_value exports)
 {
     ANS_LOGI("%{public}s, called", __func__);
 
@@ -137,7 +158,7 @@ napi_value DisturbModeInit(napi_env env, napi_value exports)
     SetNamedPropertyByInteger(env, obj, DisturbMode::ALLOW_ALARMS, "ALLOW_ALARMS");
 
     napi_property_descriptor exportFuncs[] = {
-        DECLARE_NAPI_PROPERTY("DisturbMode", obj),
+        DECLARE_NAPI_PROPERTY("DoNotDisturbMode", obj),
     };
 
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
@@ -191,9 +212,10 @@ napi_value ConstantInit(napi_env env, napi_value exports)
 {
     NotificationReasonInit(env, exports);
     SlotTypeInit(env, exports);
+    SlotLevelInit(env, exports);
     SemanticActionButtonInit(env, exports);
     InputsSourceInit(env, exports);
-    DisturbModeInit(env, exports);
+    DoNotDisturbMode(env, exports);
     InputEditTypeInit(env, exports);
     ContentTypeInit(env, exports);
     return exports;

@@ -127,6 +127,7 @@ public:
 
 private:
     WantAgentConstant(){};
+    virtual ~WantAgentConstant() = default;
 };
 }  // namespace OHOS::Notification::WantAgent
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_WANTAGENT_INCLUDE_WANT_AGENT_CONSTANT_H

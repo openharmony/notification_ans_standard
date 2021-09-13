@@ -1,6 +1,6 @@
 /*
- * Copyright (c); 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");;
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -39,15 +39,31 @@ public:
      * @param extras Indicates the PacMap object containing the additional data.
      * @param semanticActionButton Indicates the semantic action to add.
      * @param autoCreatedReplies Indicates whether to allow the platform to automatically generate possible replies.
+     * @param mimeTypeOnlyInputs Indicates the NotificationUserInput object to add which allows only values of
+     * particular MIME types.
      * @param userInputs Indicates the NotificationUserInput object to add.
+     * @param isContextual Indicates whether this NotificationActionButton is a contextual action, that is, whether this
+     * NotificationActionButton is dependent on the notification message body.
      * @return the shared_ptr object owns the created NotificationActionButton object otherwise return empty object if
-     * isContextual is true but icon or wantAgent is dempty.
+     * isContextual is true but icon or wantAgent is empty.
      */
     static std::shared_ptr<NotificationActionButton> Create(const std::shared_ptr<PixelMap> &icon,
         const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
-        const std::shared_ptr<AppExecFwk::PacMap> &extras,
-        NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
-        const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual);
+        const std::shared_ptr<AppExecFwk::PacMap> &extras = {},
+        NotificationConstant::SemanticActionButton semanticActionButton =
+            NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON,
+        bool autoCreatedReplies = true,
+        const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs = {},
+        const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs = {}, bool isContextual = false);
+
+    /**
+     * A static function used to create a NotificationActionButton instance by copying parameters from an existing
+     * NotificationActionButton object.
+     * @param actionButton Indicates the existing NotificationActionButton object.
+     * @return the shared_ptr object owns the created NotificationActionButton object otherwise return empty object.
+     */
+    static std::shared_ptr<NotificationActionButton> Create(
+        const std::shared_ptr<NotificationActionButton> &actionButton);
 
     /**
      * Default deconstructor used to deconstruct.
@@ -99,6 +115,19 @@ public:
     NotificationConstant::SemanticActionButton GetSemanticActionButton() const;
 
     /**
+     * Adds a NotificationUserInput object that only allows values of particular MIME types.
+     * @param userInput Indicates the NotificationUserInput object to add.
+     */
+    void AddMimeTypeOnlyUserInput(const std::shared_ptr<NotificationUserInput> &userInput);
+
+    /**
+     * Obtains the NotificationUserInput objects that only allow values of particular MIME types
+     * when this NotificationActionButton is sent.
+     * @return the list of NotificationUserInput objects allowing only values of particular MIME types.
+     */
+    std::vector<std::shared_ptr<NotificationUserInput>> GetMimeTypeOnlyUserInputs() const;
+
+    /**
      * Adds a NotificationUserInput object used to collect user input.
      * @param userInput Indicates the NotificationUserInput object to add.
      */
@@ -110,13 +139,6 @@ public:
      * @return the list of NotificationUserInput objects.
      */
     std::vector<std::shared_ptr<NotificationUserInput>> GetUserInputs() const;
-
-    /**
-     * Obtains the NotificationUserInput objects that only allow values of particular MIME types
-     * when this NotificationActionButton is sent.
-     * @return the list of NotificationUserInput objects allowing only values of particular MIME types.
-     */
-    std::vector<std::shared_ptr<NotificationUserInput>> GetMimeTypeOnlyUserInputs() const;
 
     /**
      * Sets whether to allow the platform to automatically generate possible replies and add them to
@@ -181,12 +203,15 @@ private:
      * @param extras Indicates the PacMap object containing the additional data.
      * @param semanticActionButton Indicates the semantic action to add.
      * @param autoCreatedReplies Indicates whether to allow the platform to automatically generate possible replies.
+     * @param mimeTypeOnlyInputs Indicates the NotificationUserInput object to add which allows only values of
+     * particular MIME types.
      * @param userInputs Indicates the NotificationUserInput object to add.
      * @param isContextual Indicates whether this NotificationActionButton is a contextual action.
      */
     NotificationActionButton(const std::shared_ptr<PixelMap> &icon, const std::string &title,
         const std::shared_ptr<WantAgent::WantAgent> &wantAgent, const std::shared_ptr<AppExecFwk::PacMap> &extras,
         NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
+        const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
         const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual);
 
     /**
@@ -203,6 +228,7 @@ private:
     NotificationConstant::SemanticActionButton semanticActionButton_{
         NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON};
     bool autoCreatedReplies_{true};
+    std::vector<std::shared_ptr<NotificationUserInput>> mimeTypeOnlyUserInputs_{};
     std::vector<std::shared_ptr<NotificationUserInput>> userInputs_{};
     bool isContextual_{false};
 };

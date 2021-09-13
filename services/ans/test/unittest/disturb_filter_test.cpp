@@ -24,23 +24,11 @@ namespace Notification {
 
 class DisturbFilterTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(){};
+    static void TearDownTestCase(){};
+    void SetUp(){};
+    void TearDown(){};
 };
-
-void DisturbFilterTest::SetUpTestCase()
-{}
-
-void DisturbFilterTest::TearDownTestCase()
-{}
-
-void DisturbFilterTest::SetUp()
-{}
-
-void DisturbFilterTest::TearDown()
-{}
 
 /**
  * @tc.number    : DisturbFilterTest_00100

@@ -43,6 +43,11 @@ public:
     Notification(const Notification &other);
 
     /**
+     * @brief Default destructor.
+     */
+    ~Notification();
+
+    /**
      * @brief Obtains whether to enable the notification light when a notification is received on the device, provided
      * that this device has a notification light.
      *
@@ -146,14 +151,14 @@ public:
      *
      * @return Return the UID of the notification creator.
      */
-    uid_t GetUid() const;
+    pid_t GetUid() const;
 
     /**
      * @brief Obtains the PID of the notification creator.
      *
      * @return Return the PID of the notification creator.
      */
-    uid_t GetPid() const;
+    pid_t GetPid() const;
 
     /**
      * @brief Obtains the vibration style for this notifications. if
@@ -232,4 +237,4 @@ private:
 };
 }  // namespace Notification
 }  // namespace OHOS
-#endif
+#endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_H

@@ -20,15 +20,16 @@
 #include <string>
 #include <vector>
 
+#include "notification_bundle_option.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
 #include "preferences_constant.h"
 
 namespace OHOS {
 namespace Notification {
-class NotificationPreferencesInfo {
+class NotificationPreferencesInfo final {
 public:
-    class BundleInfo {
+    class BundleInfo final {
     public:
         BundleInfo();
         ~BundleInfo();
@@ -47,25 +48,31 @@ public:
         void SetSlot(const sptr<NotificationSlot> &slot);
         bool GetSlot(const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot) const;
         bool GetAllSlots(std::vector<sptr<NotificationSlot>> &slots);
-        bool GetAllSlotsInGroup(const std::string groupId, std::vector<sptr<NotificationSlot>> &slots);
+        uint32_t GetAllSlotsSize();
+        bool GetAllSlotsInGroup(const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots);
+        bool GetAllSlotsInGroup(const std::string &groupId, std::vector<NotificationSlot> &slots);
         void SetGroup(const sptr<NotificationSlotGroup> &group);
-        bool GetGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group) const;
+        bool GetGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group);
         bool GetAllGroups(std::vector<sptr<NotificationSlotGroup>> &group);
         uint32_t GetGroupSize() const;
         bool IsExsitSlot(const NotificationConstant::SlotType &type) const;
         bool IsExsitSlotGroup(const std::string &groupId) const;
         bool RemoveSlot(const NotificationConstant::SlotType &type);
+        void RemoveAllSlots();
         bool RemoveSlotGroup(const std::string &groupId);
+        void SetBundleUid(const int &uid);
+        int GetBundleUid() const;
 
     private:
-        std::string bundleName_{};
+        std::string bundleName_ {};
+        int uid_ {};
         int importance_ = BUNDLE_IMPORTANCE;
         bool isShowBadge_ = BUNDLE_SHOW_BADGE;
         int badgeTotalNum_ = BUNDLE_BADGE_TOTAL_NUM;
         bool isPrivateAllowed_ = BUNDLE_PRIVATE_ALLOWED;
         bool isEnabledNotification_ = BUNDLE_ENABLE_NOTIFICATION;
-        std::map<NotificationConstant::SlotType, sptr<NotificationSlot>> slots_{};
-        std::map<std::string, sptr<NotificationSlotGroup>> groups_{};
+        std::map<NotificationConstant::SlotType, sptr<NotificationSlot>> slots_ {};
+        std::map<std::string, sptr<NotificationSlotGroup>> groups_ {};
     };
 
     NotificationPreferencesInfo()
@@ -77,9 +84,9 @@ public:
     void SetDisturbMode(const NotificationConstant::DisturbMode &mode);
     NotificationConstant::DisturbMode GetDisturbMode() const;
     void SetBundleInfo(const BundleInfo &info);
-    bool GetBundleInfo(const std::string &bundleName, BundleInfo &info) const;
-    bool RemoveBundleInfo(const std::string &bundleName);
-    bool IsExsitBundleInfo(const std::string &bundleName) const;
+    bool GetBundleInfo(const sptr<NotificationBundleOption> &bundleOption, BundleInfo &info) const;
+    bool RemoveBundleInfo(const sptr<NotificationBundleOption> &bundleOption);
+    bool IsExsitBundleInfo(const sptr<NotificationBundleOption> &bundleOption) const;
     void ClearBundleInfo();
 
 private:

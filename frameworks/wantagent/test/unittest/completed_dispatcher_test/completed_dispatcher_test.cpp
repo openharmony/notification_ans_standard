@@ -27,6 +27,7 @@
 #include "want.h"
 #include "want_params.h"
 #include "want_receiver_stub.h"
+#include "ohos/aafwk/base/bool_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS::AAFwk;
@@ -53,12 +54,12 @@ public:
          * Called when a Send operation as completed.
          *
          * @param want The original Want that was sent.
-         * @param resultCode_ The final result code determined by the Send.
+         * @param resultCode The final result code determined by the Send.
          * @param resultData The final data collected by a broadcast.
          * @param resultExtras The final extras collected by a broadcast.
          */
     public:
-        void OnSendFinished(const AAFwk::Want &want, int resultCode_, const std::string &resultData,
+        void OnSendFinished(const AAFwk::Want &want, int resultCode, const std::string &resultData,
             const AAFwk::WantParams &resultExtras) override;
         static int code;
     };
@@ -67,7 +68,7 @@ public:
 int CompletedDispatcherTest::CompletedCallbackSon::code = 0;
 
 void CompletedDispatcherTest::CompletedCallbackSon::OnSendFinished(
-    const AAFwk::Want &want, int resultCode_, const std::string &resultData, const AAFwk::WantParams &resultExtras)
+    const AAFwk::Want &want, int resultCode, const std::string &resultData, const AAFwk::WantParams &resultExtras)
 {
     code = 100;
 }

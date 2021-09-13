@@ -90,7 +90,7 @@ ErrCode NotificationShellCommand::RunAsDumpCommand()
         {0, 0, 0, 0},
     };
 
-    int ind;
+    int ind = 0;
     int option = getopt_long(argc_, argv_, "hAR", options, &ind);
 
     ErrCode ret = ERR_OK;
@@ -137,7 +137,7 @@ ErrCode NotificationShellCommand::RunAsDumpCommand()
         resultReceiver_.append(info);
     }
 
-    return ERR_OK;
+    return ret;
 }
 
 }  // namespace Notification

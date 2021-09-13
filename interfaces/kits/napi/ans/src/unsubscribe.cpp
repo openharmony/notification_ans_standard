@@ -14,94 +14,73 @@
  */
 
 #include "unsubscribe.h"
-#include "create_subscriber.h"
+#include "subscribe.h"
 
 namespace OHOS {
 namespace NotificationNapi {
 const int UNSUBSCRIBE_MAX_PARA = 2;
 
 struct AsyncCallbackInfoUnsubscribe {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_ref callback = 0;
-    napi_deferred deferred;
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
     SubscriberInstance *objectInfo = nullptr;
-    bool isCallback = false;
-    int errorCode = 0;
+    CallbackPromiseInfo info;
 };
 
-napi_value ParseParameters(const napi_env &env, const size_t &argc, const napi_value (&argv)[UNSUBSCRIBE_MAX_PARA],
-    SubscriberInstance *&objectInfo, napi_ref &callback)
-{
-    ANS_LOGI("ParseParameters start");
+struct ParametersInfoUnsubscribe {
+    SubscriberInstance *objectInfo = nullptr;
+    napi_ref callback = nullptr;
+};
 
+napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, ParametersInfoUnsubscribe &paras)
+{
+    ANS_LOGI("enter");
+
+    size_t argc = UNSUBSCRIBE_MAX_PARA;
+    napi_value argv[UNSUBSCRIBE_MAX_PARA] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
 
-    napi_valuetype valuetype;
+    napi_valuetype valuetype = napi_undefined;
     // argv[0]:subscriber
     NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type for arg0. Subscribe expected.");
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type for arg0. Subscribe object expected.");
 
-    napi_unwrap(env, argv[0], (void **)&objectInfo);
-    if (!objectInfo) {
-        ANS_LOGE("ParseParameters objectInfo is null");
+    SubscriberInstancesInfo subscriberInstancesInfo;
+    if (!HasNotificationSubscriber(env, argv[0], subscriberInstancesInfo)) {
         return nullptr;
     }
-
-    ANS_LOGI("ParseParameters objectInfo = %{public}p start", objectInfo);
-
-    if (!HasNotificationSubscriber(objectInfo)) {
-        return nullptr;
-    }
+    paras.objectInfo = subscriberInstancesInfo.subscriber;
+    ANS_LOGI("ObjectInfo = %{public}p start", paras.objectInfo);
 
     // argv[1]:callback
     if (argc >= UNSUBSCRIBE_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[1], 1, &callback);
+        napi_create_reference(env, argv[1], 1, &paras.callback);
     }
 
     return Common::NapiGetNull(env);
-}
-
-void PaddingAsyncCallbackInfoIs(const napi_env &env, const size_t &argc,
-    AsyncCallbackInfoUnsubscribe *&asynccallbackinfo, const napi_ref &callback, napi_value &promise)
-{
-    ANS_LOGI("PaddingAsyncCallbackInfoIs start");
-
-    if (argc >= UNSUBSCRIBE_MAX_PARA) {
-        asynccallbackinfo->callback = callback;
-        asynccallbackinfo->isCallback = true;
-    } else {
-        napi_deferred deferred = nullptr;
-        NAPI_CALL_RETURN_VOID(env, napi_create_promise(env, &deferred, &promise));
-        asynccallbackinfo->deferred = deferred;
-        asynccallbackinfo->isCallback = false;
-    }
 }
 
 napi_value Unsubscribe(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("Unsubscribe start");
 
-    // Argument parsing
-    size_t argc = UNSUBSCRIBE_MAX_PARA;
-    napi_value argv[UNSUBSCRIBE_MAX_PARA];
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-
-    napi_ref callback = 0;
-    SubscriberInstance *subscriberInstance = nullptr;
-    if (ParseParameters(env, argc, argv, subscriberInstance, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+    ParametersInfoUnsubscribe paras;
+    if (ParseParameters(env, info, paras) == nullptr) {
+        return Common::JSParaError(env, paras.callback);
     }
 
     AsyncCallbackInfoUnsubscribe *asynccallbackinfo = new (std::nothrow)
-        AsyncCallbackInfoUnsubscribe{.env = env, .asyncWork = nullptr, .objectInfo = subscriberInstance};
+        AsyncCallbackInfoUnsubscribe{.env = env, .asyncWork = nullptr, .objectInfo = paras.objectInfo};
+    if (!asynccallbackinfo) {
+        return Common::JSParaError(env, paras.callback);
+    }
+    napi_value promise = nullptr;
+    Common::PaddingCallbackPromiseInfo(env, paras.callback, asynccallbackinfo->info, promise);
 
-    napi_value promise = 0;
-    PaddingAsyncCallbackInfoIs(env, argc, asynccallbackinfo, callback, promise);
-
-    napi_value resourceName;
+    napi_value resourceName = nullptr;
     napi_create_string_latin1(env, "Unsubscribe", NAPI_AUTO_LENGTH, &resourceName);
 
     // Asynchronous function call
@@ -112,21 +91,18 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
             ANS_LOGI("Unsubscribe napi_create_async_work start");
             AsyncCallbackInfoUnsubscribe *asynccallbackinfo = (AsyncCallbackInfoUnsubscribe *)data;
 
-            asynccallbackinfo->errorCode =
+            asynccallbackinfo->info.errorCode =
                 NotificationHelper::UnSubscribeNotification(*(asynccallbackinfo->objectInfo));
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Unsubscribe napi_create_async_work end");
             AsyncCallbackInfoUnsubscribe *asynccallbackinfo = (AsyncCallbackInfoUnsubscribe *)data;
 
-            CallbackPromiseInfo info;
-            info.isCallback = asynccallbackinfo->isCallback;
-            info.callback = asynccallbackinfo->callback;
-            info.deferred = asynccallbackinfo->deferred;
-            info.errorCode = asynccallbackinfo->errorCode;
-            Common::ReturnCallbackPromise(env, info, Common::NapiGetNull(env));
+            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
 
-            DelAsyncCallbackInfo(asynccallbackinfo->objectInfo);
+            if (asynccallbackinfo->info.callback != nullptr) {
+                napi_delete_reference(env, asynccallbackinfo->info.callback);
+            }
 
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
@@ -139,7 +115,7 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
 
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
 
-    if (asynccallbackinfo->isCallback) {
+    if (asynccallbackinfo->info.isCallback) {
         return Common::NapiGetNull(env);
     } else {
         return promise;

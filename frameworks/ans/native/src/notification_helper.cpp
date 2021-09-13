@@ -24,6 +24,11 @@ ErrCode NotificationHelper::AddNotificationSlot(const NotificationSlot &slot)
     return DelayedSingleton<AnsNotification>::GetInstance()->AddNotificationSlot(slot);
 }
 
+ErrCode NotificationHelper::AddSlotByType(const NotificationConstant::SlotType &slotType)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->AddSlotByType(slotType);
+}
+
 ErrCode NotificationHelper::AddNotificationSlots(const std::vector<NotificationSlot> &slots)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->AddNotificationSlots(slots);
@@ -32,6 +37,11 @@ ErrCode NotificationHelper::AddNotificationSlots(const std::vector<NotificationS
 ErrCode NotificationHelper::RemoveNotificationSlot(const NotificationConstant::SlotType &slotType)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotificationSlot(slotType);
+}
+
+ErrCode NotificationHelper::RemoveAllSlots()
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveAllSlots();
 }
 
 ErrCode NotificationHelper::GetNotificationSlot(
@@ -68,6 +78,11 @@ ErrCode NotificationHelper::GetNotificationSlotGroup(const std::string &groupId,
 ErrCode NotificationHelper::GetNotificationSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetNotificationSlotGroups(groups);
+}
+
+ErrCode NotificationHelper::GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetNotificationSlotNumAsBundle(bundleOption, num);
 }
 
 ErrCode NotificationHelper::PublishNotification(const NotificationRequest &request)
@@ -194,9 +209,20 @@ ErrCode NotificationHelper::RemoveNotification(const std::string &key)
     return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotification(key);
 }
 
-ErrCode NotificationHelper::RemoveNotifications(const std::string &bundleName)
+ErrCode NotificationHelper::RemoveNotification(
+        const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label)
 {
-    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotifications(bundleName);
+    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotification(bundleOption, notificationId, label);
+}
+
+ErrCode NotificationHelper::RemoveAllNotifications(const NotificationBundleOption &bundleOption)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveAllNotifications(bundleOption);
+}
+
+ErrCode NotificationHelper::RemoveNotificationsByBundle(const NotificationBundleOption &bundleOption)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotificationsByBundle(bundleOption);
 }
 
 ErrCode NotificationHelper::RemoveNotifications()
@@ -205,9 +231,21 @@ ErrCode NotificationHelper::RemoveNotifications()
 }
 
 ErrCode NotificationHelper::GetNotificationSlotsForBundle(
-    const std::string &bundleName, std::vector<sptr<NotificationSlot>> &slots)
+    const NotificationBundleOption &bundleOption, std::vector<sptr<NotificationSlot>> &slots)
 {
-    return DelayedSingleton<AnsNotification>::GetInstance()->GetNotificationSlotsForBundle(bundleName, slots);
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetNotificationSlotsForBundle(bundleOption, slots);
+}
+
+ErrCode NotificationHelper::UpdateNotificationSlots(
+    const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->UpdateNotificationSlots(bundleOption, slots);
+}
+
+ErrCode NotificationHelper::UpdateNotificationSlotGroups(
+    const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->UpdateNotificationSlotGroups(bundleOption, groups);
 }
 
 ErrCode NotificationHelper::GetAllActiveNotifications(std::vector<sptr<Notification>> &notification)
@@ -221,9 +259,9 @@ ErrCode NotificationHelper::GetAllActiveNotifications(
     return DelayedSingleton<AnsNotification>::GetInstance()->GetAllActiveNotifications(key, notification);
 }
 
-ErrCode NotificationHelper::IsAllowedNotify(const std::string &bundle, bool &allowed)
+ErrCode NotificationHelper::IsAllowedNotify(const NotificationBundleOption &bundleOption, bool &allowed)
 {
-    return DelayedSingleton<AnsNotification>::GetInstance()->IsAllowedNotify(bundle, allowed);
+    return DelayedSingleton<AnsNotification>::GetInstance()->IsAllowedNotify(bundleOption, allowed);
 }
 
 ErrCode NotificationHelper::SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled)
@@ -237,10 +275,25 @@ ErrCode NotificationHelper::SetNotificationsEnabledForDefaultBundle(const std::s
 }
 
 ErrCode NotificationHelper::SetNotificationsEnabledForSpecifiedBundle(
-    const std::string &bundle, std::string &deviceId, bool enabled)
+    const NotificationBundleOption &bundleOption, std::string &deviceId, bool enabled)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->SetNotificationsEnabledForSpecifiedBundle(
-        bundle, deviceId, enabled);
+        bundleOption, deviceId, enabled);
+}
+
+ErrCode NotificationHelper::SetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetShowBadgeEnabledForBundle(bundleOption, enabled);
+}
+
+ErrCode NotificationHelper::GetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool &enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetShowBadgeEnabledForBundle(bundleOption, enabled);
+}
+
+ErrCode NotificationHelper::GetShowBadgeEnabled(bool &enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetShowBadgeEnabled(enabled);
 }
 
 ErrCode NotificationHelper::SetDisturbMode(NotificationConstant::DisturbMode mode)

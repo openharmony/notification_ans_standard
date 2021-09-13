@@ -1,6 +1,6 @@
 /*
- * Copyright (c); 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");;
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -23,7 +23,8 @@ namespace Notification {
 std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const std::shared_ptr<PixelMap> &icon,
     const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
     const std::shared_ptr<AppExecFwk::PacMap> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
-    bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
+    bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
+    const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
 {
     if (isContextual && (!icon || !wantAgent)) {
         ANS_LOGE("icon or wantAgent can not be null when isContextual is true");
@@ -33,10 +34,29 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
     auto realExtras = extras;
     if (!realExtras) {
         realExtras = std::make_shared<AppExecFwk::PacMap>();
+
+        if (!realExtras) {
+            ANS_LOGE("create PacMap object failed");
+            return {};
+        }
+    }
+
+    std::vector<std::shared_ptr<NotificationUserInput>> onlyInputs = mimeTypeOnlyInputs;
+    std::vector<std::shared_ptr<NotificationUserInput>> textInputs{};
+    for (auto &userInput : userInputs) {
+        if (!userInput) {
+            continue;
+        }
+
+        if (userInput->IsMimeTypeOnly()) {
+            onlyInputs.push_back(userInput);
+        } else {
+            textInputs.push_back(userInput);
+        }
     }
 
     auto pActionButton = new (std::nothrow) NotificationActionButton(
-        icon, title, wantAgent, realExtras, semanticActionButton, autoCreatedReplies, userInputs, isContextual);
+        icon, title, wantAgent, realExtras, semanticActionButton, autoCreatedReplies, onlyInputs, textInputs, isContextual);
     if (pActionButton == nullptr) {
         ANS_LOGE("create NotificationActionButton object failed");
         return {};
@@ -45,9 +65,24 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
     return std::shared_ptr<NotificationActionButton>(pActionButton);
 }
 
+std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(
+    const std::shared_ptr<NotificationActionButton> &actionButton)
+{
+    return NotificationActionButton::Create(actionButton->GetIcon(),
+        actionButton->GetTitle(),
+        actionButton->GetWantAgent(),
+        actionButton->GetAdditionalData(),
+        actionButton->GetSemanticActionButton(),
+        actionButton->IsAutoCreatedReplies(),
+        actionButton->GetMimeTypeOnlyUserInputs(),
+        actionButton->GetUserInputs(),
+        actionButton->IsContextDependent());
+}
+
 NotificationActionButton::NotificationActionButton(const std::shared_ptr<PixelMap> &icon, const std::string &title,
     const std::shared_ptr<WantAgent::WantAgent> &wantAgent, const std::shared_ptr<AppExecFwk::PacMap> &extras,
     NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
+    const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
     const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
     : icon_(icon),
       title_(title),
@@ -55,6 +90,7 @@ NotificationActionButton::NotificationActionButton(const std::shared_ptr<PixelMa
       extras_(extras),
       semanticActionButton_(semanticActionButton),
       autoCreatedReplies_(autoCreatedReplies),
+      mimeTypeOnlyUserInputs_(mimeTypeOnlyInputs),
       userInputs_(userInputs),
       isContextual_(isContextual)
 {}
@@ -94,6 +130,26 @@ NotificationConstant::SemanticActionButton NotificationActionButton::GetSemantic
     return semanticActionButton_;
 }
 
+void NotificationActionButton::AddMimeTypeOnlyUserInput(const std::shared_ptr<NotificationUserInput> &userInput)
+{
+    if (!userInput) {
+        ANS_LOGE("The userInput is invalid.");
+        return;
+    }
+
+    if (!userInput->IsMimeTypeOnly()) {
+        ANS_LOGE("The userInput is not a particular MIME types.");
+        return;
+    }
+
+    mimeTypeOnlyUserInputs_.emplace_back(userInput);
+}
+
+std::vector<std::shared_ptr<NotificationUserInput>> NotificationActionButton::GetMimeTypeOnlyUserInputs() const
+{
+    return mimeTypeOnlyUserInputs_;
+}
+
 void NotificationActionButton::AddNotificationUserInput(const std::shared_ptr<NotificationUserInput> &userInput)
 {
     if (!userInput) {
@@ -107,11 +163,6 @@ void NotificationActionButton::AddNotificationUserInput(const std::shared_ptr<No
 std::vector<std::shared_ptr<NotificationUserInput>> NotificationActionButton::GetUserInputs() const
 {
     return userInputs_;
-}
-
-std::vector<std::shared_ptr<NotificationUserInput>> NotificationActionButton::GetMimeTypeOnlyUserInputs() const
-{
-    return {};
 }
 
 void NotificationActionButton::SetAutoCreatedReplies(bool autoCreatedReplies)

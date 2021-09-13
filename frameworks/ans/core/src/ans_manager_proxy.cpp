@@ -14,7 +14,6 @@
  */
 
 #include "ans_manager_proxy.h"
-
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
@@ -167,6 +166,35 @@ ErrCode AnsManagerProxy::CancelAll()
     return result;
 }
 
+ErrCode AnsManagerProxy::AddSlotByType(NotificationConstant::SlotType slotType)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[AddSlotByType] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(slotType)) {
+        ANS_LOGW("[AddSlotByType] fail:: write slotIds failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(ADD_SLOT_BY_TYPE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[AddSlotByType] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[AddSlotByType] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::AddSlots(const std::vector<sptr<NotificationSlot>> &slots)
 {
     if (slots.empty()) {
@@ -207,7 +235,7 @@ ErrCode AnsManagerProxy::AddSlots(const std::vector<sptr<NotificationSlot>> &slo
     return result;
 }
 
-ErrCode AnsManagerProxy::RemoveSlotByType(const NotificationConstant::SlotType slotType)
+ErrCode AnsManagerProxy::RemoveSlotByType(NotificationConstant::SlotType slotType)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
@@ -257,7 +285,7 @@ ErrCode AnsManagerProxy::RemoveAllSlots()
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    return result; 
+    return result;
 }
 
 ErrCode AnsManagerProxy::AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups)
@@ -300,7 +328,7 @@ ErrCode AnsManagerProxy::AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> 
     return result;
 }
 
-ErrCode AnsManagerProxy::GetSlotByType(const NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
+ErrCode AnsManagerProxy::GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
@@ -417,6 +445,45 @@ ErrCode AnsManagerProxy::GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> 
 
     if (!ReadParcelableVector(groups, reply, result)) {
         ANS_LOGW("[GetSlotGroups] fail: read groups failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num)
+{
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[GetSlotNumAsBundle] fail: bundle is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[GetSlotNumAsBundle] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteStrongParcelable(bundleOption)) {
+        ANS_LOGW("[GetSlotNumAsBundle] fail:: write bundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(GET_SLOT_NUM_AS_BUNDLE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[GetShowBadgeEnabledForBundle] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[GetShowBadgeEnabledForBundle] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadInt32(num)) {
+        ANS_LOGW("[GetShowBadgeEnabledForBundle] fail: read enabled failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -922,6 +989,85 @@ ErrCode AnsManagerProxy::GetPrivateNotificationsAllowed(bool &allow)
     return result;
 }
 
+ErrCode AnsManagerProxy::RemoveNotification(
+    const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label)
+{
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[RemoveNotification] fail: bundle is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[RemoveNotification] fail:, write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteStrongParcelable(bundleOption)) {
+        ANS_LOGW("[RemoveNotification] fail:: write bundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(notificationId)) {
+        ANS_LOGW("[RemoveNotification] fail: write notificationId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(label)) {
+        ANS_LOGW("[RemoveNotification] fail: write label failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(REMOVE_NOTIFICATION, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[RemoveNotification] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[RemoveNotification] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::RemoveAllNotifications(const sptr<NotificationBundleOption> &bundleOption)
+{
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[RemoveAllNotifications] fail: bundle is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[RemoveAllNotifications] fail:, write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteStrongParcelable(bundleOption)) {
+        ANS_LOGW("[RemoveAllNotifications] fail:: write bundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(REMOVE_ALL_NOTIFICATIONS, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[RemoveNotification] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[RemoveNotification] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::Delete(const std::string &key)
 {
     if (key.empty()) {
@@ -956,9 +1102,9 @@ ErrCode AnsManagerProxy::Delete(const std::string &key)
     return result;
 }
 
-ErrCode AnsManagerProxy::DeleteByBundle(const std::string &bundle)
+ErrCode AnsManagerProxy::DeleteByBundle(const sptr<NotificationBundleOption> &bundleOption)
 {
-    if (bundle.empty()) {
+    if (bundleOption == nullptr) {
         ANS_LOGW("[DeleteByBundle] fail: bundle is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
@@ -969,7 +1115,7 @@ ErrCode AnsManagerProxy::DeleteByBundle(const std::string &bundle)
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundle)) {
+    if (!data.WriteStrongParcelable(bundleOption)) {
         ANS_LOGW("[DeleteByBundle] fail: write bundle failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -1014,10 +1160,11 @@ ErrCode AnsManagerProxy::DeleteAll()
     return result;
 }
 
-ErrCode AnsManagerProxy::GetSlotsByBundle(const std::string &bundle, std::vector<sptr<NotificationSlot>> &slots)
+ErrCode AnsManagerProxy::GetSlotsByBundle(
+    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots)
 {
-    if (bundle.empty()) {
-        ANS_LOGW("[GetSlotsByBundle] fail: bundle is empty.");
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[GetSlotsByBundle] fail: bundleOption is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -1027,7 +1174,7 @@ ErrCode AnsManagerProxy::GetSlotsByBundle(const std::string &bundle, std::vector
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundle)) {
+    if (!data.WriteParcelable(bundleOption)) {
         ANS_LOGW("[GetSlotsByBundle] fail:: write bundle failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -1048,10 +1195,11 @@ ErrCode AnsManagerProxy::GetSlotsByBundle(const std::string &bundle, std::vector
     return result;
 }
 
-ErrCode AnsManagerProxy::UpdateSlots(const std::string &bundle, const std::vector<sptr<NotificationSlot>> &slots)
+ErrCode AnsManagerProxy::UpdateSlots(
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
-    if (bundle.empty()) {
-        ANS_LOGW("[UpdateSlots] fail: bundle is empty.");
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[UpdateSlots] fail: bundleOption is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -1072,8 +1220,8 @@ ErrCode AnsManagerProxy::UpdateSlots(const std::string &bundle, const std::vecto
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundle)) {
-        ANS_LOGW("[UpdateSlots] fail:: write bundle failed");
+    if (!data.WriteParcelable(bundleOption)) {
+        ANS_LOGW("[UpdateSlots] fail:: write bundleoption failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -1099,10 +1247,10 @@ ErrCode AnsManagerProxy::UpdateSlots(const std::string &bundle, const std::vecto
 }
 
 ErrCode AnsManagerProxy::UpdateSlotGroups(
-    const std::string &bundle, const std::vector<sptr<NotificationSlotGroup>> &groups)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
-    if (bundle.empty()) {
-        ANS_LOGW("[UpdateSlotGroups] fail: bundle is empty.");
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[UpdateSlotGroups] fail: bundleOption is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -1123,8 +1271,8 @@ ErrCode AnsManagerProxy::UpdateSlotGroups(
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundle)) {
-        ANS_LOGW("[UpdateSlotGroups] fail:: write bundle failed.");
+    if (!data.WriteParcelable(bundleOption)) {
+        ANS_LOGW("[UpdateSlotGroups] fail:: write bundleOption failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -1218,10 +1366,10 @@ ErrCode AnsManagerProxy::SetNotificationsEnabledForAllBundles(const std::string 
 }
 
 ErrCode AnsManagerProxy::SetNotificationsEnabledForSpecialBundle(
-    const std::string &deviceId, const std::string &bundleName, bool enabled)
+    const std::string &deviceId, const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
-    if (bundleName.empty()) {
-        ANS_LOGW("[SetNotificationsEnabledForSpecialBundle] fail: bundleName is empty.");
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[SetNotificationsEnabledForSpecialBundle] fail: bundleOption is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -1236,8 +1384,8 @@ ErrCode AnsManagerProxy::SetNotificationsEnabledForSpecialBundle(
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundleName)) {
-        ANS_LOGW("[SetNotificationsEnabledForSpecialBundle] fail: write bundleName failed");
+    if (!data.WriteParcelable(bundleOption)) {
+        ANS_LOGW("[SetNotificationsEnabledForSpecialBundle] fail: write bundleOption failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -1248,7 +1396,7 @@ ErrCode AnsManagerProxy::SetNotificationsEnabledForSpecialBundle(
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(SET_NOTIFICATION_ENABLED_FOR_BUNDLE, option, data, reply);
+    ErrCode result = InnerTransact(SET_NOTIFICATION_ENABLED_FOR_SPECIAL_BUNDLE, option, data, reply);
     if (result != ERR_OK) {
         ANS_LOGW("[SetNotificationsEnabledForSpecialBundle] fail: transact ErrCode=%{public}d", result);
         return ERR_ANS_TRANSACT_FAILED;
@@ -1262,9 +1410,9 @@ ErrCode AnsManagerProxy::SetNotificationsEnabledForSpecialBundle(
     return result;
 }
 
-ErrCode AnsManagerProxy::SetShowBadgeEnabledForBundle(const std::string &bundle, bool enabled)
+ErrCode AnsManagerProxy::SetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
-    if (bundle.empty()) {
+    if (bundleOption == nullptr) {
         ANS_LOGW("[SetShowBadgeEnabledForBundle] fail: bundle is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
@@ -1275,7 +1423,7 @@ ErrCode AnsManagerProxy::SetShowBadgeEnabledForBundle(const std::string &bundle,
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundle)) {
+    if (!data.WriteParcelable(bundleOption)) {
         ANS_LOGW("[SetShowBadgeEnabledForBundle] fail:: write bundle failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -1301,9 +1449,9 @@ ErrCode AnsManagerProxy::SetShowBadgeEnabledForBundle(const std::string &bundle,
     return result;
 }
 
-ErrCode AnsManagerProxy::GetShowBadgeEnabledForBundle(const std::string &bundle, bool &enabled)
+ErrCode AnsManagerProxy::GetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
 {
-    if (bundle.empty()) {
+    if (bundleOption == nullptr) {
         ANS_LOGW("[GetShowBadgeEnabledForBundle] fail: bundle is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
@@ -1314,7 +1462,7 @@ ErrCode AnsManagerProxy::GetShowBadgeEnabledForBundle(const std::string &bundle,
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundle)) {
+    if (!data.WriteParcelable(bundleOption)) {
         ANS_LOGW("[GetShowBadgeEnabledForBundle] fail:: write bundle failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -1334,6 +1482,36 @@ ErrCode AnsManagerProxy::GetShowBadgeEnabledForBundle(const std::string &bundle,
 
     if (!reply.ReadBool(enabled)) {
         ANS_LOGW("[GetShowBadgeEnabledForBundle] fail: read enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::GetShowBadgeEnabled(bool &enabled)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[GetShowBadgeEnabled] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(GET_SHOW_BADGE_ENABLED, option, data, reply);
+
+    if (result != ERR_OK) {
+        ANS_LOGW("[GetShowBadgeEnabled] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[GetShowBadgeEnabled] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(enabled)) {
+        ANS_LOGW("[GetShowBadgeEnabled] fail: read enabled failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -1523,9 +1701,9 @@ ErrCode AnsManagerProxy::IsAllowedNotify(bool &allowed)
     return result;
 }
 
-ErrCode AnsManagerProxy::IsSpecialBundleAllowedNotify(const std::string &bundle, bool &allowed)
+ErrCode AnsManagerProxy::IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
 {
-    if (bundle.empty()) {
+    if (bundleOption == nullptr) {
         ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: bundle is empty.");
         return ERR_ANS_INVALID_PARAM;
     }
@@ -1536,7 +1714,7 @@ ErrCode AnsManagerProxy::IsSpecialBundleAllowedNotify(const std::string &bundle,
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!data.WriteString(bundle)) {
+    if (!data.WriteParcelable(bundleOption)) {
         ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: write bundle failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }

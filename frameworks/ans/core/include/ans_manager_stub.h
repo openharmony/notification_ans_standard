@@ -38,14 +38,16 @@ public:
         const sptr<NotificationRequest> &notification, const std::string &deviceId) override;
     virtual ErrCode Cancel(int notificationId, const std::string &label) override;
     virtual ErrCode CancelAll() override;
+    virtual ErrCode AddSlotByType(NotificationConstant::SlotType slotType) override;
     virtual ErrCode AddSlots(const std::vector<sptr<NotificationSlot>> &slots) override;
-    virtual ErrCode RemoveSlotByType(const NotificationConstant::SlotType slotType) override;
+    virtual ErrCode RemoveSlotByType(NotificationConstant::SlotType slotType) override;
     virtual ErrCode RemoveAllSlots() override;
     virtual ErrCode AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups) override;
-    virtual ErrCode GetSlotByType(const NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) override;
+    virtual ErrCode GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) override;
     virtual ErrCode GetSlots(std::vector<sptr<NotificationSlot>> &slots) override;
     virtual ErrCode GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group) override;
     virtual ErrCode GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    virtual ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num) override;
     virtual ErrCode RemoveSlotGroups(const std::vector<std::string> &groupIds) override;
     virtual ErrCode GetActiveNotifications(std::vector<sptr<NotificationRequest>> &notifications) override;
     virtual ErrCode GetActiveNotificationNums(int &num) override;
@@ -64,19 +66,27 @@ public:
     virtual ErrCode HasNotificationPolicyAccessPermission(bool &granted) override;
     virtual ErrCode SetPrivateNotificationsAllowed(bool allow) override;
     virtual ErrCode GetPrivateNotificationsAllowed(bool &allow) override;
+    virtual ErrCode RemoveNotification(
+        const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label) override;
+    virtual ErrCode RemoveAllNotifications(const sptr<NotificationBundleOption> &bundleOption) override;
     virtual ErrCode Delete(const std::string &key) override;
-    virtual ErrCode DeleteByBundle(const std::string &bundle) override;
+    virtual ErrCode DeleteByBundle(const sptr<NotificationBundleOption> &bundleOption) override;
     virtual ErrCode DeleteAll() override;
-    virtual ErrCode GetSlotsByBundle(const std::string &bundle, std::vector<sptr<NotificationSlot>> &slots) override;
-    virtual ErrCode UpdateSlots(const std::string &bundle, const std::vector<sptr<NotificationSlot>> &slots) override;
-    virtual ErrCode UpdateSlotGroups(
-        const std::string &bundle, const std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    virtual ErrCode GetSlotsByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots) override;
+    virtual ErrCode UpdateSlots(
+        const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) override;
+    virtual ErrCode UpdateSlotGroups(const sptr<NotificationBundleOption> &bundleOption,
+        const std::vector<sptr<NotificationSlotGroup>> &groups) override;
     virtual ErrCode SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled) override;
     virtual ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) override;
     virtual ErrCode SetNotificationsEnabledForSpecialBundle(
-        const std::string &deviceId, const std::string &bundleName, bool enabled) override;
-    virtual ErrCode SetShowBadgeEnabledForBundle(const std::string &bundle, bool enabled) override;
-    virtual ErrCode GetShowBadgeEnabledForBundle(const std::string &bundle, bool &enabled) override;
+        const std::string &deviceId, const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
+    virtual ErrCode SetShowBadgeEnabledForBundle(
+        const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
+    virtual ErrCode GetShowBadgeEnabledForBundle(
+        const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+    virtual ErrCode GetShowBadgeEnabled(bool &enabled) override;
     virtual ErrCode Subscribe(
         const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
     virtual ErrCode Unsubscribe(
@@ -84,17 +94,20 @@ public:
     virtual ErrCode AreNotificationsSuspended(bool &suspended) override;
     virtual ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap) override;
     virtual ErrCode IsAllowedNotify(bool &allowed) override;
-    virtual ErrCode IsSpecialBundleAllowedNotify(const std::string &bundle, bool &allowed) override;
+    virtual ErrCode IsSpecialBundleAllowedNotify(
+        const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
 
 private:
-    static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub*, MessageParcel &, MessageParcel &)>> interfaces_;
+    static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
+        interfaces_;
 
     ErrCode HandlePublish(MessageParcel &data, MessageParcel &reply);
     ErrCode HandlePublishToDevice(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancel(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelAll(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleAddSlotByType(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleAddSlots(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleRemoveSlotByType(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleRemoveAllSlots(MessageParcel &data, MessageParcel &reply);
@@ -103,6 +116,7 @@ private:
     ErrCode HandleGetSlotByType(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetSlotGroup(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetSlotGroups(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetSlotNumAsBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleRemoveSlotGroups(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetActiveNotifications(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetActiveNotificationNums(MessageParcel &data, MessageParcel &reply);
@@ -119,6 +133,8 @@ private:
     ErrCode HandleIsNotificationPolicyAccessGranted(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetPrivateNotificationsAllowed(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetPrivateNotificationsAllowed(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleRemoveNotification(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleRemoveAllNotifications(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleDelete(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleDeleteByBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleDeleteAll(MessageParcel &data, MessageParcel &reply);
@@ -130,13 +146,13 @@ private:
     ErrCode HandleSetNotificationsEnabledForSpecialBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetShowBadgeEnabledForBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetShowBadgeEnabledForBundle(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetShowBadgeEnabled(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSubscribe(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleUnsubscribe(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleAreNotificationsSuspended(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetCurrentAppSorting(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsAllowedNotify(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply);
-
     ErrCode HandleShellDump(MessageParcel &data, MessageParcel &reply);
 
     template <typename T>

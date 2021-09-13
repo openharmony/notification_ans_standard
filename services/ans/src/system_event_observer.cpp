@@ -15,6 +15,7 @@
 
 #include "system_event_observer.h"
 
+#include "bundle_constants.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 
@@ -45,8 +46,10 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         if (callbacks_.onBundleRemoved != nullptr) {
             auto element = want.GetElement();
-            std::string bundle = element.GetBundleName();
-            callbacks_.onBundleRemoved(bundle);
+            std::string bundleName = element.GetBundleName();
+            int uid = want.GetIntParam(AppExecFwk::Constants::UID, -1);
+            sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
+            callbacks_.onBundleRemoved(bundleOption);
         }
     }
 }

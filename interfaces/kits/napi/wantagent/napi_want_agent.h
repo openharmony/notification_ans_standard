@@ -38,6 +38,17 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::Notification;
 using namespace OHOS::Notification::WantAgent;
 
+const uint8_t NUMBER_OF_PARAMETERS_ZERO = 0;
+const uint8_t NUMBER_OF_PARAMETERS_ONE = 1;
+const uint8_t NUMBER_OF_PARAMETERS_TWO = 2;
+const uint8_t NUMBER_OF_PARAMETERS_THREE = 3;
+const uint8_t NUMBER_OF_PARAMETERS_FOUR = 4;
+const uint8_t NUMBER_OF_PARAMETERS_FIVE = 5;
+const uint8_t NUMBER_OF_PARAMETERS_SIX = 6;
+const uint8_t NUMBER_OF_PARAMETERS_SEVEN = 7;
+const uint8_t NUMBER_OF_PARAMETERS_EIGHT = 8;
+const uint8_t NUMBER_OF_PARAMETERS_NINE = 9;
+
 class TriggerCompleteCallBack;
 
 struct AsyncGetWantAgentCallbackInfo {

@@ -24,23 +24,11 @@ namespace Notification {
 
 class NotificationSlotFilterTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(){};
+    static void TearDownTestCase(){};
+    void SetUp(){};
+    void TearDown(){};
 };
-
-void NotificationSlotFilterTest::SetUpTestCase()
-{}
-
-void NotificationSlotFilterTest::TearDownTestCase()
-{}
-
-void NotificationSlotFilterTest::SetUp()
-{}
-
-void NotificationSlotFilterTest::TearDown()
-{}
 
 /**
  * @tc.number    : NotificationSlotFilterTest_00100

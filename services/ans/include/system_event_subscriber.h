@@ -30,6 +30,9 @@ public:
         : EventFwk::CommonEventSubscriber(subscribeInfo), callback_(callback)
     {}
 
+    ~SystemEventSubscriber()
+    {}
+
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override
     {
         if (callback_ != nullptr) {

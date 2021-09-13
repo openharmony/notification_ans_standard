@@ -398,8 +398,7 @@ PendingWant *PendingWant::Unmarshalling(Parcel &parcel)
     PendingWant *pendingWant = new (std::nothrow) PendingWant();
     if (pendingWant == nullptr) {
         WANT_AGENT_LOGE("read from parcel failed");
-        delete pendingWant;
-        pendingWant = nullptr;
+        return nullptr;
     }
     sptr<AAFwk::IWantSender> target = iface_cast<AAFwk::IWantSender>(parcel.ReadParcelable<IRemoteObject>());
     if (target == nullptr) {

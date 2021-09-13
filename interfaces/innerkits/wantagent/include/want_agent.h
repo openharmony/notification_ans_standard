@@ -35,6 +35,7 @@ private:
      */
 public:
     WantAgent(){};
+    virtual ~WantAgent() = default;
     explicit WantAgent(const std::shared_ptr<PendingWant> &pendingWant);
 
     /**

@@ -55,9 +55,14 @@ void TriggerCompleteCallBack::OnSendFinished(
         return;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if NAPI_VERSION >= NUMBER_OF_PARAMETERS_TWO
     napi_get_uv_event_loop(triggerCompleteInfo_.env, &loop);
 #endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        HILOG_INFO("loop instance is nullptr");
+        return;
+    }
+
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         HILOG_INFO("uv_work_t instance is nullptr");
@@ -66,6 +71,8 @@ void TriggerCompleteCallBack::OnSendFinished(
     TriggerReceiveDataWorker *dataWorker = new (std::nothrow) TriggerReceiveDataWorker();
     if (dataWorker == nullptr) {
         HILOG_INFO("TriggerReceiveDataWorker instance is nullptr");
+        delete work;
+        work = nullptr;
         return;
     }
     dataWorker->want = want;
@@ -85,7 +92,7 @@ void TriggerCompleteCallBack::OnSendFinished(
                 HILOG_INFO("TriggerReceiveDataWorker instance(uv_work_t) is nullptr");
                 return;
             }
-            napi_value result[2] = {0};
+            napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
             napi_value callback;
             napi_value undefined;
             napi_value callResult = 0;
@@ -135,7 +142,8 @@ void TriggerCompleteCallBack::OnSendFinished(
 
             napi_get_undefined(dataWorkerData->env, &undefined);
             napi_get_reference_value(dataWorkerData->env, dataWorkerData->ref, &callback);
-            napi_call_function(dataWorkerData->env, undefined, callback, 2, &result[0], &callResult);
+            napi_call_function(
+                dataWorkerData->env, undefined, callback, NUMBER_OF_PARAMETERS_TWO, &result[0], &callResult);
 
             delete dataWorkerData;
             dataWorkerData = nullptr;
@@ -176,16 +184,16 @@ napi_value WantAgentFlagsInit(napi_env env, napi_value exports)
     napi_value obj = nullptr;
     napi_create_object(env, &obj);
 
-    SetNamedPropertyByInteger(env, obj, 0, "ONE_TIME_FLAG");
-    SetNamedPropertyByInteger(env, obj, 1, "NO_BUILD_FLAG");
-    SetNamedPropertyByInteger(env, obj, 2, "CANCEL_PRESENT_FLAG");
-    SetNamedPropertyByInteger(env, obj, 3, "UPDATE_PRESENT_FLAG");
-    SetNamedPropertyByInteger(env, obj, 4, "CONSTANT_FLAG");
-    SetNamedPropertyByInteger(env, obj, 5, "REPLACE_ELEMENT");
-    SetNamedPropertyByInteger(env, obj, 6, "REPLACE_ACTION");
-    SetNamedPropertyByInteger(env, obj, 7, "REPLACE_URI");
-    SetNamedPropertyByInteger(env, obj, 8, "REPLACE_ENTITIES");
-    SetNamedPropertyByInteger(env, obj, 9, "REPLACE_BUNDLE");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_ZERO, "ONE_TIME_FLAG");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_ONE, "NO_BUILD_FLAG");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_TWO, "CANCEL_PRESENT_FLAG");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_THREE, "UPDATE_PRESENT_FLAG");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_FOUR, "CONSTANT_FLAG");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_FIVE, "REPLACE_ELEMENT");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_SIX, "REPLACE_ACTION");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_SEVEN, "REPLACE_URI");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_EIGHT, "REPLACE_ENTITIES");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_NINE, "REPLACE_BUNDLE");
 
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("Flags", obj),
@@ -202,12 +210,12 @@ napi_value WantAgentOperationTypeInit(napi_env env, napi_value exports)
     napi_value obj = nullptr;
     napi_create_object(env, &obj);
 
-    SetNamedPropertyByInteger(env, obj, 0, "UNKNOWN_TYPE");
-    SetNamedPropertyByInteger(env, obj, 1, "START_ABILITY");
-    SetNamedPropertyByInteger(env, obj, 2, "START_ABILITIES");
-    SetNamedPropertyByInteger(env, obj, 3, "START_SERVICE");
-    SetNamedPropertyByInteger(env, obj, 4, "SEND_COMMON_EVENT");
-    SetNamedPropertyByInteger(env, obj, 5, "START_FOREGROUND_SERVICE");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_ZERO, "UNKNOWN_TYPE");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_ONE, "START_ABILITY");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_TWO, "START_ABILITIES");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_THREE, "START_SERVICE");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_FOUR, "SEND_COMMON_EVENT");
+    SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_FIVE, "START_FOREGROUND_SERVICE");
 
     napi_property_descriptor exportFuncs[] = {
         DECLARE_NAPI_PROPERTY("OperationType", obj),
@@ -236,7 +244,7 @@ napi_value NAPI_GetBundleNameWrap(
             [](napi_env env, napi_status status, void *data) {
                 HILOG_INFO("GetBundleName compeleted(CallBack Mode)...");
                 AsyncGetBundleNameCallbackInfo *asyncCallbackInfo = (AsyncGetBundleNameCallbackInfo *)data;
-                napi_value result[2] = {0};
+                napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
                 napi_value callback;
                 napi_value undefined;
                 napi_value callResult = 0;
@@ -245,7 +253,7 @@ napi_value NAPI_GetBundleNameWrap(
                 napi_create_string_utf8(env, asyncCallbackInfo->bundleName.c_str(), NAPI_AUTO_LENGTH, &result[1]);
                 napi_get_undefined(env, &undefined);
                 napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-                napi_call_function(env, undefined, callback, 2, &result[0], &callResult);
+                napi_call_function(env, undefined, callback, NUMBER_OF_PARAMETERS_TWO, &result[0], &callResult);
 
                 if (asyncCallbackInfo->callback[0] != nullptr) {
                     napi_delete_reference(env, asyncCallbackInfo->callback[0]);
@@ -296,7 +304,7 @@ napi_value NAPI_GetBundleNameWrap(
 
 napi_value NAPI_GetBundleName(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
+    size_t argc = NUMBER_OF_PARAMETERS_TWO;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     HILOG_INFO("argc = [%{public}zu]", argc);
@@ -313,7 +321,7 @@ napi_value NAPI_GetBundleName(napi_env env, napi_callback_info info)
     }
 
     bool callBackMode = false;
-    if (argc >= 2) {
+    if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
@@ -356,7 +364,7 @@ napi_value NAPI_GetUidWrap(
             [](napi_env env, napi_status status, void *data) {
                 HILOG_INFO("GetUid compeleted(CallBack Mode)...");
                 AsyncGetUidCallbackInfo *asyncCallbackInfo = (AsyncGetUidCallbackInfo *)data;
-                napi_value result[2] = {0};
+                napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
                 napi_value callback;
                 napi_value undefined;
                 napi_value callResult = 0;
@@ -365,7 +373,7 @@ napi_value NAPI_GetUidWrap(
                 napi_create_int32(env, asyncCallbackInfo->uid, &result[1]);
                 napi_get_undefined(env, &undefined);
                 napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-                napi_call_function(env, undefined, callback, 2, &result[0], &callResult);
+                napi_call_function(env, undefined, callback, NUMBER_OF_PARAMETERS_TWO, &result[0], &callResult);
 
                 if (asyncCallbackInfo->callback[0] != nullptr) {
                     napi_delete_reference(env, asyncCallbackInfo->callback[0]);
@@ -416,7 +424,7 @@ napi_value NAPI_GetUidWrap(
 
 napi_value NAPI_GetUid(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
+    size_t argc = NUMBER_OF_PARAMETERS_TWO;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     HILOG_INFO("argc = [%{public}zu]", argc);
@@ -432,7 +440,7 @@ napi_value NAPI_GetUid(napi_env env, napi_callback_info info)
     }
 
     bool callBackMode = false;
-    if (argc >= 2) {
+    if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
@@ -475,7 +483,7 @@ napi_value NAPI_GetWantWrap(
             [](napi_env env, napi_status status, void *data) {
                 HILOG_INFO("GetWant compeleted(CallBack Mode)...");
                 AsyncGetWantCallbackInfo *asyncCallbackInfo = (AsyncGetWantCallbackInfo *)data;
-                napi_value result[2] = {0};
+                napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
                 napi_value callback;
                 napi_value undefined;
                 napi_value callResult = 0;
@@ -484,7 +492,7 @@ napi_value NAPI_GetWantWrap(
                 result[1] = WrapWant(env, *(asyncCallbackInfo->want));
                 napi_get_undefined(env, &undefined);
                 napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-                napi_call_function(env, undefined, callback, 2, &result[0], &callResult);
+                napi_call_function(env, undefined, callback, NUMBER_OF_PARAMETERS_TWO, &result[0], &callResult);
                 if (asyncCallbackInfo->callback[0] != nullptr) {
                     napi_delete_reference(env, asyncCallbackInfo->callback[0]);
                 }
@@ -534,7 +542,7 @@ napi_value NAPI_GetWantWrap(
 
 napi_value NAPI_GetWant(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
+    size_t argc = NUMBER_OF_PARAMETERS_TWO;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     HILOG_INFO("argc = [%{public}zu]", argc);
@@ -550,7 +558,7 @@ napi_value NAPI_GetWant(napi_env env, napi_callback_info info)
     }
 
     bool callBackMode = false;
-    if (argc >= 2) {
+    if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
@@ -604,14 +612,14 @@ napi_value NAPI_CancelWrap(
             [](napi_env env, void *data) {
                 HILOG_INFO("Cancel called(CallBack Mode)...");
                 AsyncCancelCallbackInfo *asyncCallbackInfo = (AsyncCancelCallbackInfo *)data;
-                WantAgentHelper::Cancel(asyncCallbackInfo->wantAgent);
                 int32_t code = WantAgentHelper::GetHashCode(asyncCallbackInfo->wantAgent);
+                WantAgentHelper::Cancel(asyncCallbackInfo->wantAgent);
                 DeleteRecordByCode(code);
             },
             [](napi_env env, napi_status status, void *data) {
                 HILOG_INFO("Cancel compeleted(CallBack Mode)...");
                 AsyncCancelCallbackInfo *asyncCallbackInfo = (AsyncCancelCallbackInfo *)data;
-                napi_value result[2] = {0};
+                napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
                 napi_value callback;
                 napi_value undefined;
                 napi_value callResult = 0;
@@ -620,7 +628,7 @@ napi_value NAPI_CancelWrap(
                 napi_get_null(env, &result[1]);
                 napi_get_undefined(env, &undefined);
                 napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-                napi_call_function(env, undefined, callback, 2, &result[0], &callResult);
+                napi_call_function(env, undefined, callback, NUMBER_OF_PARAMETERS_TWO, &result[0], &callResult);
 
                 if (asyncCallbackInfo->callback[0] != nullptr) {
                     napi_delete_reference(env, asyncCallbackInfo->callback[0]);
@@ -651,8 +659,8 @@ napi_value NAPI_CancelWrap(
             [](napi_env env, void *data) {
                 HILOG_INFO("Cancel called(Promise Mode)...");
                 AsyncCancelCallbackInfo *asyncCallbackInfo = (AsyncCancelCallbackInfo *)data;
-                WantAgentHelper::Cancel(asyncCallbackInfo->wantAgent);
                 int32_t code = WantAgentHelper::GetHashCode(asyncCallbackInfo->wantAgent);
+                WantAgentHelper::Cancel(asyncCallbackInfo->wantAgent);
                 DeleteRecordByCode(code);
             },
             [](napi_env env, napi_status status, void *data) {
@@ -673,7 +681,7 @@ napi_value NAPI_CancelWrap(
 
 napi_value NAPI_Cancel(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
+    size_t argc = NUMBER_OF_PARAMETERS_TWO;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     HILOG_INFO("argc = [%{public}zu]", argc);
@@ -689,7 +697,7 @@ napi_value NAPI_Cancel(napi_env env, napi_callback_info info)
     }
 
     bool callBackMode = false;
-    if (argc >= 2) {
+    if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
@@ -750,7 +758,7 @@ napi_value NAPI_TriggerWrap(napi_env env, napi_callback_info info, AsyncTriggerC
 
 napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
 {
-    size_t argc = 3;
+    size_t argc = NUMBER_OF_PARAMETERS_THREE;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     HILOG_INFO("argc = [%{public}zu]", argc);
@@ -810,9 +818,9 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
     context = ability->GetContext();
 
     bool callBackMode = false;
-    if (argc >= 3) {
+    if (argc >= NUMBER_OF_PARAMETERS_THREE) {
         napi_valuetype valuetype;
-        NAPI_CALL(env, napi_typeof(env, argv[2], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[NUMBER_OF_PARAMETERS_TWO], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
@@ -829,7 +837,7 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
     if (callBackMode) {
         asyncCallbackInfo->callBackMode = callBackMode;
         asyncCallbackInfo->triggerObj = std::make_shared<TriggerCompleteCallBack>();
-        napi_create_reference(env, argv[2], 1, &asyncCallbackInfo->callback[0]);
+        napi_create_reference(env, argv[NUMBER_OF_PARAMETERS_TWO], 1, &asyncCallbackInfo->callback[0]);
     }
 
     napi_value ret = NAPI_TriggerWrap(env, info, asyncCallbackInfo);
@@ -860,7 +868,7 @@ napi_value NAPI_EqualWrap(
             [](napi_env env, napi_status status, void *data) {
                 HILOG_INFO("Equal compeleted(CallBack Mode)...");
                 AsyncEqualCallbackInfo *asyncCallbackInfo = (AsyncEqualCallbackInfo *)data;
-                napi_value result[2] = {0};
+                napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
                 napi_value callback;
                 napi_value undefined;
                 napi_value callResult = 0;
@@ -869,7 +877,7 @@ napi_value NAPI_EqualWrap(
                 napi_get_boolean(env, asyncCallbackInfo->result, &result[1]);
                 napi_get_undefined(env, &undefined);
                 napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-                napi_call_function(env, undefined, callback, 2, &result[0], &callResult);
+                napi_call_function(env, undefined, callback, NUMBER_OF_PARAMETERS_TWO, &result[0], &callResult);
 
                 if (asyncCallbackInfo->callback[0] != nullptr) {
                     napi_delete_reference(env, asyncCallbackInfo->callback[0]);
@@ -921,7 +929,7 @@ napi_value NAPI_EqualWrap(
 
 napi_value NAPI_Equal(napi_env env, napi_callback_info info)
 {
-    size_t argc = 3;
+    size_t argc = NUMBER_OF_PARAMETERS_THREE;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     HILOG_INFO("argc = [%{public}zu]", argc);
@@ -947,9 +955,9 @@ napi_value NAPI_Equal(napi_env env, napi_callback_info info)
     }
 
     bool callBackMode = false;
-    if (argc >= 3) {
+    if (argc >= NUMBER_OF_PARAMETERS_THREE) {
         napi_valuetype valuetype;
-        NAPI_CALL(env, napi_typeof(env, argv[2], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[NUMBER_OF_PARAMETERS_TWO], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
@@ -962,7 +970,7 @@ napi_value NAPI_Equal(napi_env env, napi_callback_info info)
     asyncCallbackInfo->wantAgentSecond = std::make_shared<Notification::WantAgent::WantAgent>(*pWantAgentSecond);
 
     if (callBackMode) {
-        napi_create_reference(env, argv[1], 1, &asyncCallbackInfo->callback[0]);
+        napi_create_reference(env, argv[NUMBER_OF_PARAMETERS_TWO], 1, &asyncCallbackInfo->callback[0]);
     }
     napi_value ret = NAPI_EqualWrap(env, info, callBackMode, asyncCallbackInfo);
     if (ret == nullptr) {
@@ -1003,7 +1011,7 @@ napi_value NAPI_GetWantAgentWrap(
             [](napi_env env, napi_status status, void *data) {
                 HILOG_INFO("GetWantAgent compeleted(CallBack Mode)...");
                 AsyncGetWantAgentCallbackInfo *asyncCallbackInfo = (AsyncGetWantAgentCallbackInfo *)data;
-                napi_value result[2] = {0};
+                napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
                 napi_value callback;
                 napi_value undefined;
                 napi_value callResult = 0;
@@ -1032,7 +1040,7 @@ napi_value NAPI_GetWantAgentWrap(
                     nullptr);
                 napi_get_undefined(env, &undefined);
                 napi_get_reference_value(env, asyncCallbackInfo->callback[0], &callback);
-                napi_call_function(env, undefined, callback, 2, &result[0], &callResult);
+                napi_call_function(env, undefined, callback, NUMBER_OF_PARAMETERS_TWO, &result[0], &callResult);
 
                 if (asyncCallbackInfo->callback[0] != nullptr) {
                     napi_delete_reference(env, asyncCallbackInfo->callback[0]);
@@ -1116,7 +1124,7 @@ napi_value NAPI_GetWantAgentWrap(
 
 napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
 {
-    size_t argc = 2;
+    size_t argc = NUMBER_OF_PARAMETERS_TWO;
     napi_value argv[argc];
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     HILOG_INFO("argc = [%{public}zu]", argc);
@@ -1204,7 +1212,7 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
     context = ability->GetContext();
 
     bool callBackMode = false;
-    if (argc >= 2) {
+    if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");

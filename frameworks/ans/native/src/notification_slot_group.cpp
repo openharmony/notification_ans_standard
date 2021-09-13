@@ -49,6 +49,11 @@ std::string NotificationSlotGroup::GetName() const
     return name_;
 }
 
+void NotificationSlotGroup::SetSlots(const std::vector<NotificationSlot> &slots)
+{
+    slots_ = slots;
+}
+
 std::vector<NotificationSlot> NotificationSlotGroup::GetSlots() const
 {
     return slots_;
@@ -77,7 +82,7 @@ std::string NotificationSlotGroup::Dump() const
                                   ", name = " + name_ +
                                   ", description = " + description_ +
                                   ", slots = " + contents +
-                                  ", isDisabled = " + std::to_string(isDisabled_) + "]";
+                                  ", isDisabled = " + (isDisabled_ ? "true" : "false") + "]";
 }
 
 bool NotificationSlotGroup::Marshalling(Parcel &parcel) const
@@ -121,22 +126,17 @@ bool NotificationSlotGroup::ReadFromParcel(Parcel &parcel)
     id_ = parcel.ReadString();
     name_ = parcel.ReadString();
     description_ = parcel.ReadString();
-
-    if (slots_.size() == 0) {
-        if (!parcel.ReadInt32()) {
-            return false;
-        }
-    } else {
-        if (!parcel.ReadInt32()) {
-            return false;
-        }
-        for (auto it = slots_.begin(); it != slots_.end(); ++it) {
-            slots_.emplace_back(*it->Unmarshalling(parcel));
+    int32_t size = parcel.ReadInt32();
+    if (size) {
+        for (int32_t i = 0; i < size; ++i) {
+            auto slot = parcel.ReadParcelable<NotificationSlot>();
+            if (nullptr == slot) {
+                return false;
+            }
+            slots_.emplace_back(*slot);
         }
     }
-
     isDisabled_ = parcel.ReadBool();
-
     return true;
 }
 
@@ -144,7 +144,7 @@ NotificationSlotGroup *NotificationSlotGroup::Unmarshalling(Parcel &parcel)
 {
     NotificationSlotGroup *notificationSlotGroup = new NotificationSlotGroup();
 
-    if (!notificationSlotGroup && !notificationSlotGroup->ReadFromParcel(parcel)) {
+    if (notificationSlotGroup && !notificationSlotGroup->ReadFromParcel(parcel)) {
         delete notificationSlotGroup;
         notificationSlotGroup = nullptr;
     }
