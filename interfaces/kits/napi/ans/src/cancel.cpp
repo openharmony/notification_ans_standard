@@ -21,70 +21,73 @@ namespace NotificationNapi {
 const int CANCEL_MAX_PARA = 3;
 const int CANCEL_ALL_MAX_PARA = 1;
 
-struct AsyncCallbackInfoCancel {
-    napi_env env;
-    napi_async_work asyncWork;
+struct ParametersInfoCancel {
+    int id = 0;
+    std::string label = "";
     napi_ref callback = nullptr;
-    napi_deferred deferred;
-    std::string label;
-    int id;
-    bool hasLabel = false;
-    bool isCallback = false;
-    int errorCode = 0;
 };
 
-struct paraInfoCancel {
+struct AsyncCallbackInfoCancel {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
     int id = 0;
     std::string label;
-    bool hasLabel = false;
+    CallbackPromiseInfo info;
 };
 
-napi_value ParseParameters(const napi_env &env, const napi_value (&argv)[CANCEL_MAX_PARA], const size_t &argc,
-    paraInfoCancel &info, napi_ref &callback)
+napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, ParametersInfoCancel &paras)
 {
-    ANS_LOGI("ParseParameters start");
+    ANS_LOGI("enter");
 
+    size_t argc = CANCEL_MAX_PARA;
+    napi_value argv[CANCEL_MAX_PARA] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
     NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
 
-    napi_valuetype valuetype;
+    napi_valuetype valuetype = napi_undefined;
     // argv[0]: id: number
     NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-    NAPI_CALL(env, napi_get_value_int32(env, argv[0], &info.id));
+    NAPI_CALL(env, napi_get_value_int32(env, argv[0], &paras.id));
 
     // argv[1]: label: string / callback
     if (argc >= CANCEL_MAX_PARA - 1) {
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+        NAPI_ASSERT(env,
+            (valuetype == napi_string || valuetype == napi_function),
+            "Wrong argument type. String or function expected.");
         if (valuetype == napi_string) {
             char str[STR_MAX_SIZE] = {0};
             size_t strLen = 0;
             NAPI_CALL(env, napi_get_value_string_utf8(env, argv[1], str, STR_MAX_SIZE - 1, &strLen));
-            info.label = str;
-            info.hasLabel = true;
-        } else if (valuetype == napi_function) {
-            napi_create_reference(env, argv[1], 1, &callback);
+            paras.label = str;
         } else {
-            return nullptr;
+            napi_create_reference(env, argv[1], 1, &paras.callback);
         }
     }
 
-    // argv[2]:callback
+    // argv[2]: callback
     if (argc >= CANCEL_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[CANCEL_MAX_PARA - 1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[CANCEL_MAX_PARA - 1], 1, &callback);
+        napi_create_reference(env, argv[CANCEL_MAX_PARA - 1], 1, &paras.callback);
     }
 
     return Common::NapiGetNull(env);
 }
 
-napi_value ParseParametersByAll(
-    const napi_env &env, const napi_value (&argv)[CANCEL_ALL_MAX_PARA], const size_t &argc, napi_ref &callback)
+napi_value ParseParametersByCancelAll(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
 {
-    ANS_LOGI("ParseParametersByAll start");
+    ANS_LOGI("enter");
+
+    size_t argc = CANCEL_ALL_MAX_PARA;
+    napi_value argv[CANCEL_ALL_MAX_PARA] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
 
     if (argc >= CANCEL_ALL_MAX_PARA) {
-        napi_valuetype valuetype;
+        napi_valuetype valuetype = napi_undefined;
         // argv[0]:callback
         NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
@@ -93,46 +96,24 @@ napi_value ParseParametersByAll(
     return Common::NapiGetNull(env);
 }
 
-void PaddingAsyncCallbackInfoIs(
-    const napi_env &env, AsyncCallbackInfoCancel *&asynccallbackinfo, const napi_ref &callback, napi_value &promise)
-{
-    ANS_LOGI("PaddingAsyncCallbackInfoIs start");
-
-    if (callback) {
-        asynccallbackinfo->callback = callback;
-        asynccallbackinfo->isCallback = true;
-    } else {
-        napi_deferred deferred = nullptr;
-        NAPI_CALL_RETURN_VOID(env, napi_create_promise(env, &deferred, &promise));
-        asynccallbackinfo->deferred = deferred;
-        asynccallbackinfo->isCallback = false;
-    }
-}
-
 napi_value Cancel(napi_env env, napi_callback_info info)
 {
-    ANS_LOGI("Cancel start");
+    ANS_LOGI("enter");
 
-    size_t argc = CANCEL_MAX_PARA;
-    napi_value argv[CANCEL_MAX_PARA];
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    napi_ref callback = nullptr;
-
-    paraInfoCancel paraInfo;
-    if (ParseParameters(env, argv, argc, paraInfo, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+    ParametersInfoCancel paras;
+    if (ParseParameters(env, info, paras) == nullptr) {
+        return Common::JSParaError(env, paras.callback);
     }
-    ANS_LOGI("Cancel id = %{public}d", paraInfo.id);
-    ANS_LOGI("Cancel label = %{public}s", paraInfo.label.c_str());
 
-    AsyncCallbackInfoCancel *asynccallbackinfo = new (std::nothrow) AsyncCallbackInfoCancel{
-        .env = env, .asyncWork = nullptr, .id = paraInfo.id, .label = paraInfo.label, .hasLabel = paraInfo.hasLabel};
+    AsyncCallbackInfoCancel *asynccallbackinfo = new (std::nothrow)
+        AsyncCallbackInfoCancel{.env = env, .asyncWork = nullptr, .id = paras.id, .label = paras.label};
+    if (!asynccallbackinfo) {
+        return Common::JSParaError(env, paras.callback);
+    }
+    napi_value promise = nullptr;
+    Common::PaddingCallbackPromiseInfo(env, paras.callback, asynccallbackinfo->info, promise);
 
-    napi_value promise = 0;
-    PaddingAsyncCallbackInfoIs(env, asynccallbackinfo, callback, promise);
-
-    napi_value resourceName;
+    napi_value resourceName = nullptr;
     napi_create_string_latin1(env, "cancel", NAPI_AUTO_LENGTH, &resourceName);
     // Asynchronous function call
     napi_create_async_work(env,
@@ -142,24 +123,18 @@ napi_value Cancel(napi_env env, napi_callback_info info)
             ANS_LOGI("Cancel napi_create_async_work start");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
 
-            if (asynccallbackinfo->hasLabel) {
-                asynccallbackinfo->errorCode =
-                    NotificationHelper::CancelNotification(asynccallbackinfo->label, asynccallbackinfo->id);
-            } else {
-                asynccallbackinfo->errorCode = NotificationHelper::CancelNotification(asynccallbackinfo->id);
-            }
+            asynccallbackinfo->info.errorCode =
+                NotificationHelper::CancelNotification(asynccallbackinfo->label, asynccallbackinfo->id);
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Cancel napi_create_async_work end");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
 
-            CallbackPromiseInfo info;
-            info.isCallback = asynccallbackinfo->isCallback;
-            info.callback = asynccallbackinfo->callback;
-            info.deferred = asynccallbackinfo->deferred;
-            info.errorCode = asynccallbackinfo->errorCode;
+            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
 
-            Common::ReturnCallbackPromise(env, info, Common::NapiGetNull(env));
+            if (asynccallbackinfo->info.callback != nullptr) {
+                napi_delete_reference(env, asynccallbackinfo->info.callback);
+            }
 
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
@@ -172,7 +147,7 @@ napi_value Cancel(napi_env env, napi_callback_info info)
 
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
 
-    if (asynccallbackinfo->isCallback) {
+    if (asynccallbackinfo->info.isCallback) {
         return Common::NapiGetNull(env);
     } else {
         return promise;
@@ -181,25 +156,22 @@ napi_value Cancel(napi_env env, napi_callback_info info)
 
 napi_value CancelAll(napi_env env, napi_callback_info info)
 {
-    ANS_LOGI("CancelAll start");
+    ANS_LOGI("enter");
 
-    size_t argc = CANCEL_ALL_MAX_PARA;
-    napi_value argv[CANCEL_ALL_MAX_PARA];
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
     napi_ref callback = nullptr;
-
-    if (ParseParametersByAll(env, argv, argc, callback) == nullptr) {
+    if (ParseParametersByCancelAll(env, info, callback) == nullptr) {
         return Common::JSParaError(env, callback);
     }
 
     AsyncCallbackInfoCancel *asynccallbackinfo =
         new (std::nothrow) AsyncCallbackInfoCancel{.env = env, .asyncWork = nullptr};
+    if (!asynccallbackinfo) {
+        return Common::JSParaError(env, callback);
+    }
+    napi_value promise = nullptr;
+    Common::PaddingCallbackPromiseInfo(env, callback, asynccallbackinfo->info, promise);
 
-    napi_value promise = 0;
-    PaddingAsyncCallbackInfoIs(env, asynccallbackinfo, callback, promise);
-
-    napi_value resourceName;
+    napi_value resourceName = nullptr;
     napi_create_string_latin1(env, "cancelAll", NAPI_AUTO_LENGTH, &resourceName);
     // Asynchronous function call
     napi_create_async_work(env,
@@ -208,18 +180,17 @@ napi_value CancelAll(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("CancelAll napi_create_async_work start");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
-            asynccallbackinfo->errorCode = NotificationHelper::CancelAllNotifications();
+            asynccallbackinfo->info.errorCode = NotificationHelper::CancelAllNotifications();
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("CancelAll napi_create_async_work end");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
 
-            CallbackPromiseInfo info;
-            info.isCallback = asynccallbackinfo->isCallback;
-            info.callback = asynccallbackinfo->callback;
-            info.deferred = asynccallbackinfo->deferred;
-            info.errorCode = asynccallbackinfo->errorCode;
-            Common::ReturnCallbackPromise(env, info, Common::NapiGetNull(env));
+            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+
+            if (asynccallbackinfo->info.callback != nullptr) {
+                napi_delete_reference(env, asynccallbackinfo->info.callback);
+            }
 
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
@@ -232,7 +203,7 @@ napi_value CancelAll(napi_env env, napi_callback_info info)
 
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
 
-    if (asynccallbackinfo->isCallback) {
+    if (asynccallbackinfo->info.isCallback) {
         return Common::NapiGetNull(env);
     } else {
         return promise;

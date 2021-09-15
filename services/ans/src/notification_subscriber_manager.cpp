@@ -271,7 +271,7 @@ void NotificationSubscriberManager::NotifyConsumedInner(
         auto BundleNames = notification->GetBundleName();
 
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
-        if (record->subscribedAll ^ (iter != record->bundleList_.end())) {
+        if (!record->subscribedAll == (iter != record->bundleList_.end())) {
             record->subscriber->OnConsumed(notification, notificationMap);
             record->subscriber->OnConsumed(notification);
         }
@@ -285,7 +285,7 @@ void NotificationSubscriberManager::NotifyCanceledInner(
         auto BundleNames = notification->GetBundleName();
 
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
-        if (iter != record->bundleList_.end() ^ record->subscribedAll) {
+        if (!record->subscribedAll == (iter != record->bundleList_.end())) {
             record->subscriber->OnCanceled(notification, notificationMap, deleteReason);
             record->subscriber->OnCanceled(notification);
         }

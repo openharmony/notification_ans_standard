@@ -46,6 +46,20 @@ TriggerInfo::TriggerInfo(const TriggerInfo &paramInfo)
     resultCode_ = paramInfo.GetResultCode();
 }
 
+const TriggerInfo &TriggerInfo::operator=(const TriggerInfo &paramInfo)
+{
+    permission_ = paramInfo.GetPermission();
+    if (paramInfo.GetExtraInfo() != nullptr) {
+        extraInfo_ = std::make_shared<WantParams>(*paramInfo.GetExtraInfo());
+    }
+    if (paramInfo.GetWant() != nullptr) {
+        want_ = std::make_shared<Want>(*paramInfo.GetWant());
+    }
+    resultCode_ = paramInfo.GetResultCode();
+
+    return *this;
+}
+
 std::string TriggerInfo::GetPermission() const
 {
     return permission_;

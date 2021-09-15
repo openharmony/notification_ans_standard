@@ -19,62 +19,58 @@
 namespace OHOS {
 namespace Notification {
 
-const static std::string kDisturbMode = "ans_disturbMode";
-const static std::string kEnable = "ans_notificationAll";
-const static std::string kBundleLabel = "label_ans_bundle_";
-const static std::string kUnderLine = "_";
-const static std::string kAnsBundle = "ans_bundle";
+const static std::string KEY_DISTURB_MODE = "ans_disturbMode";
+const static std::string KEY_ENABLE_ALL_NOTIFICATION = "ans_notificationAll";
+const static std::string KEY_BUNDLE_LABEL = "label_ans_bundle_";
+const static std::string KEY_UNDER_LINE = "_";
+const static std::string KEY_ANS_BUNDLE = "ans_bundle";
 
-const static std::string kBundleName = "name";
-const static std::string kBundleImportance = "importance";
-const static std::string kBundleShowBadge = "showBadge";
-const static std::string kBundleBadgeTotalNum = "badgeTotalNum";
-const static std::string kBundlePrivateAllowed = "privateAllowed";
-const static std::string kBundleEnableNotification = "enabledNotification";
+const static std::string KEY_BUNDLE_NAME = "name";
+const static std::string KEY_BUNDLE_IMPORTANCE = "importance";
+const static std::string KEY_BUNDLE_SHOW_BADGE = "showBadge";
+const static std::string KEY_BUNDLE_BADGE_TOTAL_NUM = "badgeTotalNum";
+const static std::string KEY_BUNDLE_PRIVATE_ALLOWED = "privateAllowed";
+const static std::string KEY_BUNDLE_ENABLE_NOTIFICATION = "enabledNotification";
 
-const static std::string kGroup = "group";
-const static std::string kGroupSize = "group_size";
-const static std::string kGroupId = "id";
-const static std::string kGroupName = "name";
-const static std::string kGroupDescription = "groupDescription";
-const static std::string kGroupDisable = "isDisable";
+const static std::string KEY_GROUP = "group";
+const static std::string KEY_GROUP_ID = "id";
+const static std::string KEY_GROUP_NAME = "name";
+const static std::string KEY_GROUP_DESCRIPTION = "groupDescription";
+const static std::string KEY_GROUP_DISABLE = "isDisable";
 
-const static std::string kSlot = "slot";
-const static std::string kSlotType = "type";
-const static std::string kSlotId = "id";
-const static std::string kSlotGroupId = "groupId";
-const static std::string kSlotName = "name";
-const static std::string kSlotDescription = "description";
-const static std::string kSlotLevel = "level";
-const static std::string kSlotShowBadge = "showBadge";
-const static std::string kSlotEnableLight = "enableLight";
-const static std::string kSlotEnableVrbration = "enableVibration";
-const static std::string kSlotLedLightColor = "ledLightColor";
-const static std::string kSlotLockscreenVisibleness = "lockscreenVisibleness";
-const static std::string kSlotSound = "sound";
-const static std::string kSlotVibrationSytle = "vibrationSytle";
-const static std::string kSlotEnableBypassDnd = "enableBypassDnd";
-
-const static int32_t MAX_TIMES = 5;                // 500ms
-const static int32_t SLEEP_INTERVAL = 100 * 1000;  // 100ms
+const static std::string KEY_SLOT = "slot";
+const static std::string KEY_SLOT_TYPE = "type";
+const static std::string KEY_SLOT_ID = "id";
+const static std::string KEY_SLOT_GROUPID = "groupId";
+const static std::string KEY_SLOT_NAME = "name";
+const static std::string KEY_SLOT_DESCRIPTION = "description";
+const static std::string KEY_SLOT_LEVEL = "level";
+const static std::string KEY_SLOT_SHOW_BADGE = "showBadge";
+const static std::string KEY_SLOT_ENABLE_LIGHT = "enableLight";
+const static std::string KEY_SLOT_ENABLE_VRBRATION = "enableVibration";
+const static std::string KEY_SLOT_LED_LIGHT_COLOR = "ledLightColor";
+const static std::string KEY_SLOT_LOCKSCREEN_VISIBLENESS = "lockscreenVisibleness";
+const static std::string KEY_SLOT_SOUND = "sound";
+const static std::string KEY_SLOT_VIBRATION_STYLE = "vibrationSytle";
+const static std::string KEY_SLOT_ENABLE_BYPASS_DND = "enableBypassDnd";
 
 // distributed database
 const std::string APP_ID = "advanced_notification_service";
 const std::string STORE_ID = "local_db";
 
 const static int BUNDLE_IMPORTANCE = 3;
-const static bool BUNDLE_SHOW_BADGE = true;
 const static int BUNDLE_BADGE_TOTAL_NUM = 0;
-const static int BUNDLE_PRIVATE_ALLOWED = true;
+const static int BUNDLE_PRIVATE_ALLOWED = false;
 const static int BUNDLE_ENABLE_NOTIFICATION = true;
+const static bool BUNDLE_SHOW_BADGE = false;
 
 enum class BundleType {
-    kBundleNameType = 1,
-    kBundleImportanceType,
-    kBundleShowBadgeType,
-    kBundleBadgeTotalNumType,
-    kBundlePrivateAllowedType,
-    kBundleEnableNotificationType,
+    BUNDLE_NAME_TYPE = 1,
+    BUNDLE_IMPORTANCE_TYPE,
+    BUNDLE_SHOW_BADGE_TYPE,
+    BUNDLE_BADGE_TOTAL_NUM_TYPE,
+    BUNDLE_PRIVATE_ALLOWED_TYPE,
+    BUNDLE_ENABLE_NOTIFICATION_TYPE,
 };
 
 }  // namespace Notification

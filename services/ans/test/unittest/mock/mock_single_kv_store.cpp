@@ -57,11 +57,9 @@ Status AnsTestSingleKvStore::GetEntriesWithQuery(const DataQuery &query, std::ve
 //     resultSet: resultSet will be returned in this parameter.
 // Return:
 //     Status of this GetResultSet operation.
-void AnsTestSingleKvStore::GetResultSet(const Key &prefixKey,
-        std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
-{
-
-}
+void AnsTestSingleKvStore::GetResultSet(
+    const Key &prefixKey, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
+{}
 
 // Get ResultSet in this store by Query.
 // Parameters:
@@ -69,11 +67,9 @@ void AnsTestSingleKvStore::GetResultSet(const Key &prefixKey,
 //     resultSet: resultSet will be returned in this parameter.
 // Return:
 //     Status of this GetResultSet operation.
-void AnsTestSingleKvStore::GetResultSetWithQuery(const std::string &query,
-              std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
-{
-
-}
+void AnsTestSingleKvStore::GetResultSetWithQuery(
+    const std::string &query, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
+{}
 
 // Get ResultSet in this store by Query.
 // Parameters:
@@ -81,11 +77,9 @@ void AnsTestSingleKvStore::GetResultSetWithQuery(const std::string &query,
 //     resultSet: resultSet will be returned in this parameter.
 // Return:
 //     Status of this GetResultSet operation.
-void AnsTestSingleKvStore::GetResultSetWithQuery(const DataQuery &query,
-            std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
-{
-
-}
+void AnsTestSingleKvStore::GetResultSetWithQuery(
+    const DataQuery &query, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
+{}
 
 // Close the ResultSet returned by GetResultSet.
 // Parameters:
@@ -128,7 +122,8 @@ Status AnsTestSingleKvStore::GetCountWithQuery(const DataQuery &query, int &resu
 //     allowedDelayMs: allowed delay milli-second to sync. default value is 0 for compatibility.
 // Return:
 //     Status of this Sync operation.
-Status AnsTestSingleKvStore::Sync(const std::vector<std::string> &deviceIdList, const SyncMode &mode, uint32_t allowedDelayMs)
+Status AnsTestSingleKvStore::Sync(
+    const std::vector<std::string> &deviceIdList, const SyncMode &mode, uint32_t allowedDelayMs)
 {
     return Status::SUCCESS;
 }
@@ -230,7 +225,6 @@ Status AnsTestSingleKvStore::PutBatch(const std::vector<Entry> &entries)
     return Status::SUCCESS;
 }
 
-
 // delete a list of entries in the kvstore,
 // delete key not exist still return success,
 // key length should not be greater than 256, and can not be empty.
@@ -290,8 +284,8 @@ Status AnsTestSingleKvStore::SetCapabilityEnabled(bool enabled) const
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::SetCapabilityRange(const std::vector<std::string> &localLabels,
-                                              const std::vector<std::string> &remoteSupportLabels) const
+Status AnsTestSingleKvStore::SetCapabilityRange(
+    const std::vector<std::string> &localLabels, const std::vector<std::string> &remoteSupportLabels) const
 {
     return Status::SUCCESS;
 }
@@ -305,7 +299,6 @@ Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam
 {
     return Status::SUCCESS;
 }
-
 
 }  // namespace DistributedKv
 }  // namespace OHOS

@@ -108,14 +108,32 @@ bool NotificationPreferencesInfo::BundleInfo::GetAllSlots(std::vector<sptr<Notif
     return true;
 }
 
+uint32_t NotificationPreferencesInfo::BundleInfo::GetAllSlotsSize()
+{
+    return slots_.size();
+}
+
 bool NotificationPreferencesInfo::BundleInfo::GetAllSlotsInGroup(
-    const std::string groupId, std::vector<sptr<NotificationSlot>> &slots)
+    const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots)
 {
     std::for_each(slots_.begin(),
         slots_.end(),
-        [&slots, &groupId](std::map<NotificationConstant::SlotType, sptr<NotificationSlot>>::reference &iter) {
+        [&](std::map<NotificationConstant::SlotType, sptr<NotificationSlot>>::reference iter) {
             if (!iter.second->GetSlotGroup().compare(groupId)) {
                 slots.emplace_back(iter.second);
+            }
+        });
+    return true;
+}
+
+bool NotificationPreferencesInfo::BundleInfo::GetAllSlotsInGroup(
+    const std::string &groupId, std::vector<NotificationSlot> &slots)
+{
+    std::for_each(slots_.begin(),
+        slots_.end(),
+        [&](std::map<NotificationConstant::SlotType, sptr<NotificationSlot>>::reference &iter) {
+            if (!iter.second->GetSlotGroup().compare(groupId)) {
+                slots.emplace_back(*iter.second);
             }
         });
     return true;
@@ -126,12 +144,14 @@ void NotificationPreferencesInfo::BundleInfo::SetGroup(const sptr<NotificationSl
     groups_.insert_or_assign(group->GetId(), group);
 }
 
-bool NotificationPreferencesInfo::BundleInfo::GetGroup(
-    const std::string &groupId, sptr<NotificationSlotGroup> &group) const
+bool NotificationPreferencesInfo::BundleInfo::GetGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group)
 {
     auto iter = groups_.find(groupId);
     if (iter != groups_.end()) {
         group = iter->second;
+        std::vector<NotificationSlot> slots;
+        GetAllSlotsInGroup(groupId, slots);
+        group->SetSlots(slots);
         return true;
     }
     return false;
@@ -140,7 +160,10 @@ bool NotificationPreferencesInfo::BundleInfo::GetGroup(
 bool NotificationPreferencesInfo::BundleInfo::GetAllGroups(std::vector<sptr<NotificationSlotGroup>> &group)
 {
     std::for_each(
-        groups_.begin(), groups_.end(), [&group](std::map<std::string, sptr<NotificationSlotGroup>>::reference &iter) {
+        groups_.begin(), groups_.end(), [&](std::map<std::string, sptr<NotificationSlotGroup>>::reference iter) {
+            std::vector<NotificationSlot> slots;
+            GetAllSlotsInGroup(iter.second->GetId(), slots);
+            iter.second->SetSlots(slots);
             group.emplace_back(iter.second);
         });
     return true;
@@ -179,6 +202,11 @@ bool NotificationPreferencesInfo::BundleInfo::RemoveSlot(const NotificationConst
     return false;
 }
 
+void NotificationPreferencesInfo::BundleInfo::RemoveAllSlots()
+{
+    slots_.clear();
+}
+
 bool NotificationPreferencesInfo::BundleInfo::RemoveSlotGroup(const std::string &groupId)
 {
     auto iter = groups_.find(groupId);
@@ -187,6 +215,16 @@ bool NotificationPreferencesInfo::BundleInfo::RemoveSlotGroup(const std::string 
         return true;
     }
     return false;
+}
+
+void NotificationPreferencesInfo::BundleInfo::SetBundleUid(const int &uid)
+{
+    uid_ = uid;
+}
+
+int NotificationPreferencesInfo::BundleInfo::GetBundleUid() const
+{
+    return uid_;
 }
 
 void NotificationPreferencesInfo::SetEnabledAllNotification(const bool &value)
@@ -211,12 +249,15 @@ NotificationConstant::DisturbMode NotificationPreferencesInfo::GetDisturbMode() 
 
 void NotificationPreferencesInfo::SetBundleInfo(const BundleInfo &info)
 {
-    infos_.insert_or_assign(info.GetBundleName(), info);
+    std::string bundleKey = info.GetBundleName().append(std::to_string(info.GetBundleUid()));
+    infos_.insert_or_assign(bundleKey, info);
 }
 
-bool NotificationPreferencesInfo::GetBundleInfo(const std::string &bundleName, BundleInfo &info) const
+bool NotificationPreferencesInfo::GetBundleInfo(
+    const sptr<NotificationBundleOption> &bundleOption, BundleInfo &info) const
 {
-    auto iter = infos_.find(bundleName);
+    std::string bundleKey = bundleOption->GetBundleName() + std::to_string(bundleOption->GetUid());
+    auto iter = infos_.find(bundleKey);
     if (iter != infos_.end()) {
         info = iter->second;
         return true;
@@ -224,9 +265,10 @@ bool NotificationPreferencesInfo::GetBundleInfo(const std::string &bundleName, B
     return false;
 }
 
-bool NotificationPreferencesInfo::RemoveBundleInfo(const std::string &bundleName)
+bool NotificationPreferencesInfo::RemoveBundleInfo(const sptr<NotificationBundleOption> &bundleOption)
 {
-    auto iter = infos_.find(bundleName);
+    std::string bundleKey = bundleOption->GetBundleName() + std::to_string(bundleOption->GetUid());
+    auto iter = infos_.find(bundleKey);
     if (iter != infos_.end()) {
         infos_.erase(iter);
         return true;
@@ -234,9 +276,10 @@ bool NotificationPreferencesInfo::RemoveBundleInfo(const std::string &bundleName
     return false;
 }
 
-bool NotificationPreferencesInfo::IsExsitBundleInfo(const std::string &bundleName) const
+bool NotificationPreferencesInfo::IsExsitBundleInfo(const sptr<NotificationBundleOption> &bundleOption) const
 {
-    auto iter = infos_.find(bundleName);
+    std::string bundleKey = bundleOption->GetBundleName() + std::to_string(bundleOption->GetUid());
+    auto iter = infos_.find(bundleKey);
     if (iter != infos_.end()) {
         return true;
     }

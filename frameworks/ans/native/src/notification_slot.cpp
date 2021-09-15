@@ -196,15 +196,19 @@ void NotificationSlot::EnableBadge(bool isShowBadge)
 
 std::string NotificationSlot::Dump() const
 {
-    return "NotificationSlot[id = " + id_ + ", name = " + name_ + ", description = " + description_ +
+    return "NotificationSlot[ id = " + id_ +
+           ", name = " + name_ +
+           ", description = " + description_ +
            ", type = " + std::to_string(static_cast<int32_t>(type_)) +
            ", level = " + std::to_string(static_cast<int32_t>(level_)) +
-           ", isBypassDnd = " + std::to_string(isBypassDnd_) +
+           ", isBypassDnd = " + (isBypassDnd_ ? "true" : "false") +
            ", visibleness = " + std::to_string(static_cast<int32_t>(lockScreenVisibleness_)) +
-           ", sound = " + sound_.ToString() + ", isLightEnabled = " + std::to_string(isLightEnabled_) +
-           ", lightColor = " + std::to_string(lightColor_) + ", isVibrate = " + std::to_string(isVibrationEnabled_) +
+           ", sound = " + sound_.ToString() +
+           ", isLightEnabled = " + (isLightEnabled_ ? "true" : "false") +
+           ", lightColor = " + std::to_string(lightColor_) +
+           ", isVibrate = " + (isVibrationEnabled_ ? "true" : "false") +
            ", vibration = " + MergeVectorToString(vibrationValues_) +
-           ", isShowBadge = " + std::to_string(isShowBadge_) + ", groupId = " + groupId_ + "]";
+           ", isShowBadge = " + (isShowBadge_ ? "true" : "false") + ", groupId = " + groupId_ + "]";
 }
 
 bool NotificationSlot::Marshalling(Parcel &parcel) const

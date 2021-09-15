@@ -1,9 +1,32 @@
-#include <gtest/gtest.h>
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include <chrono>
+#include <condition_variable>
 #include <functional>
+#include <gtest/gtest.h>
+#include <list>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <vector>
 
+#include "advanced_notification_service.h"
+#include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_manager_proxy.h"
-#include "advanced_notification_service.h"
+#include "ans_mt_constant.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "notification_content.h"
@@ -16,40 +39,257 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
 
-const int32_t USLEEP_TIME = 10000;
-bool callBackFunReceived = false;
-bool OnConsumedReceived = false;
-bool OnCanceledReceived = false;
+enum class SubscriberEventType {
+    ON_SUBSCRIBERESULT,
+    ON_UNSUBSCRIBERESULT,
+    ON_DIED,
+    ON_UPDATE,
+    ON_DISTURBMODECHANGED,
+    ON_CANCELED,
+    ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON,
+    ON_CONSUMED,
+    ON_CONSUMED_WITH_SORTINGMAP,
+    UNKNOWN,
+};
+
+class SubscriberEvent {
+public:
+    ~SubscriberEvent()
+    {}
+    SubscriberEventType GetType()
+    {
+        return type_;
+    }
+
+protected:
+    SubscriberEvent(SubscriberEventType type) : type_(type)
+    {}
+
+    SubscriberEventType type_;
+};
+
+class OnSubscribeResultEvent : public SubscriberEvent {
+public:
+    ~OnSubscribeResultEvent()
+    {}
+    OnSubscribeResultEvent(NotificationConstant::SubscribeResult result)
+        : SubscriberEvent(SubscriberEventType::ON_SUBSCRIBERESULT), subscribeResult_(result)
+    {}
+    NotificationConstant::SubscribeResult GetSubscribeResult()
+    {
+        return subscribeResult_;
+    }
+
+private:
+    NotificationConstant::SubscribeResult subscribeResult_;
+};
+
+class OnUnSubscribeResultEvent : public SubscriberEvent {
+public:
+    OnUnSubscribeResultEvent(NotificationConstant::SubscribeResult result)
+        : SubscriberEvent(SubscriberEventType::ON_UNSUBSCRIBERESULT), unSubscribeResult_(result)
+    {}
+    NotificationConstant::SubscribeResult GetUnSubscribeResult()
+    {
+        return unSubscribeResult_;
+    }
+
+private:
+    NotificationConstant::SubscribeResult unSubscribeResult_;
+};
+
+class OnDiedEvent : public SubscriberEvent {
+public:
+    OnDiedEvent() : SubscriberEvent(SubscriberEventType::ON_DIED)
+    {}
+};
+
+class OnUpdatedEvent : public SubscriberEvent {
+public:
+    OnUpdatedEvent(const std::shared_ptr<NotificationSortingMap> &sortingMap)
+        : SubscriberEvent(SubscriberEventType::ON_UPDATE), sortingMap_(sortingMap)
+    {}
+
+    std::shared_ptr<NotificationSortingMap> GetNotificationSortingMap()
+    {
+        return sortingMap_;
+    }
+
+private:
+    std::shared_ptr<NotificationSortingMap> sortingMap_;
+};
+
+class OnDisturbModeChangedEvent : public SubscriberEvent {
+public:
+    OnDisturbModeChangedEvent(int disturbMode)
+        : SubscriberEvent(SubscriberEventType::ON_DISTURBMODECHANGED), disturbMode_(disturbMode)
+    {}
+
+    int GetDisturbModeChanged()
+    {
+        return disturbMode_;
+    }
+
+private:
+    int disturbMode_;
+};
+
+class OnOnCanceledEvent : public SubscriberEvent {
+public:
+    OnOnCanceledEvent(const std::shared_ptr<Notification> &request)
+        : SubscriberEvent(SubscriberEventType::ON_CANCELED), request_(request)
+    {}
+
+    std::shared_ptr<Notification> GetRequest()
+    {
+        return request_;
+    }
+
+private:
+    std::shared_ptr<Notification> request_;
+};
+
+class OnOnCanceledWithSortingMapAndDeleteReasonEvent : public SubscriberEvent {
+public:
+    OnOnCanceledWithSortingMapAndDeleteReasonEvent(const std::shared_ptr<Notification> &request,
+        const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason)
+        : SubscriberEvent(SubscriberEventType::ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON),
+          request_(request),
+          sortingMap_(sortingMap),
+          deleteReason_(deleteReason)
+    {}
+
+    std::shared_ptr<Notification> GetRequest()
+    {
+        return request_;
+    }
+    std::shared_ptr<NotificationSortingMap> GetSortingMap()
+    {
+        return sortingMap_;
+    }
+    int GetDeleteReason()
+    {
+        return deleteReason_;
+    }
+
+private:
+    std::shared_ptr<Notification> request_;
+    std::shared_ptr<NotificationSortingMap> sortingMap_;
+    int deleteReason_;
+};
+
+class OnConsumedEvent : public SubscriberEvent {
+public:
+    OnConsumedEvent(const std::shared_ptr<Notification> &request)
+        : SubscriberEvent(SubscriberEventType::ON_CONSUMED), request_(request)
+    {}
+
+    std::shared_ptr<Notification> GetRequest()
+    {
+        return request_;
+    }
+
+private:
+    std::shared_ptr<Notification> request_;
+};
+
+class OnConsumedWithSortingMapEvent : public SubscriberEvent {
+public:
+    OnConsumedWithSortingMapEvent(
+        const std::shared_ptr<Notification> &request, const std::shared_ptr<NotificationSortingMap> &sortingMap)
+        : SubscriberEvent(SubscriberEventType::ON_CONSUMED_WITH_SORTINGMAP), request_(request), sortingMap_(sortingMap)
+    {
+        type_ = SubscriberEventType::ON_CONSUMED_WITH_SORTINGMAP;
+    }
+
+    std::shared_ptr<Notification> GetRequest()
+    {
+        return request_;
+    }
+
+    std::shared_ptr<NotificationSortingMap> GetSortingMap()
+    {
+        return sortingMap_;
+    }
+
+private:
+    std::shared_ptr<Notification> request_;
+    std::shared_ptr<NotificationSortingMap> sortingMap_;
+};
+
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
     virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
-    {}
+    {
+        std::shared_ptr<OnSubscribeResultEvent> event = std::make_shared<OnSubscribeResultEvent>(result);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
+    }
     virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
-    {}
+    {
+        std::shared_ptr<OnUnSubscribeResultEvent> event = std::make_shared<OnUnSubscribeResultEvent>(result);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
+    }
     virtual void OnDied() override
     {}
     virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
-    {}
+    {
+        std::shared_ptr<OnUpdatedEvent> event = std::make_shared<OnUpdatedEvent>(sortingMap);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
+    }
     virtual void OnDisturbModeChanged(int disturbMode) override
-    {}
+    {
+        std::shared_ptr<OnDisturbModeChangedEvent> event = std::make_shared<OnDisturbModeChangedEvent>(disturbMode);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
+    }
     virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
     {
-        OnCanceledReceived = true;
+        std::shared_ptr<OnOnCanceledEvent> event = std::make_shared<OnOnCanceledEvent>(request);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
     }
     virtual void OnCanceled(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override
     {
-        callBackFunReceived = false;
+        std::shared_ptr<OnOnCanceledWithSortingMapAndDeleteReasonEvent> event =
+            std::make_shared<OnOnCanceledWithSortingMapAndDeleteReasonEvent>(request, sortingMap, deleteReason);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
     }
     virtual void OnConsumed(const std::shared_ptr<Notification> &request) override
     {
-        OnConsumedReceived = true;
+        std::shared_ptr<OnConsumedEvent> event = std::make_shared<OnConsumedEvent>(request);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
     }
+
     virtual void OnConsumed(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {
-        callBackFunReceived = true;
+        std::shared_ptr<OnConsumedWithSortingMapEvent> event =
+            std::make_shared<OnConsumedWithSortingMapEvent>(request, sortingMap);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
     }
+
+    std::list<std::shared_ptr<SubscriberEvent>> GetEvents()
+    {
+        std::unique_lock<std::mutex> lck(mtx_);
+        return events_;
+    }
+
+    void ClearEvents()
+    {
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.clear();
+    }
+
+private:
+    std::mutex mtx_;
+    std::list<std::shared_ptr<SubscriberEvent>> events_;
 };
 
 class AnsFWModuleTest : public testing::Test {
@@ -58,816 +298,771 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    inline void SleepForFC()
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 };
 
-sptr<ISystemAbilityManager> systemAbilityManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+class EventParser {
+public:
+    EventParser()
+    {
+        waitOnSubscriber_ = 0;
+        waitOnUnSubscriber_ = 0;
+        waitOnConsumed_ = false;
+        onConsumedReq_.clear();
+        onConsumedWithSortingMapReq_.clear();
+        onConsumedWithSortingMapSor_.clear();
+        waitOnConsumedWithSortingMap_ = false;
+        waitOnCanceled_ = false;
+        onCanceledReq_.clear();
+        onCanceledWithSortingMapReq_.clear();
+        onCanceledWithSortingMapSor_.clear();
+        onCanceledWithSortingMapDelRea_.clear();
+        waitOnCanceledWithSortingMapAndDeleteReason_ = false;
+    }
+
+    void parse(std::list<std::shared_ptr<SubscriberEvent>> events)
+    {
+        for (auto event : events) {
+            if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
+                std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
+                waitOnSubscriber_ = ev->GetSubscribeResult();
+            } else if (event->GetType() == SubscriberEventType::ON_CONSUMED) {
+                std::shared_ptr<OnConsumedEvent> ev = std::static_pointer_cast<OnConsumedEvent>(event);
+                waitOnConsumed_ = true;
+                onConsumedReq_.push_back(ev->GetRequest());
+            } else if (event->GetType() == SubscriberEventType::ON_CONSUMED_WITH_SORTINGMAP) {
+                std::shared_ptr<OnConsumedWithSortingMapEvent> ev =
+                    std::static_pointer_cast<OnConsumedWithSortingMapEvent>(event);
+                waitOnConsumedWithSortingMap_ = true;
+                onConsumedWithSortingMapReq_.push_back(ev->GetRequest());
+                onConsumedWithSortingMapSor_.push_back(ev->GetSortingMap());
+            } else if (event->GetType() == SubscriberEventType::ON_CANCELED) {
+                std::shared_ptr<OnOnCanceledEvent> ev = std::static_pointer_cast<OnOnCanceledEvent>(event);
+                waitOnCanceled_ = true;
+                onCanceledReq_.push_back(ev->GetRequest());
+            } else if (event->GetType() == SubscriberEventType::ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON) {
+                std::shared_ptr<OnOnCanceledWithSortingMapAndDeleteReasonEvent> ev =
+                    std::static_pointer_cast<OnOnCanceledWithSortingMapAndDeleteReasonEvent>(event);
+                waitOnCanceledWithSortingMapAndDeleteReason_ = true;
+                onCanceledWithSortingMapReq_.push_back(ev->GetRequest());
+                onCanceledWithSortingMapSor_.push_back(ev->GetSortingMap());
+                onCanceledWithSortingMapDelRea_.push_back(ev->GetDeleteReason());
+            } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
+                std::shared_ptr<OnUnSubscribeResultEvent> ev =
+                    std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
+                waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+            }
+        }
+    }
+
+    void setWaitOnConsumed(bool bl)
+    {
+        waitOnConsumed_ = bl;
+    }
+
+    void setWaitOnCanceled(bool bl)
+    {
+        waitOnCanceled_ = bl;
+    }
+
+    void setWaitOnCanceledWithSortingMapAndDeleteReason(bool bl)
+    {
+        waitOnCanceledWithSortingMapAndDeleteReason_ = bl;
+    }
+
+    void setWaitOnUnSubscriber()
+    {
+        waitOnUnSubscriber_ = NotificationConstant::SubscribeResult::RESOURCES_FAIL;
+    }
+
+    uint32_t getWaitOnSubscriber()
+    {
+        return waitOnSubscriber_;
+    }
+
+    uint32_t getWaitOnUnSubscriber()
+    {
+        return waitOnUnSubscriber_;
+    }
+
+    bool getwaitOnConsumed()
+    {
+        return waitOnConsumed_;
+    }
+
+    std::vector<std::shared_ptr<Notification>> getOnConsumedReq()
+    {
+        return onConsumedReq_;
+    }
+
+    std::vector<std::shared_ptr<Notification>> getOnConsumedWithSortingMapReq()
+    {
+        return onConsumedWithSortingMapReq_;
+    }
+
+    std::vector<std::shared_ptr<NotificationSortingMap>> getOnConsumedWithSortingMapSor()
+    {
+        return onConsumedWithSortingMapSor_;
+    }
+
+    bool getWaitOnConsumedWithSortingMap()
+    {
+        return waitOnConsumedWithSortingMap_;
+    }
+
+    bool getWaitOnCanceled()
+    {
+        return waitOnCanceled_;
+    }
+
+    bool getWaitOnCanceledWithSortingMapAndDeleteReason()
+    {
+        return waitOnCanceledWithSortingMapAndDeleteReason_;
+    }
+
+    std::vector<std::shared_ptr<Notification>> getOnCanceledReq()
+    {
+        return onCanceledReq_;
+    }
+
+    std::vector<std::shared_ptr<Notification>> getOnCanceledWithSortingMapReq()
+    {
+        return onCanceledWithSortingMapReq_;
+    }
+
+    std::vector<std::shared_ptr<NotificationSortingMap>> getOnCanceledWithSortingMapSor()
+    {
+        return onCanceledWithSortingMapSor_;
+    }
+
+    std::vector<int> getOnCanceledWithSortingMapDelRea()
+    {
+        return onCanceledWithSortingMapDelRea_;
+    }
+
+private:
+    uint32_t waitOnSubscriber_;
+    uint32_t waitOnUnSubscriber_;
+    bool waitOnConsumed_ = false;
+    std::vector<std::shared_ptr<Notification>> onConsumedReq_;
+    std::vector<std::shared_ptr<Notification>> onConsumedWithSortingMapReq_;
+    std::vector<std::shared_ptr<NotificationSortingMap>> onConsumedWithSortingMapSor_;
+    bool waitOnConsumedWithSortingMap_ = false;
+    bool waitOnCanceled_ = false;
+    std::vector<std::shared_ptr<Notification>> onCanceledReq_;
+    std::vector<std::shared_ptr<Notification>> onCanceledWithSortingMapReq_;
+    std::vector<std::shared_ptr<NotificationSortingMap>> onCanceledWithSortingMapSor_;
+    std::vector<int> onCanceledWithSortingMapDelRea_;
+    bool waitOnCanceledWithSortingMapAndDeleteReason_ = false;
+};
+
+sptr<ISystemAbilityManager> g_systemAbilityManager =
+    SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
 void AnsFWModuleTest::SetUpTestCase()
 {
     sptr<AdvancedNotificationService> service = OHOS::Notification::AdvancedNotificationService::GetInstance();
     OHOS::ISystemAbilityManager::SAExtraProp saExtraProp;
-    systemAbilityManager->AddSystemAbility(OHOS::ADVANCED_NOTIFICATION_SERVICE_ABILITY_ID, service, saExtraProp);
+    g_systemAbilityManager->AddSystemAbility(OHOS::ADVANCED_NOTIFICATION_SERVICE_ABILITY_ID, service, saExtraProp);
 }
 
 void AnsFWModuleTest::TearDownTestCase()
 {}
 
 void AnsFWModuleTest::SetUp()
-{
-    callBackFunReceived = false;
-    OnConsumedReceived = false;
-    OnCanceledReceived = false;
-}
+{}
 
 void AnsFWModuleTest::TearDown()
 {
     NotificationHelper::CancelAllNotifications();
-    sleep(1);
+    NotificationHelper::RemoveAllSlots();
+    NotificationHelper::RemoveNotifications();
+    std::vector<sptr<NotificationSlotGroup>> groups;
+    NotificationHelper::GetNotificationSlotGroups(groups);
+    for (auto group : groups) {
+        NotificationHelper::RemoveNotificationSlotGroup(group->GetId().c_str());
+    }
+    SleepForFC();
 }
 
 /**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00100
- * @tc.name      :
- * @tc.desc      : The subscriber remove all notifications from the notification queue.
- * The subscriber receives the notification of the deletion.
+ *
+ * @tc.number    : ANS_FW_MT_FlowControl_00100
+ * @tc.name      : FlowControl_00100
+ * @tc.desc      : Test notification's flow control.
  */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00100, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | Level1)
 {
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-    
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName(APP_NAME);
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    for (uint32_t i = 0; i <= MAX_ACTIVE_NUM_PERSECOND; i++) {
+        std::string label = std::to_string(i);
+        NotificationRequest req(i);
+        req.SetLabel(label);
+        req.SetContent(content);
+        if (i < MAX_ACTIVE_NUM_PERSECOND) {
+            EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+        } else {
+            EXPECT_EQ(NotificationHelper::PublishNotification(req), (int)ERR_ANS_OVER_MAX_ACITVE_PERSECOND);
+        }
+    }
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    EventParser eventParser;
+    eventParser.parse(events);
+    for (uint32_t i = 0; i <= MAX_ACTIVE_NUM_PERSECOND; i++) {
+        std::string notificationLabel = std::to_string(i);
+        std::string notificationIdStr = std::to_string(i);
+        int32_t notificationIdInt = i;
+        if (i < MAX_ACTIVE_NUM_PERSECOND) {
+            std::stringstream stream;
+            stream << UID << KEY_SPLITER << notificationLabel << KEY_SPLITER << notificationIdInt;
+            std::string notificationKey = stream.str();
+            NotificationSorting sorting;
+            EXPECT_EQ(eventParser.getOnConsumedReq()[i]->GetLabel().c_str(), notificationLabel);
+            EXPECT_EQ(eventParser.getOnConsumedReq()[i]->GetId(), notificationIdInt);
+            EXPECT_EQ(eventParser.getOnConsumedReq()[i]->GetKey(), notificationKey);
+            EXPECT_EQ(eventParser.getOnConsumedWithSortingMapReq()[i]->GetLabel().c_str(), notificationLabel);
+            EXPECT_EQ(eventParser.getOnConsumedWithSortingMapReq()[i]->GetId(), notificationIdInt);
+            EXPECT_EQ(eventParser.getOnConsumedWithSortingMapReq()[i]->GetKey(), notificationKey);
+            EXPECT_TRUE(
+                eventParser.getOnConsumedWithSortingMapSor()[i]->GetNotificationSorting(notificationKey, sorting));
+            EXPECT_EQ(sorting.GetKey().c_str(), notificationKey);
+        }
+    }
+    EXPECT_EQ((uint32_t)eventParser.getOnConsumedReq().size(), MAX_ACTIVE_NUM_PERSECOND);
+    EXPECT_EQ((uint32_t)eventParser.getOnConsumedWithSortingMapReq().size(), MAX_ACTIVE_NUM_PERSECOND);
+    EXPECT_EQ(eventParser.getWaitOnSubscriber(), NotificationConstant::SubscribeResult::SUCCESS);
+    EXPECT_EQ(eventParser.getWaitOnUnSubscriber(), NotificationConstant::SubscribeResult::SUCCESS);
+    subscriber.ClearEvents();
+    SleepForFC();
+}
 
-    std::string label = "Label";
+/**
+ *
+ * @tc.number    : ANS_FW_MT_RemoveNotificaitonsByKey_00100
+ * @tc.name      : RemoveNotificaitonsByKey_00100
+ * @tc.desc      : Remove Notification by key.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00100, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
-    req.SetLabel(label);
+    req.SetLabel(NOTIFICATION_LABEL_0);
     req.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    EXPECT_EQ(0, NotificationHelper::RemoveNotifications());
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00200
- * @tc.name      :
- * @tc.desc      : The subscriber remove the notification from the notification queue according to the specified Key.
- * The subscriber receives the notification of the deletion.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00200, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label = "Label";
-    NotificationRequest req(0);
-    req.SetLabel(label);
-    req.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notifications;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notifications));
-    std::string key = notifications[0]->GetKey().c_str();
-
-    EXPECT_EQ(0, NotificationHelper::RemoveNotification(key));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00300
- * @tc.name      :
- * @tc.desc      : An empty key was used when deleting the notification.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00300, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label = "Label";
-    NotificationRequest req(0);
-    req.SetLabel(label);
-    req.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notifications;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notifications));
-    std::string key = notifications[0]->GetKey().c_str();
-
-    EXPECT_EQ((int)ERR_ANS_INVALID_PARAM, (int)NotificationHelper::RemoveNotification(std::string()));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, false);
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00400
- * @tc.name      :
- * @tc.desc      : A non-existent key was used when deleting the notification.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00400, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label = "Label";
-    NotificationRequest req(0);
-    req.SetLabel(label);
-    req.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notifications;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notifications));
-    std::string key = "A non-existent key";
-
-    EXPECT_EQ((int)ERR_ANS_NOTIFICATION_NOT_EXISTS, (int)NotificationHelper::RemoveNotification(key));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, false);
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00500
- * @tc.name      :
- * @tc.desc      : Use the same key to delete repeatedly.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00500, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label = "Label";
-    NotificationRequest req(0);
-    req.SetLabel(label);
-    req.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notifications;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notifications));
-    std::string key = notifications[0]->GetKey().c_str();
-
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotification(key));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-    OnCanceledReceived = false;
-    EXPECT_EQ((int)ERR_ANS_NOTIFICATION_NOT_EXISTS, (int)NotificationHelper::RemoveNotification(key));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, false);
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00600
- * @tc.name      :
- * @tc.desc      : Delete an Unremovable notification.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00600, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label = "Label";
-    NotificationRequest req(0);
-    req.SetLabel(label);
-    req.SetContent(content);
-    req.SetUnremovable(false);  // TODO should be true
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notifications;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notifications));
-    std::string key = notifications[0]->GetKey().c_str();
-
-    EXPECT_EQ((int)ERR_ANS_NOTIFICATION_IS_UNREMOVABLE, (int)NotificationHelper::RemoveNotification(key));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, false);
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00700
- * @tc.name      :
- * @tc.desc      : Delete all notifications including Unremovable notifications.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00700, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    req1.SetContent(content);
-    req1.SetUnremovable(false);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label2 = "Label2";
-    NotificationRequest req2(0);
-    req2.SetLabel(label2);
-    req2.SetContent(content);
-    req2.SetUnremovable(false);  // TODO should be true
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notificationsBefor;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notificationsBefor));
-    EXPECT_EQ(2, (int)notificationsBefor.size());
-
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications());
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notificationsAfter;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notificationsAfter));
-    // EXPECT_EQ(1, (int)notificationsAfter.size()); TODO
-    // EXPECT_EQ("Label2", notificationsAfter[0]->GetLabel()); TODO
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00800
- * @tc.name      :
- * @tc.desc      : Delete notification based on bundle.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00800, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    req1.SetContent(content);
-    req1.SetUnremovable(false);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::vector<sptr<OHOS::Notification::Notification>> notificationsBefor;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notificationsBefor));
-    EXPECT_EQ(1, (int)notificationsBefor.size());
-
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications("bundleName"));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, false);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notificationsAfter;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notificationsAfter));
-    EXPECT_EQ(0, (int)notificationsAfter.size());
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotification_00900
- * @tc.name      :
- * @tc.desc      : Delete notification based on A non-existent bundle.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotification_00900, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    req1.SetContent(content);
-    req1.SetUnremovable(false);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::vector<sptr<OHOS::Notification::Notification>> notificationsBefor;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notificationsBefor));
-    EXPECT_EQ(1, (int)notificationsBefor.size());
-
-    std::string bundleName = "A non-existent bundle";
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications(bundleName));
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, false);
-
-    std::vector<sptr<OHOS::Notification::Notification>> notificationsAfter;
-    EXPECT_EQ(0, NotificationHelper::GetAllActiveNotifications(notificationsAfter));
-    EXPECT_EQ(1, (int)notificationsAfter.size());
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_GetActiveNotificationNums_00100
- * @tc.name      :
- * @tc.desc      : Get the number of active notifications for the current application.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetActiveNotificationNums_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    int countBefor = 0;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countBefor));
-    EXPECT_EQ(0, countBefor);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    req1.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label2 = "Label2";
-    NotificationRequest req2(0);
-    req2.SetLabel(label2);
-    req2.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label3 = "Label3";
-    NotificationRequest req3(0);
-    req3.SetLabel(label3);
-    req3.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req3));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    int countAfter = 0;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countAfter));
-    EXPECT_EQ(3, countAfter);
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_GetActiveNotificationNums_00200
- * @tc.name      :
- * @tc.desc      : Get the number of active notifications for the current application.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetActiveNotificationNums_00200, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    int countBefor = 0;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countBefor));
-    EXPECT_EQ(0, countBefor);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    req1.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label2 = "Label2";
-    NotificationRequest req2(0);
-    req2.SetLabel(label2);
-    req2.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label3 = "Label3";
-    NotificationRequest req3(0);
-    req3.SetLabel(label3);
-    req3.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req3));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    int countBefore = 0;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countBefore));
-    EXPECT_EQ(3, countBefore);
-
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications());
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-
-    int countAfter = 0;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countAfter));
-    EXPECT_EQ(0, countAfter);
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_GetActiveNotifications_00100
- * @tc.name      :
- * @tc.desc      : Get the active notifications for the current application.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetActiveNotifications_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    int countBefor = 0;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countBefor));
-    EXPECT_EQ(0, countBefor);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    req1.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label2 = "Label2";
-    NotificationRequest req2(0);
-    req2.SetLabel(label2);
-    req2.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label3 = "Label3";
-    NotificationRequest req3(0);
-    req3.SetLabel(label3);
-    req3.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req3));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::vector<sptr<NotificationRequest>> requests;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotifications(requests));
-    EXPECT_EQ("Label1", requests[0]->GetLabel().c_str());
-    EXPECT_EQ("Label2", requests[1]->GetLabel().c_str());
-    EXPECT_EQ("Label3", requests[2]->GetLabel().c_str());
-
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications());
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-
-    std::vector<sptr<NotificationRequest>> requestsRemoved;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotifications(requestsRemoved));
-    EXPECT_EQ(0, (int)requestsRemoved.size());
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_GetActiveNotifications_00200
- * @tc.name      :
- * @tc.desc      : Get the active notifications for the current application.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetActiveNotifications_00200, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    NotificationRequest req1(0);
-    req1.SetNotificationId(1);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    NotificationRequest req2(0);
-    req2.SetNotificationId(2);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    NotificationRequest req3(0);
-    req3.SetNotificationId(3);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req3));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications());
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-
-    std::vector<sptr<NotificationRequest>> notifications;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotifications(notifications));
-    EXPECT_EQ(nullptr, notifications[0]);
-    NotificationHelper::GetActiveNotifications(notifications);
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_GetAllActiveNotifications_00100
- * @tc.name      :
- * @tc.desc      : Get all of active notifications for the current application.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetAllActiveNotifications_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label2 = "Label2";
-    NotificationRequest req2(0);
-    req2.SetLabel(label2);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label3 = "Label3";
-    NotificationRequest req3(0);
-    req3.SetLabel(label3);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req3));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
     std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetAllActiveNotifications(notifications));
-    EXPECT_EQ(label1, notifications[0]->GetLabel());
-    EXPECT_EQ(label2, notifications[1]->GetLabel());
-    EXPECT_EQ(label3, notifications[2]->GetLabel());
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    std::string key = notifications[0]->GetKey().c_str();
+    EXPECT_EQ(NotificationHelper::RemoveNotification(key), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    EventParser eventParser;
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
+    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetId(), 0);
+    std::stringstream stream;
+    stream << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
+    std::string notificationKey = stream.str();
+    NotificationSorting sorting;
+    EXPECT_EQ(eventParser.getOnCanceledReq()[0]->GetKey(), notificationKey);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey);
+    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey, sorting));
+    EXPECT_EQ(sorting.GetKey().c_str(), notificationKey);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[0], CANCEL_REASON_DELETE);
+    subscriber.ClearEvents();
+    SleepForFC();
 }
 
 /**
- * @tc.number    : ANS_FW_MT_GetAllActiveNotifications_00200
- * @tc.name      :
- * @tc.desc      : Get  all of active notifications for the current application.
+ *
+ * @tc.number    : ANS_FW_MT_RemoveNotificaitonsByKey_00200
+ * @tc.name      : RemoveNotificaitonsByKey_00200
+ * @tc.desc      : Remove Notification by a nonexistent key.
  */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetAllActiveNotifications_00200, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00200, Function | MediumTest | Level1)
 {
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
     info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-    
-
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
-    std::string label1 = "Label1";
-    NotificationRequest req1(0);
-    req1.SetLabel(label1);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label2 = "Label2";
-    NotificationRequest req2(0);
-    req2.SetLabel(label2);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::string label3 = "Label3";
-    NotificationRequest req3(0);
-    req3.SetLabel(label3);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req3));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications());
-    usleep(USLEEP_TIME);
-    EXPECT_EQ(OnCanceledReceived, true);
-
-    std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetAllActiveNotifications(notifications));
-    EXPECT_EQ(nullptr, notifications[0]);
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_GetAllActiveNotifications_key_00100
- * @tc.name      :
- * @tc.desc      : Get the active notifications related by key for the current application.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetAllActiveNotifications_key_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-    
-
-    std::vector<std::string> key{"key_type1", "key_type2"};
-
-    std::string label1 = "label1";
-    std::string label2 = "label2";
-    std::string label3 = "label3";
-
-    NotificationRequest req1(0);
-    req1.SetSortingKey(key[0]);
-    req1.SetLabel(label1);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    NotificationRequest req2(0);
-    req2.SetSortingKey(key[0]);
-    req2.SetLabel(label2);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    NotificationRequest req3(0);
-    req3.SetSortingKey(key[1]);
-    req3.SetLabel(label3);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
-    EXPECT_EQ(OnConsumedReceived, true);
-    OnConsumedReceived = false;
-
-    std::vector<sptr<Notification>> notifications;
-    EXPECT_EQ((int)ERR_OK, NotificationHelper::GetAllActiveNotifications(key, notifications));
-    EXPECT_EQ(label1, notifications[0]->GetLabel());
-    EXPECT_EQ(label2, notifications[1]->GetLabel());
-    EXPECT_EQ(label3, notifications[2]->GetLabel());
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_UnSubscribeNotification_00100
- * @tc.name      :
- * @tc.desc      : Cancel a subscribe.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_UnSubscribeNotification_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-    
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_Subscribe_00100
- * @tc.name      :
- * @tc.desc      : produce a subscribe
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_WantAgent_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-    
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_DeleteSlots_00100
- * @tc.name      :
- * @tc.desc      : Delete slots.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_DeleteSlots_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    info.AddAppName("bundleName");
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_SlotGroupId_00100
- * @tc.name      :
- * @tc.desc      : Delete all Notifications of the app.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_SlotGroupId_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    std::string AppName = "bundleName";
-    info.AddAppName(AppName);
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    EXPECT_EQ(0, NotificationHelper::RemoveNotifications(AppName));
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_RemoveNotifications_00100
- * @tc.name      :
- * @tc.desc      : Delete all Notifications of the app.
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotifications_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    std::string AppName = "bundleName";
-    info.AddAppName(AppName);
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    EXPECT_EQ(0, NotificationHelper::RemoveNotifications(AppName));
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
-}
-
-/**
- * @tc.number    : ANS_FW_MT_SoundSlotNotification_00100
- * @tc.name      :
- * @tc.desc      : App published a sound notification .
- */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_SoundSlotNotification_00100, Function | MediumTest | Level1)
-{
-    auto subscriber = TestAnsSubscriber();
-    NotificationSubscribeInfo info = NotificationSubscribeInfo();
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
-
-    std::string str{"test"};
-    std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>(str);
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
-
     NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
     req.SetContent(content);
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    EXPECT_EQ(OnConsumedReceived, true);
-
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_EQ(NotificationHelper::RemoveNotification(AN_NOT_EXIST_KEY), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
+    std::string key = notifications[0]->GetKey().c_str();
+    EXPECT_EQ(NotificationHelper::RemoveNotification(key), (int)ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    EventParser eventParser;
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    eventParser.setWaitOnCanceled(false);
+    EXPECT_EQ(NotificationHelper::RemoveNotification(key), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
+    events = subscriber.GetEvents();
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    events = subscriber.GetEvents();
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    subscriber.ClearEvents();
+    SleepForFC();
 }
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_RemoveNotificaitons_00100
+ * @tc.name      : RemoveNotificaitons_00100
+ * @tc.desc      : Remove all Notifications.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00100, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    req.SetContent(content);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+    SleepForFC();
+    EventParser eventParser;
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    eventParser.setWaitOnConsumed(false);
+
+    NotificationRequest req1(1);
+    req1.SetLabel(NOTIFICATION_LABEL_0);
+    req1.SetContent(content);
+    events = subscriber.GetEvents();
+    EXPECT_EQ(NotificationHelper::PublishNotification(req1), ERR_OK);
+    SleepForFC();
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_EQ((int)notifications.size(), (int)0);
+
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    events = subscriber.GetEvents();
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    EXPECT_TRUE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_RemoveNotificaitons_00200
+ * @tc.name      : RemoveNotificaitons_00200
+ * @tc.desc      : Remove Notifications when no Notification.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00200, Function | MediumTest | Level1)
+{
+    EventParser eventParser;
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    EXPECT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.parse(events);
+    EXPECT_FALSE(eventParser.getwaitOnConsumed());
+    EXPECT_FALSE(eventParser.getWaitOnConsumedWithSortingMap());
+    EXPECT_FALSE(eventParser.getWaitOnCanceled());
+    EXPECT_FALSE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_UnSubscriber_00100
+ * @tc.name      : UnSubscriber_00100
+ * @tc.desc      : Remove Subscriber.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_UnSubscriber_00100, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("ANS_FW_MT_UnSubscriber_00100");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    uint32_t waitOnSubscriber_;
+    uint32_t waitOnUnSubscriber_;
+
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
+            std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
+            waitOnSubscriber_ = ev->GetSubscribeResult();
+        } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
+            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
+            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+        }
+    }
+    EXPECT_EQ(waitOnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
+
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_UnSubscriber_00200
+ * @tc.name      : UnSubscriber_00200
+ * @tc.desc      : Remove Subscriber.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_UnSubscriber_00200, Function | MediumTest | Level1)
+{
+    EventParser eventParser;
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("ANS_FW_MT_UnSubscriber_00100");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), (int)ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    uint32_t waitOnSubscriber_;
+    uint32_t waitOnUnSubscriber_;
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
+            std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
+            waitOnSubscriber_ = ev->GetSubscribeResult();
+        } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
+            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
+            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+        }
+    }
+    EXPECT_EQ(waitOnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
+    waitOnSubscriber_ = NotificationConstant::SubscribeResult::PREMISSION_FAIL;
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), (int)ERR_OK);
+    events = subscriber.GetEvents();
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
+            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
+            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+        }
+    }
+    EXPECT_EQ(waitOnUnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+/**
+ *
+ * @tc.number    : ANS_FW_MT_Subscriber_00100
+ * @tc.name      : Subscriber_00100
+ * @tc.desc      : Subscriber Notifications.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_Subscriber_00100, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("ANS_FW_MT_UnSubscriber_00100");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    uint32_t waitOnSubscriber_;
+    uint32_t waitOnUnSubscriber_;
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
+            std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
+            waitOnSubscriber_ = ev->GetSubscribeResult();
+        } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
+            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
+            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+        }
+    }
+    EXPECT_EQ(waitOnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_CancelNotificationById_00100
+ * @tc.name      : CancelNotificationById_00100
+ * @tc.desc      : Cancel Notification By Id.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelNotificationById_00100, Function | MediumTest | Level1)
+{
+    EventParser eventParser;
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    NotificationRequest req(1);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    req.SetContent(content);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+    SleepForFC();
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    int32_t id = notifications[0]->GetId();
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::CancelNotification(NOTIFICATION_LABEL_0, id), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
+    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetId(), 1);
+    std::stringstream stream;
+    stream << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 1;
+    std::string notificationKey = stream.str();
+    NotificationSorting sorting;
+    EXPECT_EQ(eventParser.getOnCanceledReq()[0]->GetKey(), notificationKey);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey);
+    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey, sorting));
+    EXPECT_EQ(sorting.GetKey().c_str(), notificationKey);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[0], APP_CANCEL_REASON_DELETE);
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_CancelNotificationById_00200
+ * @tc.name      : CancelNotificationById_00200
+ * @tc.desc      : Cancel Notification By Id when Id is not exist.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelNotificationById_00200, Function | MediumTest | Level1)
+{
+    EventParser eventParser;
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    NotificationRequest req(1);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    req.SetContent(content);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+    SleepForFC();
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    int32_t id = 0;
+    SleepForFC();
+
+    eventParser.setWaitOnCanceled(false);
+    eventParser.setWaitOnCanceledWithSortingMapAndDeleteReason(false);
+    EXPECT_EQ(NotificationHelper::CancelNotification(NOTIFICATION_LABEL_0, id), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    EXPECT_FALSE(eventParser.getWaitOnCanceled());
+    EXPECT_FALSE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_CancelAllNotifications_00100
+ * @tc.name      :
+ * @tc.desc      : Cancel all notifications.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelAllNotifications_00100, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    NotificationRequest req0(0);
+    req0.SetLabel(NOTIFICATION_LABEL_0);
+    req0.SetContent(content);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req0), ERR_OK);
+
+    NotificationRequest req1(1);
+    req1.SetLabel(NOTIFICATION_LABEL_1);
+    req1.SetContent(content);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req1), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::CancelAllNotifications(), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+
+    EventParser eventParser;
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
+    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetId(), 0);
+    std::stringstream stream0;
+    stream0 << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
+    std::string notificationKey0 = stream0.str();
+    NotificationSorting sorting0;
+    EXPECT_EQ(eventParser.getOnCanceledReq()[0]->GetKey(), notificationKey0);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey0);
+    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey0, sorting0));
+    EXPECT_EQ(sorting0.GetKey().c_str(), notificationKey0);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[0], APP_CANCEL_ALL_REASON_DELETE);
+
+    EXPECT_EQ(eventParser.getOnConsumedReq()[1]->GetLabel().c_str(), NOTIFICATION_LABEL_1);
+    EXPECT_EQ(eventParser.getOnConsumedReq()[1]->GetId(), 1);
+    std::stringstream stream1;
+    stream1 << UID << KEY_SPLITER << NOTIFICATION_LABEL_1 << KEY_SPLITER << 1;
+    std::string notificationKey1 = stream1.str();
+    NotificationSorting sorting1;
+    EXPECT_EQ(eventParser.getOnCanceledReq()[1]->GetKey(), notificationKey1);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[1]->GetKey(), notificationKey1);
+    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[1]->GetNotificationSorting(notificationKey1, sorting1));
+    EXPECT_EQ(sorting1.GetKey().c_str(), notificationKey1);
+    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[1], APP_CANCEL_ALL_REASON_DELETE);
+
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_PublishSoundNotification_00100
+ * @tc.name      :
+ * @tc.desc      : Publish a sound notification.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishSoundNotification_00100, Function | MediumTest | Level1)
+{
+    std::vector<sptr<NotificationSlot>> slots;
+    NotificationSlot slot1;
+    slot1.SetType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    slot1.SetSound(Uri("."));
+    slot1.SetVibrationStyle(std::vector<int64_t>(1, 1));
+    EXPECT_EQ(NotificationHelper::AddNotificationSlot(slot1), (int)ERR_OK);
+
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    req.SetContent(content);
+    req.SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::CancelAllNotifications(), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+
+    EventParser eventParser;
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    EXPECT_TRUE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_PublishVibrationNotification_00100
+ * @tc.name      :
+ * @tc.desc      : Publish a vibration notification.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishVibrationNotification_00100, Function | MediumTest | Level1)
+{
+    std::vector<sptr<NotificationSlot>> slots;
+    NotificationSlot slot1;
+    slot1.SetType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    slot1.SetEnableVibration(true);
+    slot1.SetVibrationStyle(std::vector<int64_t>(1, 1));
+    EXPECT_EQ(NotificationHelper::AddNotificationSlot(slot1), (int)ERR_OK);
+
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    req.SetContent(content);
+    req.SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::CancelAllNotifications(), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    EventParser eventParser;
+    eventParser.parse(events);
+    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    EXPECT_TRUE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
 }  // namespace Notification
 }  // namespace OHOS

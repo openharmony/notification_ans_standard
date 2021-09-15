@@ -16,7 +16,6 @@
 #define private public
 #include <gtest/gtest.h>
 
-#include "notification_preferences.h"
 #include "notification_preferences_database.h"
 
 using namespace testing::ext;
@@ -25,46 +24,35 @@ namespace Notification {
 
 class NotificationPreferencesDatabaseTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(){};
+    static void TearDownTestCase(){};
+    void SetUp(){};
+    void TearDown(){};
+
+    const std::string bundleName_ = "bundleName";
+    std::unique_ptr<NotificationPreferencesDatabase> preferncesDB_ =
+        std::make_unique<NotificationPreferencesDatabase>();
 };
 
-void NotificationPreferencesDatabaseTest::SetUpTestCase()
-{}
-
-void NotificationPreferencesDatabaseTest::TearDownTestCase()
-{}
-
-void NotificationPreferencesDatabaseTest::SetUp()
-{}
-
-void NotificationPreferencesDatabaseTest::TearDown()
-{}
-
-std::unique_ptr<NotificationPreferencesDatabase> preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
-
 /**
+ * @tc.name      : PutSlotsToDisturbeDB_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutSlotsToDisturbeDB_00100
+ * @tc.desc      : Put slots into Disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutSlotsToDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
     std::vector<sptr<NotificationSlot>> slots;
     sptr<NotificationSlot> slot1 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     sptr<NotificationSlot> slot2 = new NotificationSlot(NotificationConstant::SlotType::SERVICE_REMINDER);
     slots.push_back(slot1);
     slots.push_back(slot2);
-    EXPECT_EQ(true, preferncesDB_->PutSlotsToDisturbeDB(bundleName, slots));
+    EXPECT_TRUE(preferncesDB_->PutSlotsToDisturbeDB(bundleName_, slots));
 }
 
 /**
+ * @tc.name      : PutSlotsToDisturbeDB_00200
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutSlotsToDisturbeDB_00200
+ * @tc.desc      : Put slots into Disturbe DB when bundle name is null, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutSlotsToDisturbeDB_00200, Function | SmallTest | Level1)
 {
@@ -73,348 +61,324 @@ HWTEST_F(NotificationPreferencesDatabaseTest, PutSlotsToDisturbeDB_00200, Functi
     sptr<NotificationSlot> slot2 = new NotificationSlot(NotificationConstant::SlotType::SERVICE_REMINDER);
     slots.push_back(slot1);
     slots.push_back(slot2);
-    EXPECT_EQ(false, preferncesDB_->PutSlotsToDisturbeDB(std::string(), slots));
+    EXPECT_FALSE(preferncesDB_->PutSlotsToDisturbeDB(std::string(), slots));
 }
 
 /**
+ * @tc.name      : PutSlotsToDisturbeDB_00300
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutSlotsToDisturbeDB_00300
+ * @tc.desc      : Put slots into Disturbe DB when slots is null, return is false.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutSlotsToDisturbeDB_00300, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
     std::vector<sptr<NotificationSlot>> slots;
-    EXPECT_EQ(false, preferncesDB_->PutSlotsToDisturbeDB(std::string(), slots));
+    EXPECT_FALSE(preferncesDB_->PutSlotsToDisturbeDB(bundleName_, slots));
 }
 
 /**
+ * @tc.name      : PutGroupsToDisturbeDB_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutGroupsToDisturbeDB_00100
+ * @tc.desc      : Put slot group into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutGroupsToDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
     sptr<NotificationSlotGroup> slotGroup = new NotificationSlotGroup("id", "name");
     std::vector<sptr<NotificationSlotGroup>> groups;
     groups.push_back(slotGroup);
 
-    EXPECT_EQ(true, preferncesDB_->PutGroupsToDisturbeDB(bundleName, groups));
+    EXPECT_TRUE(preferncesDB_->PutGroupsToDisturbeDB(bundleName_, groups));
 }
 
 /**
+ * @tc.name      : PutGroupsToDisturbeDB_00200
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutGroupsToDisturbeDB_00200
+ * @tc.desc      : Put slot group into disturbe DB when bundle name is null, return is false.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutGroupsToDisturbeDB_00200, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
+    sptr<NotificationSlotGroup> slotGroup = new NotificationSlotGroup("id", "name");
     std::vector<sptr<NotificationSlotGroup>> groups;
-
-    EXPECT_EQ(false, preferncesDB_->PutGroupsToDisturbeDB(bundleName, groups));
+    groups.push_back(slotGroup);
+    EXPECT_FALSE(preferncesDB_->PutGroupsToDisturbeDB(std::string(), groups));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : PutGroupsToDisturbeDB_00300
  * @tc.name      :
- * @tc.desc      : PutShowBadge_00100
+ * @tc.desc      : Put slot group into disturbe DB when groups is null, return is false.
+ */
+HWTEST_F(NotificationPreferencesDatabaseTest, PutGroupsToDisturbeDB_00300, Function | SmallTest | Level1)
+{
+    std::vector<sptr<NotificationSlotGroup>> groups;
+    EXPECT_FALSE(preferncesDB_->PutGroupsToDisturbeDB(bundleName_, groups));
+}
+
+/**
+ * @tc.name      : PutShowBadge_00100
+ * @tc.number    :
+ * @tc.desc      : Put bundle show badge into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutShowBadge_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
-    EXPECT_EQ(true, preferncesDB_->PutShowBadge(bundleName, true));
+    EXPECT_TRUE(preferncesDB_->PutShowBadge(bundleName_, true));
+    EXPECT_TRUE(preferncesDB_->PutShowBadge(bundleName_, false));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : PutShowBadge_00200
  * @tc.name      :
- * @tc.desc      : PutShowBadge_00200
+ * @tc.desc      : Put bundle show badge into disturbe DB when bundle name is null, return is false.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutShowBadge_00200, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
-    EXPECT_EQ(true, preferncesDB_->PutShowBadge(bundleName, false));
+    EXPECT_FALSE(preferncesDB_->PutShowBadge(std::string(), false));
 }
 
 /**
+ * @tc.name      : PutImportance_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutShowBadge_00300
- */
-HWTEST_F(NotificationPreferencesDatabaseTest, PutShowBadge_00300, Function | SmallTest | Level1)
-{
-    EXPECT_EQ(false, preferncesDB_->PutShowBadge(std::string(), false));
-}
-
-/**
- * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutImportance_00100
+ * @tc.desc      : Put bundle importance into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutImportance_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
-    EXPECT_EQ(true,
-        preferncesDB_->PutImportance(bundleName, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_NONE));
-    EXPECT_EQ(true,
-        preferncesDB_->PutImportance(bundleName, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_MIN));
-    EXPECT_EQ(true,
-        preferncesDB_->PutImportance(bundleName, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_LOW));
-    EXPECT_EQ(true,
-        preferncesDB_->PutImportance(
-            bundleName, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_DEFAULT));
-    EXPECT_EQ(true,
-        preferncesDB_->PutImportance(bundleName, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_HIGH));
-    EXPECT_EQ(true,
-        preferncesDB_->PutImportance(
-            bundleName, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_UNDEFINED));
+    EXPECT_TRUE(
+        preferncesDB_->PutImportance(bundleName_, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_NONE));
+    EXPECT_TRUE(
+        preferncesDB_->PutImportance(bundleName_, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_MIN));
+    EXPECT_TRUE(
+        preferncesDB_->PutImportance(bundleName_, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_LOW));
+    EXPECT_TRUE(preferncesDB_->PutImportance(
+        bundleName_, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_DEFAULT));
+    EXPECT_TRUE(
+        preferncesDB_->PutImportance(bundleName_, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_HIGH));
+    EXPECT_TRUE(preferncesDB_->PutImportance(
+        bundleName_, OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_UNDEFINED));
 }
 
 /**
+ * @tc.name      : PutImportance_00200
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutTotalBadgeNums_00100
+ * @tc.desc      : Put bundle importance into disturbe DB when bundle name is null, return is false.
+ */
+HWTEST_F(NotificationPreferencesDatabaseTest, PutImportance_00200, Function | SmallTest | Level1)
+{
+    EXPECT_FALSE(preferncesDB_->PutImportance(
+        std::string(), OHOS::Notification::NotificationSlot::NotificationLevel::LEVEL_NONE));
+}
+
+/**
+ * @tc.name      : PutTotalBadgeNums_00100
+ * @tc.number    :
+ * @tc.desc      : Put bundle total badge nums into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutTotalBadgeNums_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
 
-    EXPECT_EQ(true, preferncesDB_->PutTotalBadgeNums(bundleName, 0));
+    EXPECT_TRUE(preferncesDB_->PutTotalBadgeNums(bundleName_, 0));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : PutTotalBadgeNums_00200
  * @tc.name      :
- * @tc.desc      : PutTotalBadgeNums_00200
+ * @tc.desc      : Put bundle total badge nums into disturbe DB when bundle name is null, return is false.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutTotalBadgeNums_00200, Function | SmallTest | Level1)
 {
-    EXPECT_EQ(false, preferncesDB_->PutTotalBadgeNums(std::string(), 0));
+    EXPECT_FALSE(preferncesDB_->PutTotalBadgeNums(std::string(), 0));
 }
 
 /**
+ * @tc.name      : PutPrivateNotificationsAllowed_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutPrivateNotificationsAllowed_00100
+ * @tc.desc      : Put bundle private notification allowed into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutPrivateNotificationsAllowed_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
-    EXPECT_EQ(true, preferncesDB_->PutPrivateNotificationsAllowed(bundleName, true));
+    EXPECT_TRUE(preferncesDB_->PutPrivateNotificationsAllowed(bundleName_, true));
+    EXPECT_TRUE(preferncesDB_->PutPrivateNotificationsAllowed(bundleName_, true));
 }
 
 /**
+ * @tc.name      : PutPrivateNotificationsAllowed_00200
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutPrivateNotificationsAllowed_00200
+ * @tc.desc      : Put bundle private notification allowed into disturbe DB when bundle name is null, return is false.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutPrivateNotificationsAllowed_00200, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
-    EXPECT_EQ(true, preferncesDB_->PutPrivateNotificationsAllowed(bundleName, false));
+    EXPECT_FALSE(preferncesDB_->PutPrivateNotificationsAllowed(std::string(), false));
 }
 
 /**
+ * @tc.name      : PutNotificationsEnabledForBundle_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutPrivateNotificationsAllowed_00300
- */
-HWTEST_F(NotificationPreferencesDatabaseTest, PutPrivateNotificationsAllowed_00300, Function | SmallTest | Level1)
-{
-    EXPECT_EQ(false, preferncesDB_->PutPrivateNotificationsAllowed(std::string(), false));
-}
-
-/**
- * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutNotificationsEnabledForBundle_00100
+ * @tc.desc      : Put bundle enable into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutNotificationsEnabledForBundle_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
-    EXPECT_EQ(true, preferncesDB_->PutNotificationsEnabledForBundle(bundleName, true));
+    EXPECT_TRUE(preferncesDB_->PutNotificationsEnabledForBundle(bundleName_, true));
+    EXPECT_TRUE(preferncesDB_->PutNotificationsEnabledForBundle(bundleName_, false));
 }
 
 /**
+ * @tc.name      : PutNotificationsEnabledForBundle_00200
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutNotificationsEnabledForBundle_00200
+ * @tc.desc      : Put bundle enable into disturbe DB when bundle name is null, return is false.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutNotificationsEnabledForBundle_00200, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-
-    EXPECT_EQ(true, preferncesDB_->PutNotificationsEnabledForBundle(bundleName, false));
+    EXPECT_FALSE(preferncesDB_->PutNotificationsEnabledForBundle(std::string(), false));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : PutNotificationsEnabled_00100
  * @tc.name      :
- * @tc.desc      : PutNotificationsEnabledForBundle_00300
- */
-HWTEST_F(NotificationPreferencesDatabaseTest, PutNotificationsEnabledForBundle_00300, Function | SmallTest | Level1)
-{
-    EXPECT_EQ(false, preferncesDB_->PutNotificationsEnabledForBundle(std::string(), false));
-}
-
-/**
- * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutNotificationsEnabled_00100
+ * @tc.desc      : Put notification enable into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutNotificationsEnabled_00100, Function | SmallTest | Level1)
 {
-
-    EXPECT_EQ(true, preferncesDB_->PutNotificationsEnabled(true));
+    EXPECT_TRUE(preferncesDB_->PutNotificationsEnabled(true));
+    EXPECT_TRUE(preferncesDB_->PutNotificationsEnabled(false));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : PutDisturbMode_00100
  * @tc.name      :
- * @tc.desc      : PutNotificationsEnabled_00200
- */
-HWTEST_F(NotificationPreferencesDatabaseTest, PutNotificationsEnabled_00200, Function | SmallTest | Level1)
-{
-    EXPECT_EQ(true, preferncesDB_->PutNotificationsEnabled(false));
-}
-
-/**
- * @tc.number    :
- * @tc.name      :
- * @tc.desc      : PutDisturbMode_00100
+ * @tc.desc      : Put disturbe mode into disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutDisturbMode_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ(true, preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALARMS));
-    EXPECT_EQ(true, preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALL));
-    EXPECT_EQ(true, preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_NONE));
-    EXPECT_EQ(
-        true, preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_PRIORITY));
-    EXPECT_EQ(
-        true, preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_UNKNOWN));
+    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALARMS));
+    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALL));
+    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_NONE));
+    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_PRIORITY));
+    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_UNKNOWN));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : ParseFromDisturbeDB_00100
  * @tc.name      :
- * @tc.desc      : CreateExsitBundle_00100
+ * @tc.desc      : Parse store date from disturbe DB, return is true.
  */
-HWTEST_F(NotificationPreferencesDatabaseTest, CreateExsitBundle_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesDatabaseTest, ParseFromDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-    EXPECT_EQ(true, preferncesDB_->CheckBundle(bundleName));
+    EXPECT_TRUE(preferncesDB_->PutPrivateNotificationsAllowed(bundleName_, true));
+    NotificationPreferencesInfo info;
+    EXPECT_TRUE(preferncesDB_->ParseFromDisturbeDB(info));
 }
 
 /**
+ * @tc.name      : RemoveAllDataFromDisturbeDB_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : RemoveAllBundleFromDisturbeDB_00100
+ * @tc.desc      : Remove all bundle info from disturbe DB, return is true.
  */
-HWTEST_F(NotificationPreferencesDatabaseTest, RemoveAllBundleFromDisturbeDB_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesDatabaseTest, RemoveAllDataFromDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ(true, preferncesDB_->RemoveAllBundleFromDisturbeDB());
+    EXPECT_TRUE(preferncesDB_->RemoveAllDataFromDisturbeDB());
 }
 
 /**
+ * @tc.name      : RemoveBundleFromDisturbeDB_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : RemoveBundleFromDisturbeDB_00100
+ * @tc.desc      : Remove a bundle info from disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, RemoveBundleFromDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-    EXPECT_EQ(true, preferncesDB_->RemoveBundleFromDisturbeDB(bundleName));
+    EXPECT_TRUE(preferncesDB_->PutTotalBadgeNums(bundleName_, 0));
+    EXPECT_EQ(true, preferncesDB_->RemoveBundleFromDisturbeDB(bundleName_));
 }
 
 /**
+ * @tc.name      : RemoveBundleFromDisturbeDB_00200
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : RemoveSlotFromDisturbeDB_00100
+ * @tc.desc      : Remove a bundle info from disturbe DB when bundle name is null, return is true.
+ */
+HWTEST_F(NotificationPreferencesDatabaseTest, RemoveBundleFromDisturbeDB_00200, Function | SmallTest | Level1)
+{
+    EXPECT_EQ(true, preferncesDB_->RemoveBundleFromDisturbeDB(std::string()));
+}
+
+/**
+ * @tc.name      : RemoveSlotFromDisturbeDB_00100
+ * @tc.number    :
+ * @tc.desc      : Remove slot from disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, RemoveSlotFromDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-    EXPECT_EQ(true,
-        preferncesDB_->RemoveSlotFromDisturbeDB(
-            bundleName, OHOS::Notification::NotificationConstant::SlotType::SOCIAL_COMMUNICATION));
-    EXPECT_EQ(true,
-        preferncesDB_->RemoveSlotFromDisturbeDB(
-            bundleName, OHOS::Notification::NotificationConstant::SlotType::SERVICE_REMINDER));
-    EXPECT_EQ(true,
-        preferncesDB_->RemoveSlotFromDisturbeDB(
-            bundleName, OHOS::Notification::NotificationConstant::SlotType::CONTENT_INFORMATION));
-    EXPECT_EQ(true,
-        preferncesDB_->RemoveSlotFromDisturbeDB(bundleName, OHOS::Notification::NotificationConstant::SlotType::OTHER));
-    EXPECT_EQ(true,
-        preferncesDB_->RemoveSlotFromDisturbeDB(
-            bundleName, OHOS::Notification::NotificationConstant::SlotType::CUSTOM));
+    std::vector<sptr<NotificationSlot>> slots;
+    sptr<NotificationSlot> slot1 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    slots.push_back(slot1);
+    EXPECT_TRUE(preferncesDB_->PutSlotsToDisturbeDB(bundleName_, slots));
+
+    EXPECT_TRUE(preferncesDB_->RemoveSlotFromDisturbeDB(
+        bundleName_, OHOS::Notification::NotificationConstant::SlotType::SOCIAL_COMMUNICATION));
 }
 
 /**
+ * @tc.name      : RemoveSlotFromDisturbeDB_00200
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : RemoveGroupsFromDisturbeDB_00100
+ * @tc.desc      : Remove slot from disturbe DB when bundle name is null, return is false
+ */
+HWTEST_F(NotificationPreferencesDatabaseTest, RemoveSlotFromDisturbeDB_00200, Function | SmallTest | Level1)
+{
+    EXPECT_FALSE(preferncesDB_->RemoveSlotFromDisturbeDB(
+        std::string(), OHOS::Notification::NotificationConstant::SlotType::SOCIAL_COMMUNICATION));
+}
+
+/**
+ * @tc.name      : RemoveGroupsFromDisturbeDB_00100
+ * @tc.number    :
+ * @tc.desc      : Remove slot froup from disturbe DB, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, RemoveGroupsFromDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
+    sptr<NotificationSlotGroup> slotGroup = new NotificationSlotGroup("id", "name");
+    std::vector<sptr<NotificationSlotGroup>> groups;
+    groups.push_back(slotGroup);
+    EXPECT_TRUE(preferncesDB_->PutGroupsToDisturbeDB(bundleName_, groups));
     std::vector<std::string> groupIds;
-    EXPECT_EQ(true, preferncesDB_->RemoveGroupsFromDisturbeDB(bundleName, groupIds));
+    groupIds.push_back("id");
+    EXPECT_TRUE(preferncesDB_->RemoveGroupsFromDisturbeDB(bundleName_, groupIds));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : RemoveGroupsFromDisturbeDB_00200
  * @tc.name      :
- * @tc.desc      : RemoveGroupsFromDisturbeDB_00200
+ * @tc.desc      :  Remove slot froup from disturbe DB when bundle name is null, return is false.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, RemoveGroupsFromDisturbeDB_00200, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
     std::vector<std::string> groupIds;
     groupIds.push_back("group1");
     groupIds.push_back("group2");
-    EXPECT_EQ(true, preferncesDB_->RemoveGroupsFromDisturbeDB(bundleName, groupIds));
+    EXPECT_FALSE(preferncesDB_->RemoveGroupsFromDisturbeDB(std::string(), groupIds));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : GetRemoveGroupKeys_00100
  * @tc.name      :
- * @tc.desc      : GetRemoveGroupKeys_00100
+ * @tc.desc      : Get remove group disturbe key, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, GetRemoveGroupKeys_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-    std::string groupId = "";
+    std::string groupId = "id";
     std::vector<OHOS::DistributedKv::Key> keys;
-    EXPECT_EQ(true, preferncesDB_->GetRemoveGroupKeysFromDisturbeDB(bundleName, groupId, keys));
+    EXPECT_TRUE(preferncesDB_->GetRemoveGroupKeysFromDisturbeDB(bundleName_, groupId, keys));
 }
 
 /**
+ * @tc.name      : StoreDeathRecipient_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : StoreDeathRecipient_00100
+ * @tc.desc      : Test store when death recipient.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, StoreDeathRecipient_00100, Function | SmallTest | Level1)
 {
-    NotificationPreferencesInfo preferencesInfo_{};
-    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    EXPECT_EQ(true, preferncesDB_->StoreDeathRecipient(preferencesInfo));
+    EXPECT_TRUE(preferncesDB_->StoreDeathRecipient());
 }
 
 /**
+ * @tc.name      : GetKvStore_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : GetKvStore_00100
+ * @tc.desc      : Open disturbe DB, return is SUCCESS.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, GetKvStore_00100, Function | SmallTest | Level1)
 {
@@ -422,86 +386,59 @@ HWTEST_F(NotificationPreferencesDatabaseTest, GetKvStore_00100, Function | Small
 }
 
 /**
- * @tc.number    :
- * @tc.name      :
- * @tc.desc      : CheckKvStore_00100
+ * @tc.name      : CheckKvStore_00100
+ * @tc.number    : 
+ * @tc.desc      : Check disturbe DB is exsit, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, CheckKvStore_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ(true, preferncesDB_->CheckKvStore());
+    EXPECT_TRUE(preferncesDB_->CheckKvStore());
 }
 
 /**
+ * @tc.name      : PutBundlePropertyValueToDisturbeDB_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : ResetStore_00100
+ * @tc.desc      : Put bundle property value to disturbeDB, return is true.
  */
-HWTEST_F(NotificationPreferencesDatabaseTest, ResetStore_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesDatabaseTest, PutBundlePropertyValueToDisturbeDB_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ(true, preferncesDB_->ResetStore());
+
+    NotificationPreferencesInfo::BundleInfo info;
+    EXPECT_EQ(true, preferncesDB_->PutBundlePropertyValueToDisturbeDB(info));
 }
 
 /**
- * @tc.number    :
+ * @tc.number    : ChangeSlotToEntry_00100
  * @tc.name      :
- * @tc.desc      : InitBundlePropertyValueToDisturbeDB_00100
+ * @tc.desc      : Change slot to entry.
  */
-HWTEST_F(NotificationPreferencesDatabaseTest, InitBundlePropertyValueToDisturbeDB_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesDatabaseTest, ChangeSlotToEntry_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-    EXPECT_EQ(true, preferncesDB_->InitBundlePropertyValueToDisturbeDB(bundleName));
-}
-
-/**
- * @tc.number    :
- * @tc.name      :
- * @tc.desc      : SetSlotEntry_00200
- */
-HWTEST_F(NotificationPreferencesDatabaseTest, SetSlotEntry_00200, Function | SmallTest | Level1)
-{
-    std::string bundleName = "bundleName";
     sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     std::vector<OHOS::DistributedKv::Entry> entries;
-    EXPECT_EQ(true, preferncesDB_->SlotToEntry(bundleName, slot, entries));
+    EXPECT_TRUE(preferncesDB_->SlotToEntry(bundleName_, slot, entries));
 }
 
 /**
+ * @tc.name      : ChangeGroupToEntry_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : GetGroupEntry_00100
+ * @tc.desc      : Change slot group to entry.
  */
-HWTEST_F(NotificationPreferencesDatabaseTest, GetGroupEntry_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesDatabaseTest, ChangeGroupToEntry_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
     sptr<NotificationSlotGroup> slotGroup = new NotificationSlotGroup("id", "name");
     std::vector<OHOS::DistributedKv::Entry> entries;
-    EXPECT_EQ(true, preferncesDB_->GroupToEntry(bundleName, slotGroup, entries));
+    EXPECT_TRUE(preferncesDB_->GroupToEntry(bundleName_, slotGroup, entries));
 }
 
 /**
+ * @tc.name      : CheckBundle_00100
  * @tc.number    :
- * @tc.name      :
- * @tc.desc      : GetRemoveGroupKeys_00200
+ * @tc.desc      :Check bundle is exsit, return true when exsiting, create a bundle when does not exsit.
  */
-HWTEST_F(NotificationPreferencesDatabaseTest, GetRemoveGroupKeys_00200, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesDatabaseTest, CheckBundle_00100, Function | SmallTest | Level1)
 {
-    std::string bundleName = "bundleName";
-    std::string groupId = "group1";
-    std::vector<OHOS::DistributedKv::Key> keys;
-    EXPECT_EQ(true, preferncesDB_->GetRemoveGroupKeysFromDisturbeDB(bundleName, groupId, keys));
-}
-
-/**
- * @tc.number    :
- * @tc.name      :
- * @tc.desc      : ParseGroupFromDisturbeDB_00100
- */
-HWTEST_F(NotificationPreferencesDatabaseTest, ParseGroupFromDisturbeDB_00100, Function | SmallTest | Level1)
-{
-    NotificationPreferencesInfo::BundleInfo bundleInfo;
-    bundleInfo.SetBundleName("BundleName");
-    // preferncesDB_->ParseGroupFromDisturbeDB(bundleInfo, std::string());  // TODO ‘½—¹˜¢ŽQ”
-        EXPECT_EQ("BundleName", bundleInfo.GetBundleName());
+    EXPECT_EQ(true, preferncesDB_->CheckBundle(bundleName_));
 }
 
 }  // namespace Notification

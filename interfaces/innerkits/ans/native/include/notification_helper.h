@@ -16,6 +16,7 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_HELPER_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_HELPER_H
 
+#include "notification_bundle_option.h"
 #include "notification_request.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
@@ -42,6 +43,14 @@ public:
     static ErrCode AddNotificationSlot(const NotificationSlot &slot);
 
     /**
+     * Adds a notification slot by type.
+     *
+     * @param slotType Indicates the notification slot type to be added.
+     * @return Returns add notification slot result.
+     */
+    static ErrCode AddSlotByType(const NotificationConstant::SlotType &slotType);
+
+    /**
      * Creates multiple notification slots.
      *
      * @param slots Indicates the notification slots to create.
@@ -57,6 +66,13 @@ public:
      * @return Returns remove notification slot result.
      */
     static ErrCode RemoveNotificationSlot(const NotificationConstant::SlotType &slotType);
+
+    /**
+     * Deletes all notification slots.
+     *
+     * @return Returns remove all slots result.
+     */
+    static ErrCode RemoveAllSlots();
 
     /**
      * Queries a created notification slot.
@@ -124,6 +140,15 @@ public:
      * @return Returns get notification slot groups result.
      */
     static ErrCode GetNotificationSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups);
+
+    /**
+     * Obtains number of slot.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param num Indicates number of slot.
+     * @return Returns get slot number by bundle result.
+     */
+    static ErrCode GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num);
 
     /**
      * Publishes a notification.
@@ -379,13 +404,34 @@ public:
     static ErrCode RemoveNotification(const std::string &key);
 
     /**
+     * Removes a specified removable notification of other applications.
+     * @note Your application must have platform signature to use this method.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application whose notifications are to be removed.
+     * @param notificationId Indicates the id of the notification to remove.
+     * @param label Indicates the label of the notification to remove.
+     * @return Returns remove notification result.
+     */
+    static ErrCode RemoveNotification(
+        const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label);
+
+    /**
+     * Removes a specified removable notification of other applications.
+     * @note Your application must have platform signature to use this method.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application whose notifications are to be removed.
+     * @return Returns remove notification result.
+     */
+    static ErrCode RemoveAllNotifications(const NotificationBundleOption &bundleOption);
+
+    /**
      * Removes all removable notifications of a specified bundle.
      * @note Your application must have platform signature to use this method.
      *
-     * @param bundleName Indicates the bundle name of the application whose notifications are to be removed.
+     * @param bundleOption Indicates the bundle name and uid of the application whose notifications are to be removed.
      * @return Returns remove notifications result.
      */
-    static ErrCode RemoveNotifications(const std::string &bundleName);
+    static ErrCode RemoveNotificationsByBundle(const NotificationBundleOption &bundleOption);
 
     /**
      * Removes all removable notifications in the system.
@@ -397,12 +443,32 @@ public:
     /**
      * Returns all notification slots belonging to the specified bundle.
      *
-     * @param bundleName Indicates the application name.
+     * @param bundleOption Indicates the bundle name and uid of the application.
      * @param slots Indicates a list of notification slots.
      * @return Returns get notification slots for bundle result.
      */
     static ErrCode GetNotificationSlotsForBundle(
-        const std::string &bundleName, std::vector<sptr<NotificationSlot>> &slots);
+        const NotificationBundleOption &bundleOption, std::vector<sptr<NotificationSlot>> &slots);
+
+    /**
+     * Update all notification slots for the specified bundle.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param slots Indicates a list of new notification slots.
+     * @return Returns update notification slots for bundle result.
+     */
+    static ErrCode UpdateNotificationSlots(
+        const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlot>> &slots);
+
+    /**
+     * Update all notification slot groups for the specified bundle.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param groups Indicates a list of new notification slot groups.
+     * @return Returns update notification slot groups for bundle result.
+     */
+    static ErrCode UpdateNotificationSlotGroups(
+        const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups);
 
     /**
      * Obtains all active notifications in the current system. The caller must have system permissions to
@@ -430,11 +496,11 @@ public:
      * the current application, no permission is required for calling this method. If bundle specifies another
      * application, the caller must have system permissions.
      *
-     * @param bundle Indicates the bundle name of the application to check.
+     * @param bundleOption Indicates the bundle name and uid of the application.
      * @param allowed True if the application has permissions; returns false otherwise.
      * @return Returns is allowed notify result.
      */
-    static ErrCode IsAllowedNotify(const std::string &bundle, bool &allowed);
+    static ErrCode IsAllowedNotify(const NotificationBundleOption &bundleOption, bool &allowed);
 
     /**
      * Sets whether to allow all applications to publish notifications on a specified device. The caller must have
@@ -466,7 +532,7 @@ public:
      * Sets whether to allow a specified application to publish notifications on a specified device. The caller
      * must have system permissions to call this method.
      *
-     * @param bundle Indicates the bundle name of the application.
+     * @param bundleOption Indicates the bundle name and uid of the application.
      * @param deviceId Indicates the ID of the device running the application. At present, this parameter can only
      *                 be null or an empty string, indicating the current device.
      * @param enabled Specifies whether to allow the given application to publish notifications. The value
@@ -475,7 +541,33 @@ public:
      * @return Returns set notifications enabled for specified bundle result.
      */
     static ErrCode SetNotificationsEnabledForSpecifiedBundle(
-        const std::string &bundle, std::string &deviceId, bool enabled);
+        const NotificationBundleOption &bundleOption, std::string &deviceId, bool enabled);
+
+    /**
+     * Sets whether to allow a specified application to show badge.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param enabled Specifies whether to allow the given application to show badge.
+     * @return Returns set result.
+     */
+    static ErrCode SetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool enabled);
+
+    /**
+     * Obtains the flag that whether to allow a specified application to show badge.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param enabled Specifies whether to allow the given application to show badge.
+     * @return Returns get result.
+     */
+    static ErrCode GetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool &enabled);
+
+    /**
+     * Obtains the flag that whether to allow the current application to show badge.
+     *
+     * @param enabled Specifies whether to allow the given application to show badge.
+     * @return Returns get result.
+     */
+    static ErrCode GetShowBadgeEnabled(bool &enabled);
 
     /**
      * Sets the type of the Do Not Disturb mode. The Do Not Disturb mode type specifies the type of notifications

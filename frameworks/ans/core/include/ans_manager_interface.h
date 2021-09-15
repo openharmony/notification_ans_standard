@@ -21,6 +21,7 @@
 
 #include "ans_subscriber_interface.h"
 #include "iremote_broker.h"
+#include "notification_bundle_option.h"
 #include "notification_constant.h"
 #include "notification_request.h"
 #include "notification_slot.h"
@@ -42,14 +43,18 @@ public:
     virtual ErrCode PublishToDevice(const sptr<NotificationRequest> &notification, const std::string &deviceId) = 0;
     virtual ErrCode Cancel(int notificationId, const std::string &label) = 0;
     virtual ErrCode CancelAll() = 0;
+    virtual ErrCode AddSlotByType(NotificationConstant::SlotType slotType) = 0;
     virtual ErrCode AddSlots(const std::vector<sptr<NotificationSlot>> &slots) = 0;
-    virtual ErrCode RemoveSlotByType(const NotificationConstant::SlotType slotType) = 0;
+    virtual ErrCode RemoveSlotByType(NotificationConstant::SlotType slotType) = 0;
     virtual ErrCode RemoveAllSlots() = 0;
     virtual ErrCode AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups) = 0;
-    virtual ErrCode GetSlotByType(const NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) = 0;
+    virtual ErrCode GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) = 0;
     virtual ErrCode GetSlots(std::vector<sptr<NotificationSlot>> &slots) = 0;
     virtual ErrCode GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group) = 0;
     virtual ErrCode GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups) = 0;
+
+    virtual ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num) = 0;
+
     virtual ErrCode RemoveSlotGroups(const std::vector<std::string> &groupIds) = 0;
     virtual ErrCode GetActiveNotifications(std::vector<sptr<NotificationRequest>> &notifications) = 0;
     virtual ErrCode GetActiveNotificationNums(int &num) = 0;
@@ -69,33 +74,45 @@ public:
     virtual ErrCode SetPrivateNotificationsAllowed(bool allow) = 0;
     virtual ErrCode GetPrivateNotificationsAllowed(bool &allow) = 0;
     virtual ErrCode Delete(const std::string &key) = 0;
-    virtual ErrCode DeleteByBundle(const std::string &bundle) = 0;
+
+    virtual ErrCode RemoveNotification(
+        const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label) = 0;
+
+    virtual ErrCode RemoveAllNotifications(const sptr<NotificationBundleOption> &bundleOption) = 0;
+
+    virtual ErrCode DeleteByBundle(const sptr<NotificationBundleOption> &bundleOption) = 0;
+
     virtual ErrCode DeleteAll() = 0;
-    virtual ErrCode GetSlotsByBundle(const std::string &bundle, std::vector<sptr<NotificationSlot>> &slots) = 0;
-    virtual ErrCode UpdateSlots(const std::string &bundle, const std::vector<sptr<NotificationSlot>> &slots) = 0;
+    virtual ErrCode GetSlotsByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots) = 0;
+    virtual ErrCode UpdateSlots(
+        const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) = 0;
     virtual ErrCode UpdateSlotGroups(
-        const std::string &bundle, const std::vector<sptr<NotificationSlotGroup>> &groups) = 0;
+        const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups) = 0;
     virtual ErrCode SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled) = 0;
     virtual ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) = 0;
     virtual ErrCode SetNotificationsEnabledForSpecialBundle(
-        const std::string &deviceId, const std::string &bundleName, bool enabled) = 0;
-    virtual ErrCode SetShowBadgeEnabledForBundle(const std::string &bundle, bool enabled) = 0;
-    virtual ErrCode GetShowBadgeEnabledForBundle(const std::string &bundle, bool &enabled) = 0;
+        const std::string &deviceId, const sptr<NotificationBundleOption> &bundleOption, bool enabled) = 0;
+    virtual ErrCode SetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) = 0;
+    virtual ErrCode GetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) = 0;
+    virtual ErrCode GetShowBadgeEnabled(bool &enabled) = 0;
     virtual ErrCode Subscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) = 0;
     virtual ErrCode Unsubscribe(
         const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) = 0;
     virtual ErrCode AreNotificationsSuspended(bool &suspended) = 0;
     virtual ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap) = 0;
     virtual ErrCode IsAllowedNotify(bool &allowed) = 0;
-    virtual ErrCode IsSpecialBundleAllowedNotify(const std::string &bundle, bool &allowed) = 0;
+    virtual ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) = 0;
 
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) = 0;
+
 protected:
     enum TransactId : uint32_t {
         PUBLISH_NOTIFICATION = FIRST_CALL_TRANSACTION,
         PUBLISH_NOTIFICATION_TO_DEVICE,
         CANCEL_NOTIFICATION,
         CANCEL_ALL_NOTIFICATIONS,
+        ADD_SLOT_BY_TYPE,
         ADD_SLOTS,
         REMOVE_SLOT_BY_TYPE,
         REMOVE_ALL_SLOTS,
@@ -104,6 +121,7 @@ protected:
         GET_SLOTS,
         GET_SLOT_GROUP,
         GET_SLOT_GROUPS,
+        GET_SLOT_NUM_AS_BUNDLE,
         REMOVE_SLOT_GROUPS,
         GET_ACTIVE_NOTIFICATIONS,
         GET_ACTIVE_NOTIFICATION_NUMS,
@@ -120,6 +138,8 @@ protected:
         IS_NOTIFICATION_POLICY_ACCESS_GRANTED,
         SET_PRIVATIVE_NOTIFICATIONS_ALLOWED,
         GET_PRIVATIVE_NOTIFICATIONS_ALLOWED,
+        REMOVE_NOTIFICATION,
+        REMOVE_ALL_NOTIFICATIONS,
         DELETE_NOTIFICATION,
         DELETE_NOTIFICATION_BY_BUNDLE,
         DELETE_ALL_NOTIFICATIONS,
@@ -131,6 +151,7 @@ protected:
         SET_NOTIFICATION_ENABLED_FOR_SPECIAL_BUNDLE,
         SET_SHOW_BADGE_ENABLED_FOR_BUNDLE,
         GET_SHOW_BADGE_ENABLED_FOR_BUNDLE,
+        GET_SHOW_BADGE_ENABLED,
         SUBSCRIBE_NOTIFICATION,
         UNSUBSCRIBE_NOTIFICATION,
         ARE_NOTIFICATION_SUSPENDED,

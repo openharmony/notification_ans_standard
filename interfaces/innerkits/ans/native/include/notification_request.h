@@ -1,6 +1,6 @@
 /*
- * Copyright (c); 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");;
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace Notification {
-class ComponentProvider;
 class PixelMap;
 
 class NotificationRequest : public Parcelable {
@@ -137,13 +136,13 @@ public:
     /**
      * Indicates the default notification background color, which means that no color is displayed.
      */
-    static const int32_t COLOR_DEFAULT;
+    static const uint32_t COLOR_DEFAULT;
 
 private:
     /**
      * Indicates the color mask, used for calculation with the ARGB value set by setColor(int32_t).
      */
-    static const int32_t COLOR_MASK;
+    static const uint32_t COLOR_MASK;
 
     /**
      * the maximum number of user input history is 5.
@@ -442,15 +441,15 @@ public:
      * This method is valid only when background color has been enabled by calling setColorEnabled(bool).
      * @param color Indicates the background color to set. For details about the value range, see Color.
      */
-    void SetColor(int32_t color);
+    void SetColor(uint32_t color);
 
     /**
      * Obtains the background color of this notification.
      * The return value, except for the default color COLOR_DEFAULT,
-     * is the bitwise OR operation result of 0xFF000000 and the ARGB value set by setColor(int32_t).
+     * is the bitwise OR operation result of 0xFF000000 and the ARGB value set by setColor(uint32_t).
      * @return the background color of this notification.
      */
-    int32_t GetColor() const;
+    uint32_t GetColor() const;
 
     /**
      * Checks whether background color is enabled for this notification.
@@ -507,47 +506,6 @@ public:
      * @param isCountDown Specifies whether to show the notification creation time as a countdown timer.
      */
     void SetCountdownTimer(bool isCountDown);
-
-    /**
-     * Sets the custom view to be displayed when this notification is expanded.
-     * @param view Indicates the ComponentProvider object defining the custom view.
-     */
-    void SetCustomBigView(const std::shared_ptr<ComponentProvider> &view);
-
-    /**
-     * Obtains the ComponentProvider object defining the custom view to be displayed when this notification is expanded
-     * The ComponentProvider object is set in setCustomBigView(ComponentProvider).
-     * @return the ComponentProvider object defining the custom view.
-     */
-    const std::shared_ptr<ComponentProvider> GetCustomBigView() const;
-
-    /**
-     * Sets the custom view to be displayed when this notification is shown as a floating window at the top of the
-     * screen
-     * @param view Indicates the ComponentProvider object defining the custom view.
-     */
-    void SetCustomFloatView(const std::shared_ptr<ComponentProvider> &view);
-
-    /**
-     * Obtains the ComponentProvider object defining the custom view to be displayed
-     * when this notification is shown as a floating window at the top of the screen.
-     * The ComponentProvider object is set in setCustomFloatView(ComponentProvider).
-     * @return the ComponentProvider object defining the custom view.
-     */
-    const std::shared_ptr<ComponentProvider> GetCustomFloatView() const;
-
-    /**
-     * Sets the custom view of this notification.
-     * @param view Indicates the ComponentProvider object defining the custom view.
-     */
-    void SetCustomView(const std::shared_ptr<ComponentProvider> &view);
-
-    /**
-     * Obtains the ComponentProvider object defining the custom view set in this notification.
-     * The ComponentProvider object is set in setCustomView(ComponentProvider).
-     * @return the ComponentProvider object defining the custom view.
-     */
-    const std::shared_ptr<ComponentProvider> GetCustomView() const;
 
     /**
      * Sets the group alert type for this notification,
@@ -877,13 +835,13 @@ public:
      * Sets the UID of the notification creator.
      * @param uid the UID of the notification creator.
      */
-    void SetCreatorUid(uid_t uid);
+    void SetCreatorUid(pid_t uid);
 
     /**
      * Obtains the UID of the notification creator.
      * @return the UID of the notification creator.
      */
-    uid_t GetCreatorUid() const;
+    pid_t GetCreatorUid() const;
 
     /**
      * Sets the label of this notification.
@@ -932,7 +890,7 @@ private:
 
 private:
     int32_t notificationId_{0};
-    int32_t color_{NotificationRequest::COLOR_DEFAULT};
+    uint32_t color_{NotificationRequest::COLOR_DEFAULT};
     int32_t badgeNumber_{0};
     int32_t progressValue_{0};
     int32_t progressMax_{0};
@@ -941,7 +899,7 @@ private:
     int64_t autoDeletedTime_{0};
 
     pid_t creatorPid_{0};
-    uid_t creatorUid_{0};
+    pid_t creatorUid_{0};
 
     std::string settingsText_{};
     std::string creatorBundleName_{};
@@ -981,9 +939,6 @@ private:
     std::shared_ptr<PixelMap> littleIcon_{};
     std::shared_ptr<PixelMap> bigIcon_{};
     std::shared_ptr<NotificationContent> notificationContent_{};
-    std::shared_ptr<ComponentProvider> customBigView_{};
-    std::shared_ptr<ComponentProvider> customFloatView_{};
-    std::shared_ptr<ComponentProvider> customView_{};
     std::shared_ptr<NotificationRequest> publicNotification_{};
 
     std::vector<std::shared_ptr<NotificationActionButton>> actionButtons_{};

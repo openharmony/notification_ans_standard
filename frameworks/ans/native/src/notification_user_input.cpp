@@ -1,6 +1,6 @@
 /*
- * Copyright (c); 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");;
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -202,8 +202,24 @@ bool NotificationUserInput::IsPermitFreeFormInput() const
 
 std::string NotificationUserInput::Dump()
 {
+    std::string options;
+    for (std::string option : options_) {
+        options += option + ", ";
+    }
+    options.pop_back();
+    options.pop_back();
+
+    std::string permitMimeTypes;
+    for (auto permitMimeType : permitMimeTypes_) {
+        permitMimeTypes += permitMimeType + ", ";
+    }
+    permitMimeTypes.pop_back();
+    permitMimeTypes.pop_back();
+
     return "NotificationUserInput[ inputKey = " + inputKey_ + " tag = " + tag_ +
+           "options = [ " + options + " ]" +
            " permitFreeFormInput = " + (permitFreeFormInput_ ? "true" : "false") +
+           " permitMimeTypes = [ " + permitMimeTypes + " ]" +
            " editType = " + std::to_string(static_cast<int32_t>(editType_)) + " ]";
 }
 

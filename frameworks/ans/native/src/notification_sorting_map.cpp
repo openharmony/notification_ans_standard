@@ -82,13 +82,15 @@ NotificationSortingMap *NotificationSortingMap::Unmarshalling(Parcel &parcel)
 {
     std::vector<NotificationSorting> sortings;
     // read sorting num
-    int32_t size;
+    int32_t size = 0;
     parcel.ReadInt32(size);
 
     for (int i = 0; i < size; i++) {
         // read sorting
-        NotificationSorting a = *parcel.ReadParcelable<NotificationSorting>();
-        sortings.push_back(a);
+        NotificationSorting *sorting = parcel.ReadParcelable<NotificationSorting>();
+        if (sorting != nullptr) {
+            sortings.push_back(*sorting);
+        }
     }
 
     NotificationSortingMap *sortingMap = new NotificationSortingMap(sortings);

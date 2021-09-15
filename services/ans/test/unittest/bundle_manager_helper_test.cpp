@@ -28,23 +28,11 @@ namespace Notification {
 
 class BundleManagerHelperTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(){};
+    static void TearDownTestCase(){};
+    void SetUp(){};
+    void TearDown(){};
 };
-
-void BundleManagerHelperTest::SetUpTestCase()
-{}
-
-void BundleManagerHelperTest::TearDownTestCase()
-{}
-
-void BundleManagerHelperTest::SetUp()
-{}
-
-void BundleManagerHelperTest::TearDown()
-{}
 
 /**
  * @tc.number    : BundleManagerHelperTest_00100
@@ -53,7 +41,7 @@ void BundleManagerHelperTest::TearDown()
  */
 HWTEST_F(BundleManagerHelperTest, BundleManagerHelperTest_00100, Function | SmallTest | Level1)
 {
-    uid_t callingUid = IPCSkeleton::GetCallingUid();
+    pid_t callingUid = IPCSkeleton::GetCallingUid();
     std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
     EXPECT_EQ(bundleManager->GetBundleNameByUid(callingUid), "bundleName");
 }
@@ -65,7 +53,7 @@ HWTEST_F(BundleManagerHelperTest, BundleManagerHelperTest_00100, Function | Smal
  */
 HWTEST_F(BundleManagerHelperTest, BundleManagerHelperTest_00200, Function | SmallTest | Level1)
 {
-    uid_t callingUid = IPCSkeleton::GetCallingUid();
+    pid_t callingUid = IPCSkeleton::GetCallingUid();
     std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
     EXPECT_TRUE(bundleManager->IsSystemApp(callingUid));
 }

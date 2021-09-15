@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,28 @@
  * limitations under the License.
  */
 
-#include "ipc_skeleton.h"
+#include "mock_ipc_skeleton.h"
 
 namespace OHOS {
 #ifdef CONFIG_IPC_SINGLE
 using namespace IPC_SINGLE;
 #endif
-pid_t IPCSkeleton::GetCallingUid()
+
+int uid_ = 1;
+
+int IPCSkeleton::GetCallingUid()
 {
-    pid_t uid = 1;
-    return uid;
+    return uid_;
+}
+
+int IPCSkeleton::GetCallingPid()
+{
+    uid_ = 1;
+    return uid_;
+}
+
+void IPCSkeleton::SetCallingUid(int uid)
+{
+  uid_ = uid;
 }
 }  // namespace OHOS

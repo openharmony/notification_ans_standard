@@ -17,7 +17,6 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_UNSUBSCRIBE_H
 
 #include "common.h"
-#include "create_subscriber.h"
 
 namespace OHOS {
 namespace NotificationNapi {

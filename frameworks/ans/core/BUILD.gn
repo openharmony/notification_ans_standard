@@ -28,6 +28,7 @@ config("public_ans_core_config") {
     "${interfaces_path}/innerkits/ans/native/include",
     "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
+    "//third_party/jsoncpp/include",
   ]
 }
 
@@ -44,6 +45,7 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/ans/native/src/notification.cpp",
     "${frameworks_path}/ans/native/src/notification_action_button.cpp",
     "${frameworks_path}/ans/native/src/notification_basic_content.cpp",
+    "${frameworks_path}/ans/native/src/notification_bundle_option.cpp",
     "${frameworks_path}/ans/native/src/notification_constant.cpp",
     "${frameworks_path}/ans/native/src/notification_content.cpp",
     "${frameworks_path}/ans/native/src/notification_conversational_content.cpp",
@@ -72,6 +74,7 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
+    "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 

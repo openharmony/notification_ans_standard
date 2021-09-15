@@ -34,6 +34,7 @@
 #include "want_params.h"
 #include "want_receiver_stub.h"
 #include "want_sender_stub.h"
+#include "ohos/aafwk/base/bool_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS::AAFwk;

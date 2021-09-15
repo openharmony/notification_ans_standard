@@ -17,7 +17,6 @@
 
 #include "distributed_kv_data_manager.h"
 #include "constant.h"
-//#include "ikvstore.h"
 #include "mock_single_kv_store.h"
 #include "types.h"
 
@@ -56,14 +55,10 @@ Status DistributedKvDataManager::DeleteKvStore(const AppId &appId, const StoreId
 
 void DistributedKvDataManager::RegisterKvStoreServiceDeathRecipient(
     std::shared_ptr<KvStoreDeathRecipient> kvStoreDeathRecipient)
-{
-  printf("@DistributedKvDataManager 3");
-}
+{}
 
 void DistributedKvDataManager::UnRegisterKvStoreServiceDeathRecipient(
     std::shared_ptr<KvStoreDeathRecipient> kvStoreDeathRecipient)
-{
-  printf("@UnRegisterKvStoreServiceDeathRecipient 3");
-}
+{}
 }  // namespace DistributedKv
 }  // namespace OHOS

@@ -41,6 +41,9 @@ static const std::string ACTIVE_NOTIFICATION_OPTION = "active";
 static const std::string RECENT_NOTIFICATION_OPTION = "recent";
 static const std::string SET_RECENT_COUNT_OPTION = "setRecentCount";
 
+static const int32_t NOTIFICATION_MIN_COUNT = 0;
+static const int32_t NOTIFICATION_MAX_COUNT = 1024;
+
 static const int32_t DEFAULT_RECENT_COUNT = 16;
 
 struct RecentNotification {
@@ -69,7 +72,7 @@ inline std::string GetClientBundleName()
 {
     std::string bundle;
 
-    uid_t callingUid = IPCSkeleton::GetCallingUid();
+    int callingUid = IPCSkeleton::GetCallingUid();
 
     std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
     if (bundleManager != nullptr) {
@@ -83,11 +86,10 @@ inline bool IsSystemApp()
 {
     bool isSystemApp = false;
 
-    uid_t callingUid = IPCSkeleton::GetCallingUid();
+    int callingUid = IPCSkeleton::GetCallingUid();
 
     std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
     if (bundleManager != nullptr) {
-        printf("callingUid : %d\n", callingUid);
         isSystemApp = bundleManager->IsSystemApp(callingUid);
     }
 
@@ -98,18 +100,20 @@ inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRec
 {
     sptr<NotificationSlot> slot;
     ErrCode result = NotificationPreferences::GetInstance().GetNotificationSlot(
-        record->notification->GetBundleName(), record->request->GetSlotType(), slot);
+        record->bundleOption, record->request->GetSlotType(), slot);
     if ((result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) ||
         (result == ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST)) {
         result = NotificationPreferences::GetInstance().GetNotificationSlot(
-            record->notification->GetBundleName(), NotificationConstant::SlotType::OTHER, slot);
+            record->bundleOption, NotificationConstant::SlotType::OTHER, slot);
         if ((result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) ||
             (result == ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST)) {
             slot = new NotificationSlot(NotificationConstant::SlotType::OTHER);
             std::vector<sptr<NotificationSlot>> slots;
             slots.push_back(slot);
-            result = NotificationPreferences::GetInstance().AddNotificationSlots(
-                record->notification->GetBundleName(), slots);
+            result = NotificationPreferences::GetInstance().AddNotificationSlots(record->bundleOption, slots);
+        }
+        if (result == ERR_OK) {
+            record->request->SetSlotType(NotificationConstant::SlotType::OTHER);
         }
     }
     if (result == ERR_OK) {
@@ -128,8 +132,8 @@ inline ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &reque
     request->SetOwnerBundleName(bundle);
     request->SetCreatorBundleName(bundle);
 
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    int32_t pid = IPCSkeleton::GetCallingPid();
+    int uid = IPCSkeleton::GetCallingUid();
+    int pid = IPCSkeleton::GetCallingPid();
     request->SetCreatorUid(uid);
     request->SetCreatorPid(pid);
 
@@ -167,6 +171,36 @@ AdvancedNotificationService::~AdvancedNotificationService()
     StopFilters();
 }
 
+sptr<NotificationBundleOption> AdvancedNotificationService::GenerateBundleOption()
+{
+    sptr<NotificationBundleOption> bundleOption = nullptr;
+    std::string bundle = GetClientBundleName();
+    if (bundle.empty()) {
+        return nullptr;
+    }
+    int uid = IPCSkeleton::GetCallingUid();
+    bundleOption = new NotificationBundleOption(bundle, uid);
+    return bundleOption;
+}
+
+sptr<NotificationBundleOption> AdvancedNotificationService::GenerateValidBundleOption(
+    const sptr<NotificationBundleOption> &bundleOption)
+{
+    sptr<NotificationBundleOption> validBundleOption = nullptr;
+    if (bundleOption->GetUid() <= 0) {
+        std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+        if (bundleManager != nullptr) {
+            int uid = bundleManager->GetDefaultUidByBundleName(bundleOption->GetBundleName());
+            if (uid > 0) {
+                validBundleOption = new NotificationBundleOption(bundleOption->GetBundleName(), uid);
+            }
+        }
+    } else {
+        validBundleOption = bundleOption;
+    }
+    return validBundleOption;
+}
+
 ErrCode AdvancedNotificationService::Publish(const std::string &label, const sptr<NotificationRequest> &request)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
@@ -176,10 +210,19 @@ ErrCode AdvancedNotificationService::Publish(const std::string &label, const spt
     }
 
     ErrCode result = PrepereNotificationRequest(request);
+    if (result != ERR_OK) {
+        return result;
+    }
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
 
     std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
     record->request = request;
     record->notification = new Notification(request);
+    record->bundleOption = bundleOption;
 
     handler_->PostSyncTask(std::bind([&]() {
         result = AssignValidNotificationSlot(record);
@@ -281,13 +324,9 @@ sptr<NotificationSortingMap> AdvancedNotificationService::GenerateSortingMap()
     std::vector<NotificationSorting> sortingList;
     for (auto record : notificationList_) {
         NotificationSorting sorting;
+        sorting.SetRanking((int32_t)sortingList.size());
         sorting.SetKey(record->notification->GetKey());
-        sptr<NotificationSlot> slot;
-        if (NotificationPreferences::GetInstance().GetNotificationSlot(
-                record->notification->GetBundleName(), record->request->GetSlotType(), slot) == ERR_OK) {
-            sorting.SetRanking((int32_t)sortingList.size());
-            sorting.SetSlot(slot);
-        }
+        sorting.SetSlot(record->slot);
         sortingList.push_back(sorting);
     }
 
@@ -314,15 +353,15 @@ ErrCode AdvancedNotificationService::Cancel(int notificationId, const std::strin
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
 
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         sptr<Notification> notification = nullptr;
-        result = RemoveFromNotificationList(bundle, label, notificationId, notification, true);
+        result = RemoveFromNotificationList(bundleOption, label, notificationId, notification, true);
         if (result != ERR_OK) {
             return;
         }
@@ -341,16 +380,17 @@ ErrCode AdvancedNotificationService::CancelAll()
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
 
     handler_->PostSyncTask(std::bind([&]() {
         sptr<Notification> notification = nullptr;
 
-        std::vector<std::string> keys = GetNotificationKeys(bundle);
+        std::vector<std::string> keys = GetNotificationKeys(bundleOption);
         for (auto key : keys) {
             result = RemoveFromNotificationList(key, notification, true);
             if (result != ERR_OK) {
@@ -370,116 +410,118 @@ ErrCode AdvancedNotificationService::CancelAll()
     return result;
 }
 
-inline bool IsCustomSlotContained(const std::vector<sptr<NotificationSlot>> &slots)
-{
-    bool isContained = false;
-    for (auto slot : slots) {
-        if (slot->GetType() == NotificationConstant::SlotType::CUSTOM) {
-            isContained = true;
-            break;
-        }
-    }
-    return isContained;
-}
-
 ErrCode AdvancedNotificationService::AddSlots(const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
-        return ERR_ANS_INVALID_BUNDLE;
-    }
-
-    bool isSystemApp = IsSystemApp();
-
-    if (IsCustomSlotContained(slots) && !isSystemApp) {
+    if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    std::vector<sptr<NotificationSlot>> innerSlots;
-
-    sptr<NotificationSlot> item;
-    for (auto slot : slots) {
-        switch (slot->GetType()) {
-            case NotificationConstant::SlotType::SOCIAL_COMMUNICATION:
-            case NotificationConstant::SlotType::SERVICE_REMINDER:
-            case NotificationConstant::SlotType::CONTENT_INFORMATION:
-            case NotificationConstant::SlotType::OTHER:
-                item = new NotificationSlot(slot->GetType());
-                item->SetDescription(slot->GetDescription());
-                innerSlots.push_back(item);
-                break;
-            case NotificationConstant::SlotType::CUSTOM:
-                item = slot;
-                innerSlots.push_back(item);
-                break;
-            default:
-                break;
-        }
-        item = nullptr;
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
     }
 
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().AddNotificationSlots(bundle, innerSlots); }));
+    if (slots.size() == 0) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        std::vector<sptr<NotificationSlot>> addSlots;
+        for (auto slot : slots) {
+            sptr<NotificationSlot> originalSlot;
+            result =
+                NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slot->GetType(), originalSlot);
+            if ((result == ERR_OK) && (originalSlot != nullptr)) {
+                continue;
+            } else {
+                addSlots.push_back(slot);
+            }
+        }
+
+        if (addSlots.size() == 0) {
+            result = ERR_OK;
+        } else {
+            result = NotificationPreferences::GetInstance().AddNotificationSlots(bundleOption, addSlots);
+        }
+    }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().AddNotificationSlotGroups(bundle, groups); }));
+        [&]() { result = NotificationPreferences::GetInstance().AddNotificationSlotGroups(bundleOption, groups); }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::GetSlots(std::vector<sptr<NotificationSlot>> &slots)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().GetNotificationAllSlots(bundle, slots); }));
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind(
+        [&]() { result = NotificationPreferences::GetInstance().GetNotificationAllSlots(bundleOption, slots); }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetNotificationSlotGroup(bundle, groupId, group); }));
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetNotificationSlotGroup(bundleOption, groupId, group);
+    }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetNotificationAllSlotGroups(bundle, groups); }));
+        [&]() { result = NotificationPreferences::GetInstance().GetNotificationAllSlotGroups(bundleOption, groups); }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::RemoveSlotGroups(const std::vector<std::string> &groupIds)
 {
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
     ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundle, groupIds); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundleOption, groupIds);
+    }));
     return result;
 }
 
@@ -487,14 +529,17 @@ ErrCode AdvancedNotificationService::GetActiveNotifications(std::vector<sptr<Not
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
+        notifications.clear();
         for (auto record : notificationList_) {
-            if (record->notification->GetBundleName() == bundle) {
+            if ((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
+                (record->bundleOption->GetUid() == bundleOption->GetUid())) {
                 notifications.push_back(record->request);
             }
         }
@@ -506,15 +551,17 @@ ErrCode AdvancedNotificationService::GetActiveNotificationNums(int &num)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         int count = 0;
         for (auto record : notificationList_) {
-            if (record->notification->GetBundleName() == bundle) {
+            if ((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
+                (record->bundleOption->GetUid() == bundleOption->GetUid())) {
                 count += 1;
             }
         }
@@ -525,67 +572,83 @@ ErrCode AdvancedNotificationService::GetActiveNotificationNums(int &num)
 
 ErrCode AdvancedNotificationService::SetNotificationAgent(const std::string &agent)
 {
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 ErrCode AdvancedNotificationService::GetNotificationAgent(std::string &agent)
 {
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 ErrCode AdvancedNotificationService::CanPublishAsBundle(const std::string &representativeBundle, bool &canPublish)
 {
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 ErrCode AdvancedNotificationService::PublishAsBundle(
     const sptr<NotificationRequest> notification, const std::string &representativeBundle)
 {
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AdvancedNotificationService::SetNotificationBadgeNum(int num)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().SetTotalBadgeNums(bundle, num); }));
+        std::bind([&]() { result = NotificationPreferences::GetInstance().SetTotalBadgeNums(bundleOption, num); }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::GetBundleImportance(int &importance)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().GetImportance(bundle, importance); }));
+        std::bind([&]() { result = NotificationPreferences::GetInstance().GetImportance(bundleOption, importance); }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::SetDisturbMode(NotificationConstant::DisturbMode mode)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
-        return ERR_ANS_INVALID_BUNDLE;
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
     }
-    handler_->PostSyncTask(std::bind([&]() { result = NotificationPreferences::GetInstance().SetDisturbMode(mode); }));
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetDisturbMode(mode);
+        if (result == ERR_OK) {
+            NotificationSubscriberManager::GetInstance()->NotifyDisturbModeChanged(mode);
+        }
+    }));
     return result;
 }
+
 ErrCode AdvancedNotificationService::GetDisturbMode(NotificationConstant::DisturbMode &mode)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
-        return ERR_ANS_INVALID_BUNDLE;
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
     }
-    handler_->PostSyncTask(std::bind(
-        [this, &bundle, &mode, &result]() { result = NotificationPreferences::GetInstance().GetDisturbMode(mode); }));
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() { result = NotificationPreferences::GetInstance().GetDisturbMode(mode); }));
     return result;
 }
+
 ErrCode AdvancedNotificationService::HasNotificationPolicyAccessPermission(bool &granted)
 {
     return ERR_OK;
@@ -593,25 +656,33 @@ ErrCode AdvancedNotificationService::HasNotificationPolicyAccessPermission(bool 
 
 ErrCode AdvancedNotificationService::SetPrivateNotificationsAllowed(bool allow)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().SetPrivateNotificationsAllowed(bundle, allow); }));
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetPrivateNotificationsAllowed(bundleOption, allow);
+    }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::GetPrivateNotificationsAllowed(bool &allow)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetPrivateNotificationsAllowed(bundle, allow); }));
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetPrivateNotificationsAllowed(bundleOption, allow);
+    }));
     return result;
 }
 
@@ -643,7 +714,7 @@ ErrCode AdvancedNotificationService::Delete(const std::string &key)
     return result;
 }
 
-ErrCode AdvancedNotificationService::DeleteByBundle(const std::string &bundle)
+ErrCode AdvancedNotificationService::DeleteByBundle(const sptr<NotificationBundleOption> &bundleOption)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
@@ -651,13 +722,17 @@ ErrCode AdvancedNotificationService::DeleteByBundle(const std::string &bundle)
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
     ErrCode result = ERR_OK;
-
     handler_->PostSyncTask(std::bind([&]() {
-        sptr<Notification> notification = nullptr;
-
         std::vector<std::string> keys = GetNotificationKeys(bundle);
         for (auto key : keys) {
+            sptr<Notification> notification = nullptr;
+
             result = RemoveFromNotificationList(key, notification);
             if (result != ERR_OK) {
                 continue;
@@ -687,10 +762,10 @@ ErrCode AdvancedNotificationService::DeleteAll()
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
-        sptr<Notification> notification = nullptr;
-
-        std::vector<std::string> keys = GetNotificationKeys(std::string());
+        std::vector<std::string> keys = GetNotificationKeys(nullptr);
         for (auto key : keys) {
+            sptr<Notification> notification = nullptr;
+
             result = RemoveFromNotificationList(key, notification);
             if (result != ERR_OK) {
                 continue;
@@ -710,12 +785,14 @@ ErrCode AdvancedNotificationService::DeleteAll()
     return result;
 }
 
-std::vector<std::string> AdvancedNotificationService::GetNotificationKeys(const std::string &bundle)
+std::vector<std::string> AdvancedNotificationService::GetNotificationKeys(
+    const sptr<NotificationBundleOption> &bundleOption)
 {
     std::vector<std::string> keys;
 
     for (auto record : notificationList_) {
-        if (!bundle.empty() && (record->notification->GetBundleName() != bundle)) {
+        if ((bundleOption != nullptr) && (record->bundleOption->GetBundleName() != bundleOption->GetBundleName() &&
+                                             (record->bundleOption->GetUid() != bundleOption->GetUid()))) {
             continue;
         }
         keys.push_back(record->notification->GetKey());
@@ -725,12 +802,17 @@ std::vector<std::string> AdvancedNotificationService::GetNotificationKeys(const 
 }
 
 ErrCode AdvancedNotificationService::GetSlotsByBundle(
-    const std::string &bundle, std::vector<sptr<NotificationSlot>> &slots)
+    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
     }
 
     ErrCode result = ERR_OK;
@@ -740,12 +822,17 @@ ErrCode AdvancedNotificationService::GetSlotsByBundle(
 }
 
 ErrCode AdvancedNotificationService::UpdateSlots(
-    const std::string &bundle, const std::vector<sptr<NotificationSlot>> &slots)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
     }
 
     ErrCode result = ERR_OK;
@@ -755,12 +842,17 @@ ErrCode AdvancedNotificationService::UpdateSlots(
 }
 
 ErrCode AdvancedNotificationService::UpdateSlotGroups(
-    const std::string &bundle, const std::vector<sptr<NotificationSlotGroup>> &groups)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
     }
 
     ErrCode result = ERR_OK;
@@ -769,7 +861,13 @@ ErrCode AdvancedNotificationService::UpdateSlotGroups(
     return result;
 }
 
-ErrCode AdvancedNotificationService::SetNotificationsEnabledForBundle(const std::string &bundle, bool enabled)
+ErrCode AdvancedNotificationService::SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled)
+{
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AdvancedNotificationService::SetShowBadgeEnabledForBundle(
+    const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
@@ -777,18 +875,9 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForBundle(const std:
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(bundle, enabled); }));
-    return result;
-}
-
-ErrCode AdvancedNotificationService::SetShowBadgeEnabledForBundle(const std::string &bundle, bool enabled)
-{
-    ANS_LOGD("%{public}s", __FUNCTION__);
-
-    if (!IsSystemApp()) {
-        return ERR_ANS_NON_SYSTEM_APP;
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
     }
 
     ErrCode result = ERR_OK;
@@ -797,12 +886,18 @@ ErrCode AdvancedNotificationService::SetShowBadgeEnabledForBundle(const std::str
     return result;
 }
 
-ErrCode AdvancedNotificationService::GetShowBadgeEnabledForBundle(const std::string &bundle, bool &enabled)
+ErrCode AdvancedNotificationService::GetShowBadgeEnabledForBundle(
+    const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
     }
 
     ErrCode result = ERR_OK;
@@ -811,12 +906,28 @@ ErrCode AdvancedNotificationService::GetShowBadgeEnabledForBundle(const std::str
     return result;
 }
 
-ErrCode AdvancedNotificationService::RemoveFromNotificationList(const std::string &bundle, const std::string &label,
-    int notificationId, sptr<Notification> &notification, bool isCancel)
+ErrCode AdvancedNotificationService::GetShowBadgeEnabled(bool &enabled)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(
+        std::bind([&]() { result = NotificationPreferences::GetInstance().IsShowBadge(bundleOption, enabled); }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::RemoveFromNotificationList(const sptr<NotificationBundleOption> &bundleOption,
+    const std::string &label, int notificationId, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
-        if ((record->notification->GetBundleName() == bundle) && (record->notification->GetLabel() == label) &&
-            (record->notification->GetId() == notificationId)) {
+        if (((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
+                (record->bundleOption->GetUid() == bundleOption->GetUid())) &&
+            (record->notification->GetLabel() == label) && (record->notification->GetId() == notificationId)) {
             if (!isCancel && record->request->IsUnremovable()) {
                 return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
             }
@@ -883,25 +994,31 @@ ErrCode AdvancedNotificationService::Unsubscribe(
 ErrCode AdvancedNotificationService::GetSlotByType(
     const NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetNotificationSlot(bundle, slotType, slot); }));
+        [&]() { result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot); }));
     return result;
 }
 
 ErrCode AdvancedNotificationService::RemoveSlotByType(const NotificationConstant::SlotType slotType)
 {
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().RemoveNotificationSlot(bundle, slotType); }));
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind(
+        [&]() { result = NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleOption, slotType); }));
     return result;
 }
 
@@ -915,6 +1032,7 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
+        notifications.clear();
         for (auto record : notificationList_) {
             notifications.push_back(record->notification);
         }
@@ -979,7 +1097,7 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForAllBundles(const 
 }
 
 ErrCode AdvancedNotificationService::SetNotificationsEnabledForSpecialBundle(
-    const std::string &deviceId, const std::string &bundleName, bool enabled)
+    const std::string &deviceId, const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
@@ -987,11 +1105,16 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForSpecialBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         if (deviceId.empty()) {
             // Local device
-            result = NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(bundleName, enabled);
+            result = NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(bundle, enabled);
         } else {
             // Remote revice
         }
@@ -1003,27 +1126,45 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
-    std::string bundle = GetClientBundleName();
-    if (bundle.empty()) {
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         allowed = false;
         result = NotificationPreferences::GetInstance().GetNotificationsEnabled(allowed);
         if (result == ERR_OK && allowed) {
-            result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundle, allowed);
+            result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
         }
     }));
     return result;
 }
 
-ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(const std::string &bundle, bool &allowed)
+ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
+    const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    if (!IsSystemApp()) {
-        return ERR_ANS_NON_SYSTEM_APP;
+    sptr<NotificationBundleOption> clientBundle = GenerateBundleOption();
+    if (clientBundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    sptr<NotificationBundleOption> targetBundle = nullptr;
+    if (bundleOption == nullptr) {
+        targetBundle = clientBundle;
+    } else {
+        if ((clientBundle->GetBundleName() == bundleOption->GetBundleName()) &&
+            (clientBundle->GetUid() == bundleOption->GetUid())) {
+            targetBundle = bundleOption;
+        } else {
+            if (!IsSystemApp()) {
+                return ERR_ANS_NON_SYSTEM_APP;
+            }
+            targetBundle = GenerateValidBundleOption(bundleOption);
+        }
     }
 
     ErrCode result = ERR_OK;
@@ -1031,7 +1172,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(const std::str
         allowed = false;
         result = NotificationPreferences::GetInstance().GetNotificationsEnabled(allowed);
         if (result == ERR_OK && allowed) {
-            result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundle, allowed);
+            result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(targetBundle, allowed);
         }
     }));
     return result;
@@ -1111,11 +1252,14 @@ ErrCode AdvancedNotificationService::SetRecentNotificationCount(const std::strin
     ANS_LOGD("%{public}s arg = %{public}s", __FUNCTION__, arg.c_str());
     int count = atoi(arg.c_str());
 
-    if (count < 0 || count > 1024) {
+    if (count < NOTIFICATION_MIN_COUNT || count > NOTIFICATION_MAX_COUNT) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     recentInfo_->recentCount = count;
+    while (recentInfo_->list.size() > recentInfo_->recentCount) {
+        recentInfo_->list.pop_back();
+    }
     return ERR_OK;
 }
 
@@ -1158,7 +1302,7 @@ void AdvancedNotificationService::UpdateRecentNotification(sptr<Notification> &n
 
     if (!isDelete) {
         if (recentInfo_->list.size() >= recentInfo_->recentCount) {
-            recentInfo_->list.erase(recentInfo_->list.end());
+            recentInfo_->list.pop_back();
         }
         auto recentNotification = std::make_shared<RecentNotification>();
         recentNotification->isActive = true;
@@ -1228,12 +1372,12 @@ ErrCode AdvancedNotificationService::FlowControl(const std::shared_ptr<Notificat
     return ERR_OK;
 }
 
-void AdvancedNotificationService::OnBundleRemoved(const std::string &bundle)
+void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     handler_->PostTask(std::bind([&]() {
-        ErrCode result = NotificationPreferences::GetInstance().RemoveNotificationForBundle(bundle);
+        ErrCode result = NotificationPreferences::GetInstance().RemoveNotificationForBundle(bundleOption);
         if (result != ERR_OK) {
             ANS_LOGE("NotificationPreferences::RemoveNotificationForBundle failed: %{public}d", result);
         }
@@ -1245,6 +1389,149 @@ void AdvancedNotificationService::OnDistributedKvStoreDeathRecipient()
     ANS_LOGD("%{public}s", __FUNCTION__);
     handler_->PostTask(
         std::bind([&]() { NotificationPreferences::GetInstance().OnDistributedKvStoreDeathRecipient(); }));
+}
+
+ErrCode AdvancedNotificationService::RemoveAllSlots()
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(
+        std::bind([&]() { result = NotificationPreferences::GetInstance().RemoveNotificationAllSlots(bundleOption); }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::AddSlotByType(NotificationConstant::SlotType slotType)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<NotificationSlot> slot;
+        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot);
+        if ((result == ERR_OK) && (slot != nullptr)) {
+            return;
+        } else {
+            slot = new NotificationSlot(slotType);
+            std::vector<sptr<NotificationSlot>> slots;
+            slots.push_back(slot);
+            result = NotificationPreferences::GetInstance().AddNotificationSlots(bundleOption, slots);
+        }
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::RemoveNotification(
+    const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = ERR_ANS_NOTIFICATION_NOT_EXISTS;
+
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<Notification> notification = nullptr;
+
+        for (auto record : notificationList_) {
+            if ((record->bundleOption->GetBundleName() == bundle->GetBundleName()) &&
+                (record->bundleOption->GetUid() == bundleOption->GetUid()) &&
+                (record->notification->GetId() == notificationId) && (record->notification->GetLabel() == label)) {
+                if (record->request->IsUnremovable()) {
+                    result = ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+                    break;
+                }
+                notification = record->notification;
+                notificationList_.remove(record);
+                result = ERR_OK;
+                break;
+            }
+        }
+
+        if (notification != nullptr) {
+            int reason = NotificationConstant::CANCEL_REASON_DELETE;
+            UpdateRecentNotification(notification, true, reason);
+            sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+            NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+        }
+    }));
+
+    return result;
+}
+
+ErrCode AdvancedNotificationService::RemoveAllNotifications(const sptr<NotificationBundleOption> &bundleOption)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    handler_->PostSyncTask(std::bind([&]() {
+        std::vector<std::shared_ptr<NotificationRecord>> removeList;
+        for (auto record : notificationList_) {
+            if ((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
+                (record->bundleOption->GetUid() == bundleOption->GetUid()) && !record->request->IsUnremovable()) {
+                removeList.push_back(record);
+            }
+        }
+
+        for (auto record : removeList) {
+            notificationList_.remove(record);
+
+            if (record->notification != nullptr) {
+                int reason = NotificationConstant::CANCEL_REASON_DELETE;
+                UpdateRecentNotification(record->notification, true, reason);
+                sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+                NotificationSubscriberManager::GetInstance()->NotifyCanceled(record->notification, sortingMap, reason);
+            }
+        }
+    }));
+
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = ERR_OK;
+
+    handler_->PostSyncTask(std::bind(
+        [&]() { result = NotificationPreferences::GetInstance().GetNotificationSlotsNumForBundle(bundle, num); }));
+
+    return result;
 }
 
 }  // namespace Notification

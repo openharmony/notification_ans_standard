@@ -33,10 +33,12 @@ public:
     /**
      * @brief Default constructor used to create a instance.
      */
-    NotificationSubscriber()
-    {
-        impl_ = new SubscriberImpl(*this);
-    };
+    NotificationSubscriber();
+
+    /**
+     * @brief Default destructor.
+     */
+    virtual ~NotificationSubscriber();
 
     /**
      * @brief Called back when a notification is canceled.
@@ -162,4 +164,4 @@ private:
 }  // namespace Notification
 }  // namespace OHOS
 
-#endif
+#endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SUBSCRIBER_H

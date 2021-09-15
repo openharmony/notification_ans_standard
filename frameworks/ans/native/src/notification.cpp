@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License"){}
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -31,6 +31,9 @@ Notification::Notification(const sptr<NotificationRequest> &request)
 
 Notification::Notification(const Notification &other)
 {
+    enableSound_ = other.enableSound_;
+    enableLight_ = other.enableLight_;
+    enableViration_ = other.enableViration_;
     key_ = other.key_;
     ledLightColor_ = other.ledLightColor_;
     lockscreenVisibleness_ = other.lockscreenVisibleness_;
@@ -40,28 +43,22 @@ Notification::Notification(const Notification &other)
     vibrationStyle_ = other.vibrationStyle_;
 }
 
+Notification::~Notification()
+{}
+
 bool Notification::EnableLight() const
 {
-    if (ledLightColor_ == -1) {
-        return false;
-    }
-    return true;
+    return enableLight_;
 }
 
 bool Notification::EnableSound() const
 {
-    if (sound_ == nullptr) {
-        return false;
-    }
-    return true;
+    return enableSound_;
 }
 
 bool Notification::EnableVibrate() const
 {
-    if (!vibrationStyle_.size()) {
-        return false;
-    }
-    return true;
+    return enableViration_;
 }
 
 std::string Notification::GetBundleName() const
@@ -137,7 +134,7 @@ Uri Notification::GetSound() const
     return Uri("");
 }
 
-uid_t Notification::GetUid() const
+pid_t Notification::GetUid() const
 {
     if (request_ == nullptr) {
         return 0;
@@ -145,7 +142,7 @@ uid_t Notification::GetUid() const
     return request_->GetCreatorUid();
 }
 
-uid_t Notification::GetPid() const
+pid_t Notification::GetPid() const
 {
     if (request_ == nullptr) {
         return 0;
@@ -176,17 +173,17 @@ bool Notification::IsFloatingIcon() const
 
 bool Notification::Marshalling(Parcel &parcel) const
 {
-    if(!parcel.WriteBool(enableLight_)){
+    if (!parcel.WriteBool(enableLight_)) {
         ANS_LOGE("Can't write enableLight_");
         return false;
     }
 
-    if(!parcel.WriteBool(enableSound_)) {
+    if (!parcel.WriteBool(enableSound_)) {
         ANS_LOGE("Can't write enableSound_");
         return false;
     }
 
-    if(!parcel.WriteBool(enableViration_)) {
+    if (!parcel.WriteBool(enableViration_)) {
         ANS_LOGE("Can't write enableViration_");
         return false;
     }
@@ -219,7 +216,7 @@ bool Notification::Marshalling(Parcel &parcel) const
         if (!parcel.WriteString(sound_->ToString())) {
             ANS_LOGE("Can't write sound");
             return false;
-        } 
+        }
     }
 
     if (!parcel.WriteInt64Vector(vibrationStyle_)) {
@@ -257,7 +254,7 @@ bool Notification::ReadFromParcel(Parcel &parcel)
     postTime_ = parcel.ReadInt64();
 
     // Read sound_
-    if (enableSound_) {    
+    if (enableSound_) {
         sound_ = std::make_shared<Uri>(parcel.ReadString());
     }
 
@@ -278,17 +275,17 @@ Notification *Notification::Unmarshalling(Parcel &parcel)
     return n;
 }
 
-void Notification::SetEnableSound(const bool& enable)
+void Notification::SetEnableSound(const bool &enable)
 {
     enableSound_ = enable;
 }
 
-void Notification::SetEnableLight(const bool& enable)
+void Notification::SetEnableLight(const bool &enable)
 {
     enableLight_ = enable;
 }
 
-void Notification::SetEnableViration(const bool& enable)
+void Notification::SetEnableViration(const bool &enable)
 {
     enableViration_ = enable;
 }
@@ -331,7 +328,8 @@ std::string Notification::GenerateNotificationKey(int32_t uid, const std::string
 std::string Notification::Dump() const
 {
     std::string dump = "Notification{ key = " + key_ + ", ledLightColor = " + std::to_string(ledLightColor_) +
-                       ", lockscreenVisbleness = " + std::to_string(static_cast<int32_t>(lockscreenVisibleness_)) + ",request = ";
+                       ", lockscreenVisbleness = " + std::to_string(static_cast<int32_t>(lockscreenVisibleness_)) +
+                       ",request = ";
     if (request_ == nullptr) {
         dump += "nullptr";
     } else {

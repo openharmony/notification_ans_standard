@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include "ans_inner_errors.h"
+#include "ans_ut_constant.h"
 #include "notification_preferences.h"
 #include "notification_slot.h"
 #include "permission_filter.h"
@@ -28,17 +29,11 @@ namespace Notification {
 
 class PermissionFilterTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
+    static void SetUpTestCase(){};
+    static void TearDownTestCase(){};
     void SetUp();
     void TearDown();
 };
-
-void PermissionFilterTest::SetUpTestCase()
-{}
-
-void PermissionFilterTest::TearDownTestCase()
-{}
 
 void PermissionFilterTest::SetUp()
 {
@@ -73,36 +68,22 @@ HWTEST_F(PermissionFilterTest, PermissionFilterTest_00200, Function | SmallTest 
 }
 
 /**
- * @tc.number    : PermissionFilterTest_00300
- * @tc.name      : AMS_ANS_OnPublish_0100
- * @tc.desc      : Test OnPublish function when the param is wrong
- */
-HWTEST_F(PermissionFilterTest, PermissionFilterTest_00300, Function | SmallTest | Level1)
-{
-    PermissionFilter permissionFilter;
-    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
-    record->request = new NotificationRequest();
-    record->notification = new Notification(record->request);
-    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
-    EXPECT_EQ(permissionFilter.OnPublish(record), (int)ERR_ANS_INVALID_PARAM);
-}
-
-/**
  * @tc.number    : PermissionFilterTest_00400
- * @tc.name      : AMS_ANS_OnPublish_0200
- * @tc.desc      : Test OnPublish function
+ * @tc.name      :
+ * @tc.desc      : Test OnPublish function.Expect return ERR_OK
  */
 HWTEST_F(PermissionFilterTest, PermissionFilterTest_00400, Function | SmallTest | Level1)
 {
     PermissionFilter permissionFilter;
-    std::string bundleName = "bundleName";
     sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::OTHER);
     std::vector<sptr<NotificationSlot>> slots;
     slots.push_back(slot);
-    NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots);
+    NotificationPreferences::GetInstance().AddNotificationSlots(
+        new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID), slots);
     std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->bundleOption = new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID);
     record->request = new NotificationRequest();
-    record->request->SetOwnerBundleName(bundleName);
+    record->request->SetOwnerBundleName(TEST_DEFUALT_BUNDLE);
     record->notification = new Notification(record->request);
     record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     EXPECT_EQ(permissionFilter.OnPublish(record), ERR_OK);
@@ -110,44 +91,25 @@ HWTEST_F(PermissionFilterTest, PermissionFilterTest_00400, Function | SmallTest 
 
 /**
  * @tc.number    : PermissionFilterTest_00500
- * @tc.name      : AMS_ANS_OnPublish_0300
- * @tc.desc      : Test OnPublish function when file is null
+ * @tc.name      :
+ * @tc.desc      : Test OnPublish function when NotificationsEnabled is false.Expect return ERR_ANS_NOT_ALLOWED
  */
 HWTEST_F(PermissionFilterTest, PermissionFilterTest_00500, Function | SmallTest | Level1)
 {
     PermissionFilter permissionFilter;
-    std::string bundleName = "bundleName";
     sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::OTHER);
     std::vector<sptr<NotificationSlot>> slots;
     slots.push_back(slot);
-    NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots);
+    NotificationPreferences::GetInstance().AddNotificationSlots(
+        new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID), slots);
+    NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(
+        new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID), false);
     std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->bundleOption = new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID);
     record->request = new NotificationRequest();
-    record->request->SetOwnerBundleName("bundleName1");
+    record->request->SetOwnerBundleName(TEST_DEFUALT_BUNDLE);
     record->notification = new Notification(record->request);
-    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
-    EXPECT_EQ((int)permissionFilter.OnPublish(record), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : PermissionFilterTest_00600
- * @tc.name      : AMS_ANS_OnPublish_0400
- * @tc.desc      : Test OnPublish function when NotificationsEnabled is false
- */
-HWTEST_F(PermissionFilterTest, PermissionFilterTest_00600, Function | SmallTest | Level1)
-{
-    PermissionFilter permissionFilter;
-    std::string bundleName = "bundleName";
-    sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::OTHER);
-    std::vector<sptr<NotificationSlot>> slots;
-    slots.push_back(slot);
-    NotificationPreferences::GetInstance().AddNotificationSlots(bundleName, slots);
-    NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(bundleName, false);
-    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
-    record->request = new NotificationRequest();
-    record->request->SetOwnerBundleName(bundleName);
-    record->notification = new Notification(record->request);
-    record->slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    record->slot = slot;
 
     EXPECT_EQ((int)permissionFilter.OnPublish(record), (int)ERR_ANS_NOT_ALLOWED);
 }

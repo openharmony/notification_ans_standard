@@ -91,8 +91,8 @@ std::string MessageUser::Dump() const
                         ", name = " + name_ +
                         ", pixelMap = " + (pixelMap_ ? "not null" : "null") +
                         ", uri = " + uri_.ToString() +
-                        ", isMachine = " + std::to_string(isMachine_) +
-                        ", isUserImportant = " + std::to_string(isUserImportant_) + "]";
+                        ", isMachine = " + (isMachine_ ? "true" : "false") +
+                        ", isUserImportant = " + (isUserImportant_ ? "true" : "false") + "]";
 }
 
 bool MessageUser::Marshalling(Parcel &parcel) const

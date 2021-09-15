@@ -37,23 +37,23 @@ NotificationPreferences &NotificationPreferences::GetInstance()
 }
 
 ErrCode NotificationPreferences::AddNotificationSlots(
-    const std::string &bundleName, const std::vector<sptr<NotificationSlot>> &slots)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
 
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty() || slots.empty()) {
+    if (bundleOption->GetBundleName().empty() || slots.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result = ERR_OK;
     for (auto slot : slots) {
-        result = CheckSlotForCreateSlot(bundleName, slot, preferencesInfo);
+        result = CheckSlotForCreateSlot(bundleOption, slot, preferencesInfo);
         if (result != ERR_OK) {
             return result;
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutSlotsToDisturbeDB(bundleName, slots))) {
+    if (result == ERR_OK && (!preferncesDB_->PutSlotsToDisturbeDB(GenerateBundleKey(bundleOption), slots))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -64,25 +64,24 @@ ErrCode NotificationPreferences::AddNotificationSlots(
 }
 
 ErrCode NotificationPreferences::AddNotificationSlotGroups(
-    const std::string &bundleName, const std::vector<sptr<NotificationSlotGroup>> &groups)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty() || groups.empty()) {
+    if (bundleOption->GetBundleName().empty() || groups.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result = ERR_OK;
     for (auto group : groups) {
-        result = CheckGroupForCreateSlotGroup(bundleName, group, preferencesInfo);
+        result = CheckGroupForCreateSlotGroup(bundleOption, group, preferencesInfo);
         if (result != ERR_OK) {
             return result;
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutGroupsToDisturbeDB(bundleName, groups))) {
-        result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
-        return result;
+    if (result == ERR_OK && (!preferncesDB_->PutGroupsToDisturbeDB(GenerateBundleKey(bundleOption), groups))) {
+        return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
     if (result == ERR_OK) {
@@ -91,20 +90,62 @@ ErrCode NotificationPreferences::AddNotificationSlotGroups(
     return result;
 }
 
+ErrCode NotificationPreferences::AddNotificationBundleProperty(const sptr<NotificationBundleOption> &bundleOption)
+{
+    if (bundleOption->GetBundleName().empty()) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
+    NotificationPreferencesInfo::BundleInfo bundleInfo;
+    preferencesInfo.SetBundleInfo(bundleInfo);
+    ErrCode result = ERR_OK;
+    if (preferncesDB_->PutBundlePropertyToDisturbeDB(bundleInfo)) {
+        preferencesInfo_ = preferencesInfo;
+    } else {
+        result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode NotificationPreferences::RemoveNotificationSlot(
-    const std::string &bundleName, const NotificationConstant::SlotType &slotType)
+    const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result = ERR_OK;
-    result = CheckSlotForRemoveSlot(bundleName, slotType, preferencesInfo);
+    result = CheckSlotForRemoveSlot(bundleOption, slotType, preferencesInfo);
 
-    if (result == ERR_OK && (!preferncesDB_->RemoveSlotFromDisturbeDB(bundleName, slotType))) {
-        result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
-        return result;
+    if (result == ERR_OK && (!preferncesDB_->RemoveSlotFromDisturbeDB(GenerateBundleKey(bundleOption), slotType))) {
+        return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
+    }
+
+    if (result == ERR_OK) {
+        preferencesInfo_ = preferencesInfo;
+    }
+    return result;
+}
+
+ErrCode NotificationPreferences::RemoveNotificationAllSlots(const sptr<NotificationBundleOption> &bundleOption)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    if (bundleOption->GetBundleName().empty()) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
+    ErrCode result = ERR_OK;
+    NotificationPreferencesInfo::BundleInfo bundleInfo;
+    if (preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
+        bundleInfo.RemoveAllSlots();
+        if (!preferncesDB_->RemoveAllSlotsFromDisturbeDB(GenerateBundleKey(bundleOption))) {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
+        }
+    } else {
+        result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
 
     if (result == ERR_OK) {
@@ -114,23 +155,22 @@ ErrCode NotificationPreferences::RemoveNotificationSlot(
 }
 
 ErrCode NotificationPreferences::RemoveNotificationSlotGroups(
-    const std::string &bundleName, const std::vector<std::string> &groupIds)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<std::string> &groupIds)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty() || groupIds.empty()) {
+    if (bundleOption->GetBundleName().empty() || groupIds.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result = ERR_OK;
     for (auto groupId : groupIds) {
-        result = CheckGroupForRemoveSlotGroup(bundleName, groupId, preferencesInfo);
+        result = CheckGroupForRemoveSlotGroup(bundleOption, groupId, preferencesInfo);
         if (result != ERR_OK) {
             return result;
         }
     }
-    if (result == ERR_OK && (!preferncesDB_->RemoveGroupsFromDisturbeDB(bundleName, groupIds))) {
-        result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
-        return result;
+    if (result == ERR_OK && (!preferncesDB_->RemoveGroupsFromDisturbeDB(GenerateBundleKey(bundleOption), groupIds))) {
+        return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
     if (result == ERR_OK) {
@@ -139,19 +179,19 @@ ErrCode NotificationPreferences::RemoveNotificationSlotGroups(
     return result;
 }
 
-ErrCode NotificationPreferences::RemoveNotificationForBundle(const std::string &bundleName)
+ErrCode NotificationPreferences::RemoveNotificationForBundle(const sptr<NotificationBundleOption> &bundleOption)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
 
     ErrCode result = ERR_OK;
-    if (preferencesInfo.IsExsitBundleInfo(bundleName)) {
-        preferencesInfo.RemoveBundleInfo(bundleName);
-        if (!preferncesDB_->RemoveBundleFromDisturbeDB(bundleName)) {
+    if (preferencesInfo.IsExsitBundleInfo(bundleOption)) {
+        preferencesInfo.RemoveBundleInfo(bundleOption);
+        if (!preferncesDB_->RemoveBundleFromDisturbeDB(GenerateBundleKey(bundleOption))) {
             result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
         }
     } else {
@@ -166,25 +206,24 @@ ErrCode NotificationPreferences::RemoveNotificationForBundle(const std::string &
 }
 
 ErrCode NotificationPreferences::UpdateNotificationSlots(
-    const std::string &bundleName, const std::vector<sptr<NotificationSlot>> &slots)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty() || slots.empty()) {
+    if (bundleOption->GetBundleName().empty() || slots.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result = ERR_OK;
     for (auto slotIter : slots) {
-        result = CheckSlotForUpdateSlot(bundleName, slotIter, preferencesInfo);
+        result = CheckSlotForUpdateSlot(bundleOption, slotIter, preferencesInfo);
         if (result != ERR_OK) {
             return result;
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutSlotsToDisturbeDB(bundleName, slots))) {
-        result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
-        return result;
+    if (result == ERR_OK && (!preferncesDB_->PutSlotsToDisturbeDB(GenerateBundleKey(bundleOption), slots))) {
+        return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
     if (result == ERR_OK) {
@@ -195,25 +234,25 @@ ErrCode NotificationPreferences::UpdateNotificationSlots(
 }
 
 ErrCode NotificationPreferences::UpdateNotificationSlotGroups(
-    const std::string &bundleName, const std::vector<sptr<NotificationSlotGroup>> &groups)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
+
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty() || groups.empty()) {
+    if (bundleOption->GetBundleName().empty() || groups.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result = ERR_OK;
     for (auto groupIter : groups) {
-        result = CheckGroupForUpdateSlotGroup(bundleName, groupIter, preferencesInfo);
+        result = CheckGroupForUpdateSlotGroup(bundleOption, groupIter, preferencesInfo);
         if (result != ERR_OK) {
             return result;
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutGroupsToDisturbeDB(bundleName, groups))) {
-        result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
-        return result;
+    if (result == ERR_OK && (!preferncesDB_->PutGroupsToDisturbeDB(GenerateBundleKey(bundleOption), groups))) {
+        return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
     if (result == ERR_OK) {
@@ -222,17 +261,17 @@ ErrCode NotificationPreferences::UpdateNotificationSlotGroups(
     return result;
 }
 
-ErrCode NotificationPreferences::GetNotificationSlot(
-    const std::string &bundleName, const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot)
+ErrCode NotificationPreferences::GetNotificationSlot(const sptr<NotificationBundleOption> &bundleOption,
+    const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo_.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         if (!bundleInfo.GetSlot(type, slot)) {
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
         }
@@ -244,15 +283,15 @@ ErrCode NotificationPreferences::GetNotificationSlot(
 }
 
 ErrCode NotificationPreferences::GetNotificationAllSlots(
-    const std::string &bundleName, std::vector<sptr<NotificationSlot>> &slots)
+    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo_.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.GetAllSlots(slots);
     } else {
         ANS_LOGE("Notification bundle does not exsit.");
@@ -262,16 +301,33 @@ ErrCode NotificationPreferences::GetNotificationAllSlots(
     return result;
 }
 
-ErrCode NotificationPreferences::GetNotificationSlotGroup(
-    const std::string &bundleName, const std::string &groupId, sptr<NotificationSlotGroup> &group)
+ErrCode NotificationPreferences::GetNotificationSlotsNumForBundle(
+    const sptr<NotificationBundleOption> &bundleOption, int &num)
 {
-    if (bundleName.empty() || groupId.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo_.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
+        num = bundleInfo.GetAllSlotsSize();
+    } else {
+        result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
+    }
+    return result;
+}
+
+ErrCode NotificationPreferences::GetNotificationSlotGroup(
+    const sptr<NotificationBundleOption> &bundleOption, const std::string &groupId, sptr<NotificationSlotGroup> &group)
+{
+    if (bundleOption->GetBundleName().empty() || groupId.empty()) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode result = ERR_OK;
+    NotificationPreferencesInfo::BundleInfo bundleInfo;
+    if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         if (!bundleInfo.GetGroup(groupId, group)) {
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_NOT_EXIST;
         }
@@ -283,15 +339,15 @@ ErrCode NotificationPreferences::GetNotificationSlotGroup(
 }
 
 ErrCode NotificationPreferences::GetNotificationAllSlotGroups(
-    const std::string &bundleName, std::vector<sptr<NotificationSlotGroup>> &groups)
+    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlotGroup>> &groups)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo_.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.GetAllGroups(groups);
     } else {
         ANS_LOGE("Notification bundle does not exsit.");
@@ -300,16 +356,16 @@ ErrCode NotificationPreferences::GetNotificationAllSlotGroups(
     return result;
 }
 
-ErrCode NotificationPreferences::GetNotificationAllSlotInSlotGroup(
-    const std::string &bundleName, const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots)
+ErrCode NotificationPreferences::GetNotificationAllSlotInSlotGroup(const sptr<NotificationBundleOption> &bundleOption,
+    const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots)
 {
-    if (bundleName.empty() || groupId.empty()) {
+    if (bundleOption->GetBundleName().empty() || groupId.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo_.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.GetAllSlotsInGroup(groupId, slots);
     } else {
         ANS_LOGE("Notification bundle does not exsit.");
@@ -318,113 +374,119 @@ ErrCode NotificationPreferences::GetNotificationAllSlotInSlotGroup(
     return result;
 }
 
-ErrCode NotificationPreferences::IsShowBadge(const std::string &bundleName, bool &enable)
+ErrCode NotificationPreferences::IsShowBadge(const sptr<NotificationBundleOption> &bundleOption, bool &enable)
 {
-    ErrCode result = ERR_ANS_INVALID_PARAM;
-    if (bundleName.empty()) {
-        return result;
+    if (bundleOption->GetBundleName().empty()) {
+        return ERR_ANS_INVALID_PARAM;
     }
-    result = GetBundleProperty(bundleName, BundleType::kBundleShowBadgeType, enable);
-    return result;
+    return GetBundleProperty(bundleOption, BundleType::BUNDLE_SHOW_BADGE_TYPE, enable);
 }
 
-ErrCode NotificationPreferences::SetShowBadge(const std::string &bundleName, const bool enable)
+ErrCode NotificationPreferences::SetShowBadge(const sptr<NotificationBundleOption> &bundleOption, const bool enable)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(preferencesInfo, bundleName, BundleType::kBundleShowBadgeType, enable);
+    ErrCode result =
+        SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_SHOW_BADGE_TYPE, enable);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
     return result;
 }
 
-ErrCode NotificationPreferences::GetImportance(const std::string &bundleName, int &importance)
+ErrCode NotificationPreferences::GetImportance(const sptr<NotificationBundleOption> &bundleOption, int &importance)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
-    ErrCode result = GetBundleProperty(bundleName, BundleType::kBundleImportanceType, importance);
-    return result;
+    return GetBundleProperty(bundleOption, BundleType::BUNDLE_IMPORTANCE_TYPE, importance);
 }
 
-ErrCode NotificationPreferences::SetImportance(const std::string &bundleName, const int &importance)
+ErrCode NotificationPreferences::SetImportance(
+    const sptr<NotificationBundleOption> &bundleOption, const int &importance)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(preferencesInfo, bundleName, BundleType::kBundleImportanceType, importance);
+    ErrCode result = SetBundleProperty(
+        preferencesInfo, bundleOption, BundleType::BUNDLE_IMPORTANCE_TYPE, importance);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
     return result;
 }
 
-ErrCode NotificationPreferences::GetTotalBadgeNums(const std::string &bundleName, int &totalBadgeNum)
+ErrCode NotificationPreferences::GetTotalBadgeNums(
+    const sptr<NotificationBundleOption> &bundleOption, int &totalBadgeNum)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
-    ErrCode result = GetBundleProperty(bundleName, BundleType::kBundleBadgeTotalNumType, totalBadgeNum);
-    return result;
+    return GetBundleProperty(bundleOption, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, totalBadgeNum);
 }
 
-ErrCode NotificationPreferences::SetTotalBadgeNums(const std::string &bundleName, const int num)
+ErrCode NotificationPreferences::SetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, const int num)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(preferencesInfo, bundleName, BundleType::kBundleBadgeTotalNumType, num);
+    ErrCode result =
+        SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, num);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
     return result;
 }
 
-ErrCode NotificationPreferences::GetPrivateNotificationsAllowed(const std::string &bundleName, bool &allow)
+ErrCode NotificationPreferences::GetPrivateNotificationsAllowed(
+    const sptr<NotificationBundleOption> &bundleOption, bool &allow)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
-    ErrCode result = GetBundleProperty(bundleName, BundleType::kBundlePrivateAllowedType, allow);
-    return result;
+    return GetBundleProperty(bundleOption, BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE, allow);
 }
 
-ErrCode NotificationPreferences::SetPrivateNotificationsAllowed(const std::string &bundleName, const bool allow)
+ErrCode NotificationPreferences::SetPrivateNotificationsAllowed(
+    const sptr<NotificationBundleOption> &bundleOption, const bool allow)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(preferencesInfo, bundleName, BundleType::kBundlePrivateAllowedType, allow);
+    ErrCode result = SetBundleProperty(
+        preferencesInfo, bundleOption, BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE, allow);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
     return result;
 }
 
-ErrCode NotificationPreferences::GetNotificationsEnabledForBundle(const std::string &bundleName, bool &enabled)
+ErrCode NotificationPreferences::GetNotificationsEnabledForBundle(
+    const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
 {
-    if (bundleName.empty()) {
+    if (bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
-    ErrCode result = GetBundleProperty(bundleName, BundleType::kBundleEnableNotificationType, enabled);
-    return result;
+    return GetBundleProperty(bundleOption, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
 }
 
-ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(const std::string &bundleName, const bool enabled)
+ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(
+    const sptr<NotificationBundleOption> &bundleOption, const bool enabled)
 {
-    if (bundleName.empty()) {
-        return ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
+    if (bundleOption->GetBundleName().empty()) {
+        return ERR_ANS_INVALID_PARAM;
     }
+
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(preferencesInfo, bundleName, BundleType::kBundleEnableNotificationType, enabled);
+    ErrCode result = SetBundleProperty(
+        preferencesInfo, bundleOption, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
 
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
@@ -446,6 +508,10 @@ ErrCode NotificationPreferences::SetNotificationsEnabled(const bool &enabled)
     if (!preferncesDB_->PutNotificationsEnabled(enabled)) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
+
+    if (result == ERR_OK) {
+        preferencesInfo_ = preferencesInfo;
+    }
     return result;
 }
 
@@ -463,6 +529,10 @@ ErrCode NotificationPreferences::SetDisturbMode(const NotificationConstant::Dist
     if (!preferncesDB_->PutDisturbMode(mode)) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
+
+    if (result == ERR_OK) {
+        preferencesInfo_ = preferencesInfo;
+    }
     return result;
 }
 
@@ -471,13 +541,17 @@ ErrCode NotificationPreferences::ClearNotificationInRestoreFactorySettings()
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     preferencesInfo.ClearBundleInfo();
     ErrCode result = ERR_OK;
-    if (!preferncesDB_->RemoveAllBundleFromDisturbeDB()) {
+    if (!preferncesDB_->RemoveAllDataFromDisturbeDB()) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
+    }
+
+    if (result == ERR_OK) {
+        preferencesInfo_ = preferencesInfo;
     }
     return result;
 }
 
-ErrCode NotificationPreferences::CheckSlotForCreateSlot(const std::string &bundleName,
+ErrCode NotificationPreferences::CheckSlotForCreateSlot(const sptr<NotificationBundleOption> &bundleOption,
     const sptr<NotificationSlot> &slot, NotificationPreferencesInfo &preferencesInfo) const
 {
     if (slot == nullptr) {
@@ -485,18 +559,18 @@ ErrCode NotificationPreferences::CheckSlotForCreateSlot(const std::string &bundl
         return ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_NOT_EXIST;
     }
 
-    ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (!preferencesInfo.GetBundleInfo(bundleName, bundleInfo)) {
-        bundleInfo.SetBundleName(bundleName);
+    if (!preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
+        bundleInfo.SetBundleName(bundleOption->GetBundleName());
+        bundleInfo.SetBundleUid(bundleOption->GetUid());
     }
     bundleInfo.SetSlot(slot);
     preferencesInfo.SetBundleInfo(bundleInfo);
 
-    return result;
+    return ERR_OK;
 }
 
-ErrCode NotificationPreferences::CheckGroupForCreateSlotGroup(const std::string &bundleName,
+ErrCode NotificationPreferences::CheckGroupForCreateSlotGroup(const sptr<NotificationBundleOption> &bundleOption,
     const sptr<NotificationSlotGroup> &group, NotificationPreferencesInfo &preferencesInfo) const
 {
     if (group == nullptr) {
@@ -509,29 +583,28 @@ ErrCode NotificationPreferences::CheckGroupForCreateSlotGroup(const std::string 
         return ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_ID_INVALID;
     }
 
-    ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (!preferencesInfo.GetBundleInfo(bundleName, bundleInfo)) {
-        bundleInfo.SetBundleName(bundleName);
+    if (!preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
+        bundleInfo.SetBundleName(bundleOption->GetBundleName());
+        bundleInfo.SetBundleUid(bundleOption->GetUid());
     } else {
         if (bundleInfo.GetGroupSize() >= MAX_SLOT_GROUP_NUM) {
-            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_EXCEED_MAX_NUM;
-            return result;
+            return ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_EXCEED_MAX_NUM;
         }
     }
 
     bundleInfo.SetGroup(group);
     preferencesInfo.SetBundleInfo(bundleInfo);
 
-    return result;
+    return ERR_OK;
 }
 
-ErrCode NotificationPreferences::CheckSlotForRemoveSlot(const std::string &bundleName,
+ErrCode NotificationPreferences::CheckSlotForRemoveSlot(const sptr<NotificationBundleOption> &bundleOption,
     const NotificationConstant::SlotType &slotType, NotificationPreferencesInfo &preferencesInfo) const
 {
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
         if (bundleInfo.IsExsitSlot(slotType)) {
             bundleInfo.RemoveSlot(slotType);
             preferencesInfo.SetBundleInfo(bundleInfo);
@@ -546,12 +619,12 @@ ErrCode NotificationPreferences::CheckSlotForRemoveSlot(const std::string &bundl
     return result;
 }
 
-ErrCode NotificationPreferences::CheckGroupForRemoveSlotGroup(
-    const std::string &bundleName, const std::string &groupId, NotificationPreferencesInfo &preferencesInfo) const
+ErrCode NotificationPreferences::CheckGroupForRemoveSlotGroup(const sptr<NotificationBundleOption> &bundleOption,
+    const std::string &groupId, NotificationPreferencesInfo &preferencesInfo) const
 {
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
         if (bundleInfo.IsExsitSlotGroup(groupId)) {
             bundleInfo.RemoveSlotGroup(groupId);
             preferencesInfo.SetBundleInfo(bundleInfo);
@@ -566,7 +639,7 @@ ErrCode NotificationPreferences::CheckGroupForRemoveSlotGroup(
     return result;
 }
 
-ErrCode NotificationPreferences::CheckSlotForUpdateSlot(const std::string &bundleName,
+ErrCode NotificationPreferences::CheckSlotForUpdateSlot(const sptr<NotificationBundleOption> &bundleOption,
     const sptr<NotificationSlot> &slot, NotificationPreferencesInfo &preferencesInfo) const
 {
     if (slot == nullptr) {
@@ -576,30 +649,33 @@ ErrCode NotificationPreferences::CheckSlotForUpdateSlot(const std::string &bundl
 
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
         if (bundleInfo.IsExsitSlot(slot->GetType())) {
-            bundleInfo.SetBundleName(bundleName);
+            bundleInfo.SetBundleName(bundleOption->GetBundleName());
+            bundleInfo.SetBundleUid(bundleOption->GetUid());
             bundleInfo.SetSlot(slot);
             preferencesInfo.SetBundleInfo(bundleInfo);
         } else {
+            ANS_LOGE("Notification slot type does not exist.");
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
         }
     } else {
-        ANS_LOGE("Notification slot is nullptr.");
-        return ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
+        ANS_LOGE("Notification bundle does not exsit.");
+        result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
 
     return result;
 }
 
-ErrCode NotificationPreferences::CheckGroupForUpdateSlotGroup(const std::string &bundleName,
+ErrCode NotificationPreferences::CheckGroupForUpdateSlotGroup(const sptr<NotificationBundleOption> &bundleOption,
     const sptr<NotificationSlotGroup> &group, NotificationPreferencesInfo &preferencesInfo) const
 {
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
         if (bundleInfo.IsExsitSlotGroup(group->GetId())) {
-            bundleInfo.SetBundleName(bundleName);
+            bundleInfo.SetBundleName(bundleOption->GetBundleName());
+            bundleInfo.SetBundleUid(bundleOption->GetUid());
             bundleInfo.SetGroup(group);
             preferencesInfo.SetBundleInfo(bundleInfo);
         } else {
@@ -607,22 +683,23 @@ ErrCode NotificationPreferences::CheckGroupForUpdateSlotGroup(const std::string 
         }
     } else {
         ANS_LOGE("Notification slot is nullptr.");
-        return ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
+        result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;
 }
 
 template <typename T>
-ErrCode NotificationPreferences::SetBundleProperty(
-    NotificationPreferencesInfo &preferencesInfo, const std::string &bundleName, const BundleType &type, const T &value)
+ErrCode NotificationPreferences::SetBundleProperty(NotificationPreferencesInfo &preferencesInfo,
+    const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, const T &value)
 {
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (!preferencesInfo_.GetBundleInfo(bundleName, bundleInfo)) {
-        bundleInfo.SetBundleName(bundleName);
+    if (!preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
+        bundleInfo.SetBundleName(bundleOption->GetBundleName());
+        bundleInfo.SetBundleUid(bundleOption->GetUid());
     }
 
-    result = SaveBundleProperty(bundleInfo, bundleName, type, value);
+    result = SaveBundleProperty(bundleInfo, bundleOption, type, value);
     preferencesInfo.SetBundleInfo(bundleInfo);
 
     return result;
@@ -630,61 +707,57 @@ ErrCode NotificationPreferences::SetBundleProperty(
 
 template <typename T>
 ErrCode NotificationPreferences::SaveBundleProperty(NotificationPreferencesInfo::BundleInfo &bundleInfo,
-    const std::string &bundleName, const BundleType &type, const T &value)
+    const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, const T &value)
 {
     bool storeDBResult = true;
     switch (type) {
-        case BundleType::kBundleImportanceType:
+        case BundleType::BUNDLE_IMPORTANCE_TYPE:
             bundleInfo.SetImportance(value);
-            storeDBResult = preferncesDB_->PutImportance(bundleName, value);
+            storeDBResult = preferncesDB_->PutImportance(bundleOption->GetBundleName(), value);
             break;
-        case BundleType::kBundleBadgeTotalNumType:
+        case BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE:
             bundleInfo.SetBadgeTotalNum(value);
-            storeDBResult = preferncesDB_->PutTotalBadgeNums(bundleName, value);
+            storeDBResult = preferncesDB_->PutTotalBadgeNums(bundleOption->GetBundleName(), value);
             break;
-        case BundleType::kBundleShowBadgeType:
+        case BundleType::BUNDLE_SHOW_BADGE_TYPE:
             bundleInfo.SetIsShowBadge(value);
-            storeDBResult = preferncesDB_->PutShowBadge(bundleName, value);
+            storeDBResult = preferncesDB_->PutShowBadge(bundleOption->GetBundleName(), value);
             break;
-        case BundleType::kBundlePrivateAllowedType:
+        case BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE:
             bundleInfo.SetIsPrivateAllowed(value);
-            storeDBResult = preferncesDB_->PutPrivateNotificationsAllowed(bundleName, value);
+            storeDBResult = preferncesDB_->PutPrivateNotificationsAllowed(bundleOption->GetBundleName(), value);
             break;
-        case BundleType::kBundleEnableNotificationType:
+        case BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE:
             bundleInfo.SetEnableNotification(value);
-            storeDBResult = preferncesDB_->PutNotificationsEnabledForBundle(bundleName, value);
+            storeDBResult = preferncesDB_->PutNotificationsEnabledForBundle(bundleOption->GetBundleName(), value);
             break;
         default:
             break;
     }
-    ErrCode result = ERR_OK;
-    if (!storeDBResult) {
-        result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
-    }
-    return result;
+    return storeDBResult ? ERR_OK : ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
 }
 
 template <typename T>
 ErrCode NotificationPreferences::GetBundleProperty(
-    const std::string &bundleName, const BundleType &type, T &value) const
+    const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, T &value) const
 {
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
-    if (preferencesInfo_.GetBundleInfo(bundleName, bundleInfo)) {
+    if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         switch (type) {
-            case BundleType::kBundleImportanceType:
+            case BundleType::BUNDLE_IMPORTANCE_TYPE:
                 value = bundleInfo.GetImportance();
                 break;
-            case BundleType::kBundleBadgeTotalNumType:
+            case BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE:
                 value = bundleInfo.GetBadgeTotalNum();
                 break;
-            case BundleType::kBundleShowBadgeType:
+            case BundleType::BUNDLE_SHOW_BADGE_TYPE:
                 value = bundleInfo.GetIsShowBadge();
                 break;
-            case BundleType::kBundlePrivateAllowedType:
+            case BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE:
                 value = bundleInfo.GetIsPrivateAllowed();
                 break;
-            case BundleType::kBundleEnableNotificationType:
+            case BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE:
                 value = bundleInfo.GetEnableNotification();
                 break;
             default:
@@ -698,10 +771,16 @@ ErrCode NotificationPreferences::GetBundleProperty(
     return result;
 }
 
+std::string NotificationPreferences::GenerateBundleKey(const sptr<NotificationBundleOption> &bundleOption) const
+{
+    return bundleOption->GetBundleName().append(std::to_string(bundleOption->GetUid()));
+}
+
 void NotificationPreferences::OnDistributedKvStoreDeathRecipient()
 {
     if (preferncesDB_ != nullptr) {
-        preferncesDB_->StoreDeathRecipient(preferencesInfo_);
+        if (preferncesDB_->StoreDeathRecipient()) {
+        }
     }
 }
 

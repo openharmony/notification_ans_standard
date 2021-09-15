@@ -25,6 +25,7 @@ namespace NotificationNapi {
 using namespace OHOS::Notification;
 
 const std::int32_t STR_MAX_SIZE = 64;
+const std::int32_t LONG_STR_MAX_SIZE = 1024;
 const int NO_ERROR = 0;
 const int ERROR = -1;
 
@@ -43,6 +44,14 @@ enum SlotType {
     SERVICE_INFORMATION = 2,
     CONTENT_INFORMATION = 3,
     OTHER_TYPES = 0xFFFF,
+};
+
+enum SlotLevel {
+    LEVEL_NONE = 0,
+    LEVEL_MIN = 1,
+    LEVEL_LOW = 2,
+    LEVEL_DEFAULT = 3,
+    LEVEL_HIGH = 4,
 };
 
 enum NotificationReason {
@@ -78,22 +87,31 @@ enum DisturbMode { ALLOW_UNKNOWN, ALLOW_ALL, ALLOW_PRIORITY, ALLOW_NONE, ALLOW_A
 
 enum InputEditType { EDIT_AUTO, EDIT_DISABLED, EDIT_ENABLED };
 
-struct NotificationSubscriberInfo {
+struct NotificationSubscribeInfo {
     std::vector<std::string> bundleNames;
     // std::vector<std::string> deviceIds;
     int userId = 0;
-    bool hasSubscriberInfo = false;
+    bool hasSubscribeInfo = false;
+};
+
+struct BundleOption {
+    std::string bundle{};
+    int uid{};
+};
+
+struct NotificationKey {
+    int id{};
+    std::string label{};
 };
 
 struct CallbackPromiseInfo {
     napi_ref callback = nullptr;
-    napi_deferred deferred;
+    napi_deferred deferred = nullptr;
     bool isCallback = false;
     int errorCode = 0;
 };
 
 class Common {
-
     Common();
 
     ~Common();
@@ -104,6 +122,9 @@ public:
     static napi_value NapiGetNull(napi_env env);
 
     static napi_value GetCallbackErrorValue(napi_env env, int errCode);
+
+    static void PaddingCallbackPromiseInfo(
+        const napi_env &env, const napi_ref &callback, CallbackPromiseInfo &info, napi_value &promise);
 
     static void ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInfo &info, const napi_value &result);
 
@@ -155,7 +176,7 @@ public:
         const napi_env &env, const std::shared_ptr<NotificationActionButton> &actionButton, napi_value &result);
 
     static napi_value GetNotificationSubscriberInfo(
-        const napi_env &env, const napi_value &value, NotificationSubscriberInfo &result);
+        const napi_env &env, const napi_value &value, NotificationSubscribeInfo &result);
 
     static napi_value GetNotificationRequest(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
@@ -166,7 +187,11 @@ public:
     static napi_value GetNotificationWantAgent(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
 
-    static napi_value GetNotificationSlot(const napi_env &env, NotificationSlot &slot, const napi_value &result);
+    static napi_value GetNotificationSlot(const napi_env &env, const napi_value &value, NotificationSlot &slot);
+
+    static napi_value GetBundleOption(const napi_env &env, const napi_value &value, BundleOption &option);
+
+    static napi_value GetNotificationKey(const napi_env &env, const napi_value &value, NotificationKey &key);
 
     static bool ContentTypeJSToC(const enum ContentType &inType, enum NotificationContent::Type &outType);
 
@@ -175,6 +200,10 @@ public:
     static bool SlotTypeJSToC(const enum SlotType &inType, enum NotificationConstant::SlotType &outType);
 
     static bool SlotTypeCToJS(const enum NotificationConstant::SlotType &inType, enum SlotType &outType);
+
+    static bool SlotLevelJSToC(const SlotLevel &inLevel, NotificationSlot::NotificationLevel &outLevel);
+
+    static bool SlotLevelCToJS(const NotificationSlot::NotificationLevel &inLevel, SlotLevel &outLevel);
 
     static bool ReasonCToJS(const int &inType, int &outType);
 
@@ -186,6 +215,7 @@ private:
     static const int ARGS_TWO = 2;
     static const int PARAM0 = 0;
     static const int PARAM1 = 1;
+    static std::set<std::shared_ptr<WantAgent::WantAgent>> wantAgent_;
 };
 
 }  // namespace NotificationNapi
