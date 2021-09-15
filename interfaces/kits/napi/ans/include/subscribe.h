@@ -15,12 +15,81 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_SUBSCRIBE_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_SUBSCRIBE_H
 
-#include "create_subscriber.h"
 #include "common.h"
 
 namespace OHOS {
 namespace NotificationNapi {
 using namespace OHOS::Notification;
+
+class SubscriberInstance : public NotificationSubscriber {
+public:
+    SubscriberInstance();
+
+    virtual ~SubscriberInstance();
+
+    virtual void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request) override;
+
+    virtual void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request,
+        const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override;
+
+    virtual void OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request) override;
+
+    virtual void OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request,
+        const std::shared_ptr<NotificationSortingMap> &sortingMap) override;
+
+    virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override;
+
+    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override;
+
+    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override;
+
+    virtual void OnDied() override;
+
+    virtual void OnDisturbModeChanged(int disturbMode) override;
+
+    void SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref);
+
+private:
+    void SetCancelCallbackInfo(const napi_env &env, const napi_ref &ref);
+
+    void SetConsumeCallbackInfo(const napi_env &env, const napi_ref &ref);
+
+    void SetUpdateCallbackInfo(const napi_env &env, const napi_ref &ref);
+
+    void SetSubscribeCallbackInfo(const napi_env &env, const napi_ref &ref);
+
+    void SetUnsubscribeCallbackInfo(const napi_env &env, const napi_ref &ref);
+
+    void SetDieCallbackInfo(const napi_env &env, const napi_ref &ref);
+
+    void SetDisturbModeCallbackInfo(const napi_env &env, const napi_ref &ref);
+
+private:
+    struct CallbackInfo {
+        napi_env env = nullptr;
+        napi_ref ref = nullptr;
+    };
+
+    CallbackInfo canceCallbackInfo_;
+    CallbackInfo consumeCallbackInfo_;
+    CallbackInfo updateCallbackInfo_;
+    CallbackInfo subscribeCallbackInfo_;
+    CallbackInfo unsubscribeCallbackInfo_;
+    CallbackInfo dieCallbackInfo_;
+    CallbackInfo disturbModeCallbackInfo_;
+};
+
+struct SubscriberInstancesInfo {
+    napi_ref ref = nullptr;
+    SubscriberInstance *subscriber = nullptr;
+};
+
+static std::mutex mutex_;
+static std::vector<SubscriberInstancesInfo> subscriberInstances_;
+
+bool HasNotificationSubscriber(const napi_env &env, const napi_value &value, SubscriberInstancesInfo &subscriberInfo);
+bool AddSubscriberInstancesInfo(const napi_env &env, const SubscriberInstancesInfo &subscriberInfo);
+bool DelSubscriberInstancesInfo(const napi_env &env, SubscriberInstance *subscriber);
 
 napi_value Subscribe(napi_env env, napi_callback_info info);
 

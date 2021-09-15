@@ -23,9 +23,13 @@ using namespace OHOS::Notification;
 
 napi_value AddSlot(napi_env env, napi_callback_info info);
 napi_value AddSlots(napi_env env, napi_callback_info info);
+napi_value SetSlotAsBundle(napi_env env, napi_callback_info info);
 napi_value GetSlot(napi_env env, napi_callback_info info);
+napi_value GetSlotNumAsBundle(napi_env env, napi_callback_info info);
 napi_value GetSlots(napi_env env, napi_callback_info info);
+napi_value GetSlotsAsBundle(napi_env env, napi_callback_info info);
 napi_value RemoveSlot(napi_env env, napi_callback_info info);
+napi_value RemoveAllSlots(napi_env env, napi_callback_info info);
 
 }  // namespace NotificationNapi
 }  // namespace OHOS

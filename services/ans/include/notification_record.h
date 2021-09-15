@@ -19,6 +19,7 @@
 #include "refbase.h"
 
 #include "notification.h"
+#include "notification_bundle_option.h"
 #include "notification_request.h"
 #include "notification_slot.h"
 
@@ -26,6 +27,7 @@ namespace OHOS {
 namespace Notification {
 
 struct NotificationRecord {
+    sptr<NotificationBundleOption> bundleOption;
     sptr<NotificationRequest> request;
     sptr<Notification> notification;
     sptr<NotificationSlot> slot;

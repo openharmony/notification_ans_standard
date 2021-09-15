@@ -24,9 +24,10 @@ namespace OHOS {
 namespace NotificationNapi {
 napi_value NotificationReasonInit(napi_env env, napi_value exports);
 napi_value SlotTypeInit(napi_env env, napi_value exports);
+napi_value SlotLevelInit(napi_env env, napi_value exports);
 napi_value SemanticActionButtonInit(napi_env env, napi_value exports);
 napi_value InputsSourceInit(napi_env env, napi_value exports);
-napi_value DisturbModeInit(napi_env env, napi_value exports);
+napi_value DoNotDisturbMode(napi_env env, napi_value exports);
 napi_value InputEditTypeInit(napi_env env, napi_value exports);
 napi_value ContentTypeInit(napi_env env, napi_value exports);
 napi_value ConstantInit(napi_env env, napi_value exports);

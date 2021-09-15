@@ -15,6 +15,7 @@
 
 #include "bundle_manager_helper.h"
 
+#include "ans_ut_constant.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -31,14 +32,19 @@ BundleManagerHelper::~BundleManagerHelper()
 void BundleManagerHelper::OnRemoteDied(const wptr<IRemoteObject> &object)
 {}
 
-std::string BundleManagerHelper::GetBundleNameByUid(uid_t uid)
+std::string BundleManagerHelper::GetBundleNameByUid(int uid)
 {
-    return 1000 < uid && uid < 1500 ? "" : "bundleName";
+    return (uid == NON_BUNDLE_NAME_UID) ? "" : "bundleName";
 }
 
-bool BundleManagerHelper::IsSystemApp(uid_t uid)
+int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle)
 {
-    return 500 < uid && uid < 1000 ? false : true;
+    return NON_SYSTEM_APP_UID;
+}
+
+bool BundleManagerHelper::IsSystemApp(int uid)
+{
+    return (uid == SYSTEM_APP_UID);
 }
 
 void BundleManagerHelper::Connect()

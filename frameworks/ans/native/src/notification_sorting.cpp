@@ -58,8 +58,8 @@ std::string NotificationSorting::Dump() const
     return "NotificationSorting[key =" + key_ + ", ranking =" + std::to_string(ranking_) +
            ", importance =" + std::to_string(importance_) +
            ", visiblenessOverride =" + std::to_string(visiblenessOverride_) +
-           ", isDisplayBadge =" + std::to_string(isDisplayBadge_) +
-           ", isHiddenNotification =" + std::to_string(isHiddenNotification_) +
+           ", isDisplayBadge =" + (isDisplayBadge_ ? "true" : "false") +
+           ", isHiddenNotification =" + (isHiddenNotification_ ? "true" : "false") +
            ", groupKeyOverride =" + groupKeyOverride_ + ", slot_ =" + contents + "]";
 }
 

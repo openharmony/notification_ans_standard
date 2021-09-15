@@ -21,6 +21,14 @@
 namespace OHOS {
 namespace Notification {
 
+NotificationSubscriber::NotificationSubscriber()
+{
+    impl_ = new SubscriberImpl(*this);
+};
+
+NotificationSubscriber::~NotificationSubscriber()
+{}
+
 const sptr<NotificationSubscriber::SubscriberImpl> NotificationSubscriber::GetImpl() const
 {
     return impl_;

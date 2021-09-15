@@ -32,16 +32,30 @@ ErrCode NotificationSlotFilter::OnPublish(const std::shared_ptr<NotificationReco
 {
     if (record->slot != nullptr) {
         if (record->slot->CanEnableLight()) {
+            record->notification->SetEnableLight(true);
             record->notification->SetLedLightColor(record->slot->GetLedLightColor());
+        } else {
+            record->notification->SetEnableLight(false);
         }
 
         if (record->slot->CanVibrate()) {
+            record->notification->SetEnableViration(true);
             record->notification->SetVibrationStyle(record->slot->GetVibrationStyle());
+        } else {
+            record->notification->SetEnableViration(false);
         }
 
-        record->notification->SetSound(record->slot->GetSound());
+        auto sound = record->slot->GetSound();
+        if (!sound.ToString().empty()) {
+            record->notification->SetEnableSound(true);
+            record->notification->SetSound(record->slot->GetSound());
+        } else {
+            record->notification->SetEnableSound(false);
+        }
 
-        record->request->SetVisibleness(record->slot->GetLockScreenVisibleness());
+        if (record->request->GetVisibleness() == NotificationConstant::VisiblenessType::NO_OVERRIDE) {
+            record->request->SetVisibleness(record->slot->GetLockScreenVisibleness());
+        }
     } else {
         ANS_LOGE("Non valid slot!");
         return ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_NOT_EXIST;

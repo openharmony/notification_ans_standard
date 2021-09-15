@@ -31,8 +31,8 @@ void PermissionFilter::OnStop()
 ErrCode PermissionFilter::OnPublish(const std::shared_ptr<NotificationRecord> &record)
 {
     bool enable = false;
-    ErrCode result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(
-        record->notification->GetBundleName(), enable);
+    ErrCode result =
+        NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(record->bundleOption, enable);
     if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
         result = ERR_OK;
         enable = true;

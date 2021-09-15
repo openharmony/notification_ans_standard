@@ -19,33 +19,22 @@
 #include "advanced_notification_service_ability.h"
 
 using namespace testing::ext;
+
 namespace OHOS {
 namespace Notification {
 
 class AdvancedNotificationServiceAbilityTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase(){};
+    static void TearDownTestCase(){};
+    void SetUp(){};
+    void TearDown(){};
 };
-
-void AdvancedNotificationServiceAbilityTest::SetUpTestCase()
-{}
-
-void AdvancedNotificationServiceAbilityTest::TearDownTestCase()
-{}
-
-void AdvancedNotificationServiceAbilityTest::SetUp()
-{}
-
-void AdvancedNotificationServiceAbilityTest::TearDown()
-{}
 
 /**
  * @tc.number    : AdvancedNotificationServiceAbilityTest_00100
  * @tc.name      : AMS_ANS_AdvancedNotificationServiceAbility_0100
- * @tc.desc      : structure AdvancedNotificationServiceAbility with systemAbilityId and runOnCreate
+ * @tc.desc      : Structure AdvancedNotificationServiceAbility with systemAbilityId and runOnCreate
  */
 HWTEST_F(
     AdvancedNotificationServiceAbilityTest, AdvancedNotificationServiceAbilityTest_00100, Function | SmallTest | Level1)
@@ -54,5 +43,6 @@ HWTEST_F(
     bool runOnCreate = true;
     AdvancedNotificationServiceAbility(systemAbilityId, runOnCreate);
 }
+
 }  // namespace Notification
 }  // namespace OHOS

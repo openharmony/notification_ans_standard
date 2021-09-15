@@ -151,12 +151,12 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::string key_;
-    std::string name_;
-    std::shared_ptr<PixelMap> pixelMap_;
+    std::string key_{};
+    std::string name_{};
+    std::shared_ptr<PixelMap> pixelMap_{nullptr};
     Uri uri_;
-    bool isMachine_;
-    bool isUserImportant_;
+    bool isMachine_{false};
+    bool isUserImportant_{false};
 
     // no object in parcel
     static constexpr int VALUE_NULL = -1;

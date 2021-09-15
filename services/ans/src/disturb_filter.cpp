@@ -61,6 +61,9 @@ ErrCode DisturbFilter::OnPublish(const std::shared_ptr<NotificationRecord> &reco
             break;
         case NotificationConstant::DisturbMode::ALLOW_PRIORITY:
             break;
+        case NotificationConstant::DisturbMode::ALLOW_UNKNOWN:
+            // DO NOTHING
+            break;
         default:
             break;
     }

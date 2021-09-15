@@ -24,10 +24,6 @@ namespace OHOS {
 namespace Notification {
 class NotificationSlotGroup : public Parcelable {
 public:
-    /**
-     * Default constructor used to create a NotificationSlotGroup instance.
-     */
-    NotificationSlotGroup();
 
     /**
      * A constructor used to create a NotificationSlotGroup instance with the group ID and name initialized.
@@ -68,6 +64,14 @@ public:
 
     /**
      * Obtains a list of notification slots bound to this NotificationSlotGroup object.
+     * @note NotificationSlot::SetSlotGroup(string) is used to bind a notification slot to a notification slot group.
+     * @param slots Indicates the slots which to set to the slotgroup.
+     *
+     */
+    void SetSlots(const std::vector<NotificationSlot> &slots);
+
+    /**
+     * Sets a list of notification slots bound to this NotificationSlotGroup object.
      * @note NotificationSlot::SetSlotGroup(string) is used to bind a notification slot to a notification slot group.
      *
      * @return Returns the list of notification slots bound to this NotificationSlotGroup.
@@ -121,6 +125,12 @@ public:
     std::string TruncateString(const std::string &inPutString);
 
 private:
+
+    /**
+     * Default constructor used to create a NotificationSlotGroup instance.
+     */
+    NotificationSlotGroup();
+
     /**
      * Read NotificationSlotGroup object from a Parcel.
      *
@@ -130,11 +140,11 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::string id_;
-    std::string name_;
-    std::string description_;
-    std::vector<NotificationSlot> slots_;
-    bool isDisabled_;
+    std::string id_{};
+    std::string name_{};
+    std::string description_{};
+    std::vector<NotificationSlot> slots_{};
+    bool isDisabled_{false};
 };
 }  // namespace Notification
 }  // namespace OHOS

@@ -18,11 +18,13 @@
 #include "napi_common.h"
 #include "notification_long_text_content.h"
 #include "notification_multiline_content.h"
+#include "notification_slot.h"
 #include "publish.h"
 #include "want_agent.h"
 
 namespace OHOS {
 namespace NotificationNapi {
+std::set<std::shared_ptr<WantAgent::WantAgent>> Common::wantAgent_;
 static napi_value GetIdByPublish(const napi_env &env, const napi_value &value, NotificationRequest &request);
 static napi_value GetSlotType(const napi_env &env, const napi_value &value, NotificationRequest &request);
 static napi_value GetNotificationIsOngoing(const napi_env &env, const napi_value &value, NotificationRequest &request);
@@ -59,14 +61,14 @@ static napi_value GetNotificationIsCountDown(
     const napi_env &env, const napi_value &value, NotificationRequest &request);
 // static napi_value GetNotificationVisibleness(
 //     const napi_env &env, const napi_value &value, NotificationRequest &request);
-static napi_value GetNotificationProgressBar(
-    const napi_env &env, const napi_value &value, NotificationRequest &request);
+// static napi_value GetNotificationProgressBar(
+//     const napi_env &env, const napi_value &value, NotificationRequest &request);
 static napi_value GetNotificationStatusBarText(
     const napi_env &env, const napi_value &value, NotificationRequest &request);
 // static napi_value GetNotificationOnlyLocal(
 //     const napi_env &env, const napi_value &value, NotificationRequest &request);
-static napi_value GetNotificationSortingKey(
-    const napi_env &env, const napi_value &value, NotificationRequest &request);
+// static napi_value GetNotificationSortingKey(const napi_env &env, const napi_value &value, NotificationRequest
+// &request);
 static napi_value GetNotificationLabel(const napi_env &env, const napi_value &value, NotificationRequest &request);
 static napi_value GetNotificationBadgeIconStyle(
     const napi_env &env, const napi_value &value, NotificationRequest &request);
@@ -99,14 +101,14 @@ Common::~Common()
 
 napi_value Common::NapiGetboolean(napi_env env, const bool &isValue)
 {
-    napi_value result = 0;
+    napi_value result = nullptr;
     napi_get_boolean(env, isValue, &result);
     return result;
 }
 
 napi_value Common::NapiGetNull(napi_env env)
 {
-    napi_value result = 0;
+    napi_value result = nullptr;
     napi_get_null(env, &result);
     return result;
 }
@@ -121,9 +123,25 @@ napi_value Common::GetCallbackErrorValue(napi_env env, int errCode)
     return result;
 }
 
+void Common::PaddingCallbackPromiseInfo(
+    const napi_env &env, const napi_ref &callback, CallbackPromiseInfo &info, napi_value &promise)
+{
+    ANS_LOGI("enter");
+
+    if (callback) {
+        info.callback = callback;
+        info.isCallback = true;
+    } else {
+        napi_deferred deferred = nullptr;
+        NAPI_CALL_RETURN_VOID(env, napi_create_promise(env, &deferred, &promise));
+        info.deferred = deferred;
+        info.isCallback = false;
+    }
+}
+
 void Common::ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInfo &info, const napi_value &result)
 {
-    ANS_LOGI("ReturnCallbackPromise start");
+    ANS_LOGI("enter");
 
     if (info.isCallback) {
         SetCallback(env, info.callback, info.errorCode, result);
@@ -137,13 +155,13 @@ void Common::SetCallback(
     const napi_env &env, const napi_ref &callbackIn, const int &errorCode, const napi_value &result)
 {
     ANS_LOGI("enter");
-    napi_value undefined;
+    napi_value undefined = nullptr;
     napi_get_undefined(env, &undefined);
 
-    napi_value callback;
-    napi_value resultout;
+    napi_value callback = nullptr;
+    napi_value resultout = nullptr;
     napi_get_reference_value(env, callbackIn, &callback);
-    napi_value results[ARGS_TWO] = {0};
+    napi_value results[ARGS_TWO] = {nullptr};
     results[PARAM0] = GetCallbackErrorValue(env, errorCode);
     results[PARAM1] = result;
     NAPI_CALL_RETURN_VOID(env, napi_call_function(env, undefined, callback, ARGS_TWO, &results[PARAM0], &resultout));
@@ -162,7 +180,7 @@ napi_value Common::JSParaError(const napi_env &env, const napi_ref &callback)
     if (callback) {
         return Common::NapiGetNull(env);
     } else {
-        napi_value promise = 0;
+        napi_value promise = nullptr;
         napi_deferred deferred = nullptr;
         napi_create_promise(env, &deferred, &promise);
         SetPromise(env, deferred, Common::NapiGetNull(env));
@@ -173,13 +191,13 @@ napi_value Common::JSParaError(const napi_env &env, const napi_ref &callback)
 napi_value Common::SetNotification(
     const napi_env &env, OHOS::Notification::Notification *notification, napi_value &result)
 {
-    ANS_LOGI("SetNotification start");
+    ANS_LOGI("enter");
 
     if (notification == nullptr) {
         ANS_LOGE("notification is nullptr");
         return NapiGetboolean(env, false);
     }
-    napi_value value;
+    napi_value value = nullptr;
     NotificationRequest request = notification->GetNotificationRequest();
     if (!SetNotificationRequest(env, &request, result)) {
         return NapiGetboolean(env, false);
@@ -217,7 +235,7 @@ napi_value Common::SetNotificationRequest(
 {
     ANS_LOGI("SetNotificationRequest start");
 
-    napi_value value;
+    napi_value value = nullptr;
 
     if (request == nullptr) {
         ANS_LOGE("request is nullptr");
@@ -227,7 +245,7 @@ napi_value Common::SetNotificationRequest(
     // content: NotificationContent
     std::shared_ptr<NotificationContent> content = request->GetContent();
     if (content) {
-        napi_value contentResult;
+        napi_value contentResult = nullptr;
         napi_create_object(env, &contentResult);
         if (!SetNotificationContent(env, content, contentResult)) {
             ANS_LOGE("SetNotificationContent call failed");
@@ -244,7 +262,7 @@ napi_value Common::SetNotificationRequest(
     napi_set_named_property(env, result, "id", value);
 
     // slotType?: SlotType
-    enum SlotType outType;
+    enum SlotType outType = SlotType::UNKNOWN_TYPE;
     if (!SlotTypeCToJS(request->GetSlotType(), outType)) {
         return NapiGetboolean(env, false);
     }
@@ -278,7 +296,7 @@ napi_value Common::SetNotificationRequest(
     // wantAgent?: WantAgent
     std::shared_ptr<WantAgent::WantAgent> agent = request->GetWantAgent();
     if (agent) {
-        napi_value wantAgent;
+        napi_value wantAgent = nullptr;
         wantAgent = CreateWantAgentByJS(env, agent);
         napi_set_named_property(env, result, "wantAgent", wantAgent);
     } else {
@@ -288,7 +306,7 @@ napi_value Common::SetNotificationRequest(
     // extraInfo ?: {[key:string] : any}
     std::shared_ptr<AAFwk::WantParams> additionalData = request->GetAdditionalData();
     if (additionalData) {
-        napi_value extraInfo;
+        napi_value extraInfo = nullptr;
         extraInfo = OHOS::AppExecFwk::WrapWantParams(env, *additionalData);
         napi_set_named_property(env, result, "extraInfo", extraInfo);
     }
@@ -317,7 +335,7 @@ napi_value Common::SetNotificationRequest(
     // removalWantAgent ?: WantAgent
     std::shared_ptr<WantAgent::WantAgent> removalAgent = request->GetRemovalWantAgent();
     if (removalAgent) {
-        napi_value wantAgent;
+        napi_value wantAgent = nullptr;
         wantAgent = CreateWantAgentByJS(env, removalAgent);
         napi_set_named_property(env, result, "removalWantAgent", wantAgent);
     } else {
@@ -327,7 +345,7 @@ napi_value Common::SetNotificationRequest(
     // maxScreenWantAgent ? WantAgent
     std::shared_ptr<WantAgent::WantAgent> maxScreenAgent = request->GetMaxScreenWantAgent();
     if (maxScreenAgent) {
-        napi_value wantAgent;
+        napi_value wantAgent = nullptr;
         wantAgent = CreateWantAgentByJS(env, maxScreenAgent);
         napi_set_named_property(env, result, "maxScreenWantAgent", wantAgent);
     } else {
@@ -339,7 +357,7 @@ napi_value Common::SetNotificationRequest(
     napi_set_named_property(env, result, "classification", value);
 
     // color ?: number
-    napi_create_int32(env, request->GetColor(), &value);
+    napi_create_uint32(env, request->GetColor(), &value);
     napi_set_named_property(env, result, "color", value);
 
     // colorEnabled ?: boolean
@@ -363,17 +381,17 @@ napi_value Common::SetNotificationRequest(
     // napi_create_int32(env, visibleness, &value);
     // napi_set_named_property(env, result, "visibleness", value);
 
-    // progressValue ?: number
-    napi_create_int32(env, request->GetProgressValue(), &value);
-    napi_set_named_property(env, result, "progressValue", value);
+    // // progressValue ?: number
+    // napi_create_int32(env, request->GetProgressValue(), &value);
+    // napi_set_named_property(env, result, "progressValue", value);
 
-    // progressMaxValue ?: number
-    napi_create_int32(env, request->GetProgressMax(), &value);
-    napi_set_named_property(env, result, "progressMaxValue", value);
+    // // progressMaxValue ?: number
+    // napi_create_int32(env, request->GetProgressMax(), &value);
+    // napi_set_named_property(env, result, "progressMaxValue", value);
 
-    // isIndeterminate ?: boolean
-    napi_get_boolean(env, request->IsProgressIndeterminate(), &value);
-    napi_set_named_property(env, result, "isIndeterminate", value);
+    // // isIndeterminate ?: boolean
+    // napi_get_boolean(env, request->IsProgressIndeterminate(), &value);
+    // napi_set_named_property(env, result, "isIndeterminate", value);
 
     // statusBarText ?: string
     napi_create_string_utf8(env, request->GetStatusBarText().c_str(), NAPI_AUTO_LENGTH, &value);
@@ -387,9 +405,9 @@ napi_value Common::SetNotificationRequest(
     // napi_get_boolean(env, request->IsOnlyLocal(), &value);
     // napi_set_named_property(env, result, "onlyLocal", value);
 
-    // sortingKey ?: string
-    napi_create_string_utf8(env, request->GetSortingKey().c_str(), NAPI_AUTO_LENGTH, &value);
-    napi_set_named_property(env, result, "sortingKey", value);
+    // // sortingKey ?: string
+    // napi_create_string_utf8(env, request->GetSortingKey().c_str(), NAPI_AUTO_LENGTH, &value);
+    // napi_set_named_property(env, result, "sortingKey", value);
 
     // // messageUsers ?: Array<MessageUser>
     // napi_value arr;
@@ -425,12 +443,12 @@ napi_value Common::SetNotificationRequest(
     napi_set_named_property(env, result, "showDeliveryTime", value);
 
     // actionButtons?: Array<NotificationActionButton>
-    napi_value arr;
+    napi_value arr = nullptr;
     int count = 0;
     napi_create_array(env, &arr);
     for (auto vec : request->GetActionButtons()) {
         if (vec) {
-            napi_value actionButtonResult;
+            napi_value actionButtonResult = nullptr;
             napi_create_object(env, &actionButtonResult);
             if (SetNotificationActionButton(env, vec, actionButtonResult)) {
                 napi_set_element(env, arr, count, actionButtonResult);
@@ -472,21 +490,21 @@ napi_value Common::SetNotificationSortingMap(
     }
 
     size_t count = 0;
-    napi_value arrSortedHashCode;
+    napi_value arrSortedHashCode = nullptr;
     napi_create_array(env, &arrSortedHashCode);
-    napi_value sortingsResult;
+    napi_value sortingsResult = nullptr;
     napi_create_object(env, &sortingsResult);
     for (auto key : sortingMap->GetKey()) {
         NotificationSorting sorting;
         if (sortingMap->GetNotificationSorting(key, sorting)) {
             // sortedHashCode: Array<string>
-            napi_value keyValue;
+            napi_value keyValue = nullptr;
             ANS_LOGI("sortingMap key = %{public}s", key.c_str());
             napi_create_string_utf8(env, key.c_str(), NAPI_AUTO_LENGTH, &keyValue);
             napi_set_element(env, arrSortedHashCode, count, keyValue);
 
             // sortings:{[key : string] : NotificationSorting}
-            napi_value sortingResult;
+            napi_value sortingResult = nullptr;
             napi_create_object(env, &sortingResult);
             if (!SetNotificationSorting(env, sorting, sortingResult)) {
                 ANS_LOGE("SetNotificationSorting call failed");
@@ -509,8 +527,8 @@ napi_value Common::SetNotificationSorting(const napi_env &env, const Notificatio
     ANS_LOGI("SetNotificationSorting start");
 
     // slot: NotificationSlot
-    napi_value slotResult;
-    napi_value value = 0;
+    napi_value slotResult = nullptr;
+    napi_value value = nullptr;
     napi_create_object(env, &slotResult);
     if (!SetNotificationSlot(env, sorting.GetSlot(), slotResult)) {
         ANS_LOGE("SetNotificationSlot call failed");
@@ -555,12 +573,11 @@ napi_value Common::SetNotificationSorting(const napi_env &env, const Notificatio
 
 napi_value Common::SetNotificationSlot(const napi_env &env, const NotificationSlot &slot, napi_value &result)
 {
-    ANS_LOGI("SetNotificationSlot start");
+    ANS_LOGI("enter");
 
-    napi_value value = 0;
-
+    napi_value value = nullptr;
     // type: SlotType;
-    enum SlotType outType;
+    enum SlotType outType = SlotType::UNKNOWN_TYPE;
     if (!SlotTypeCToJS(slot.GetType(), outType)) {
         return NapiGetboolean(env, false);
     }
@@ -568,24 +585,28 @@ napi_value Common::SetNotificationSlot(const napi_env &env, const NotificationSl
     napi_set_named_property(env, result, "type", value);
 
     // level?: number
-    napi_create_int32(env, slot.GetLevel(), &value);
+    enum SlotLevel outLevel { SlotLevel::LEVEL_NONE };
+    if (!SlotLevelCToJS(slot.GetLevel(), outLevel)) {
+        return NapiGetboolean(env, false);
+    }
+    napi_create_int32(env, outLevel, &value);
     napi_set_named_property(env, result, "level", value);
 
     // desc?: string
     napi_create_string_utf8(env, slot.GetDescription().c_str(), NAPI_AUTO_LENGTH, &value);
     napi_set_named_property(env, result, "desc", value);
 
-    // showBadgeFlag?: boolean
+    // badgeFlag?: boolean
     napi_get_boolean(env, slot.IsShowBadge(), &value);
-    napi_set_named_property(env, result, "showBadgeFlag", value);
+    napi_set_named_property(env, result, "badgeFlag", value);
 
     // bypassDnd?: boolean
     napi_get_boolean(env, slot.IsEnableBypassDnd(), &value);
     napi_set_named_property(env, result, "bypassDnd", value);
 
     // lockscreenVisibility?: number
-    int32_t LockScreenVisibleness = (int32_t)slot.GetLockScreenVisibleness();
-    napi_create_int32(env, LockScreenVisibleness, &value);
+    int32_t lockScreenVisibleness = (int32_t)slot.GetLockScreenVisibleness();
+    napi_create_int32(env, lockScreenVisibleness, &value);
     napi_set_named_property(env, result, "lockscreenVisibility", value);
 
     // vibrationEnabled?: boolean
@@ -605,7 +626,7 @@ napi_value Common::SetNotificationSlot(const napi_env &env, const NotificationSl
     napi_set_named_property(env, result, "lightColor", value);
 
     // vibrationValues?: Array<number>
-    napi_value arr;
+    napi_value arr = nullptr;
     napi_create_array(env, &arr);
     size_t count = 0;
     for (auto vec : slot.GetVibrationStyle()) {
@@ -627,10 +648,10 @@ napi_value Common::SetNotificationContent(
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
     // contentType: ContentType;
     NotificationContent::Type type = content->GetContentType();
-    ContentType outType;
+    ContentType outType = ContentType::NOTIFICATION_CONTENT_BASIC_TEXT;
     if (!ContentTypeCToJS(type, outType)) {
         return NapiGetboolean(env, false);
     }
@@ -645,7 +666,7 @@ napi_value Common::SetNotificationContent(
     }
     if (outType == ContentType::NOTIFICATION_CONTENT_BASIC_TEXT) {
         // normal?: NotificationBasicContent
-        napi_value basicContentResult;
+        napi_value basicContentResult = nullptr;
         napi_create_object(env, &basicContentResult);
         if (SetNotificationBasicContent(env, basicContent.get(), basicContentResult)) {
             napi_set_named_property(env, result, "normal", basicContentResult);
@@ -657,7 +678,7 @@ napi_value Common::SetNotificationContent(
         // longText?: NotificationLongTextContent
         OHOS::Notification::NotificationLongTextContent *longTextContent =
             static_cast<OHOS::Notification::NotificationLongTextContent *>(basicContent.get());
-        napi_value longTextContentResult;
+        napi_value longTextContentResult = nullptr;
         napi_create_object(env, &longTextContentResult);
         if (SetNotificationLongTextContent(env, longTextContent, longTextContentResult)) {
             napi_set_named_property(env, result, "longText", longTextContentResult);
@@ -669,7 +690,7 @@ napi_value Common::SetNotificationContent(
         // picture?: NotificationPictureContent
         OHOS::Notification::NotificationPictureContent *pictureContent =
             static_cast<OHOS::Notification::NotificationPictureContent *>(basicContent.get());
-        napi_value pictureContentResult;
+        napi_value pictureContentResult = nullptr;
         napi_create_object(env, &pictureContentResult);
         if (SetNotificationPictureContent(env, pictureContent, pictureContentResult)) {
             napi_set_named_property(env, result, "picture", pictureContentResult);
@@ -680,7 +701,7 @@ napi_value Common::SetNotificationContent(
         // conversational?: NotificationConversationalContent
         OHOS::Notification::NotificationConversationalContent *conversationalContent =
             static_cast<OHOS::Notification::NotificationConversationalContent *>(basicContent.get());
-        napi_value conversationalContentResult;
+        napi_value conversationalContentResult = nullptr;
         napi_create_object(env, &conversationalContentResult);
         if (SetNotificationConversationalContent(env, conversationalContent, conversationalContentResult)) {
             napi_set_named_property(env, result, "conversational", conversationalContentResult);
@@ -691,7 +712,7 @@ napi_value Common::SetNotificationContent(
         // multiLine?: NotificationMultiLineContent
         OHOS::Notification::NotificationMultiLineContent *multiLineContent =
             static_cast<OHOS::Notification::NotificationMultiLineContent *>(basicContent.get());
-        napi_value multiLineContentResult;
+        napi_value multiLineContentResult = nullptr;
         napi_create_object(env, &multiLineContentResult);
         if (SetNotificationMultiLineContent(env, multiLineContent, multiLineContentResult)) {
             napi_set_named_property(env, result, "multiLine", multiLineContentResult);
@@ -714,7 +735,7 @@ napi_value Common::SetNotificationBasicContent(
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
 
     // title: string;
     napi_create_string_utf8(env, basicContent->GetTitle().c_str(), NAPI_AUTO_LENGTH, &value);
@@ -745,7 +766,7 @@ napi_value Common::SetNotificationLongTextContent(
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
 
     // longText: string
     napi_create_string_utf8(env, longTextContent->GetLongText().c_str(), NAPI_AUTO_LENGTH, &value);
@@ -776,7 +797,7 @@ napi_value Common::SetNotificationPictureContent(
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
 
     // pictureId: number   //c++ no do
 
@@ -807,7 +828,7 @@ napi_value Common::SetNotificationConversationalContent(const napi_env &env,
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
     // conversationTitle: string
     napi_create_string_utf8(env, conversationalContent->GetConversationTitle().c_str(), NAPI_AUTO_LENGTH, &value);
     napi_set_named_property(env, result, "conversationTitle", value);
@@ -817,7 +838,7 @@ napi_value Common::SetNotificationConversationalContent(const napi_env &env,
     napi_set_named_property(env, result, "conversationGroup", value);
 
     // messages: Array<ConversationalMessage>
-    napi_value arr;
+    napi_value arr = nullptr;
     int count = 0;
     napi_create_array(env, &arr);
     std::vector<std::shared_ptr<NotificationConversationalMessage>> messages =
@@ -826,7 +847,7 @@ napi_value Common::SetNotificationConversationalContent(const napi_env &env,
         if (!vec) {
             continue;
         }
-        napi_value conversationalMessageResult;
+        napi_value conversationalMessageResult = nullptr;
         napi_create_object(env, &conversationalMessageResult);
         if (SetConversationalMessage(env, vec, conversationalMessageResult)) {
             napi_set_element(env, arr, count, conversationalMessageResult);
@@ -836,7 +857,7 @@ napi_value Common::SetNotificationConversationalContent(const napi_env &env,
     napi_set_named_property(env, result, "messages", arr);
 
     // user: MessageUser
-    napi_value messageUserResult;
+    napi_value messageUserResult = nullptr;
     napi_create_object(env, &messageUserResult);
     if (!SetMessageUser(env, conversationalContent->GetMessageUser(), messageUserResult)) {
         messageUserResult = NapiGetNull(env);
@@ -860,7 +881,7 @@ napi_value Common::SetNotificationMultiLineContent(
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
     // briefText: string
     napi_create_string_utf8(env, multiLineContent->GetBriefText().c_str(), NAPI_AUTO_LENGTH, &value);
     napi_set_named_property(env, result, "briefText", value);
@@ -870,7 +891,7 @@ napi_value Common::SetNotificationMultiLineContent(
     napi_set_named_property(env, result, "longTitle", value);
 
     // lines: Array<String>
-    napi_value arr;
+    napi_value arr = nullptr;
     int count = 0;
     napi_create_array(env, &arr);
     for (auto vec : multiLineContent->GetAllLines()) {
@@ -887,7 +908,7 @@ napi_value Common::SetMessageUser(const napi_env &env, const MessageUser &messag
 {
     ANS_LOGI("SetMessageUser start");
 
-    napi_value value;
+    napi_value value = nullptr;
     // name: string
     napi_create_string_utf8(env, messageUser.GetName().c_str(), NAPI_AUTO_LENGTH, &value);
     napi_set_named_property(env, result, "name", value);
@@ -922,7 +943,7 @@ napi_value Common::SetConversationalMessage(const napi_env &env,
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
     // text: string
     napi_create_string_utf8(env, conversationalMessage->GetText().c_str(), NAPI_AUTO_LENGTH, &value);
     napi_set_named_property(env, result, "text", value);
@@ -940,7 +961,7 @@ napi_value Common::SetConversationalMessage(const napi_env &env,
     napi_set_named_property(env, result, "uri", value);
 
     // sender: MessageUser;
-    napi_value messageUserResult;
+    napi_value messageUserResult = nullptr;
     napi_create_object(env, &messageUserResult);
     if (SetMessageUser(env, conversationalMessage->GetSender(), messageUserResult)) {
         messageUserResult = NapiGetNull(env);
@@ -959,7 +980,7 @@ napi_value Common::SetNotificationActionButton(
         return NapiGetboolean(env, false);
     }
 
-    napi_value value;
+    napi_value value = nullptr;
 
     // title: string
     napi_create_string_utf8(env, actionButton->GetTitle().c_str(), NAPI_AUTO_LENGTH, &value);
@@ -972,7 +993,7 @@ napi_value Common::SetNotificationActionButton(
         napi_set_named_property(env, result, "wantAgent", NapiGetNull(env));
         return NapiGetboolean(env, true);
     }
-    napi_value wantAgent;
+    napi_value wantAgent = nullptr;
     wantAgent = CreateWantAgentByJS(env, agent);
     napi_set_named_property(env, result, "wantAgent", wantAgent);
 
@@ -982,61 +1003,65 @@ napi_value Common::SetNotificationActionButton(
 }
 
 napi_value Common::GetNotificationSubscriberInfo(
-    const napi_env &env, const napi_value &value, NotificationSubscriberInfo &result)
+    const napi_env &env, const napi_value &value, NotificationSubscribeInfo &subscriberInfo)
 {
     uint32_t length = 0;
-    size_t strLen;
+    size_t strLen = 0;
     bool hasProperty = false;
-    napi_valuetype valuetype;
+    bool isArray = false;
+    napi_valuetype valuetype = napi_undefined;
+
     // bundleNames?: Array<string>;
     NAPI_CALL(env, napi_has_named_property(env, value, "bundleNames", &hasProperty));
     if (hasProperty) {
-        napi_value nbundleNames;
-        napi_get_named_property(env, value, "bundleNames", &nbundleNames);
-        napi_get_array_length(env, nbundleNames, &length);
-        if (length > 0) {
-            for (uint32_t i = 0; i < length; ++i) {
-                napi_value nbundleName;
-                char str[STR_MAX_SIZE] = {0};
-                napi_get_element(env, nbundleNames, i, &nbundleName);
-                NAPI_CALL(env, napi_typeof(env, nbundleName, &valuetype));
-                NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-                NAPI_CALL(env, napi_get_value_string_utf8(env, nbundleName, str, STR_MAX_SIZE - 1, &strLen));
-                result.bundleNames.emplace_back(str);
-                result.hasSubscriberInfo = true;
-            }
+        napi_value nBundleNames = nullptr;
+        napi_get_named_property(env, value, "bundleNames", &nBundleNames);
+        napi_is_array(env, nBundleNames, &isArray);
+        NAPI_ASSERT(env, isArray, "Property bundleNames is expected to be an array.");
+        napi_get_array_length(env, nBundleNames, &length);
+        NAPI_ASSERT(env, length > 0, "The array is empty.");
+        for (uint32_t i = 0; i < length; ++i) {
+            napi_value nBundleName = nullptr;
+            char str[STR_MAX_SIZE] = {0};
+            napi_get_element(env, nBundleNames, i, &nBundleName);
+            NAPI_CALL(env, napi_typeof(env, nBundleName, &valuetype));
+            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+            NAPI_CALL(env, napi_get_value_string_utf8(env, nBundleName, str, STR_MAX_SIZE - 1, &strLen));
+            subscriberInfo.bundleNames.emplace_back(str);
+            subscriberInfo.hasSubscribeInfo = true;
         }
     }
 
-    // deviceIds?: Array<string>;
+    // // deviceIds?: Array<string>;
     // NAPI_CALL(env, napi_has_named_property(env, value, "deviceIds", &hasProperty));
     // if (hasProperty) {
-    //     napi_value ndeviceIds;
-    //     napi_get_named_property(env, value, "deviceIds", &ndeviceIds);
+    //     napi_value nDeviceIds = nullptr;
+    //     napi_get_named_property(env, value, "deviceIds", &nDeviceIds);
+    //     napi_is_array(env, nDeviceIds, &isArray);
+    //     NAPI_ASSERT(env, isArray, "Property bundleNames is expected to be an array.");
     //     napi_get_array_length(env, value, &length);
-    //     if (length > 0) {
-    //         for (uint32_t i = 0; i < length; ++i) {
-    //             napi_value ndeviceId;
-    //             char str[STR_MAX_SIZE] = {0};
-    //             napi_get_element(env, ndeviceIds, i, &ndeviceId);
-    //             NAPI_CALL(env, napi_typeof(env, ndeviceId, &valuetype));
-    //             NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-    //             NAPI_CALL(env, napi_get_value_string_utf8(env, ndeviceId, str, STR_MAX_SIZE - 1, &strLen));
-    //             result.deviceIds.emplace_back(str);
-    //             result.hasSubscriberInfo = true;
-    //         }
+    //     NAPI_ASSERT(env, length > 0, "The array is empty.");
+    //     for (uint32_t i = 0; i < length; ++i) {
+    //         napi_value nDeviceId = nullptr;
+    //         char str[STR_MAX_SIZE] = {0};
+    //         napi_get_element(env, nDeviceIds, i, &nDeviceId);
+    //         NAPI_CALL(env, napi_typeof(env, nDeviceId, &valuetype));
+    //         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+    //         NAPI_CALL(env, napi_get_value_string_utf8(env, nDeviceId, str, STR_MAX_SIZE - 1, &strLen));
+    //         subscriberInfo.deviceIds.emplace_back(str);
+    //         subscriberInfo.hasSubscribeInfo = true;
     //     }
     // }
 
     // userId?: number;
     NAPI_CALL(env, napi_has_named_property(env, value, "userId", &hasProperty));
     if (hasProperty) {
-        napi_value nuserId;
-        napi_get_named_property(env, value, "userId", &nuserId);
-        NAPI_CALL(env, napi_typeof(env, nuserId, &valuetype));
+        napi_value nUserId = nullptr;
+        napi_get_named_property(env, value, "userId", &nUserId);
+        NAPI_CALL(env, napi_typeof(env, nUserId, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        NAPI_CALL(env, napi_get_value_int32(env, nuserId, &result.userId));
-        result.hasSubscriberInfo = true;
+        NAPI_CALL(env, napi_get_value_int32(env, nUserId, &subscriberInfo.userId));
+        subscriberInfo.hasSubscribeInfo = true;
     }
 
     return NapiGetNull(env);
@@ -1082,7 +1107,7 @@ napi_value Common::GetNotificationRequest(const napi_env &env, const napi_value 
     }
 
     // wantAgent?: WantAgent
-    if (Common::GetNotificationWantAgent(env, value, request) == nullptr) {
+    if (GetNotificationWantAgent(env, value, request) == nullptr) {
         return nullptr;
     }
 
@@ -1161,22 +1186,10 @@ napi_value Common::GetNotificationRequest(const napi_env &env, const napi_value 
     //     return nullptr;
     // }
 
-    // progressValue?: number
-    // progressMaxValue?: number
-    // isIndeterminate?: boolean
-    if (GetNotificationProgressBar(env, value, request) == nullptr) {
-        return nullptr;
-    }
-
-    // progressMaxValue?: number
-    // if (GetNotificationProgressMaxValueByPublish(env, value, notificationRequestData.progressMaxValue, request) ==
-    //     nullptr) {
-    //     return nullptr;
-    // }
-
-    // isIndeterminate?: boolean
-    // if (GetNotificationIsIndeterminateByPublish(env, value, notificationRequestData.isIndeterminate, request) ==
-    //     nullptr) {
+    // // progressValue?: number
+    // // progressMaxValue?: number
+    // // isIndeterminate?: boolean
+    // if (GetNotificationProgressBar(env, value, request) == nullptr) {
     //     return nullptr;
     // }
 
@@ -1190,10 +1203,10 @@ napi_value Common::GetNotificationRequest(const napi_env &env, const napi_value 
     //     return nullptr;
     // }
 
-    // sortingKey?: string
-    if (GetNotificationSortingKey(env, value, request) == nullptr) {
-        return nullptr;
-    }
+    // // sortingKey?: string
+    // if (GetNotificationSortingKey(env, value, request) == nullptr) {
+    //     return nullptr;
+    // }
 
     // label?: string
     if (GetNotificationLabel(env, value, request) == nullptr) {
@@ -1227,13 +1240,12 @@ napi_value GetIdByPublish(const napi_env &env, const napi_value &value, Notifica
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    int32_t notificationId;
+    int32_t notificationId = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "id", &hasProperty));
-    ANS_LOGI("============GetIdByPublish hasProperty = %{public}d", hasProperty);
     if (hasProperty) {
         napi_get_named_property(env, value, "id", &result);
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
@@ -1253,20 +1265,19 @@ napi_value GetSlotType(const napi_env &env, const napi_value &value, Notificatio
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    int32_t slotType;
+    int32_t slotType = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "slotType", &hasProperty));
-    ANS_LOGI("============GetSlotType hasProperty = %{public}d", hasProperty);
     if (hasProperty) {
         napi_get_named_property(env, value, "slotType", &result);
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int32(env, result, &slotType);
 
-        enum NotificationConstant::SlotType outType;
+        enum NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
         if (!Common::SlotTypeJSToC(SlotType(slotType), outType)) {
             return nullptr;
         }
@@ -1283,61 +1294,58 @@ napi_value Common::GetNotificationContent(const napi_env &env, const napi_value 
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    int32_t type;
+    int32_t type = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "content", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, value, "content", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        ANS_LOGI("GetNotificationContent valuetype = %{public}d", valuetype);
-        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-        if (GetNotificationContentType(env, result, type) == nullptr) {
-            return nullptr;
-        }
-        NotificationContent::Type outType;
-        if (!ContentTypeJSToC(ContentType(type), outType)) {
-            return nullptr;
-        }
-        switch (outType) {
-            case NotificationContent::Type::BASIC_TEXT:
-                ANS_LOGI("============GetNotificationContent================");
-                if (GetNotificationBasicContent(env, result, request) == nullptr) {
-                    return nullptr;
-                }
-                break;
-            case NotificationContent::Type::LONG_TEXT:
-                ANS_LOGI("============GetNotificationLongContentByPublish================");
-                if (GetNotificationLongTextContent(env, result, request) == nullptr) {
-                    return nullptr;
-                }
-                break;
-            case NotificationContent::Type::PICTURE:
-                ANS_LOGI("============GetNotificationPictureContent================");
-                if (GetNotificationPictureContent(env, result, request) == nullptr) {
-                    return nullptr;
-                }
-                break;
-            case NotificationContent::Type::CONVERSATION:
-                ANS_LOGI("============GetNotificationConversationalContent================");
-                if (GetNotificationConversationalContent(env, result, request) == nullptr) {
-                    return nullptr;
-                }
-                break;
-            case NotificationContent::Type::MULTILINE:
-                ANS_LOGI("============GetNotificationMultilineContentByPublish================");
-                if (GetNotificationMultiLineContent(env, result, request) == nullptr) {
-                    return nullptr;
-                }
-                break;
-            case NotificationContent::Type::MEDIA:
-                break;
-            default:
+    if (!hasProperty) {
+        ANS_LOGE("Property content expected.");
+        return nullptr;
+    }
+
+    napi_get_named_property(env, value, "content", &result);
+    NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    if (GetNotificationContentType(env, result, type) == nullptr) {
+        return nullptr;
+    }
+    NotificationContent::Type outType = NotificationContent::Type::NONE;
+    if (!ContentTypeJSToC(ContentType(type), outType)) {
+        return nullptr;
+    }
+    switch (outType) {
+        case NotificationContent::Type::BASIC_TEXT:
+            if (GetNotificationBasicContent(env, result, request) == nullptr) {
                 return nullptr;
-                break;
-        }
+            }
+            break;
+        case NotificationContent::Type::LONG_TEXT:
+            if (GetNotificationLongTextContent(env, result, request) == nullptr) {
+                return nullptr;
+            }
+            break;
+        case NotificationContent::Type::PICTURE:
+            if (GetNotificationPictureContent(env, result, request) == nullptr) {
+                return nullptr;
+            }
+            break;
+        case NotificationContent::Type::CONVERSATION:
+            if (GetNotificationConversationalContent(env, result, request) == nullptr) {
+                return nullptr;
+            }
+            break;
+        case NotificationContent::Type::MULTILINE:
+            if (GetNotificationMultiLineContent(env, result, request) == nullptr) {
+                return nullptr;
+            }
+            break;
+        case NotificationContent::Type::MEDIA:
+            break;
+        default:
+            return nullptr;
+            break;
     }
 
     ANS_LOGI("end");
@@ -1348,10 +1356,10 @@ napi_value GetNotificationIsOngoing(const napi_env &env, const napi_value &value
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool isOngoing;
+    bool isOngoing = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "isOngoing", &hasProperty));
     if (hasProperty) {
@@ -1369,10 +1377,10 @@ napi_value GetNotificationIsUnremovable(const napi_env &env, const napi_value &v
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool isUnremovable;
+    bool isUnremovable = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "isUnremovable", &hasProperty));
     if (hasProperty) {
@@ -1390,10 +1398,10 @@ napi_value GetNotificationDeliveryTime(const napi_env &env, const napi_value &va
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    int64_t deliveryTime;
+    int64_t deliveryTime = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "deliveryTime", &hasProperty));
     if (hasProperty) {
@@ -1411,10 +1419,10 @@ napi_value GetNotificationtapDismissed(const napi_env &env, const napi_value &va
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool tapDismissed;
+    bool tapDismissed = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "tapDismissed", &hasProperty));
     if (hasProperty) {
@@ -1434,8 +1442,8 @@ napi_value Common::GetNotificationWantAgent(const napi_env &env, const napi_valu
 
     bool hasProperty = false;
     WantAgent::WantAgent *wantAgent = nullptr;
-    napi_value result;
-    napi_valuetype valuetype;
+    napi_value result = nullptr;
+    napi_valuetype valuetype = napi_undefined;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "wantAgent", &hasProperty));
     if (hasProperty) {
@@ -1444,6 +1452,7 @@ napi_value Common::GetNotificationWantAgent(const napi_env &env, const napi_valu
         NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
         napi_unwrap(env, result, (void **)&wantAgent);
         if (wantAgent == nullptr) {
+            ANS_LOGE("Invalid object wantAgent");
             return nullptr;
         }
         std::shared_ptr<WantAgent::WantAgent> sWantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgent);
@@ -1457,8 +1466,8 @@ napi_value GetNotificationExtraInfo(const napi_env &env, const napi_value &value
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "extraInfo", &hasProperty));
@@ -1484,8 +1493,8 @@ napi_value GetNotificationRemovalWantAgent(const napi_env &env, const napi_value
 
     bool hasProperty = false;
     WantAgent::WantAgent *wantAgent = nullptr;
-    napi_value result;
-    napi_valuetype valuetype;
+    napi_value result = nullptr;
+    napi_valuetype valuetype = napi_undefined;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "removalWantAgent", &hasProperty));
     if (hasProperty) {
@@ -1494,6 +1503,7 @@ napi_value GetNotificationRemovalWantAgent(const napi_env &env, const napi_value
         NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
         napi_unwrap(env, result, (void **)&wantAgent);
         if (wantAgent == nullptr) {
+            ANS_LOGE("Invalid object removalWantAgent");
             return nullptr;
         }
         std::shared_ptr<WantAgent::WantAgent> removeWantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgent);
@@ -1509,8 +1519,8 @@ napi_value GetNotificationMaxScreenWantAgent(const napi_env &env, const napi_val
 
     bool hasProperty = false;
     WantAgent::WantAgent *wantAgent = nullptr;
-    napi_value result;
-    napi_valuetype valuetype;
+    napi_value result = nullptr;
+    napi_valuetype valuetype = napi_undefined;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "maxScreenWantAgent", &hasProperty));
     if (hasProperty) {
@@ -1519,6 +1529,7 @@ napi_value GetNotificationMaxScreenWantAgent(const napi_env &env, const napi_val
         NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
         napi_unwrap(env, result, (void **)&wantAgent);
         if (wantAgent == nullptr) {
+            ANS_LOGE("Invalid object maxScreenWantAgent");
             return nullptr;
         }
         std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgent);
@@ -1532,10 +1543,10 @@ napi_value GetNotificationAutoDeletedTime(const napi_env &env, const napi_value 
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    int64_t autoDeletedTime;
+    int64_t autoDeletedTime = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "autoDeletedTime", &hasProperty));
     if (hasProperty) {
@@ -1554,8 +1565,8 @@ napi_value GetNotificationAutoDeletedTime(const napi_env &env, const napi_value 
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
 //     char str[STR_MAX_SIZE] = {0};
 //     size_t strLen = 0;
@@ -1578,8 +1589,8 @@ napi_value GetNotificationAutoDeletedTime(const napi_env &env, const napi_value 
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
 //     char str[STR_MAX_SIZE] = {0};
 //     size_t strLen = 0;
@@ -1602,10 +1613,10 @@ napi_value GetNotificationAutoDeletedTime(const napi_env &env, const napi_value 
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
-//     int32_t groupAlertType;
+//     int32_t groupAlertType = 0;
 
 //     NAPI_CALL(env, napi_has_named_property(env, value, "groupAlertType", &hasProperty));
 //     if (hasProperty) {
@@ -1624,10 +1635,10 @@ napi_value GetNotificationAutoDeletedTime(const napi_env &env, const napi_value 
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
-//     bool groupOverview;
+//     bool groupOverview = false;
 
 //     NAPI_CALL(env, napi_has_named_property(env, value, "groupOverview", &hasProperty));
 //     if (hasProperty) {
@@ -1641,13 +1652,12 @@ napi_value GetNotificationAutoDeletedTime(const napi_env &env, const napi_value 
 //     return Common::NapiGetNull(env);
 // }
 
-napi_value GetNotificationClassification(
-    const napi_env &env, const napi_value &value, NotificationRequest &request)
+napi_value GetNotificationClassification(const napi_env &env, const napi_value &value, NotificationRequest &request)
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
@@ -1668,10 +1678,10 @@ napi_value GetNotificationColor(const napi_env &env, const napi_value &value, No
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    int32_t color;
+    int32_t color = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "color", &hasProperty));
     if (hasProperty) {
@@ -1679,6 +1689,7 @@ napi_value GetNotificationColor(const napi_env &env, const napi_value &value, No
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int32(env, result, &color);
+        NAPI_ASSERT(env, color >= 0, "Wrong argument type. Natural number expected.");
         request.SetColor(color);
     }
 
@@ -1689,10 +1700,10 @@ napi_value GetNotificationColorEnabled(const napi_env &env, const napi_value &va
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool colorEnabled;
+    bool colorEnabled = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "colorEnabled", &hasProperty));
     if (hasProperty) {
@@ -1710,10 +1721,10 @@ napi_value GetNotificationIsAlertOnce(const napi_env &env, const napi_value &val
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool isAlertOnce;
+    bool isAlertOnce = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "isAlertOnce", &hasProperty));
     if (hasProperty) {
@@ -1731,10 +1742,10 @@ napi_value GetNotificationIsStopwatch(const napi_env &env, const napi_value &val
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool isStopwatch;
+    bool isStopwatch = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "isStopwatch", &hasProperty));
     if (hasProperty) {
@@ -1752,10 +1763,10 @@ napi_value GetNotificationIsCountDown(const napi_env &env, const napi_value &val
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool isCountDown;
+    bool isCountDown = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "isCountDown", &hasProperty));
     if (hasProperty) {
@@ -1774,10 +1785,10 @@ napi_value GetNotificationIsCountDown(const napi_env &env, const napi_value &val
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
-//     int32_t visibleness;
+//     int32_t visibleness = 0;
 
 //     NAPI_CALL(env, napi_has_named_property(env, value, "visibleness", &hasProperty));
 //     if (hasProperty) {
@@ -1790,89 +1801,43 @@ napi_value GetNotificationIsCountDown(const napi_env &env, const napi_value &val
 
 //     return Common::NapiGetNull(env);
 // }
-napi_value GetNotificationProgressBar(const napi_env &env, const napi_value &value, NotificationRequest &request)
-{
-    ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value resultProgressValue, resultProgressMaxValue, resultIsIndeterminate;
-    bool hasPropertyProgressValue = false;
-    bool hasPropertyProgressMaxValue = false;
-    bool hasPropertyIsIndeterminate = false;
-    int32_t progressValue = 0;
-    int32_t progressMaxValue = 0;
-    bool isIndeterminate = false;
-
-    NAPI_CALL(env, napi_has_named_property(env, value, "progressValue", &hasPropertyProgressValue));
-    if (hasPropertyProgressValue) {
-        NAPI_CALL(env, napi_has_named_property(env, value, "progressMaxValue", &hasPropertyProgressMaxValue));
-        if (hasPropertyProgressMaxValue) {
-            NAPI_CALL(env, napi_has_named_property(env, value, "isIndeterminate", &hasPropertyIsIndeterminate));
-            if (hasPropertyIsIndeterminate) {
-                napi_get_named_property(env, value, "progressValue", &resultProgressValue);
-                NAPI_CALL(env, napi_typeof(env, resultProgressValue, &valuetype));
-                NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-                napi_get_value_int32(env, resultProgressValue, &progressValue);
-
-                napi_get_named_property(env, value, "progressMaxValue", &resultProgressMaxValue);
-                NAPI_CALL(env, napi_typeof(env, resultProgressMaxValue, &valuetype));
-                NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-                napi_get_value_int32(env, resultProgressMaxValue, &progressMaxValue);
-
-                napi_get_named_property(env, value, "isIndeterminate", &resultIsIndeterminate);
-                NAPI_CALL(env, napi_typeof(env, resultIsIndeterminate, &valuetype));
-                NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. bool expected.");
-                napi_get_value_bool(env, resultIsIndeterminate, &isIndeterminate);
-            }
-        }
-        request.SetProgressBar(progressValue, progressMaxValue, isIndeterminate);
-    }
-
-    return Common::NapiGetNull(env);
-}
-
-// napi_value GetNotificationProgressMaxValueByPublish(
-//     const napi_env &env, const napi_value &value, int32_t &progressMaxValue, NotificationRequest &request)
+// napi_value GetNotificationProgressBar(const napi_env &env, const napi_value &value, NotificationRequest &request)
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
+//     int32_t progressValue = 0;
+//     int32_t progressMaxValue = 0;
+//     bool isIndeterminate = false;
+
+//     NAPI_CALL(env, napi_has_named_property(env, value, "progressValue", &hasProperty));
+//     if (hasProperty) {
+//         napi_get_named_property(env, value, "progressValue", &result);
+//         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+//         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+//         napi_get_value_int32(env, result, &progressValue);
+//     }
 
 //     NAPI_CALL(env, napi_has_named_property(env, value, "progressMaxValue", &hasProperty));
 //     if (hasProperty) {
-//         // isSetRequestProperty[PROGRESSMAXVALUE] = true;
 //         napi_get_named_property(env, value, "progressMaxValue", &result);
 //         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-//         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. int expected.");
+//         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
 //         napi_get_value_int32(env, result, &progressMaxValue);
-//     } else {
-//         // isSetRequestProperty[PROGRESSMAXVALUE] = false;
 //     }
-
-//     return Common::NapiGetNull(env);
-// }
-
-// napi_value GetNotificationIsIndeterminateByPublish(
-//     const napi_env &env, const napi_value &value, bool &isIndeterminate, NotificationRequest &request)
-// {
-//     ANS_LOGI("enter");
-
-//     napi_valuetype valuetype;
-//     napi_value result;
-//     bool hasProperty = false;
 
 //     NAPI_CALL(env, napi_has_named_property(env, value, "isIndeterminate", &hasProperty));
 //     if (hasProperty) {
-//         // isSetRequestProperty[ISINDETERMINATE] = true;
 //         napi_get_named_property(env, value, "isIndeterminate", &result);
 //         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-//         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. bool expected.");
+//         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
 //         napi_get_value_bool(env, result, &isIndeterminate);
-//     } else {
-//         // isSetRequestProperty[ISINDETERMINATE] = false;
 //     }
+
+//     request.SetProgressBar(progressValue, progressMaxValue, isIndeterminate);
 
 //     return Common::NapiGetNull(env);
 // }
@@ -1881,8 +1846,8 @@ napi_value GetNotificationStatusBarText(const napi_env &env, const napi_value &v
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
@@ -1896,7 +1861,6 @@ napi_value GetNotificationStatusBarText(const napi_env &env, const napi_value &v
         request.SetStatusBarText(str);
     }
 
-    ANS_LOGI("===============GetNotificationStatusBarText====statusBarText = %{public}s end", str);
     return Common::NapiGetNull(env);
 }
 
@@ -1905,10 +1869,10 @@ napi_value GetNotificationStatusBarText(const napi_env &env, const napi_value &v
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
-//     bool onlyLocal;
+//     bool onlyLocal = false;
 
 //     NAPI_CALL(env, napi_has_named_property(env, value, "onlyLocal", &hasProperty));
 //     if (hasProperty) {
@@ -1922,35 +1886,34 @@ napi_value GetNotificationStatusBarText(const napi_env &env, const napi_value &v
 //     return Common::NapiGetNull(env);
 // }
 
-napi_value GetNotificationSortingKey(
-    const napi_env &env, const napi_value &value, NotificationRequest &request)
-{
-    ANS_LOGI("enter");
+// napi_value GetNotificationSortingKey(const napi_env &env, const napi_value &value, NotificationRequest &request)
+// {
+//     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
-    bool hasProperty = false;
-    char str[STR_MAX_SIZE] = {0};
-    size_t strLen = 0;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
+//     bool hasProperty = false;
+//     char str[STR_MAX_SIZE] = {0};
+//     size_t strLen = 0;
 
-    NAPI_CALL(env, napi_has_named_property(env, value, "sortingKey", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, value, "sortingKey", &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-        NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
-        request.SetSortingKey(str);
-    }
+//     NAPI_CALL(env, napi_has_named_property(env, value, "sortingKey", &hasProperty));
+//     if (hasProperty) {
+//         napi_get_named_property(env, value, "sortingKey", &result);
+//         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+//         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+//         NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
+//         request.SetSortingKey(str);
+//     }
 
-    return Common::NapiGetNull(env);
-}
+//     return Common::NapiGetNull(env);
+// }
 
 napi_value GetNotificationLabel(const napi_env &env, const napi_value &value, NotificationRequest &request)
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
@@ -1964,7 +1927,6 @@ napi_value GetNotificationLabel(const napi_env &env, const napi_value &value, No
         request.SetLabel(str);
     }
 
-    ANS_LOGI("===============GetNotificationLabel====label = %{public}s end", str);
     return Common::NapiGetNull(env);
 }
 
@@ -1972,10 +1934,10 @@ napi_value GetNotificationBadgeIconStyle(const napi_env &env, const napi_value &
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    int32_t badgeIconStyle;
+    int32_t badgeIconStyle = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "badgeIconStyle", &hasProperty));
     if (hasProperty) {
@@ -1994,8 +1956,8 @@ napi_value GetNotificationBadgeIconStyle(const napi_env &env, const napi_value &
 // {
 //     ANS_LOGI("enter");
 
-//     napi_valuetype valuetype;
-//     napi_value result;
+//     napi_valuetype valuetype = napi_undefined;
+//     napi_value result = nullptr;
 //     bool hasProperty = false;
 //     char str[STR_MAX_SIZE] = {0};
 //     size_t strLen = 0;
@@ -2017,16 +1979,16 @@ napi_value GetNotificationShowDeliveryTime(const napi_env &env, const napi_value
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value result;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
     bool hasProperty = false;
-    bool showDeliveryTime;
+    bool showDeliveryTime = false;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "showDeliveryTime", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, value, "showDeliveryTime", &result);
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. bool expected.");
+        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
         napi_get_value_bool(env, result, &showDeliveryTime);
         request.SetShowDeliveryTime(showDeliveryTime);
     }
@@ -2040,55 +2002,69 @@ napi_value GetNotificationNotificationActionButtons(
     ANS_LOGI("enter");
 
     bool isArray = false;
-    napi_valuetype valuetype;
-    napi_value actionButtons;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value actionButtons = nullptr;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
     uint32_t length = 0;
     bool hasProperty = false;
-    napi_value titelActionButton, wantAgentActionButton;
+    napi_value titelActionButton = nullptr;
+    napi_value wantAgentActionButton = nullptr;
     std::string title;
     WantAgent::WantAgent *wantAgentPtr = nullptr;
     std::shared_ptr<WantAgent::WantAgent> wantAgent;
 
+    napi_has_named_property(env, value, "actionButtons", &hasProperty);
+    if (!hasProperty) {
+        return Common::NapiGetNull(env);
+    }
+
     napi_get_named_property(env, value, "actionButtons", &actionButtons);
     napi_is_array(env, actionButtons, &isArray);
-    if (isArray) {
-        napi_get_array_length(env, actionButtons, &length);
-        NAPI_ASSERT(env, length > 0, "The array is empty.");
-        for (size_t i = 0; i < length; i++) {
-            napi_value actionButton;
-            napi_get_element(env, actionButtons, i, &actionButton);
-            NAPI_CALL(env, napi_typeof(env, actionButton, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, isArray, "Property actionButtons is expected to be an array.");
+    napi_get_array_length(env, actionButtons, &length);
+    NAPI_ASSERT(env, length > 0, "The array is empty.");
+    for (size_t i = 0; i < length; i++) {
+        napi_value actionButton = nullptr;
+        napi_get_element(env, actionButtons, i, &actionButton);
+        NAPI_CALL(env, napi_typeof(env, actionButton, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
 
-            NAPI_CALL(env, napi_has_named_property(env, actionButton, "title", &hasProperty));
-            if (hasProperty) {
-                napi_get_named_property(env, actionButton, "title", &titelActionButton);
-                NAPI_CALL(env, napi_typeof(env, titelActionButton, &valuetype));
-                NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-                NAPI_CALL(env, napi_get_value_string_utf8(env, titelActionButton, str, STR_MAX_SIZE - 1, &strLen));
-                title = str;
-            }
-
-            NAPI_CALL(env, napi_has_named_property(env, actionButton, "wantAgent", &hasProperty));
-            if (hasProperty) {
-                napi_get_named_property(env, actionButton, "wantAgent", &wantAgentActionButton);
-                NAPI_CALL(env, napi_typeof(env, wantAgentActionButton, &valuetype));
-                NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-                napi_unwrap(env, wantAgentActionButton, (void **)&wantAgentPtr);
-                if (wantAgentPtr == nullptr) {
-                    return nullptr;
-                }
-                wantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgentPtr);
-            }
-
-            std::vector<std::shared_ptr<NotificationUserInput>> vec{nullptr};
-
-            auto pActionButton = NotificationActionButton::Create(
-                nullptr, title, wantAgent, nullptr, NotificationConstant::ARCHIVE_ACTION_BUTTON, false, vec, false);
-            request.AddActionButton(pActionButton);
+        // title: string;
+        NAPI_CALL(env, napi_has_named_property(env, actionButton, "title", &hasProperty));
+        if (hasProperty) {
+            napi_get_named_property(env, actionButton, "title", &titelActionButton);
+            NAPI_CALL(env, napi_typeof(env, titelActionButton, &valuetype));
+            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+            NAPI_CALL(env, napi_get_value_string_utf8(env, titelActionButton, str, STR_MAX_SIZE - 1, &strLen));
+            title = str;
+        } else {
+            ANS_LOGE("Property title expected.");
+            return nullptr;
         }
+
+        // wantAgent: WantAgent;
+        NAPI_CALL(env, napi_has_named_property(env, actionButton, "wantAgent", &hasProperty));
+        if (hasProperty) {
+            napi_get_named_property(env, actionButton, "wantAgent", &wantAgentActionButton);
+            NAPI_CALL(env, napi_typeof(env, wantAgentActionButton, &valuetype));
+            NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+            napi_unwrap(env, wantAgentActionButton, (void **)&wantAgentPtr);
+            if (wantAgentPtr == nullptr) {
+                ANS_LOGE("Invalid object wantAgent");
+                return nullptr;
+            }
+            wantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgentPtr);
+        } else {
+            ANS_LOGE("Property wantAgent expected.");
+            return nullptr;
+        }
+
+        // extras?: {[key: string]: any};
+
+        std::vector<std::shared_ptr<NotificationUserInput>> vec;
+        auto pActionButton = NotificationActionButton::Create(nullptr, title, wantAgent);
+        request.AddActionButton(pActionButton);
     }
 
     return Common::NapiGetNull(env);
@@ -2098,17 +2074,20 @@ napi_value GetNotificationContentType(const napi_env &env, const napi_value &res
 {
     ANS_LOGI("enter");
 
-    napi_value contentResult;
-    napi_valuetype valuetype;
+    napi_value contentResult = nullptr;
+    napi_valuetype valuetype = napi_undefined;
     bool hasProperty = false;
 
     NAPI_CALL(env, napi_has_named_property(env, result, "contentType", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, result, "contentType", &contentResult);
-        NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        napi_get_value_int32(env, contentResult, &type);
+    if (!hasProperty) {
+        ANS_LOGE("Property contentType expected.");
+        return nullptr;
     }
+
+    napi_get_named_property(env, result, "contentType", &contentResult);
+    NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+    napi_get_value_int32(env, contentResult, &type);
 
     return Common::NapiGetNull(env);
 }
@@ -2117,54 +2096,65 @@ napi_value GetNotificationBasicContent(const napi_env &env, const napi_value &re
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value contentResult, basicContentResult;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value contentResult = nullptr;
+    napi_value basicContentResult = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, result, "normal", &hasProperty));
-    if (hasProperty) {
-        std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
-        if (normalContent == nullptr) {
-            ANS_LOGE("normalContent is null");
-            return nullptr;
-        }
-        napi_get_named_property(env, result, "normal", &contentResult);
-        NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, hasProperty, "Property normal expected.");
+    napi_get_named_property(env, result, "normal", &contentResult);
+    NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "title", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            normalContent->SetTitle(str);
-            ANS_LOGI("normal::title = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "text", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            normalContent->SetText(str);
-            ANS_LOGI("normal::text = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            normalContent->SetAdditionalText(str);
-            ANS_LOGI("normal::additionalText = %{public}s", str);
-        }
-        request.SetContent(std::make_shared<NotificationContent>(normalContent));
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    if (normalContent == nullptr) {
+        ANS_LOGE("normalContent is null");
+        return nullptr;
     }
+
+    // title: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "title", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        normalContent->SetTitle(str);
+        ANS_LOGI("normal::title = %{public}s", str);
+    } else {
+        ANS_LOGE("Property title expected.");
+        return nullptr;
+    }
+
+    // text: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "text", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        normalContent->SetText(str);
+        ANS_LOGI("normal::text = %{public}s", str);
+    } else {
+        ANS_LOGE("Property text expected.");
+        return nullptr;
+    }
+
+    // additionalText?: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        normalContent->SetAdditionalText(str);
+        ANS_LOGI("normal::additionalText = %{public}s", str);
+    }
+
+    request.SetContent(std::make_shared<NotificationContent>(normalContent));
 
     return Common::NapiGetNull(env);
 }
@@ -2173,327 +2163,395 @@ napi_value GetNotificationLongTextContent(const napi_env &env, const napi_value 
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value contentResult, longContentResult, basicContentResult;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value contentResult = nullptr;
+    napi_value longContentResult = nullptr;
+    napi_value basicContentResult = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, result, "longText", &hasProperty));
-    if (hasProperty) {
-        std::shared_ptr<OHOS::Notification::NotificationLongTextContent> longContent =
-            std::make_shared<OHOS::Notification::NotificationLongTextContent>();
-        if (longContent == nullptr) {
-            ANS_LOGE("longContent is null");
-            return nullptr;
-        }
-        napi_get_named_property(env, result, "longText", &contentResult);
-        NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, hasProperty, "Property longText expected.");
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "title", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            longContent->SetTitle(str);
-            ANS_LOGI("longText::title = %{public}s", str);
-        }
+    napi_get_named_property(env, result, "longText", &contentResult);
+    NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "text", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            longContent->SetText(str);
-            ANS_LOGI("longText::text = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            longContent->SetAdditionalText(str);
-            ANS_LOGI("longText::additionalText = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "longText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "longText", &longContentResult);
-            NAPI_CALL(env, napi_typeof(env, longContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            longContent->SetLongText(str);
-            ANS_LOGI("longText::longText = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "briefText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "briefText", &longContentResult);
-            NAPI_CALL(env, napi_typeof(env, longContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            longContent->SetBriefText(str);
-            ANS_LOGI("longText::briefText = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "expandedTitle", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "expandedTitle", &longContentResult);
-            NAPI_CALL(env, napi_typeof(env, longContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            longContent->SetExpandedTitle(str);
-            ANS_LOGI("longText::expandedTitle = %{public}s", str);
-        }
-        request.SetContent(std::make_shared<NotificationContent>(longContent));
+    std::shared_ptr<OHOS::Notification::NotificationLongTextContent> longContent =
+        std::make_shared<OHOS::Notification::NotificationLongTextContent>();
+    if (longContent == nullptr) {
+        ANS_LOGE("longContent is null");
+        return nullptr;
     }
+
+    // title: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "title", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        longContent->SetTitle(str);
+        ANS_LOGI("longText::title = %{public}s", str);
+    } else {
+        ANS_LOGE("Property title expected.");
+        return nullptr;
+    }
+
+    // text: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "text", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        longContent->SetText(str);
+        ANS_LOGI("longText::text = %{public}s", str);
+    } else {
+        ANS_LOGE("Property text expected.");
+        return nullptr;
+    }
+
+    // additionalText?: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        longContent->SetAdditionalText(str);
+        ANS_LOGI("longText::additionalText = %{public}s", str);
+    }
+
+    // longText: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "longText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "longText", &longContentResult);
+        NAPI_CALL(env, napi_typeof(env, longContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, str, LONG_STR_MAX_SIZE - 1, &strLen));
+        longContent->SetLongText(str);
+        ANS_LOGI("longText::longText = %{public}s", str);
+    } else {
+        ANS_LOGE("Property longText expected.");
+        return nullptr;
+    }
+
+    // briefText: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "briefText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "briefText", &longContentResult);
+        NAPI_CALL(env, napi_typeof(env, longContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        longContent->SetBriefText(str);
+        ANS_LOGI("longText::briefText = %{public}s", str);
+    } else {
+        ANS_LOGE("Property briefText expected.");
+        return nullptr;
+    }
+
+    // expandedTitle: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "expandedTitle", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "expandedTitle", &longContentResult);
+        NAPI_CALL(env, napi_typeof(env, longContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        longContent->SetExpandedTitle(str);
+        ANS_LOGI("longText::expandedTitle = %{public}s", str);
+    } else {
+        ANS_LOGE("Property expandedTitle expected.");
+        return nullptr;
+    }
+
+    request.SetContent(std::make_shared<NotificationContent>(longContent));
 
     return Common::NapiGetNull(env);
 }
+
 napi_value GetNotificationPictureContent(const napi_env &env, const napi_value &result, NotificationRequest &request)
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value contentResult;
-    napi_value pictureContentResult;
-    napi_value basicContentResult;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value contentResult = nullptr;
+    napi_value pictureContentResult = nullptr;
+    napi_value basicContentResult = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, result, "picture", &hasProperty));
-    if (hasProperty) {
-        std::shared_ptr<OHOS::Notification::NotificationPictureContent> pictureContent =
-            std::make_shared<OHOS::Notification::NotificationPictureContent>();
-        if (pictureContent == nullptr) {
-            ANS_LOGE("pictureContent is null");
-            return nullptr;
-        }
-        napi_get_named_property(env, result, "picture", &contentResult);
-        NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, hasProperty, "Property picture expected.");
+    napi_get_named_property(env, result, "picture", &contentResult);
+    NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "title", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            pictureContent->SetTitle(str);
-            ANS_LOGI("pictureText::title = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "text", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            pictureContent->SetText(str);
-            ANS_LOGI("pictureText::text = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            pictureContent->SetAdditionalText(str);
-            ANS_LOGI("pictureText::additionalText = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "pictureId", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "pictureId", &pictureContentResult);
-            NAPI_CALL(env, napi_typeof(env, pictureContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-            int32_t pictureId = 0;
-            napi_get_value_int32(env, contentResult, &pictureId);
-            // pictureContent->SetLongText(str);  //do C++没接口
-            ANS_LOGI("pictureText::pictureId = %{public}d", pictureId);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "briefText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "briefText", &pictureContentResult);
-            NAPI_CALL(env, napi_typeof(env, pictureContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, pictureContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            pictureContent->SetBriefText(str);
-            ANS_LOGI("pictureText::briefText = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "expandedTitle", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "expandedTitle", &pictureContentResult);
-            NAPI_CALL(env, napi_typeof(env, pictureContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, pictureContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            pictureContent->SetExpandedTitle(str);
-            ANS_LOGI("pictureText::expandedTitle = %{public}s", str);
-        }
-
-        //  bigPicture: image.PixelMap  do
-
-        request.SetContent(std::make_shared<NotificationContent>(pictureContent));
+    std::shared_ptr<OHOS::Notification::NotificationPictureContent> pictureContent =
+        std::make_shared<OHOS::Notification::NotificationPictureContent>();
+    if (pictureContent == nullptr) {
+        ANS_LOGE("pictureContent is null");
+        return nullptr;
     }
+
+    // title: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "title", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        pictureContent->SetTitle(str);
+        ANS_LOGI("pictureText::title = %{public}s", str);
+    } else {
+        ANS_LOGE("Property title expected.");
+        return nullptr;
+    }
+
+    // text: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "text", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        pictureContent->SetText(str);
+        ANS_LOGI("pictureText::text = %{public}s", str);
+    } else {
+        ANS_LOGE("Property text expected.");
+        return nullptr;
+    }
+
+    // additionalText?: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        pictureContent->SetAdditionalText(str);
+        ANS_LOGI("pictureText::additionalText = %{public}s", str);
+    }
+
+    // briefText: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "briefText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "briefText", &pictureContentResult);
+        NAPI_CALL(env, napi_typeof(env, pictureContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, pictureContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        pictureContent->SetBriefText(str);
+        ANS_LOGI("pictureText::briefText = %{public}s", str);
+    } else {
+        ANS_LOGE("Property briefText expected.");
+        return nullptr;
+    }
+
+    // expandedTitle: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "expandedTitle", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "expandedTitle", &pictureContentResult);
+        NAPI_CALL(env, napi_typeof(env, pictureContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, pictureContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        pictureContent->SetExpandedTitle(str);
+        ANS_LOGI("pictureText::expandedTitle = %{public}s", str);
+    } else {
+        ANS_LOGE("Property expandedTitle expected.");
+        return nullptr;
+    }
+
+    //  bigPicture: image.PixelMap  do
+
+    request.SetContent(std::make_shared<NotificationContent>(pictureContent));
 
     return Common::NapiGetNull(env);
 }
 
-napi_value getMessageUser(const napi_env &env, const napi_value &senderResult, MessageUser &sender)
+napi_value GetMessageUser(const napi_env &env, const napi_value &result, MessageUser &messageUser)
 {
     ANS_LOGI("enter");
-    napi_valuetype valuetype;
+    napi_valuetype valuetype = napi_undefined;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
 
     // name: string
-    NAPI_CALL(env, napi_has_named_property(env, senderResult, "name", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, result, "name", &hasProperty));
     if (hasProperty) {
-        napi_value nameResult;
-        napi_get_named_property(env, senderResult, "name", &nameResult);
+        napi_value nameResult = nullptr;
+        napi_get_named_property(env, result, "name", &nameResult);
         NAPI_CALL(env, napi_typeof(env, nameResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, nameResult, str, STR_MAX_SIZE - 1, &strLen));
-        sender.SetName(str);
+        messageUser.SetName(str);
         ANS_LOGI("MessageUser::name = %{public}s", str);
+    } else {
+        ANS_LOGE("Property name expected.");
+        return nullptr;
     }
+
     // pixelMap: image.PixelMap do
+
     // uri: string
-    NAPI_CALL(env, napi_has_named_property(env, senderResult, "uri", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, result, "uri", &hasProperty));
     if (hasProperty) {
-        napi_value uriResult;
-        napi_get_named_property(env, senderResult, "uri", &uriResult);
+        napi_value uriResult = nullptr;
+        napi_get_named_property(env, result, "uri", &uriResult);
         NAPI_CALL(env, napi_typeof(env, uriResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, uriResult, str, STR_MAX_SIZE - 1, &strLen));
         Uri uri(str);
-        sender.SetUri(uri);
+        messageUser.SetUri(uri);
         ANS_LOGI("MessageUser::uri = %{public}s", str);
+    } else {
+        ANS_LOGE("Property uri expected.");
+        return nullptr;
     }
+
     // important: boolean
-    NAPI_CALL(env, napi_has_named_property(env, senderResult, "important", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, result, "important", &hasProperty));
     if (hasProperty) {
-        napi_value importantResult;
-        napi_get_named_property(env, senderResult, "important", &importantResult);
+        napi_value importantResult = nullptr;
+        napi_get_named_property(env, result, "important", &importantResult);
         NAPI_CALL(env, napi_typeof(env, importantResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
         bool important = false;
         napi_get_value_bool(env, importantResult, &important);
-        sender.SetUserAsImportant(important);
+        messageUser.SetUserAsImportant(important);
         ANS_LOGI("MessageUser::important = %{public}d", important);
+    } else {
+        ANS_LOGE("Property important expected.");
+        return nullptr;
     }
+
     // machine: boolean
-    NAPI_CALL(env, napi_has_named_property(env, senderResult, "machine", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, result, "machine", &hasProperty));
     if (hasProperty) {
-        napi_value machineResult;
-        napi_get_named_property(env, senderResult, "machine", &machineResult);
+        napi_value machineResult = nullptr;
+        napi_get_named_property(env, result, "machine", &machineResult);
         NAPI_CALL(env, napi_typeof(env, machineResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
         bool machine = false;
         napi_get_value_bool(env, machineResult, &machine);
-        sender.SetMachine(machine);
+        messageUser.SetMachine(machine);
         ANS_LOGI("MessageUser::machine = %{public}d", machine);
+    } else {
+        ANS_LOGE("Property machine expected.");
+        return nullptr;
     }
+
     // key: string
-    NAPI_CALL(env, napi_has_named_property(env, senderResult, "key", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, result, "key", &hasProperty));
     if (hasProperty) {
-        napi_value keyResult;
-        napi_get_named_property(env, senderResult, "key", &keyResult);
+        napi_value keyResult = nullptr;
+        napi_get_named_property(env, result, "key", &keyResult);
         NAPI_CALL(env, napi_typeof(env, keyResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, keyResult, str, STR_MAX_SIZE - 1, &strLen));
-        sender.SetKey(str);
+        messageUser.SetKey(str);
         ANS_LOGI("MessageUser::key = %{public}s", str);
+    } else {
+        ANS_LOGE("Property key expected.");
+        return nullptr;
     }
+
     return Common::NapiGetNull(env);
 }
-napi_value getConversationalMessage(const napi_env &env, const napi_value &conversationalMessage,
+
+napi_value GetConversationalMessage(const napi_env &env, const napi_value &conversationalMessage,
     std::shared_ptr<NotificationConversationalMessage> &message)
 {
     ANS_LOGI("enter");
-    napi_valuetype valuetype;
+    napi_valuetype valuetype = napi_undefined;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
-
     std::string text;
     int64_t timestamp = 0;
     std::string mimeType;
     std::string uri;
     MessageUser sender;
+
     // text: string
     NAPI_CALL(env, napi_has_named_property(env, conversationalMessage, "text", &hasProperty));
     if (hasProperty) {
-        napi_value textResult;
-        napi_get_named_property(env, conversationalMessage, "title", &textResult);
+        napi_value textResult = nullptr;
+        napi_get_named_property(env, conversationalMessage, "text", &textResult);
         NAPI_CALL(env, napi_typeof(env, textResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, textResult, str, STR_MAX_SIZE - 1, &strLen));
         text = str;
         ANS_LOGI("conversationalMessage::text = %{public}s", str);
+    } else {
+        ANS_LOGE("Property text expected.");
     }
+
     // timestamp: number
     NAPI_CALL(env, napi_has_named_property(env, conversationalMessage, "timestamp", &hasProperty));
     if (hasProperty) {
-        napi_value timestampResult;
+        napi_value timestampResult = nullptr;
         napi_get_named_property(env, conversationalMessage, "timestamp", &timestampResult);
         NAPI_CALL(env, napi_typeof(env, timestampResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int64(env, timestampResult, &timestamp);
         ANS_LOGI("conversationalMessage::timestamp = %{public}" PRId64, timestamp);
+    } else {
+        ANS_LOGE("Property timestamp expected.");
     }
+
     // mimeType: string
     NAPI_CALL(env, napi_has_named_property(env, conversationalMessage, "mimeType", &hasProperty));
     if (hasProperty) {
-        napi_value mimeTypeResult;
+        napi_value mimeTypeResult = nullptr;
         napi_get_named_property(env, conversationalMessage, "mimeType", &mimeTypeResult);
         NAPI_CALL(env, napi_typeof(env, mimeTypeResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, mimeTypeResult, str, STR_MAX_SIZE - 1, &strLen));
         mimeType = str;
         ANS_LOGI("conversationalMessage::mimeType = %{public}s", str);
+    } else {
+        ANS_LOGE("Property mimeType expected.");
     }
+
     // uri: string
     NAPI_CALL(env, napi_has_named_property(env, conversationalMessage, "uri", &hasProperty));
     if (hasProperty) {
-        napi_value uriResult;
+        napi_value uriResult = nullptr;
         napi_get_named_property(env, conversationalMessage, "uri", &uriResult);
         NAPI_CALL(env, napi_typeof(env, uriResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, uriResult, str, STR_MAX_SIZE - 1, &strLen));
         uri = str;
         ANS_LOGI("conversationalMessage::uri = %{public}s", str);
+    } else {
+        ANS_LOGE("Property uri expected.");
     }
+
     // sender: MessageUser
     NAPI_CALL(env, napi_has_named_property(env, conversationalMessage, "sender", &hasProperty));
     if (hasProperty) {
-        napi_value senderResult;
+        napi_value senderResult = nullptr;
         napi_get_named_property(env, conversationalMessage, "sender", &senderResult);
         NAPI_CALL(env, napi_typeof(env, senderResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-        if (!getMessageUser(env, senderResult, sender)) {
+        if (!GetMessageUser(env, senderResult, sender)) {
             return nullptr;
         }
+    } else {
+        ANS_LOGE("Property sender expected.");
     }
-    std::shared_ptr<NotificationConversationalMessage> messagePtr =
-        std::make_shared<NotificationConversationalMessage>(text, timestamp, sender);
-    if (messagePtr == nullptr) {
-        ANS_LOGE("conversationalMessage is null");
+
+    message = std::make_shared<NotificationConversationalMessage>(text, timestamp, sender);
+    if (message == nullptr) {
+        ANS_LOGE("Failed to create NotificationConversationalMessage object.");
         return nullptr;
     }
     std::shared_ptr<Uri> uriPtr = std::make_shared<Uri>(uri);
-    messagePtr->SetData(mimeType, uriPtr);
-    message = messagePtr;
+    message->SetData(mimeType, uriPtr);
+
     return Common::NapiGetNull(env);
 }
 
@@ -2502,197 +2560,246 @@ napi_value GetNotificationConversationalContent(
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value contentResult;
-    napi_value conversationalContentResult;
-    napi_value basicContentResult;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value contentResult = nullptr;
+    napi_value conversationalContentResult = nullptr;
+    napi_value basicContentResult = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
     MessageUser user;
 
     NAPI_CALL(env, napi_has_named_property(env, result, "conversational", &hasProperty));
+    NAPI_ASSERT(env, hasProperty, "Property conversational expected.");
+    napi_get_named_property(env, result, "conversational", &contentResult);
+    NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+
+    // user: MessageUser
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "user", &hasProperty));
     if (hasProperty) {
-
-        napi_get_named_property(env, result, "conversational", &contentResult);
-        NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
+        napi_value userResult = nullptr;
+        napi_get_named_property(env, contentResult, "user", &userResult);
+        NAPI_CALL(env, napi_typeof(env, userResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-
-        // user: MessageUser
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "user", &hasProperty));
-        if (hasProperty) {
-            napi_value userResult;
-            napi_get_named_property(env, contentResult, "user", &userResult);
-            NAPI_CALL(env, napi_typeof(env, userResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-            if (!getMessageUser(env, userResult, user)) {
-                return nullptr;
-            }
-        }
-
-        std::shared_ptr<OHOS::Notification::NotificationConversationalContent> conversationalContent =
-            std::make_shared<OHOS::Notification::NotificationConversationalContent>(user);
-        if (conversationalContent == nullptr) {
-            ANS_LOGE("conversationalContent is null");
+        if (!GetMessageUser(env, userResult, user)) {
             return nullptr;
         }
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "title", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            conversationalContent->SetTitle(str);
-            ANS_LOGI("conversationalText::title = %{public}s", str);
-        }
+    } else {
+        ANS_LOGE("Property user expected.");
+        return nullptr;
+    }
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "text", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            conversationalContent->SetText(str);
-            ANS_LOGI("conversationalText::text = %{public}s", str);
-        }
+    std::shared_ptr<OHOS::Notification::NotificationConversationalContent> conversationalContent =
+        std::make_shared<OHOS::Notification::NotificationConversationalContent>(user);
+    if (conversationalContent == nullptr) {
+        ANS_LOGE("conversationalContent is null");
+        return nullptr;
+    }
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            conversationalContent->SetAdditionalText(str);
-            ANS_LOGI("conversationalText::additionalText = %{public}s", str);
-        }
+    // title: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "title", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        conversationalContent->SetTitle(str);
+        ANS_LOGI("conversationalText::title = %{public}s", str);
+    } else {
+        ANS_LOGE("Property title expected.");
+        return nullptr;
+    }
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "conversationTitle", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "conversationTitle", &conversationalContentResult);
-            NAPI_CALL(env, napi_typeof(env, conversationalContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(
-                env, napi_get_value_string_utf8(env, conversationalContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            conversationalContent->SetConversationTitle(str);
-            ANS_LOGI("conversationalText::conversationTitle = %{public}s", str);
-        }
+    // text: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "text", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        conversationalContent->SetText(str);
+        ANS_LOGI("conversationalText::text = %{public}s", str);
+    } else {
+        ANS_LOGE("Property text expected.");
+        return nullptr;
+    }
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "conversationGroup", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "conversationGroup", &conversationalContentResult);
-            NAPI_CALL(env, napi_typeof(env, conversationalContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
-            bool conversationGroup = false;
-            napi_get_value_bool(env, conversationalContentResult, &conversationGroup);
-            conversationalContent->SetConversationGroup(conversationGroup);
-            ANS_LOGI("conversationalText::conversationGroup = %{public}d", conversationGroup);
-        }
+    // additionalText?: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        conversationalContent->SetAdditionalText(str);
+        ANS_LOGI("conversationalText::additionalText = %{public}s", str);
+    }
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "messages", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "messages", &conversationalContentResult);
-            bool isArray = false;
-            napi_is_array(env, conversationalContentResult, &isArray);
-            if (isArray) {
-                uint32_t length = 0;
-                napi_get_array_length(env, conversationalContentResult, &length);
-                NAPI_ASSERT(env, length > 0, "The array is empty.");
-                for (size_t i = 0; i < length; i++) {
-                    napi_value conversationalMessage;
-                    napi_get_element(env, conversationalContentResult, i, &conversationalMessage);
-                    NAPI_CALL(env, napi_typeof(env, conversationalMessage, &valuetype));
-                    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-                    std::shared_ptr<NotificationConversationalMessage> message = nullptr;
-                    if (!getConversationalMessage(env, conversationalMessage, message)) {
-                        return nullptr;
-                    }
-                    conversationalContent->AddConversationalMessage(message);
-                }
-            } else {
+    // conversationTitle: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "conversationTitle", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "conversationTitle", &conversationalContentResult);
+        NAPI_CALL(env, napi_typeof(env, conversationalContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, conversationalContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        conversationalContent->SetConversationTitle(str);
+        ANS_LOGI("conversationalText::conversationTitle = %{public}s", str);
+    } else {
+        ANS_LOGE("Property conversationTitle expected.");
+        return nullptr;
+    }
+
+    // conversationGroup: boolean;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "conversationGroup", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "conversationGroup", &conversationalContentResult);
+        NAPI_CALL(env, napi_typeof(env, conversationalContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
+        bool conversationGroup = false;
+        napi_get_value_bool(env, conversationalContentResult, &conversationGroup);
+        conversationalContent->SetConversationGroup(conversationGroup);
+        ANS_LOGI("conversationalText::conversationGroup = %{public}d", conversationGroup);
+    } else {
+        ANS_LOGE("Property conversationGroup expected.");
+        return nullptr;
+    }
+
+    // messages: Array<ConversationalMessage>;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "messages", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "messages", &conversationalContentResult);
+        bool isArray = false;
+        napi_is_array(env, conversationalContentResult, &isArray);
+        NAPI_ASSERT(env, isArray, "Property messages is expected to be an array.");
+        uint32_t length = 0;
+        napi_get_array_length(env, conversationalContentResult, &length);
+        NAPI_ASSERT(env, length > 0, "The array is empty.");
+        for (size_t i = 0; i < length; i++) {
+            napi_value conversationalMessage = nullptr;
+            napi_get_element(env, conversationalContentResult, i, &conversationalMessage);
+            NAPI_CALL(env, napi_typeof(env, conversationalMessage, &valuetype));
+            NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+            std::shared_ptr<NotificationConversationalMessage> message = nullptr;
+            if (!GetConversationalMessage(env, conversationalMessage, message)) {
                 return nullptr;
             }
+            conversationalContent->AddConversationalMessage(message);
         }
-        request.SetContent(std::make_shared<NotificationContent>(conversationalContent));
+    } else {
+        ANS_LOGE("Property messages expected.");
+        return nullptr;
     }
+
+    request.SetContent(std::make_shared<NotificationContent>(conversationalContent));
+
     return Common::NapiGetNull(env);
 }
+
 napi_value GetNotificationMultiLineContent(const napi_env &env, const napi_value &result, NotificationRequest &request)
 {
     ANS_LOGI("enter");
 
-    napi_valuetype valuetype;
-    napi_value contentResult, multiLineContentResult, basicContentResult;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value contentResult = nullptr;
+    napi_value multiLineContentResult = nullptr;
+    napi_value basicContentResult = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, result, "multiLine", &hasProperty));
-    if (hasProperty) {
-        std::shared_ptr<OHOS::Notification::NotificationMultiLineContent> multiLineContent =
-            std::make_shared<OHOS::Notification::NotificationMultiLineContent>();
-        napi_get_named_property(env, result, "multiLine", &contentResult);
-        NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT(env, hasProperty, "Property multiLine expected.");
+    napi_get_named_property(env, result, "multiLine", &contentResult);
+    NAPI_CALL(env, napi_typeof(env, contentResult, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
 
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "title", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            multiLineContent->SetTitle(str);
-            ANS_LOGI("multiLine::title = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "text", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            multiLineContent->SetText(str);
-            ANS_LOGI("multiLine::text = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
-            NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            multiLineContent->SetAdditionalText(str);
-            ANS_LOGI("multiLine::additionalText = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "briefText", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "briefText", &multiLineContentResult);
-            NAPI_CALL(env, napi_typeof(env, multiLineContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, multiLineContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            multiLineContent->SetBriefText(str);
-            ANS_LOGI("multiLine: briefText = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "longTitle", &hasProperty));
-        if (hasProperty) {
-            napi_get_named_property(env, contentResult, "longTitle", &multiLineContentResult);
-            NAPI_CALL(env, napi_typeof(env, multiLineContentResult, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, multiLineContentResult, str, STR_MAX_SIZE - 1, &strLen));
-            multiLineContent->SetExpandedTitle(str);
-            ANS_LOGI("multiLine: longTitle = %{public}s", str);
-        }
-
-        NAPI_CALL(env, napi_has_named_property(env, contentResult, "lines", &hasProperty));
-        if (hasProperty) {
-            if (GetNotificationMultiLineContentLines(env, contentResult, multiLineContent) == nullptr) {
-                return nullptr;
-            }
-        }
-
-        request.SetContent(std::make_shared<NotificationContent>(multiLineContent));
+    std::shared_ptr<OHOS::Notification::NotificationMultiLineContent> multiLineContent =
+        std::make_shared<OHOS::Notification::NotificationMultiLineContent>();
+    if (multiLineContent == nullptr) {
+        ANS_LOGE("multiLineContent is null");
+        return nullptr;
     }
+
+    // title: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "title", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "title", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        multiLineContent->SetTitle(str);
+        ANS_LOGI("multiLine::title = %{public}s", str);
+    } else {
+        ANS_LOGE("Property title expected.");
+        return nullptr;
+    }
+
+    // text: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "text", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "text", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        multiLineContent->SetText(str);
+        ANS_LOGI("multiLine::text = %{public}s", str);
+    } else {
+        ANS_LOGE("Property text expected.");
+        return nullptr;
+    }
+
+    // additionalText?: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "additionalText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "additionalText", &basicContentResult);
+        NAPI_CALL(env, napi_typeof(env, basicContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, basicContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        multiLineContent->SetAdditionalText(str);
+        ANS_LOGI("multiLine::additionalText = %{public}s", str);
+    }
+
+    // briefText: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "briefText", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "briefText", &multiLineContentResult);
+        NAPI_CALL(env, napi_typeof(env, multiLineContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, multiLineContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        multiLineContent->SetBriefText(str);
+        ANS_LOGI("multiLine: briefText = %{public}s", str);
+    } else {
+        ANS_LOGE("Property briefText expected.");
+        return nullptr;
+    }
+
+    // longTitle: string;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "longTitle", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, contentResult, "longTitle", &multiLineContentResult);
+        NAPI_CALL(env, napi_typeof(env, multiLineContentResult, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, multiLineContentResult, str, STR_MAX_SIZE - 1, &strLen));
+        multiLineContent->SetExpandedTitle(str);
+        ANS_LOGI("multiLine: longTitle = %{public}s", str);
+    } else {
+        ANS_LOGE("Property longTitle expected.");
+        return nullptr;
+    }
+
+    // lines: Array<String>;
+    NAPI_CALL(env, napi_has_named_property(env, contentResult, "lines", &hasProperty));
+    if (hasProperty) {
+        if (GetNotificationMultiLineContentLines(env, contentResult, multiLineContent) == nullptr) {
+            return nullptr;
+        }
+    } else {
+        ANS_LOGE("Property lines expected.");
+        return nullptr;
+    }
+
+    request.SetContent(std::make_shared<NotificationContent>(multiLineContent));
 
     return Common::NapiGetNull(env);
 }
@@ -2703,71 +2810,77 @@ napi_value GetNotificationMultiLineContentLines(const napi_env &env, const napi_
     ANS_LOGI("enter");
 
     bool isArray = false;
-    napi_valuetype valuetype;
-    napi_value multilines;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value multilines = nullptr;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
     uint32_t length = 0;
 
     napi_get_named_property(env, result, "lines", &multilines);
     napi_is_array(env, multilines, &isArray);
-    if (isArray) {
-        napi_get_array_length(env, multilines, &length);
-        NAPI_ASSERT(env, length > 0, "The array is empty.");
-        for (size_t i = 0; i < length; i++) {
-            napi_value line;
-            napi_get_element(env, multilines, i, &line);
-            NAPI_CALL(env, napi_typeof(env, line, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
-            multiLineContent->AddSingleLine(str);
-            ANS_LOGI("multiLine: lines : addSingleLine = %{public}s", str);
-        }
+    NAPI_ASSERT(env, isArray, "Property lines is expected to be an array.");
+
+    napi_get_array_length(env, multilines, &length);
+    NAPI_ASSERT(env, length > 0, "The array is empty.");
+    for (size_t i = 0; i < length; i++) {
+        napi_value line = nullptr;
+        napi_get_element(env, multilines, i, &line);
+        NAPI_CALL(env, napi_typeof(env, line, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
+        multiLineContent->AddSingleLine(str);
+        ANS_LOGI("multiLine: lines : addSingleLine = %{public}s", str);
     }
 
     return Common::NapiGetNull(env);
 }
 
-napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &slot, const napi_value &result)
+napi_value Common::GetNotificationSlot(const napi_env &env, const napi_value &value, NotificationSlot &slot)
 {
     ANS_LOGI("enter");
     napi_value nobj = nullptr;
-    napi_valuetype valuetype;
+    napi_valuetype valuetype = napi_undefined;
     bool hasProperty = false;
     size_t strLen = 0;
     uint32_t length = 0;
 
     // type: notification.SlotType
     int slotType = 0;
-    napi_get_named_property(env, result, "type", &nobj);
+    NAPI_CALL(env, napi_has_named_property(env, value, "type", &hasProperty));
+    NAPI_ASSERT(env, hasProperty, "Property type expected.");
+    napi_get_named_property(env, value, "type", &nobj);
     NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
     napi_get_value_int32(env, nobj, &slotType);
-
-    enum NotificationConstant::SlotType outType;
+    enum NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
     if (!SlotTypeJSToC(SlotType(slotType), outType)) {
         return nullptr;
     }
     slot.SetType(outType);
 
     // level?: number
-    NAPI_CALL(env, napi_has_named_property(env, result, "level", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "level", &hasProperty));
     if (hasProperty) {
-        int level = 0;
-        napi_get_named_property(env, result, "level", &nobj);
+        int inLevel = 0;
+        napi_get_named_property(env, value, "level", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        napi_get_value_int32(env, nobj, &level);
-        ANS_LOGI("level is: %{public}d", level);
-        slot.SetLevel(NotificationSlot::NotificationLevel(level));
+        napi_get_value_int32(env, nobj, &inLevel);
+        ANS_LOGI("level is: %{public}d", inLevel);
+
+        NotificationSlot::NotificationLevel outLevel{NotificationSlot::NotificationLevel::LEVEL_NONE};
+        if (!SlotLevelJSToC(SlotLevel(inLevel), outLevel)) {
+            return nullptr;
+        }
+        slot.SetLevel(outLevel);
     }
 
     // desc?: string
-    NAPI_CALL(env, napi_has_named_property(env, result, "desc", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "desc", &hasProperty));
     if (hasProperty) {
         std::string desc;
         char str[STR_MAX_SIZE] = {0};
-        napi_get_named_property(env, result, "desc", &nobj);
+        napi_get_named_property(env, value, "desc", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, nobj, str, STR_MAX_SIZE - 1, &strLen));
@@ -2776,23 +2889,23 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
         slot.SetDescription(desc);
     }
 
-    // showBadgeFlag?: boolean
-    NAPI_CALL(env, napi_has_named_property(env, result, "showBadgeFlag", &hasProperty));
+    // badgeFlag?: boolean
+    NAPI_CALL(env, napi_has_named_property(env, value, "badgeFlag", &hasProperty));
     if (hasProperty) {
-        bool showBadgeFlag = false;
-        napi_get_named_property(env, result, "showBadgeFlag", &nobj);
+        bool badgeFlag = false;
+        napi_get_named_property(env, value, "badgeFlag", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
-        napi_get_value_bool(env, nobj, &showBadgeFlag);
-        ANS_LOGI("showBadgeFlag is: %{public}d", showBadgeFlag);
-        slot.EnableBadge(showBadgeFlag);
+        napi_get_value_bool(env, nobj, &badgeFlag);
+        ANS_LOGI("badgeFlag is: %{public}d", badgeFlag);
+        slot.EnableBadge(badgeFlag);
     }
 
     // bypassDnd?: boolean
-    NAPI_CALL(env, napi_has_named_property(env, result, "bypassDnd", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "bypassDnd", &hasProperty));
     if (hasProperty) {
         bool bypassDnd = false;
-        napi_get_named_property(env, result, "bypassDnd", &nobj);
+        napi_get_named_property(env, value, "bypassDnd", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
         napi_get_value_bool(env, nobj, &bypassDnd);
@@ -2801,10 +2914,10 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
     }
 
     // lockscreenVisibility?: number
-    NAPI_CALL(env, napi_has_named_property(env, result, "lockscreenVisibility", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "lockscreenVisibility", &hasProperty));
     if (hasProperty) {
         int lockscreenVisibility = 0;
-        napi_get_named_property(env, result, "lockscreenVisibility", &nobj);
+        napi_get_named_property(env, value, "lockscreenVisibility", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int32(env, nobj, &lockscreenVisibility);
@@ -2813,10 +2926,10 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
     }
 
     // vibrationEnabled?: boolean
-    NAPI_CALL(env, napi_has_named_property(env, result, "vibrationEnabled", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "vibrationEnabled", &hasProperty));
     if (hasProperty) {
         bool vibrationEnabled = false;
-        napi_get_named_property(env, result, "vibrationEnabled", &nobj);
+        napi_get_named_property(env, value, "vibrationEnabled", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
         napi_get_value_bool(env, nobj, &vibrationEnabled);
@@ -2825,11 +2938,11 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
     }
 
     // sound?: string
-    NAPI_CALL(env, napi_has_named_property(env, result, "sound", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "sound", &hasProperty));
     if (hasProperty) {
         std::string sound;
         char str[STR_MAX_SIZE] = {0};
-        napi_get_named_property(env, result, "sound", &nobj);
+        napi_get_named_property(env, value, "sound", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, nobj, str, STR_MAX_SIZE - 1, &strLen));
@@ -2839,10 +2952,10 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
     }
 
     // lightEnabled?: boolean
-    NAPI_CALL(env, napi_has_named_property(env, result, "lightEnabled", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "lightEnabled", &hasProperty));
     if (hasProperty) {
         bool lightEnabled = false;
-        napi_get_named_property(env, result, "lightEnabled", &nobj);
+        napi_get_named_property(env, value, "lightEnabled", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
         napi_get_value_bool(env, nobj, &lightEnabled);
@@ -2851,10 +2964,10 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
     }
 
     // lightColor?: number
-    NAPI_CALL(env, napi_has_named_property(env, result, "lightColor", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "lightColor", &hasProperty));
     if (hasProperty) {
         int lightColor = 0;
-        napi_get_named_property(env, result, "lightColor", &nobj);
+        napi_get_named_property(env, value, "lightColor", &nobj);
         NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int32(env, nobj, &lightColor);
@@ -2863,29 +2976,89 @@ napi_value Common::GetNotificationSlot(const napi_env &env, NotificationSlot &sl
     }
 
     // vibrationValues?: Array<number>
-    NAPI_CALL(env, napi_has_named_property(env, result, "vibrationValues", &hasProperty));
+    NAPI_CALL(env, napi_has_named_property(env, value, "vibrationValues", &hasProperty));
     if (hasProperty) {
         bool isArray = false;
-        napi_get_named_property(env, result, "vibrationValues", &nobj);
+        napi_get_named_property(env, value, "vibrationValues", &nobj);
         napi_is_array(env, nobj, &isArray);
-        if (isArray) {
-            napi_get_array_length(env, nobj, &length);
-            std::vector<int64_t> vibrationValues;
-            for (size_t i = 0; i < length; i++) {
-                napi_value nVibrationValue;
-                int64_t vibrationValue = 0;
-                napi_get_element(env, nobj, i, &nVibrationValue);
-                NAPI_CALL(env, napi_typeof(env, nVibrationValue, &valuetype));
-                NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-                napi_get_value_int64(env, nVibrationValue, &vibrationValue);
-                ANS_LOGI("vibrationValue is: %{public}" PRId64, vibrationValue);
-                vibrationValues.emplace_back(vibrationValue);
-            }
-            if (vibrationValues.size() > 0) {
-                slot.SetVibrationStyle(vibrationValues);
-            }
+        NAPI_ASSERT(env, isArray, "Property vibrationValues is expected to be an array.");
+        napi_get_array_length(env, nobj, &length);
+        NAPI_ASSERT(env, length > 0, "The array is empty.");
+        std::vector<int64_t> vibrationValues;
+        for (size_t i = 0; i < length; i++) {
+            napi_value nVibrationValue = nullptr;
+            int64_t vibrationValue = 0;
+            napi_get_element(env, nobj, i, &nVibrationValue);
+            NAPI_CALL(env, napi_typeof(env, nVibrationValue, &valuetype));
+            NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+            napi_get_value_int64(env, nVibrationValue, &vibrationValue);
+            ANS_LOGI("vibrationValue is: %{public}" PRId64, vibrationValue);
+            vibrationValues.emplace_back(vibrationValue);
         }
+        slot.SetVibrationStyle(vibrationValues);
     }
+    return NapiGetNull(env);
+}
+
+napi_value Common::GetBundleOption(const napi_env &env, const napi_value &value, BundleOption &option)
+{
+    ANS_LOGI("enter");
+
+    bool hasProperty{false};
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+
+    char str[STR_MAX_SIZE] = {0};
+    size_t strLen = 0;
+    // bundle: string;
+    NAPI_CALL(env, napi_has_named_property(env, value, "bundle", &hasProperty));
+    NAPI_ASSERT(env, hasProperty, "Property bundle expected.");
+    napi_get_named_property(env, value, "bundle", &result);
+    NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+    NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
+    option.bundle = str;
+
+    // uid?: number;
+    NAPI_CALL(env, napi_has_named_property(env, value, "uid", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "uid", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+        napi_get_value_int32(env, result, &option.uid);
+    }
+
+    return NapiGetNull(env);
+}
+
+napi_value Common::GetNotificationKey(const napi_env &env, const napi_value &value, NotificationKey &key)
+{
+    ANS_LOGI("enter");
+
+    bool hasProperty{false};
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+
+    // id: number;
+    NAPI_CALL(env, napi_has_named_property(env, value, "id", &hasProperty));
+    NAPI_ASSERT(env, hasProperty, "Property id expected.");
+    napi_get_named_property(env, value, "id", &result);
+    NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+    napi_get_value_int32(env, result, &key.id);
+
+    // lable?: string;
+    NAPI_CALL(env, napi_has_named_property(env, value, "label", &hasProperty));
+    if (hasProperty) {
+        char str[STR_MAX_SIZE] = {0};
+        size_t strLen = 0;
+        napi_get_named_property(env, value, "label", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
+        key.label = str;
+    }
+
     return NapiGetNull(env);
 }
 
@@ -2898,20 +3071,20 @@ bool Common::ContentTypeJSToC(const enum ContentType &inType, enum NotificationC
         case ContentType::NOTIFICATION_CONTENT_LONG_TEXT:
             outType = NotificationContent::Type::LONG_TEXT;
             break;
-        case ContentType::NOTIFICATION_CONTENT_PICTURE:
-            outType = NotificationContent::Type::PICTURE;
-            break;
-        case ContentType::NOTIFICATION_CONTENT_CONVERSATION:
-            outType = NotificationContent::Type::CONVERSATION;
-            break;
+        // case ContentType::NOTIFICATION_CONTENT_PICTURE:
+        //     outType = NotificationContent::Type::PICTURE;
+        //     break;
+        // case ContentType::NOTIFICATION_CONTENT_CONVERSATION:
+        //     outType = NotificationContent::Type::CONVERSATION;
+        //     break;
         case ContentType::NOTIFICATION_CONTENT_MULTILINE:
             outType = NotificationContent::Type::MULTILINE;
             break;
-        case ContentType::NOTIFICATION_CONTENT_MEDIA:
-            outType = NotificationContent::Type::MEDIA;
-            break;
+        // case ContentType::NOTIFICATION_CONTENT_MEDIA:
+        //     outType = NotificationContent::Type::MEDIA;
+        //     break;
         default:
-            ANS_LOGI("contentType is error");
+            ANS_LOGE("ContentType %{public}d is an invalid value", inType);
             return false;
     }
     return true;
@@ -2926,20 +3099,20 @@ bool Common::ContentTypeCToJS(const enum NotificationContent::Type &inType, enum
         case NotificationContent::Type::LONG_TEXT:
             outType = ContentType::NOTIFICATION_CONTENT_LONG_TEXT;
             break;
-        case NotificationContent::Type::PICTURE:
-            outType = ContentType::NOTIFICATION_CONTENT_PICTURE;
-            break;
-        case NotificationContent::Type::CONVERSATION:
-            outType = ContentType::NOTIFICATION_CONTENT_CONVERSATION;
-            break;
+        // case NotificationContent::Type::PICTURE:
+        //     outType = ContentType::NOTIFICATION_CONTENT_PICTURE;
+        //     break;
+        // case NotificationContent::Type::CONVERSATION:
+        //     outType = ContentType::NOTIFICATION_CONTENT_CONVERSATION;
+        //     break;
         case NotificationContent::Type::MULTILINE:
             outType = ContentType::NOTIFICATION_CONTENT_MULTILINE;
             break;
-        case NotificationContent::Type::MEDIA:
-            outType = ContentType::NOTIFICATION_CONTENT_MEDIA;
-            break;
+        // case NotificationContent::Type::MEDIA:
+        //     outType = ContentType::NOTIFICATION_CONTENT_MEDIA;
+        //     break;
         default:
-            ANS_LOGI("contentType is error");
+            ANS_LOGE("ContentType %{public}d is an invalid value", inType);
             return false;
     }
     return true;
@@ -2962,7 +3135,7 @@ bool Common::SlotTypeJSToC(const enum SlotType &inType, enum NotificationConstan
             outType = NotificationConstant::SlotType::OTHER;
             break;
         default:
-            ANS_LOGI("slotType is error");
+            ANS_LOGE("SlotType %{public}d is an invalid value", inType);
             return false;
     }
     return true;
@@ -2987,7 +3160,58 @@ bool Common::SlotTypeCToJS(const enum NotificationConstant::SlotType &inType, en
             outType = SlotType::OTHER_TYPES;
             break;
         default:
-            ANS_LOGI("slotType is error");
+            ANS_LOGE("SlotType %{public}d is an invalid value", inType);
+            return false;
+    }
+    return true;
+}
+
+bool Common::SlotLevelJSToC(const SlotLevel &inLevel, NotificationSlot::NotificationLevel &outLevel)
+{
+    switch (inLevel) {
+        case SlotLevel::LEVEL_NONE:
+            outLevel = NotificationSlot::NotificationLevel::LEVEL_NONE;
+            break;
+        case SlotLevel::LEVEL_MIN:
+            outLevel = NotificationSlot::NotificationLevel::LEVEL_MIN;
+            break;
+        case SlotLevel::LEVEL_LOW:
+            outLevel = NotificationSlot::NotificationLevel::LEVEL_LOW;
+            break;
+        case SlotLevel::LEVEL_DEFAULT:
+            outLevel = NotificationSlot::NotificationLevel::LEVEL_DEFAULT;
+            break;
+        case SlotLevel::LEVEL_HIGH:
+            outLevel = NotificationSlot::NotificationLevel::LEVEL_HIGH;
+            break;
+        default:
+            ANS_LOGE("SlotLevel %{public}d is an invalid value", inLevel);
+            return false;
+    }
+    return true;
+}
+
+bool Common::SlotLevelCToJS(const NotificationSlot::NotificationLevel &inLevel, SlotLevel &outLevel)
+{
+    switch (inLevel) {
+        case NotificationSlot::NotificationLevel::LEVEL_NONE:
+        case NotificationSlot::NotificationLevel::LEVEL_UNDEFINED:
+            outLevel = SlotLevel::LEVEL_NONE;
+            break;
+        case NotificationSlot::NotificationLevel::LEVEL_MIN:
+            outLevel = SlotLevel::LEVEL_MIN;
+            break;
+        case NotificationSlot::NotificationLevel::LEVEL_LOW:
+            outLevel = SlotLevel::LEVEL_LOW;
+            break;
+        case NotificationSlot::NotificationLevel::LEVEL_DEFAULT:
+            outLevel = SlotLevel::LEVEL_DEFAULT;
+            break;
+        case NotificationSlot::NotificationLevel::LEVEL_HIGH:
+            outLevel = SlotLevel::LEVEL_HIGH;
+            break;
+        default:
+            ANS_LOGE("SlotLevel %{public}d is an invalid value", inLevel);
             return false;
     }
     return true;
@@ -3024,7 +3248,7 @@ bool Common::ReasonCToJS(const int &inType, int &outType)
             outType = NotificationReason::APP_CANCEL_REASON_OTHER;
             break;
         default:
-            ANS_LOGI("reason is error");
+            ANS_LOGE("Reason %{public}d is an invalid value", inType);
             return false;
     }
     return true;
@@ -3049,7 +3273,7 @@ bool Common::DisturbModeJSToC(const enum DisturbMode &inType, enum NotificationC
             outType = NotificationConstant::DisturbMode::ALLOW_ALARMS;
             break;
         default:
-            ANS_LOGI("disturbMode is error");
+            ANS_LOGE("DisturbMode %{public}d is an invalid value", inType);
             return false;
     }
     return true;
@@ -3061,6 +3285,8 @@ napi_value Common::CreateWantAgentByJS(const napi_env &env, const std::shared_pt
         ANS_LOGI("agent is nullptr");
         return nullptr;
     }
+
+    wantAgent_.insert(agent);
     napi_value wantAgent = nullptr;
     napi_value wantAgentClass = nullptr;
     napi_define_class(env,
@@ -3076,7 +3302,24 @@ napi_value Common::CreateWantAgentByJS(const napi_env &env, const std::shared_pt
         nullptr,
         &wantAgentClass);
     napi_new_instance(env, wantAgentClass, 0, nullptr, &wantAgent);
-    napi_wrap(env, wantAgent, (void *)agent.get(), [](napi_env env, void *data, void *hint) {}, nullptr, nullptr);
+    napi_wrap(env,
+        wantAgent,
+        (void *)agent.get(),
+        [](napi_env env, void *data, void *hint) {
+            WantAgent::WantAgent *objectInfo = (WantAgent::WantAgent *)data;
+            ANS_LOGI("CreateWantAgentByJS this = %{public}p", objectInfo);
+
+            if (objectInfo) {
+                for (auto it = wantAgent_.begin(); it != wantAgent_.end(); ++it) {
+                    if ((*it).get() == objectInfo) {
+                        wantAgent_.erase(it);
+                        break;
+                    }
+                }
+            }
+        },
+        nullptr,
+        nullptr);
 
     return wantAgent;
 }

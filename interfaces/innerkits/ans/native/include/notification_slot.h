@@ -346,20 +346,20 @@ private:
     void SetName(const std::string &name);
 
 private:
-    std::string id_;
-    std::string name_;
-    bool isLightEnabled_;
-    bool isVibrationEnabled_;
-    bool isShowBadge_ = true;
-    bool isBypassDnd_;
-    std::string description_;
-    int32_t lightColor_ = 0;
-    NotificationLevel level_ = LEVEL_DEFAULT;
-    NotificationConstant::SlotType type_;
+    std::string id_{};
+    std::string name_{};
+    bool isLightEnabled_ {false};
+    bool isVibrationEnabled_ {false};
+    bool isShowBadge_{true};
+    bool isBypassDnd_{false};
+    std::string description_{};
+    int32_t lightColor_ {0};
+    NotificationLevel level_{LEVEL_DEFAULT};
+    NotificationConstant::SlotType type_{};
     NotificationConstant::VisiblenessType lockScreenVisibleness_{NotificationConstant::VisiblenessType::NO_OVERRIDE};
-    std::string groupId_;
+    std::string groupId_{};
     Uri sound_;
-    std::vector<int64_t> vibrationValues_;
+    std::vector<int64_t> vibrationValues_{};
 
     // no object in parcel
     static constexpr int VALUE_NULL = -1;

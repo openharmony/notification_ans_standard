@@ -45,7 +45,7 @@ private:
      */
 public:
     WantAgentInfo();
-    ~WantAgentInfo() = default;
+    virtual ~WantAgentInfo() = default;
 
     /**
      * A constructor used to create an WantAgentInfo instance based on the input parameters.

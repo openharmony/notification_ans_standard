@@ -30,12 +30,12 @@ BundleManagerHelper::~BundleManagerHelper()
 void BundleManagerHelper::OnRemoteDied(const wptr<IRemoteObject> &object)
 {}
 
-std::string BundleManagerHelper::GetBundleNameByUid(uid_t uid)
+std::string BundleManagerHelper::GetBundleNameByUid(int uid)
 {
     return "bundleName";
 }
 
-bool BundleManagerHelper::IsSystemApp(uid_t uid)
+bool BundleManagerHelper::IsSystemApp(int uid)
 {
     return true;
 }

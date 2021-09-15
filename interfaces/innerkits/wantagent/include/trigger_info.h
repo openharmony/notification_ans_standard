@@ -29,6 +29,7 @@ class TriggerInfo final : public std::enable_shared_from_this<TriggerInfo> {
      */
 public:
     TriggerInfo();
+    virtual ~TriggerInfo() = default;
 
     /**
      * A constructor used to create a {@code TriggerInfo} instance based on the input parameters.
@@ -56,6 +57,14 @@ public:
      * @param paramInfo Indicates the existing {@code TriggerInfo} object.
      */
     explicit TriggerInfo(const TriggerInfo &paramInfo);
+
+    /**
+     * A copy assignment operator used to create a {@code TriggerInfo} instance by copying parameters from an existing
+     * one.
+     *
+     * @param paramInfo Indicates the existing {@code TriggerInfo} object.
+     */
+    const TriggerInfo &operator=(const TriggerInfo &paramInfo);
 
     /**
      * Obtains the permission from the current {@code TriggerInfo} object.
@@ -103,6 +112,7 @@ public:
          */
     public:
         Builder();
+        virtual ~Builder() = default;
 
         /**
          * Sets the permission that the {@link WantAgent} recipient must have.

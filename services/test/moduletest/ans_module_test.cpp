@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <functional>
 #include <gtest/gtest.h>
 
@@ -1146,7 +1160,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0054, Function | SmallTest | Level1)
 {
     // add slot
     std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlotGroup> group = new NotificationSlotGroup();
+    sptr<NotificationSlotGroup> group = new NotificationSlotGroup("id", "name");
     sptr<NotificationSlot> socialSlot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     sptr<NotificationSlot> reminderSlot = new NotificationSlot(NotificationConstant::SlotType::SERVICE_REMINDER);
     sptr<NotificationSlot> contentSlot = new NotificationSlot(NotificationConstant::SlotType::CONTENT_INFORMATION);
@@ -1178,7 +1192,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0055, Function | SmallTest | Level1)
 {
     // add slot
     std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlotGroup> group = new NotificationSlotGroup();
+    sptr<NotificationSlotGroup> group = new NotificationSlotGroup("id", "name");
     sptr<NotificationSlot> socialSlot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     socialSlot->SetSlotGroup(group->GetId());
     slots.push_back(socialSlot);
@@ -1244,7 +1258,9 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0058, Function | SmallTest | Level1)
     req->SetBadgeNumber(1);
 
     // SetShowBadgeEnabledForBundle true
-    g_advancedNotificationService->SetShowBadgeEnabledForBundle("bundleName", true);
+    sptr<NotificationBundleOption> bundleOption;
+    bundleOption->SetBundleName("bundleName");
+    g_advancedNotificationService->SetShowBadgeEnabledForBundle(bundleOption, true);
 
     g_advancedNotificationService->Publish(label, req);
     EXPECT_EQ(true, passed);
@@ -2605,54 +2621,47 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0130, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
     subscriber->consumedCb_ = [](
-        const std::shared_ptr<Notification> notification, 
+        const std::shared_ptr<Notification> notification,
         const std::shared_ptr<NotificationSortingMap> sortingMap)
         {
             EXPECT_EQ(false, notification->EnableVibrate());
-            EXPECT_EQ(NotificationConstant::VisiblenessType::PUBLIC,notification->GetLockscreenVisibleness());
+            EXPECT_EQ(NotificationConstant::VisiblenessType::PUBLIC, notification->GetLockscreenVisibleness());
         };
 
     // add slot
     std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slot=new NotificationSlot(NotificationConstant::SlotType::OTHER);
+    sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::SlotType::OTHER);
     slots.push_back(slot);
     slot->SetLockscreenVisibleness(NotificationConstant::VisiblenessType::PUBLIC);
     slot->SetEnableVibration(true);
 
     // create request
-    std::string label="testLabel";
-    sptr<NotificationRequest> req=new NotificationRequest(0);
+    std::string label = "testLabel";
+    sptr<NotificationRequest> req = new NotificationRequest(0);
     req->SetSlotType(NotificationConstant::SlotType::OTHER);
     req->SetLabel(label);
     // publish
 
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
-
 }
-
 
 /**
  * @tc.number    : AnsModuleTest_0131
  * @tc.name      : AMS_ANS_GetActiveNotifications_13100
  * @tc.desc      : Test publish notification when cancel a  notification.
  */
-HWTEST_F(AnsModuleTest,AnsModuleTest_0131,Function | SmallTest|Level1){
-    //subscriber
+HWTEST_F(AnsModuleTest, AnsModuleTest_0131, Function | SmallTest | Level1)
+{
+    // subscriber
     auto subscriber = new TestAnsSubscriber();
-    g_advancedNotificationService->Subscribe(subscriber->GetImpl(),nullptr);
+    g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
     subscriber->canceledCb_ = [](const std::shared_ptr<Notification> &request,
                                   const std::shared_ptr<NotificationSortingMap> &sortingMap,
                                   int deleteReason) { passed = true; };
     //
     g_advancedNotificationService->Cancel(1, "1");
-    EXPECT_EQ(false,passed);
-
+    EXPECT_EQ(false, passed);
 }
-
-
-
-
 
 }  // namespace Notification
 }  // namespace OHOS
-

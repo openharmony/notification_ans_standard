@@ -14,7 +14,6 @@
  */
 
 #include "ans_manager_stub.h"
-
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
@@ -39,6 +38,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::CANCEL_ALL_NOTIFICATIONS,
             std::bind(
                 &AnsManagerStub::HandleCancelAll, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
+        {AnsManagerStub::ADD_SLOT_BY_TYPE,
+            std::bind(&AnsManagerStub::HandleAddSlotByType, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::ADD_SLOTS,
             std::bind(
                 &AnsManagerStub::HandleAddSlots, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
@@ -62,6 +64,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
                 std::placeholders::_3)},
         {AnsManagerStub::GET_SLOT_GROUPS,
             std::bind(&AnsManagerStub::HandleGetSlotGroups, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::GET_SLOT_NUM_AS_BUNDLE,
+            std::bind(&AnsManagerStub::HandleGetSlotNumAsBundle, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
         {AnsManagerStub::REMOVE_SLOT_GROUPS,
             std::bind(&AnsManagerStub::HandleRemoveSlotGroups, std::placeholders::_1, std::placeholders::_2,
@@ -111,6 +116,12 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::GET_PRIVATIVE_NOTIFICATIONS_ALLOWED,
             std::bind(&AnsManagerStub::HandleGetPrivateNotificationsAllowed, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
+        {AnsManagerStub::REMOVE_NOTIFICATION,
+            std::bind(&AnsManagerStub::HandleRemoveNotification, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::REMOVE_ALL_NOTIFICATIONS,
+            std::bind(&AnsManagerStub::HandleRemoveAllNotifications, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::DELETE_NOTIFICATION,
             std::bind(
                 &AnsManagerStub::HandleDelete, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
@@ -132,6 +143,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::SET_NOTIFICATION_ENABLED_FOR_BUNDLE,
             std::bind(&AnsManagerStub::HandleSetNotificationsEnabledForBundle, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
+        {AnsManagerStub::SET_NOTIFICATION_ENABLED_FOR_ALL_BUNDLE,
+            std::bind(&AnsManagerStub::HandleSetNotificationsEnabledForAllBundles, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
         {AnsManagerStub::SET_NOTIFICATION_ENABLED_FOR_SPECIAL_BUNDLE,
             std::bind(&AnsManagerStub::HandleSetNotificationsEnabledForSpecialBundle, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
@@ -140,6 +154,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
                 std::placeholders::_3)},
         {AnsManagerStub::GET_SHOW_BADGE_ENABLED_FOR_BUNDLE,
             std::bind(&AnsManagerStub::HandleGetShowBadgeEnabledForBundle, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::GET_SHOW_BADGE_ENABLED,
+            std::bind(&AnsManagerStub::HandleGetShowBadgeEnabled, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
         {AnsManagerStub::SUBSCRIBE_NOTIFICATION,
             std::bind(
@@ -280,6 +297,19 @@ ErrCode AnsManagerStub::HandleCancelAll(MessageParcel &data, MessageParcel &repl
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleAddSlotByType(MessageParcel &data, MessageParcel &reply)
+{
+    NotificationConstant::SlotType slotType = static_cast<NotificationConstant::SlotType>(data.ReadInt32());
+
+    ErrCode result = AddSlotByType(slotType);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleAddSlotByType] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleAddSlots(MessageParcel &data, MessageParcel &reply)
 {
     std::vector<sptr<NotificationSlot>> slots;
@@ -403,6 +433,28 @@ ErrCode AnsManagerStub::HandleGetSlotGroups(MessageParcel &data, MessageParcel &
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleGetSlotNumAsBundle(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<NotificationBundleOption> bundleOption = data.ReadStrongParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleGetSlotNumAsBundle] fail: read bundle failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    int num = 0;
+    ErrCode result = GetSlotNumAsBundle(bundleOption, num);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleGetSlotNumAsBundle] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteInt32(num)) {
+        ANS_LOGW("[HandleGetSlotNumAsBundle] fail: write enabled failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
     return ERR_OK;
 }
 
@@ -667,6 +719,50 @@ ErrCode AnsManagerStub::HandleGetPrivateNotificationsAllowed(MessageParcel &data
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleRemoveNotification(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<NotificationBundleOption> bundleOption = data.ReadStrongParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleRemoveNotification] fail: read bundle failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    int notificationId = 0;
+    if (!data.ReadInt32(notificationId)) {
+        ANS_LOGW("[HandleRemoveNotification] fail: read notificationId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    std::string label;
+    if (!data.ReadString(label)) {
+        ANS_LOGW("[HandleRemoveNotification] fail: read label failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = RemoveNotification(bundleOption, notificationId, label);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleRemoveNotification] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleRemoveAllNotifications(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<NotificationBundleOption> bundleOption = data.ReadStrongParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleRemoveAllNotifications] fail: read bundle failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = RemoveAllNotifications(bundleOption);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleRemoveAllNotifications] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleDelete(MessageParcel &data, MessageParcel &reply)
 {
     std::string key;
@@ -685,13 +781,13 @@ ErrCode AnsManagerStub::HandleDelete(MessageParcel &data, MessageParcel &reply)
 
 ErrCode AnsManagerStub::HandleDeleteByBundle(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
+    sptr<NotificationBundleOption> bundleOption = data.ReadStrongParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
         ANS_LOGW("[HandleDeleteByBundle] fail: read bundle failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    ErrCode result = DeleteByBundle(bundle);
+    ErrCode result = DeleteByBundle(bundleOption);
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleDeleteByBundle] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -711,14 +807,14 @@ ErrCode AnsManagerStub::HandleDeleteAll(MessageParcel &data, MessageParcel &repl
 
 ErrCode AnsManagerStub::HandleGetSlotsByBundle(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
-        ANS_LOGW("[HandleGetSlotsByBundle] fail: read bundle failed.");
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleGetSlotsByBundle] fail: read bundleOption failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
     std::vector<sptr<NotificationSlot>> slots;
-    ErrCode result = GetSlotsByBundle(bundle, slots);
+    ErrCode result = GetSlotsByBundle(bundleOption, slots);
     if (!WriteParcelableVector(slots, reply, result)) {
         ANS_LOGW("[HandleGetSlotsByBundle] fail: write slots failed.");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -728,9 +824,9 @@ ErrCode AnsManagerStub::HandleGetSlotsByBundle(MessageParcel &data, MessageParce
 
 ErrCode AnsManagerStub::HandleUpdateSlots(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
-        ANS_LOGW("[HandleUpdateSlots] fail: read bundle failed.");
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleUpdateSlots] fail: read bundleOption failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -740,7 +836,7 @@ ErrCode AnsManagerStub::HandleUpdateSlots(MessageParcel &data, MessageParcel &re
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    ErrCode result = UpdateSlots(bundle, slots);
+    ErrCode result = UpdateSlots(bundleOption, slots);
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleUpdateSlots] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -750,8 +846,8 @@ ErrCode AnsManagerStub::HandleUpdateSlots(MessageParcel &data, MessageParcel &re
 
 ErrCode AnsManagerStub::HandleUpdateSlotGroups(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
         ANS_LOGW("[HandleUpdateSlotGroups] fail: read bundle failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -762,7 +858,7 @@ ErrCode AnsManagerStub::HandleUpdateSlotGroups(MessageParcel &data, MessageParce
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    ErrCode result = UpdateSlotGroups(bundle, groups);
+    ErrCode result = UpdateSlotGroups(bundleOption, groups);
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleUpdateSlotGroups] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -822,9 +918,9 @@ ErrCode AnsManagerStub::HandleSetNotificationsEnabledForSpecialBundle(MessagePar
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
-        ANS_LOGW("[HandleSetNotificationsEnabledForSpecialBundle] fail: read bundle failed.");
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleSetNotificationsEnabledForSpecialBundle] fail: read bundleOption failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -834,7 +930,7 @@ ErrCode AnsManagerStub::HandleSetNotificationsEnabledForSpecialBundle(MessagePar
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    ErrCode result = SetNotificationsEnabledForSpecialBundle(deviceId, bundle, enabled);
+    ErrCode result = SetNotificationsEnabledForSpecialBundle(deviceId, bundleOption, enabled);
     if (!reply.WriteInt32(result)) {
         ANS_LOGW(
             "[HandleSetNotificationsEnabledForSpecialBundle] fail: write result failed, ErrCode=%{public}d", result);
@@ -845,8 +941,8 @@ ErrCode AnsManagerStub::HandleSetNotificationsEnabledForSpecialBundle(MessagePar
 
 ErrCode AnsManagerStub::HandleSetShowBadgeEnabledForBundle(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
         ANS_LOGW("[HandleSetShowBadgeEnabledForBundle] fail: read bundle failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -857,7 +953,7 @@ ErrCode AnsManagerStub::HandleSetShowBadgeEnabledForBundle(MessageParcel &data, 
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    ErrCode result = SetShowBadgeEnabledForBundle(bundle, enabled);
+    ErrCode result = SetShowBadgeEnabledForBundle(bundleOption, enabled);
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleSetShowBadgeEnabledForBundle] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -867,14 +963,14 @@ ErrCode AnsManagerStub::HandleSetShowBadgeEnabledForBundle(MessageParcel &data, 
 
 ErrCode AnsManagerStub::HandleGetShowBadgeEnabledForBundle(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
         ANS_LOGW("[HandleGetShowBadgeEnabledForBundle] fail: read bundle failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
     bool enabled = false;
-    ErrCode result = GetShowBadgeEnabledForBundle(bundle, enabled);
+    ErrCode result = GetShowBadgeEnabledForBundle(bundleOption, enabled);
 
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetShowBadgeEnabledForBundle] fail: write result failed, ErrCode=%{public}d", result);
@@ -888,6 +984,23 @@ ErrCode AnsManagerStub::HandleGetShowBadgeEnabledForBundle(MessageParcel &data, 
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleGetShowBadgeEnabled(MessageParcel &data, MessageParcel &reply)
+{
+    bool enabled = false;
+    ErrCode result = GetShowBadgeEnabled(enabled);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleGetShowBadgeEnabled] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteBool(enabled)) {
+        ANS_LOGW("[HandleGetShowBadgeEnabled] fail: write enabled failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleSubscribe(MessageParcel &data, MessageParcel &reply)
 {
     sptr<IRemoteObject> subscriber = data.ReadRemoteObject();
@@ -896,7 +1009,7 @@ ErrCode AnsManagerStub::HandleSubscribe(MessageParcel &data, MessageParcel &repl
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    bool subcribeInfo;
+    bool subcribeInfo = false;
     if (!data.ReadBool(subcribeInfo)) {
         ANS_LOGW("[HandleSubscribe] fail: read isSubcribeInfo failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -927,7 +1040,7 @@ ErrCode AnsManagerStub::HandleUnsubscribe(MessageParcel &data, MessageParcel &re
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    bool subcribeInfo;
+    bool subcribeInfo = false;
     if (!data.ReadBool(subcribeInfo)) {
         ANS_LOGW("[HandleUnsubscribe] fail: read isSubcribeInfo failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1003,14 +1116,14 @@ ErrCode AnsManagerStub::HandleIsAllowedNotify(MessageParcel &data, MessageParcel
 
 ErrCode AnsManagerStub::HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundle;
-    if (!data.ReadString(bundle)) {
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
         ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: read bundle failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
     bool allowed = false;
-    ErrCode result = IsSpecialBundleAllowedNotify(bundle, allowed);
+    ErrCode result = IsSpecialBundleAllowedNotify(bundleOption, allowed);
 
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: write result failed, ErrCode=%{public}d", result);
@@ -1095,281 +1208,314 @@ bool AnsManagerStub::ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos,
 ErrCode AnsManagerStub::Publish(const std::string &label, const sptr<NotificationRequest> &notification)
 {
     ANS_LOGW("AnsManagerStub::Publish called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::PublishToDevice(const sptr<NotificationRequest> &notification, const std::string &deviceId)
 {
     ANS_LOGW("AnsManagerStub::PublishToDevice called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::Cancel(int notificationId, const std::string &label)
 {
     ANS_LOGW("AnsManagerStub::Cancel called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::CancelAll()
 {
     ANS_LOGW("AnsManagerStub::CancelAll called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::AddSlotByType(NotificationConstant::SlotType slotType)
+{
+    ANS_LOGW("AnsManagerStub::AddSlotByType called!");
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::AddSlots(const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGW("AnsManagerStub::AddSlots called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::RemoveSlotByType(const NotificationConstant::SlotType slotType)
+ErrCode AnsManagerStub::RemoveSlotByType(NotificationConstant::SlotType slotType)
 {
     ANS_LOGW("AnsManagerStub::RemoveSlotByType called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::RemoveAllSlots()
 {
     ANS_LOGW("AnsManagerStub::RemoveAllSlots called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups)
 {
     ANS_LOGW("AnsManagerStub::AddSlotGroups called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::GetSlotByType(const NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
+ErrCode AnsManagerStub::GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
 {
     ANS_LOGW("AnsManagerStub::GetSlotByType called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetSlots(std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGW("AnsManagerStub::GetSlots called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group)
 {
     ANS_LOGW("AnsManagerStub::GetSlotGroup called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups)
 {
     ANS_LOGW("AnsManagerStub::GetSlotGroups called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num)
+{
+    ANS_LOGW("AnsManagerStub::GetSlotNumAsBundle called!");
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::RemoveSlotGroups(const std::vector<std::string> &groupIds)
 {
     ANS_LOGW("AnsManagerStub::RemoveSlotGroups called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetActiveNotifications(std::vector<sptr<NotificationRequest>> &notifications)
 {
     ANS_LOGW("AnsManagerStub::GetActiveNotifications called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetActiveNotificationNums(int &num)
 {
     ANS_LOGW("AnsManagerStub::GetActiveNotificationNums called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetAllActiveNotifications(std::vector<sptr<Notification>> &notifications)
 {
     ANS_LOGW("AnsManagerStub::GetAllActiveNotifications called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetSpecialActiveNotifications(
     const std::vector<std::string> &key, std::vector<sptr<Notification>> &notifications)
 {
     ANS_LOGW("AnsManagerStub::GetSpecialActiveNotifications called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::SetNotificationAgent(const std::string &agent)
 {
     ANS_LOGW("AnsManagerStub::SetNotificationAgent called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetNotificationAgent(std::string &agent)
 {
     ANS_LOGW("AnsManagerStub::GetNotificationAgent called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::CanPublishAsBundle(const std::string &representativeBundle, bool &canPublish)
 {
     ANS_LOGW("AnsManagerStub::CanPublishAsBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::PublishAsBundle(
     const sptr<NotificationRequest> notification, const std::string &representativeBundle)
 {
     ANS_LOGW("AnsManagerStub::PublishAsBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::SetNotificationBadgeNum(int num)
 {
     ANS_LOGW("AnsManagerStub::SetNotificationBadgeNum called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetBundleImportance(int &importance)
 {
     ANS_LOGW("AnsManagerStub::GetBundleImportance called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::SetDisturbMode(NotificationConstant::DisturbMode mode)
 {
     ANS_LOGW("AnsManagerStub::SetDisturbMode called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetDisturbMode(NotificationConstant::DisturbMode &mode)
 {
     ANS_LOGW("AnsManagerStub::GetDisturbMode called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::HasNotificationPolicyAccessPermission(bool &granted)
 {
     ANS_LOGW("AnsManagerStub::HasNotificationPolicyAccessPermission called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::SetPrivateNotificationsAllowed(bool allow)
 {
     ANS_LOGW("AnsManagerStub::SetPrivateNotificationsAllowed called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetPrivateNotificationsAllowed(bool &allow)
 {
     ANS_LOGW("AnsManagerStub::GetPrivateNotificationsAllowed called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::RemoveNotification(
+    const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label)
+{
+    ANS_LOGW("AnsManagerStub::RemoveNotification called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::RemoveAllNotifications(const sptr<NotificationBundleOption> &bundleOption)
+{
+    ANS_LOGW("AnsManagerStub::RemoveAllNotifications called!");
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::Delete(const std::string &key)
 {
     ANS_LOGW("AnsManagerStub::Delete called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::DeleteByBundle(const std::string &bundle)
+ErrCode AnsManagerStub::DeleteByBundle(const sptr<NotificationBundleOption> &bundleOption)
 {
     ANS_LOGW("AnsManagerStub::DeleteByBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::DeleteAll()
 {
     ANS_LOGW("AnsManagerStub::DeleteAll called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::GetSlotsByBundle(const std::string &bundle, std::vector<sptr<NotificationSlot>> &slots)
+ErrCode AnsManagerStub::GetSlotsByBundle(
+    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGW("AnsManagerStub::GetSlotsByBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::UpdateSlots(const std::string &bundle, const std::vector<sptr<NotificationSlot>> &slots)
+ErrCode AnsManagerStub::UpdateSlots(
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGW("AnsManagerStub::UpdateSlots called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::UpdateSlotGroups(
-    const std::string &bundle, const std::vector<sptr<NotificationSlotGroup>> &groups)
+    const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
     ANS_LOGW("AnsManagerStub::UpdateSlotGroups called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::SetNotificationsEnabledForBundle(const std::string &bundle, bool enabled)
 {
     ANS_LOGW("AnsManagerStub::SetNotificationsEnabledForBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled)
 {
     ANS_LOGW("AnsManagerStub::SetNotificationsEnabledForAllBundles called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::SetNotificationsEnabledForSpecialBundle(
-    const std::string &deviceId, const std::string &bundleName, bool enabled)
+    const std::string &deviceId, const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
     ANS_LOGW("AnsManagerStub::SetNotificationsEnabledForSpecialBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::SetShowBadgeEnabledForBundle(const std::string &bundle, bool enabled)
+ErrCode AnsManagerStub::SetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
     ANS_LOGW("AnsManagerStub::SetShowBadgeEnabledForBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::GetShowBadgeEnabledForBundle(const std::string &bundle, bool &enabled)
+ErrCode AnsManagerStub::GetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
 {
     ANS_LOGW("AnsManagerStub::GetShowBadgeEnabledForBundle called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::GetShowBadgeEnabled(bool &enabled)
+{
+    ANS_LOGW("AnsManagerStub::GetShowBadgeEnabled called!");
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::Subscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info)
 {
     ANS_LOGW("AnsManagerStub::Subscribe called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::Unsubscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info)
 {
     ANS_LOGW("AnsManagerStub::Unsubscribe called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::AreNotificationsSuspended(bool &suspended)
 {
     ANS_LOGW("AnsManagerStub::AreNotificationsSuspended called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap)
 {
     ANS_LOGW("AnsManagerStub::GetCurrentAppSorting called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::IsAllowedNotify(bool &allowed)
 {
     ANS_LOGW("AnsManagerStub::IsAllowedNotify called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::IsSpecialBundleAllowedNotify(const std::string &bundle, bool &allowed)
+ErrCode AnsManagerStub::IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
 {
     ANS_LOGW("AnsManagerStub::IsSpecialBundleAllowedNotify called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 ErrCode AnsManagerStub::ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo)
 {
     ANS_LOGW("AnsManagerStub::ShellDump called!");
-    return ERR_OK;
+    return ERR_INVALID_OPERATION;
 }
 
 }  // namespace Notification

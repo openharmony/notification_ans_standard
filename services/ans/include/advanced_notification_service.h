@@ -29,6 +29,7 @@
 #include "distributed_kv_data_manager.h"
 #include "distributed_kvstore_death_recipient.h"
 #include "notification.h"
+#include "notification_bundle_option.h"
 #include "notification_record.h"
 #include "notification_sorting_map.h"
 #include "system_event_observer.h"
@@ -47,13 +48,16 @@ public:
     ErrCode Publish(const std::string &label, const sptr<NotificationRequest> &request) override;
     ErrCode Cancel(int notificationId, const std::string &label) override;
     ErrCode CancelAll() override;
+    ErrCode AddSlotByType(NotificationConstant::SlotType slotType) override;
     ErrCode AddSlots(const std::vector<sptr<NotificationSlot>> &slots) override;
     ErrCode RemoveSlotByType(const NotificationConstant::SlotType slotType) override;
+    ErrCode RemoveAllSlots() override;
     ErrCode AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups) override;
     ErrCode GetSlotByType(const NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) override;
     ErrCode GetSlots(std::vector<sptr<NotificationSlot>> &slots) override;
     ErrCode GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group) override;
     ErrCode GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num) override;
     ErrCode RemoveSlotGroups(const std::vector<std::string> &groupIds) override;
     ErrCode GetActiveNotifications(std::vector<sptr<NotificationRequest>> &notifications) override;
     ErrCode GetActiveNotificationNums(int &num) override;
@@ -72,28 +76,35 @@ public:
     ErrCode HasNotificationPolicyAccessPermission(bool &granted) override;
     ErrCode SetPrivateNotificationsAllowed(bool allow) override;
     ErrCode GetPrivateNotificationsAllowed(bool &allow) override;
+    ErrCode RemoveNotification(
+        const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label) override;
+    ErrCode RemoveAllNotifications(const sptr<NotificationBundleOption> &bundleOption) override;
     ErrCode Delete(const std::string &key) override;
-    ErrCode DeleteByBundle(const std::string &bundle) override;
+    ErrCode DeleteByBundle(const sptr<NotificationBundleOption> &bundleOption) override;
     ErrCode DeleteAll() override;
-    ErrCode GetSlotsByBundle(const std::string &bundle, std::vector<sptr<NotificationSlot>> &slots) override;
-    ErrCode UpdateSlots(const std::string &bundle, const std::vector<sptr<NotificationSlot>> &slots) override;
-    ErrCode UpdateSlotGroups(
-        const std::string &bundle, const std::vector<sptr<NotificationSlotGroup>> &groups) override;
+
+    ErrCode GetSlotsByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots) override;
+    ErrCode UpdateSlots(
+        const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) override;
+    ErrCode UpdateSlotGroups(const sptr<NotificationBundleOption> &bundleOption,
+        const std::vector<sptr<NotificationSlotGroup>> &groups) override;
     ErrCode SetNotificationsEnabledForBundle(const std::string &bundle, bool enabled) override;
     ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) override;
     ErrCode SetNotificationsEnabledForSpecialBundle(
-        const std::string &deviceId, const std::string &bundleName, bool enabled) override;
-    ErrCode SetShowBadgeEnabledForBundle(const std::string &bundle, bool enabled) override;
-    ErrCode GetShowBadgeEnabledForBundle(const std::string &bundle, bool &enabled) override;
+        const std::string &deviceId, const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
+    ErrCode SetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
+    ErrCode GetShowBadgeEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+    ErrCode GetShowBadgeEnabled(bool &enabled) override;
     ErrCode Subscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
     ErrCode Unsubscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
     ErrCode IsAllowedNotify(bool &allowed) override;
-    ErrCode IsSpecialBundleAllowedNotify(const std::string &bundle, bool &allowed) override;
+    ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
 
     // SystemEvent
-    void OnBundleRemoved(const std::string &bundle);
+    void OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption);
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();
@@ -108,10 +119,10 @@ private:
 
     void AddToNotificationList(const std::shared_ptr<NotificationRecord> &record);
     void UpdateInNotificationList(const std::shared_ptr<NotificationRecord> &record);
-    ErrCode RemoveFromNotificationList(const std::string &bundle, const std::string &label, int notificationId,
-        sptr<Notification> &notification, bool isCancel = false);
+    ErrCode RemoveFromNotificationList(const sptr<NotificationBundleOption> &bundleOption, const std::string &label,
+        int notificationId, sptr<Notification> &notification, bool isCancel = false);
     ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification, bool isCancel = false);
-    std::vector<std::string> GetNotificationKeys(const std::string &bundle);
+    std::vector<std::string> GetNotificationKeys(const sptr<NotificationBundleOption> &bundleOption);
     bool IsNotificationExists(const std::string &key);
     void SortNotificationList();
     static bool NotificationCompare(
@@ -119,6 +130,8 @@ private:
     ErrCode FlowControl(const std::shared_ptr<NotificationRecord> &record);
 
     sptr<NotificationSortingMap> GenerateSortingMap();
+    sptr<NotificationBundleOption> GenerateBundleOption();
+    sptr<NotificationBundleOption> GenerateValidBundleOption(const sptr<NotificationBundleOption> &bundleOption);
 
     std::string TimeToString(int64_t time);
     int64_t GetNowSysTime();

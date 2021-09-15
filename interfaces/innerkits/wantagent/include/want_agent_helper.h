@@ -44,7 +44,9 @@ static const int FLAG_IMMUTABLE = 1 << 26;
 class WantAgentHelper final : public std::enable_shared_from_this<WantAgentHelper> {
 private:
     WantAgentHelper();
+    virtual ~WantAgentHelper() = default;
 
+public:
     /**
      * Obtains an WantAgent object.
      * The WantAgent class does not have any constructor, and you can only use this method to create an
@@ -55,7 +57,6 @@ private:
      * WantAgent object to create.
      * @return Returns the created WantAgent object.
      */
-public:
     static std::shared_ptr<WantAgent> GetWantAgent(
         const std::shared_ptr<OHOS::AppExecFwk::Context> &context, const WantAgentInfo &paramsInfo);
 
@@ -71,6 +72,12 @@ public:
      */
     static std::shared_ptr<WantAgent> GetWantAgent(const WantAgentInfo &paramsInfo);
 
+    /**
+     * Obtains an WantAgent object operation type.
+     *
+     * @param agent Indicates the WantAgent to trigger.
+     * @return Returns the created WantAgent object.
+     */
     static WantAgentConstant::OperationType GetType(const std::shared_ptr<WantAgent> &agent);
 
     /**
@@ -142,9 +149,21 @@ public:
      */
     static std::shared_ptr<AAFwk::Want> GetWant(const std::shared_ptr<WantAgent> &agent);
 
+    /**
+     * Register Cancel function Listener.
+     *
+     * @param cancelListener Register listener object.
+     * @param agent Indicates the WantAgent whose bundle name is to be obtained.
+     */
     static void RegisterCancelListener(
         const std::shared_ptr<CancelListener> &cancelListener, const std::shared_ptr<WantAgent> &agent);
 
+    /**
+     * Unregister Cancel function Listener.
+     *
+     * @param cancelListener Register listener object.
+     * @param agent Indicates the WantAgent whose bundle name is to be obtained.
+     */
     static void UnregisterCancelListener(
         const std::shared_ptr<CancelListener> &cancelListener, const std::shared_ptr<WantAgent> &agent);
 

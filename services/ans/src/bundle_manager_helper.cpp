@@ -40,7 +40,7 @@ void BundleManagerHelper::OnRemoteDied(const wptr<IRemoteObject> &object)
     Disconnect();
 }
 
-std::string BundleManagerHelper::GetBundleNameByUid(uid_t uid)
+std::string BundleManagerHelper::GetBundleNameByUid(int uid)
 {
     std::string bundle;
 
@@ -55,7 +55,7 @@ std::string BundleManagerHelper::GetBundleNameByUid(uid_t uid)
     return bundle;
 }
 
-bool BundleManagerHelper::IsSystemApp(uid_t uid)
+bool BundleManagerHelper::IsSystemApp(int uid)
 {
     bool isSystemApp = false;
 
@@ -99,6 +99,24 @@ void BundleManagerHelper::Disconnect()
         bundleMgr_->AsObject()->RemoveDeathRecipient(deathRecipient_);
         bundleMgr_ = nullptr;
     }
+}
+
+int BundleManagerHelper::GetDefaultUidByBundleName(const std::string& bundle)
+{
+    int uid = -1;
+
+    std::lock_guard<std::mutex> lock(connectionMutex_);
+
+    Connect();
+
+    if (bundleMgr_ != nullptr) {
+        AppExecFwk::BundleInfo bundleInfo;
+        if (bundleMgr_->GetBundleInfo(bundle, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo)) {
+            uid = bundleInfo.uid;
+        }
+    }
+
+    return uid;
 }
 
 }  // namespace Notification

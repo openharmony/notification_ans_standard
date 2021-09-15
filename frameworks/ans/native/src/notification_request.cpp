@@ -1,6 +1,6 @@
 /*
- * Copyright (c); 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");;
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -37,9 +37,9 @@ const std::string NotificationRequest::CLASSIFICATION_STATUS{"status"};
 const std::string NotificationRequest::CLASSIFICATION_SYSTEM{"sys"};
 const std::string NotificationRequest::CLASSIFICATION_TRANSPORT{"transport"};
 
-const int32_t NotificationRequest::COLOR_DEFAULT{0};
+const uint32_t NotificationRequest::COLOR_DEFAULT{0};
 
-const int32_t NotificationRequest::COLOR_MASK{0xFF000000};
+const uint32_t NotificationRequest::COLOR_MASK{0xFF000000};
 const std::size_t NotificationRequest::MAX_USER_INPUT_HISTORY{5};
 const std::size_t NotificationRequest::MAX_ACTION_BUTTONS{3};
 
@@ -108,9 +108,6 @@ NotificationRequest::NotificationRequest(const NotificationRequest &other)
     this->littleIcon_ = other.littleIcon_;
     this->bigIcon_ = other.bigIcon_;
     this->notificationContent_ = other.notificationContent_;
-    this->customBigView_ = other.customBigView_;
-    this->customFloatView_ = other.customFloatView_;
-    this->customView_ = other.customView_;
     this->publicNotification_ = other.publicNotification_;
 
     this->actionButtons_ = other.actionButtons_;
@@ -170,9 +167,6 @@ NotificationRequest &NotificationRequest::operator=(const NotificationRequest &o
     this->littleIcon_ = other.littleIcon_;
     this->bigIcon_ = other.bigIcon_;
     this->notificationContent_ = other.notificationContent_;
-    this->customBigView_ = other.customBigView_;
-    this->customFloatView_ = other.customFloatView_;
-    this->customView_ = other.customView_;
     this->publicNotification_ = other.publicNotification_;
 
     this->actionButtons_ = other.actionButtons_;
@@ -380,15 +374,15 @@ std::string NotificationRequest::GetClassification() const
     return classification_;
 }
 
-void NotificationRequest::SetColor(int32_t color)
+void NotificationRequest::SetColor(uint32_t color)
 {
     color_ = color;
-    if (NotificationRequest::COLOR_DEFAULT != color) {
-        color_ = color | NotificationRequest::COLOR_MASK;
+    if (NotificationRequest::COLOR_DEFAULT != color_) {
+        color_ = color_ | NotificationRequest::COLOR_MASK;
     }
 }
 
-int32_t NotificationRequest::GetColor() const
+uint32_t NotificationRequest::GetColor() const
 {
     return color_;
 }
@@ -456,36 +450,6 @@ bool NotificationRequest::IsCountdownTimer() const
 void NotificationRequest::SetCountdownTimer(bool isCountDown)
 {
     isCountdown_ = isCountDown;
-}
-
-void NotificationRequest::SetCustomBigView(const std::shared_ptr<ComponentProvider> &view)
-{
-    customBigView_ = view;
-}
-
-const std::shared_ptr<ComponentProvider> NotificationRequest::GetCustomBigView() const
-{
-    return customBigView_;
-}
-
-void NotificationRequest::SetCustomFloatView(const std::shared_ptr<ComponentProvider> &view)
-{
-    customFloatView_ = view;
-}
-
-const std::shared_ptr<ComponentProvider> NotificationRequest::GetCustomFloatView() const
-{
-    return customFloatView_;
-}
-
-void NotificationRequest::SetCustomView(const std::shared_ptr<ComponentProvider> &view)
-{
-    customView_ = view;
-}
-
-const std::shared_ptr<ComponentProvider> NotificationRequest::GetCustomView() const
-{
-    return customView_;
 }
 
 void NotificationRequest::SetGroupAlertType(NotificationRequest::GroupAlertType type)
@@ -727,12 +691,12 @@ pid_t NotificationRequest::GetCreatorPid() const
     return creatorPid_;
 }
 
-void NotificationRequest::SetCreatorUid(uid_t uid)
+void NotificationRequest::SetCreatorUid(pid_t uid)
 {
     creatorUid_ = uid;
 }
 
-uid_t NotificationRequest::GetCreatorUid() const
+pid_t NotificationRequest::GetCreatorUid() const
 {
     return creatorUid_;
 }
@@ -785,9 +749,6 @@ std::string NotificationRequest::Dump()
            ", littleIcon = " + (littleIcon_ ? "not null" : "null") +
            ", bigIcon = " + (bigIcon_ ? "not null" : "null") +
            ", notificationContent = " + (notificationContent_ ? "not null" : "null") +
-           ", customBigView = " + (customBigView_ ? "not null" : "null") +
-           ", customFloatView = " + (customFloatView_ ? "not null" : "null") +
-           ", customView = " + (customView_ ? "not null" : "null") +
            ", publicNotification = " + (publicNotification_ ? "not null" : "null") +
            ", actionButtons = " + (!actionButtons_.empty() ? "not empty" : "empty") +
            ", messageUsers = " + (!messageUsers_.empty() ? "not empty" : "empty") +
@@ -802,7 +763,7 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    if (!parcel.WriteInt32(color_)) {
+    if (!parcel.WriteUint32(color_)) {
         ANS_LOGE("Failed to write color");
         return false;
     }
@@ -1080,45 +1041,6 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         }
     }
 
-    // valid = customBigView_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether customBigView is null");
-    //     return false;
-    // }
-
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(customBigView_.get())) {
-    //         ANS_LOGE("Failed to write customBigView");
-    //         return false;
-    //     }
-    // }
-
-    // valid = customFloatView_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether customFloatView is null");
-    //     return false;
-    // }
-
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(customFloatView_.get())) {
-    //         ANS_LOGE("Failed to write customFloatView");
-    //         return false;
-    //     }
-    // }
-
-    // valid = customView_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether customView is null");
-    //     return false;
-    // }
-
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(customView_.get())) {
-    //         ANS_LOGE("Failed to write customView");
-    //         return false;
-    //     }
-    // }
-
     valid = publicNotification_ ? true : false;
     if (!parcel.WriteBool(valid)) {
         ANS_LOGE("Failed to write the flag which indicate whether publicNotification is null");
@@ -1179,7 +1101,7 @@ NotificationRequest *NotificationRequest::Unmarshalling(Parcel &parcel)
 bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 {
     notificationId_ = parcel.ReadInt32();
-    color_ = parcel.ReadInt32();
+    color_ = parcel.ReadUint32();
     badgeNumber_ = parcel.ReadInt32();
     progressValue_ = parcel.ReadInt32();
     progressMax_ = parcel.ReadInt32();
@@ -1188,7 +1110,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     autoDeletedTime_ = parcel.ReadInt64();
 
     creatorPid_ = static_cast<pid_t>(parcel.ReadInt32());
-    creatorUid_ = static_cast<uid_t>(parcel.ReadInt32());
+    creatorUid_ = static_cast<pid_t>(parcel.ReadInt32());
 
     if (!parcel.ReadString(settingsText_)) {
         ANS_LOGE("Failed to read settings text");
@@ -1319,33 +1241,6 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
             return false;
         }
     }
-
-    // valid = parcel.ReadBool();
-    // if (valid) {
-    //     customBigView_ = std::shared_ptr<ComponentProvider>(parcel.ReadParcelable<ComponentProvider>());
-    //     if (!customBigView_) {
-    //         ANS_LOGE("Failed to read customBigView");
-    //         return false;
-    //     }
-    // }
-
-    // valid = parcel.ReadBool();
-    // if (valid) {
-    //     customFloatView_ = std::shared_ptr<ComponentProvider>(parcel.ReadParcelable<ComponentProvider>());
-    //     if (!customFloatView_) {
-    //         ANS_LOGE("Failed to read customFloatView");
-    //         return false;
-    //     }
-    // }
-
-    // valid = parcel.ReadBool();
-    // if (valid) {
-    //     customView_ = std::shared_ptr<ComponentProvider>(parcel.ReadParcelable<ComponentProvider>());
-    //     if (!customView_) {
-    //         ANS_LOGE("Failed to read customView");
-    //         return false;
-    //     }
-    // }
 
     valid = parcel.ReadBool();
     if (valid) {

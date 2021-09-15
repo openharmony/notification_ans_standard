@@ -47,8 +47,7 @@ WantAgent *WantAgent::Unmarshalling(Parcel &parcel)
     WantAgent *agent = new (std::nothrow) WantAgent();
     if (agent == nullptr) {
         WANT_AGENT_LOGE("read from parcel failed");
-        delete agent;
-        agent = nullptr;
+        return nullptr;
     }
     std::shared_ptr<PendingWant> pendingWant(parcel.ReadParcelable<PendingWant>());
     agent->SetPendingWant(pendingWant);

@@ -21,40 +21,44 @@
 
 #include "notification_preferences_database.h"
 
+
 namespace OHOS {
 namespace Notification {
 class NotificationPreferences final {
 public:
     DISALLOW_COPY_AND_MOVE(NotificationPreferences);
     static NotificationPreferences &GetInstance();
-    ErrCode AddNotificationSlots(const std::string &bundleName, const std::vector<sptr<NotificationSlot>> &slots);
+    ErrCode AddNotificationSlots(const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots);
     ErrCode AddNotificationSlotGroups(
-        const std::string &bundleName, const std::vector<sptr<NotificationSlotGroup>> &groups);
-    ErrCode RemoveNotificationSlot(const std::string &bundleName, const NotificationConstant::SlotType &slotType);
-    ErrCode RemoveNotificationSlotGroups(const std::string &bundleName, const std::vector<std::string> &groupIds);
-    ErrCode RemoveNotificationForBundle(const std::string &bundleName);
-    ErrCode UpdateNotificationSlots(const std::string &bundleName, const std::vector<sptr<NotificationSlot>> &slot);
+        const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups);
+    ErrCode AddNotificationBundleProperty(const sptr<NotificationBundleOption> &bundleOption);
+    ErrCode RemoveNotificationSlot(const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType);
+    ErrCode RemoveNotificationAllSlots(const sptr<NotificationBundleOption> &bundleOption);
+    ErrCode RemoveNotificationSlotGroups(const sptr<NotificationBundleOption> &bundleOption, const std::vector<std::string> &groupIds);
+    ErrCode RemoveNotificationForBundle(const sptr<NotificationBundleOption> &bundleOption);
+    ErrCode UpdateNotificationSlots(const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slot);
     ErrCode UpdateNotificationSlotGroups(
-        const std::string &bundleName, const std::vector<sptr<NotificationSlotGroup>> &groups);
+        const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups);
     ErrCode GetNotificationSlot(
-        const std::string &bundleName, const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot);
-    ErrCode GetNotificationAllSlots(const std::string &bundleName, std::vector<sptr<NotificationSlot>> &slots);
+        const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot);
+    ErrCode GetNotificationAllSlots(const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots);
+    ErrCode GetNotificationSlotsNumForBundle(const sptr<NotificationBundleOption> &bundleOption, int &num);
     ErrCode GetNotificationSlotGroup(
-        const std::string &bundleName, const std::string &groupId, sptr<NotificationSlotGroup> &group);
+        const sptr<NotificationBundleOption> &bundleOption, const std::string &groupId, sptr<NotificationSlotGroup> &group);
     ErrCode GetNotificationAllSlotGroups(
-        const std::string &bundleName, std::vector<sptr<NotificationSlotGroup>> &groups);
+        const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlotGroup>> &groups);
     ErrCode GetNotificationAllSlotInSlotGroup(
-        const std::string &bundleName, const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots);
-    ErrCode IsShowBadge(const std::string &bundleName, bool &enable);
-    ErrCode SetShowBadge(const std::string &bundleName, const bool enable);
-    ErrCode GetImportance(const std::string &bundleName, int &importance);
-    ErrCode SetImportance(const std::string &bundleName, const int &importance);
-    ErrCode GetTotalBadgeNums(const std::string &bundleName, int &totalBadgeNum);
-    ErrCode SetTotalBadgeNums(const std::string &bundleName, const int num);
-    ErrCode GetPrivateNotificationsAllowed(const std::string &bundleName, bool &allow);
-    ErrCode SetPrivateNotificationsAllowed(const std::string &bundleName, const bool allow);
-    ErrCode GetNotificationsEnabledForBundle(const std::string &bundleName, bool &enabled);
-    ErrCode SetNotificationsEnabledForBundle(const std::string &bundleName, const bool enabled);
+        const sptr<NotificationBundleOption> &bundleOption, const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots);
+    ErrCode IsShowBadge(const sptr<NotificationBundleOption> &bundleOption, bool &enable);
+    ErrCode SetShowBadge(const sptr<NotificationBundleOption> &bundleOption, const bool enable);
+    ErrCode GetImportance(const sptr<NotificationBundleOption> &bundleOption, int &importance);
+    ErrCode SetImportance(const sptr<NotificationBundleOption> &bundleOption, const int &importance);
+    ErrCode GetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, int &totalBadgeNum);
+    ErrCode SetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, const int num);
+    ErrCode GetPrivateNotificationsAllowed(const sptr<NotificationBundleOption> &bundleOption, bool &allow);
+    ErrCode SetPrivateNotificationsAllowed(const sptr<NotificationBundleOption> &bundleOption, const bool allow);
+    ErrCode GetNotificationsEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled);
+    ErrCode SetNotificationsEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, const bool enabled);
     ErrCode GetNotificationsEnabled(bool &enabled);
     ErrCode SetNotificationsEnabled(const bool &enabled);
     ErrCode GetDisturbMode(NotificationConstant::DisturbMode &mode);
@@ -64,28 +68,27 @@ public:
     void OnDistributedKvStoreDeathRecipient();
 
 private:
-    // enum class BundlePropertyType;
-
-    ErrCode CheckSlotForCreateSlot(const std::string &bundleName, const sptr<NotificationSlot> &slot,
+    ErrCode CheckSlotForCreateSlot(const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationSlot> &slot,
         NotificationPreferencesInfo &preferencesInfo) const;
-    ErrCode CheckGroupForCreateSlotGroup(const std::string &bundleName, const sptr<NotificationSlotGroup> &group,
+    ErrCode CheckGroupForCreateSlotGroup(const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationSlotGroup> &group,
         NotificationPreferencesInfo &preferencesInfo) const;
-    ErrCode CheckSlotForRemoveSlot(const std::string &bundleName, const NotificationConstant::SlotType &slotType,
+    ErrCode CheckSlotForRemoveSlot(const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType,
         NotificationPreferencesInfo &preferencesInfo) const;
     ErrCode CheckGroupForRemoveSlotGroup(
-        const std::string &bundleName, const std::string &groupId, NotificationPreferencesInfo &preferencesInfo) const;
-    ErrCode CheckSlotForUpdateSlot(const std::string &bundleName, const sptr<NotificationSlot> &slot,
+        const sptr<NotificationBundleOption> &bundleOption, const std::string &groupId, NotificationPreferencesInfo &preferencesInfo) const;
+    ErrCode CheckSlotForUpdateSlot(const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationSlot> &slot,
         NotificationPreferencesInfo &preferencesInfo) const;
-    ErrCode CheckGroupForUpdateSlotGroup(const std::string &bundleName, const sptr<NotificationSlotGroup> &group,
+    ErrCode CheckGroupForUpdateSlotGroup(const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationSlotGroup> &group,
         NotificationPreferencesInfo &preferencesInfo) const;
     template <typename T>
-    ErrCode SetBundleProperty(NotificationPreferencesInfo &preferencesInfo, const std::string &bundleName,
+    ErrCode SetBundleProperty(NotificationPreferencesInfo &preferencesInfo, const sptr<NotificationBundleOption> &bundleOption,
         const BundleType &type, const T &value);
     template <typename T>
-    ErrCode SaveBundleProperty(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &bundleName,
+    ErrCode SaveBundleProperty(NotificationPreferencesInfo::BundleInfo &bundleInfo, const sptr<NotificationBundleOption> &bundleOption,
         const BundleType &type, const T &value);
     template <typename T>
-    ErrCode GetBundleProperty(const std::string &bundleName, const BundleType &type, T &value) const;
+    ErrCode GetBundleProperty(const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, T &value) const;
+    std::string GenerateBundleKey(const sptr<NotificationBundleOption> &bundleOption) const;
 
 private:
     NotificationPreferencesInfo preferencesInfo_ {};

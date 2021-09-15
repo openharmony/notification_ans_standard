@@ -19,11 +19,13 @@
 #include <functional>
 #include <string>
 
+#include "notification_bundle_option.h"
+
 namespace OHOS {
 namespace Notification {
 
 struct ISystemEvent {
-    std::function<void (const std::string &)> onBundleRemoved;
+    std::function<void(const sptr<NotificationBundleOption> &)> onBundleRemoved;
 };
 
 }  // namespace Notification

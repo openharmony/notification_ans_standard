@@ -1,6 +1,6 @@
 /*
- * Copyright (c); 2021 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");;
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -47,17 +47,17 @@ public:
     };
 
     enum SemanticActionButton {
-        ARCHIVE_ACTION_BUTTON,      // Indicates the action of archiving the content associated with the notification.
-        CALL_ACTION_BUTTON,         // Indicates the action of making a call.
-        DELETE_ACTION_BUTTON,       // Indicates the action of deleting the content associated with the notification.
-        MUTE_ACTION_BUTTON,         // Indicates the action of muting the content associated with the notification.
         NONE_ACTION_BUTTON,         // Indicates that no WantAgent is associated.
-        READ_ACTION_BUTTON,         // Indicates the action of marking the content as read.
         REPLY_ACTION_BUTTON,        // Indicates the action of replying to a conversation.
-        THUMBS_DOWN_ACTION_BUTTON,  // Indicates the action of marking the content with a thumbs-down.
-        THUMBS_UP_ACTION_BUTTON,    // Indicates the action of marking the content with a thumbs-up.
-        UNMUTE_ACTION_BUTTON,       // Indicates the action of unmuting the content associated with the notification.
+        READ_ACTION_BUTTON,         // Indicates the action of marking the content as read.
         UNREAD_ACTION_BUTTON,       // Indicates the action of marking the content as unread.
+        DELETE_ACTION_BUTTON,       // Indicates the action of deleting the content associated with the notification.
+        ARCHIVE_ACTION_BUTTON,      // Indicates the action of archiving the content associated with the notification.
+        MUTE_ACTION_BUTTON,         // Indicates the action of muting the content associated with the notification.
+        UNMUTE_ACTION_BUTTON,       // Indicates the action of unmuting the content associated with the notification.
+        THUMBS_UP_ACTION_BUTTON,    // Indicates the action of marking the content with a thumbs-up.
+        THUMBS_DOWN_ACTION_BUTTON,  // Indicates the action of marking the content with a thumbs-down.
+        CALL_ACTION_BUTTON,         // Indicates the action of making a call.
     };
 
     enum SubscribeResult : uint32_t {
