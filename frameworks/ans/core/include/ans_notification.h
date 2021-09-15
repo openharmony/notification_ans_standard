@@ -618,6 +618,13 @@ private:
      */
     bool CanPublishMediaContent(const NotificationRequest &request) const;
 
+    /**
+     * Check whether the picture size exceeds the limit
+     *
+     * @return the ErrCode.
+     */
+    ErrCode CheckImageSize(const NotificationRequest &request);
+
 private:
     std::mutex mutex_;
     sptr<IAnsManager> ansManagerProxy_;

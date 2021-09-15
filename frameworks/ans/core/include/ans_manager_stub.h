@@ -155,10 +155,10 @@ private:
     ErrCode HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleShellDump(MessageParcel &data, MessageParcel &reply);
 
-    template <typename T>
+    template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);
 
-    template <typename T>
+    template<typename T>
     bool ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos, MessageParcel &data);
 };
 }  // namespace Notification

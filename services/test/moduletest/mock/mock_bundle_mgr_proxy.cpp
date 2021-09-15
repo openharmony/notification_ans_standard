@@ -258,13 +258,13 @@ bool BundleMgrProxy::UnregisterPermissionsChanged(const sptr<OnPermissionChanged
     return true;
 }
 
-template <typename T>
+template<typename T>
 bool BundleMgrProxy::GetParcelableInfo(IBundleMgr::Message code, MessageParcel &data, T &parcelableInfo)
 {
     return true;
 }
 
-template <typename T>
+template<typename T>
 bool BundleMgrProxy::GetParcelableInfos(IBundleMgr::Message code, MessageParcel &data, std::vector<T> &parcelableInfos)
 {
     return true;

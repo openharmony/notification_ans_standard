@@ -24,7 +24,7 @@ using namespace OHOS::Notification;
 
 napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info);
 napi_value GetActiveNotifications(napi_env env, napi_callback_info info);
-napi_value GetActiveNotificationNums(napi_env env, napi_callback_info info);
+napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info);
 
 }  // namespace NotificationNapi
 }  // namespace OHOS

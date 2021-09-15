@@ -19,8 +19,8 @@ import { NotificationSlot } from './notificationSlot';
  * Provides sorting information about an active notification.
  *
  * @name NotificationSorting
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  * @since 7
  */

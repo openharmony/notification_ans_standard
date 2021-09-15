@@ -19,6 +19,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+
+constexpr int SYSTEMAPP_UUID = 1000;
+
 void MockBundleMgrService::MockSetIsSystemApp(bool isSystemApp)
 {
     isSystemAppMock_ = true;
@@ -30,7 +33,7 @@ bool MockBundleMgrService::CheckIsSystemAppByUid(const int uid)
     if (isSystemAppMock_) {
         return isSystemApp_;
     }
-    return (uid < 1000) ? false : true;
+    return (uid < SYSTEMAPP_UUID) ? false : true;
 }
 
 int MockBundleMgrService::CheckPermission(const std::string &bundleName, const std::string &permission)

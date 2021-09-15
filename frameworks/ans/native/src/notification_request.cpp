@@ -344,22 +344,22 @@ int64_t NotificationRequest::GetAutoDeletedTime() const
     return autoDeletedTime_;
 }
 
-void NotificationRequest::SetLittleIcon(const std::shared_ptr<PixelMap> &littleIcon)
+void NotificationRequest::SetLittleIcon(const std::shared_ptr<Media::PixelMap> &littleIcon)
 {
     littleIcon_ = littleIcon;
 }
 
-const std::shared_ptr<PixelMap> NotificationRequest::GetLittleIcon() const
+const std::shared_ptr<Media::PixelMap> NotificationRequest::GetLittleIcon() const
 {
     return littleIcon_;
 }
 
-void NotificationRequest::SetBigIcon(const std::shared_ptr<PixelMap> &bigIcon)
+void NotificationRequest::SetBigIcon(const std::shared_ptr<Media::PixelMap> &bigIcon)
 {
     bigIcon_ = bigIcon;
 }
 
-const std::shared_ptr<PixelMap> NotificationRequest::GetBigIcon() const
+const std::shared_ptr<Media::PixelMap> NotificationRequest::GetBigIcon() const
 {
     return bigIcon_;
 }
@@ -1002,31 +1002,31 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         }
     }
 
-    // valid = littleIcon_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether littleIcon is null");
-    //     return false;
-    // }
+    valid = littleIcon_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write the flag which indicate whether littleIcon is null");
+        return false;
+    }
 
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(littleIcon_.get())) {
-    //         ANS_LOGE("Failed to write littleIcon");
-    //         return false;
-    //     }
-    // }
+    if (valid) {
+        if (!parcel.WriteParcelable(littleIcon_.get())) {
+            ANS_LOGE("Failed to write littleIcon");
+            return false;
+        }
+    }
 
-    // valid = bigIcon_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether bigIcon is null");
-    //     return false;
-    // }
+    valid = bigIcon_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write the flag which indicate whether bigIcon is null");
+        return false;
+    }
 
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(bigIcon_.get())) {
-    //         ANS_LOGE("Failed to write bigIcon");
-    //         return false;
-    //     }
-    // }
+    if (valid) {
+        if (!parcel.WriteParcelable(bigIcon_.get())) {
+            ANS_LOGE("Failed to write bigIcon");
+            return false;
+        }
+    }
 
     valid = notificationContent_ ? true : false;
     if (!parcel.WriteBool(valid)) {
@@ -1215,23 +1215,23 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
         }
     }
 
-    // valid = parcel.ReadBool();
-    // if (valid) {
-    //     littleIcon_ = std::shared_ptr<PixelMap>(parcel.ReadParcelable<PixelMap>());
-    //     if (!littleIcon_) {
-    //         ANS_LOGE("Failed to read littleIcon");
-    //         return false;
-    //     }
-    // }
+    valid = parcel.ReadBool();
+    if (valid) {
+        littleIcon_ = std::shared_ptr<Media::PixelMap>(parcel.ReadParcelable<Media::PixelMap>());
+        if (!littleIcon_) {
+            ANS_LOGE("Failed to read littleIcon");
+            return false;
+        }
+    }
 
-    // valid = parcel.ReadBool();
-    // if (valid) {
-    //     bigIcon_ = std::shared_ptr<PixelMap>(parcel.ReadParcelable<PixelMap>());
-    //     if (!bigIcon_) {
-    //         ANS_LOGE("Failed to read bigIcon");
-    //         return false;
-    //     }
-    // }
+    valid = parcel.ReadBool();
+    if (valid) {
+        bigIcon_ = std::shared_ptr<Media::PixelMap>(parcel.ReadParcelable<Media::PixelMap>());
+        if (!bigIcon_) {
+            ANS_LOGE("Failed to read bigIcon");
+            return false;
+        }
+    }
 
     valid = parcel.ReadBool();
     if (valid) {

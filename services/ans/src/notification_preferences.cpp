@@ -141,6 +141,7 @@ ErrCode NotificationPreferences::RemoveNotificationAllSlots(const sptr<Notificat
     NotificationPreferencesInfo::BundleInfo bundleInfo;
     if (preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.RemoveAllSlots();
+        preferencesInfo.SetBundleInfo(bundleInfo);
         if (!preferncesDB_->RemoveAllSlotsFromDisturbeDB(GenerateBundleKey(bundleOption))) {
             result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
         }
@@ -389,8 +390,7 @@ ErrCode NotificationPreferences::SetShowBadge(const sptr<NotificationBundleOptio
     }
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result =
-        SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_SHOW_BADGE_TYPE, enable);
+    ErrCode result = SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_SHOW_BADGE_TYPE, enable);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
@@ -413,8 +413,7 @@ ErrCode NotificationPreferences::SetImportance(
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(
-        preferencesInfo, bundleOption, BundleType::BUNDLE_IMPORTANCE_TYPE, importance);
+    ErrCode result = SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_IMPORTANCE_TYPE, importance);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
@@ -436,8 +435,7 @@ ErrCode NotificationPreferences::SetTotalBadgeNums(const sptr<NotificationBundle
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result =
-        SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, num);
+    ErrCode result = SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, num);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
@@ -460,8 +458,7 @@ ErrCode NotificationPreferences::SetPrivateNotificationsAllowed(
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(
-        preferencesInfo, bundleOption, BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE, allow);
+    ErrCode result = SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE, allow);
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
@@ -485,8 +482,8 @@ ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(
     }
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    ErrCode result = SetBundleProperty(
-        preferencesInfo, bundleOption, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
+    ErrCode result =
+        SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
 
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;

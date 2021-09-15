@@ -59,7 +59,7 @@ private:
 
     bool CheckBundle(const std::string &bundleKey);
     bool PutBundlePropertyValueToDisturbeDB(const NotificationPreferencesInfo::BundleInfo &bundleInfo);
-    template <typename T>
+    template<typename T>
     OHOS::DistributedKv::Status PutBundlePropertyToDisturbeDB(
         const std::string &bundleKey, const BundleType &type, const T &t);
     bool PutBundleToDisturbeDB(
