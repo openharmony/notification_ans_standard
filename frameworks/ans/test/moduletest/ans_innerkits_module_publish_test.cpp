@@ -57,6 +57,10 @@ const int32_t CASE_FOURTEEN = 14;
 const int32_t CASE_FIFTEEN = 15;
 const int32_t CASE_SIXTEEN = 16;
 const int32_t CALLING_UID = 9999;
+
+const int32_t PIXEL_MAP_TEST_WIDTH = 1024;
+const int32_t PIXEL_MAP_TEST_HEIGHT = 1024;
+
 std::mutex g_subscribe_mtx;
 std::mutex g_consumed_mtx;
 std::mutex g_unsubscribe_mtx;
@@ -163,8 +167,8 @@ private:
             }
         }
         EXPECT_EQ(NotificationConstant::OTHER, notificationRequest.GetSlotType());
-        for (auto it : notificationRequest.GetNotificationUserInputHistory()) {
-            EXPECT_EQ("style", it);
+        for (auto str : notificationRequest.GetNotificationUserInputHistory()) {
+            EXPECT_EQ("style", str);
         }
         EXPECT_EQ("bundleName", notificationRequest.GetOwnerBundleName());
         EXPECT_EQ("bundleName", notificationRequest.GetCreatorBundleName());
@@ -173,18 +177,31 @@ private:
         if (NotificationRequestPtr != nullptr) {
             EXPECT_EQ("ANS_Interface_MT_Publish_00100_REQUEST", NotificationRequestPtr->GetLabel());
         }
+
+        // pixelmap
+        auto littleIcon = notificationRequest.GetLittleIcon();
+        Media::ImageInfo outImageInfo;
+        littleIcon->GetImageInfo(outImageInfo);
+        GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00100 :: littleIcon :: width : " << outImageInfo.size.width;
+        GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00100 :: littleIcon :: height : " << outImageInfo.size.height;
+
+        EXPECT_EQ(outImageInfo.size.width, PIXEL_MAP_TEST_WIDTH);
+        EXPECT_EQ(outImageInfo.size.height, PIXEL_MAP_TEST_HEIGHT);
+        EXPECT_EQ(outImageInfo.pixelFormat, Media::PixelFormat::ALPHA_8);
+        EXPECT_EQ(outImageInfo.colorSpace, Media::ColorSpace::SRGB);
+
         EXPECT_EQ(nullptr, notificationRequest.GetBigIcon());
         EXPECT_EQ(nullptr, notificationRequest.GetLittleIcon());
         EXPECT_EQ(nullptr, notificationRequest.GetLittleIcon());
         std::vector<std::shared_ptr<MessageUser>> messageUser = notificationRequest.GetMessageUsers();
-        for (auto it : messageUser) {
-            if (it != nullptr) {
-                EXPECT_EQ("ANS_Interface_MT_Publish_00100_Message_User", it->GetName());
-                EXPECT_EQ("key", it->GetKey());
-                EXPECT_EQ(nullptr, it->GetPixelMap());
-                EXPECT_EQ(Uri("."), it->GetUri());
-                EXPECT_EQ(false, it->IsMachine());
-                EXPECT_EQ(false, it->IsUserImportant());
+        for (auto user : messageUser) {
+            if (user != nullptr) {
+                EXPECT_EQ("ANS_Interface_MT_Publish_00100_Message_User", user->GetName());
+                EXPECT_EQ("key", user->GetKey());
+                EXPECT_EQ(nullptr, user->GetPixelMap());
+                EXPECT_EQ(Uri("."), user->GetUri());
+                EXPECT_EQ(false, user->IsMachine());
+                EXPECT_EQ(false, user->IsUserImportant());
             }
         }
     }
@@ -352,6 +369,11 @@ class CompletedCallbackTest : public WantAgent::CompletedCallback {
     void OnSendFinished(
         const AAFwk::Want &want, int resultCode, const std::string &resultData, const AAFwk::WantParams &resultExtras)
     {
+        (void)want;
+        (void)resultCode;
+        (void)resultData;
+        (void)resultExtras;
+
         g_send_finished_mtx.unlock();
         OnWantReceived = true;
     }
@@ -480,8 +502,22 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00100, Function
     std::shared_ptr<NotificationRequest> requestPtr = std::make_shared<NotificationRequest>();
     requestPtr->SetLabel("ANS_Interface_MT_Publish_00100_REQUEST");
     req.SetPublicNotification(requestPtr);
-    req.SetBigIcon(nullptr);
-    req.SetLittleIcon(nullptr);
+
+    // pixelmap
+    auto pixelMap = std::make_shared<Media::PixelMap>();
+    Media::ImageInfo imageInfo;
+    imageInfo.size.width = PIXEL_MAP_TEST_WIDTH;
+    imageInfo.size.height = PIXEL_MAP_TEST_HEIGHT;
+    imageInfo.pixelFormat = Media::PixelFormat::ALPHA_8;
+    imageInfo.colorSpace = Media::ColorSpace::SRGB;
+    pixelMap->SetImageInfo(imageInfo);
+    int32_t rowDataSize = (PIXEL_MAP_TEST_WIDTH + 3) / 4 * 4;
+    uint32_t bufferSize = rowDataSize * PIXEL_MAP_TEST_HEIGHT;
+    void *buffer = malloc(bufferSize);
+    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, Media::AllocatorType::HEAP_ALLOC, nullptr);
+
+    req.SetBigIcon(pixelMap);
+    req.SetLittleIcon(pixelMap);
     std::shared_ptr<MessageUser> messageUserPtr = std::make_shared<MessageUser>();
     messageUserPtr->SetName("ANS_Interface_MT_Publish_00100_Message_User");
     messageUserPtr->SetKey("key");

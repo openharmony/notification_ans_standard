@@ -27,61 +27,95 @@ namespace Notification {
 const std::map<std::string,
     std::function<void(NotificationPreferencesDatabase *, sptr<NotificationSlot> &, std::string &)>>
     NotificationPreferencesDatabase::slotMap_ = {
-        {KEY_SLOT_GROUPID,
+        {
+            KEY_SLOT_GROUPID,
             std::bind(&NotificationPreferencesDatabase::ParseSlotGroupId, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
-        {KEY_SLOT_DESCRIPTION,
+                std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_DESCRIPTION,
             std::bind(&NotificationPreferencesDatabase::ParseSlotDescription, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_SLOT_LEVEL,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_LEVEL,
             std::bind(&NotificationPreferencesDatabase::ParseSlotLevel, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
-        {KEY_SLOT_SHOW_BADGE,
+                std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_SHOW_BADGE,
             std::bind(&NotificationPreferencesDatabase::ParseSlotShowBadge, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_SLOT_ENABLE_LIGHT,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_ENABLE_LIGHT,
             std::bind(&NotificationPreferencesDatabase::ParseSlotEnableLight, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_SLOT_ENABLE_VRBRATION,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_ENABLE_VRBRATION,
             std::bind(&NotificationPreferencesDatabase::ParseSlotEnableVrbration, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_SLOT_LED_LIGHT_COLOR,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_LED_LIGHT_COLOR,
             std::bind(&NotificationPreferencesDatabase::ParseSlotLedLightColor, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_SLOT_LOCKSCREEN_VISIBLENESS,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_LOCKSCREEN_VISIBLENESS,
             std::bind(&NotificationPreferencesDatabase::ParseSlotLockscreenVisibleness, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_SLOT_SOUND,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_SOUND,
             std::bind(&NotificationPreferencesDatabase::ParseSlotSound, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
-        {KEY_SLOT_VIBRATION_STYLE,
+                std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_VIBRATION_STYLE,
             std::bind(&NotificationPreferencesDatabase::ParseSlotVibrationSytle, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_SLOT_VIBRATION_STYLE,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_SLOT_VIBRATION_STYLE,
             std::bind(&NotificationPreferencesDatabase::ParseSlotEnableBypassDnd, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)}};
+                std::placeholders::_2, std::placeholders::_3),
+        }};
 
 const std::map<std::string,
     std::function<void(NotificationPreferencesDatabase *, NotificationPreferencesInfo::BundleInfo &, std::string &)>>
     NotificationPreferencesDatabase::bundleMap_ = {
-        {KEY_BUNDLE_NAME,
+        {
+            KEY_BUNDLE_NAME,
             std::bind(&NotificationPreferencesDatabase::ParseBundleName, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
-        {KEY_BUNDLE_IMPORTANCE,
+                std::placeholders::_3),
+        },
+        {
+            KEY_BUNDLE_IMPORTANCE,
             std::bind(&NotificationPreferencesDatabase::ParseBundleImportance, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_BUNDLE_SHOW_BADGE,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_BUNDLE_SHOW_BADGE,
             std::bind(&NotificationPreferencesDatabase::ParseBundleShowBadge, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_BUNDLE_BADGE_TOTAL_NUM,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_BUNDLE_BADGE_TOTAL_NUM,
             std::bind(&NotificationPreferencesDatabase::ParseBundleBadgeNum, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_BUNDLE_PRIVATE_ALLOWED,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_BUNDLE_PRIVATE_ALLOWED,
             std::bind(&NotificationPreferencesDatabase::ParseBundlePrivateAllowed, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)},
-        {KEY_BUNDLE_ENABLE_NOTIFICATION,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
+            KEY_BUNDLE_ENABLE_NOTIFICATION,
             std::bind(&NotificationPreferencesDatabase::ParseBundleEnableNotification, std::placeholders::_1,
-                std::placeholders::_2, std::placeholders::_3)}};
+                std::placeholders::_2, std::placeholders::_3),
+        }};
 
 NotificationPreferencesDatabase::NotificationPreferencesDatabase()
 {
@@ -105,10 +139,12 @@ void NotificationPreferencesDatabase::TryTwice(const std::function<OHOS::Distrib
 OHOS::DistributedKv::Status NotificationPreferencesDatabase::GetKvStore()
 {
     OHOS::DistributedKv::Status status;
-    OHOS::DistributedKv::Options options = {.createIfMissing = true,
+    OHOS::DistributedKv::Options options = {
+        .createIfMissing = true,
         .encrypt = false,
         .autoSync = true,
-        .kvStoreType = OHOS::DistributedKv::KvStoreType::SINGLE_VERSION};
+        .kvStoreType = OHOS::DistributedKv::KvStoreType::SINGLE_VERSION,
+    };
     dataManager_.GetSingleKvStore(options,
         appId_,
         storeId_,
@@ -456,7 +492,7 @@ bool NotificationPreferencesDatabase::ParseFromDisturbeDB(NotificationPreference
     }
     OHOS::DistributedKv::Status status;
     std::vector<OHOS::DistributedKv::Entry> entries;
-    status = kvStorePtr_->GetEntries({KEY_BUNDLE_LABEL}, entries);
+    status = kvStorePtr_->GetEntries(DistributedKv::Key(KEY_BUNDLE_LABEL), entries);
     if (status != OHOS::DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Get Bundle Info failed.");
         return false;
@@ -486,7 +522,8 @@ bool NotificationPreferencesDatabase::RemoveBundleFromDisturbeDB(const std::stri
 
     OHOS::DistributedKv::Status status;
     std::vector<OHOS::DistributedKv::Entry> entries;
-    status = kvStorePtr_->GetEntries({KEY_ANS_BUNDLE + KEY_UNDER_LINE + bundleKey + KEY_UNDER_LINE}, entries);
+    status = kvStorePtr_->GetEntries(
+        DistributedKv::Key(KEY_ANS_BUNDLE + KEY_UNDER_LINE + bundleKey + KEY_UNDER_LINE), entries);
 
     if (status != OHOS::DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Get Bundle Info failed.");
@@ -498,7 +535,7 @@ bool NotificationPreferencesDatabase::RemoveBundleFromDisturbeDB(const std::stri
         keys.push_back(iter.key);
     }
 
-    OHOS::DistributedKv::Key bundleDBKey({KEY_BUNDLE_LABEL + KEY_BUNDLE_NAME + KEY_UNDER_LINE + bundleKey});
+    OHOS::DistributedKv::Key bundleDBKey(KEY_BUNDLE_LABEL + KEY_BUNDLE_NAME + KEY_UNDER_LINE + bundleKey);
     keys.push_back(bundleDBKey);
     status = kvStorePtr_->DeleteBatch(keys);
     if (status != OHOS::DistributedKv::Status::SUCCESS) {
@@ -525,7 +562,8 @@ bool NotificationPreferencesDatabase::RemoveSlotFromDisturbeDB(
     OHOS::DistributedKv::Status status;
     std::vector<OHOS::DistributedKv::Entry> slotentries;
     std::string slotType = std::to_string(type);
-    status = kvStorePtr_->GetEntries({GenerateSlotKey(bundleKey, slotType) + KEY_UNDER_LINE}, slotentries);
+    status =
+        kvStorePtr_->GetEntries(DistributedKv::Key(GenerateSlotKey(bundleKey, slotType) + KEY_UNDER_LINE), slotentries);
     if (status != DistributedKv::Status::SUCCESS) {
         return false;
     }
@@ -559,7 +597,7 @@ bool NotificationPreferencesDatabase::RemoveAllSlotsFromDisturbeDB(const std::st
 
     OHOS::DistributedKv::Status status;
     std::vector<OHOS::DistributedKv::Entry> slotsEntries;
-    status = kvStorePtr_->GetEntries({GenerateSlotKey(bundleKey) + KEY_UNDER_LINE}, slotsEntries);
+    status = kvStorePtr_->GetEntries(DistributedKv::Key(GenerateSlotKey(bundleKey) + KEY_UNDER_LINE), slotsEntries);
     if (status != DistributedKv::Status::SUCCESS) {
         return false;
     }
@@ -616,7 +654,7 @@ bool NotificationPreferencesDatabase::GetRemoveGroupKeysFromDisturbeDB(
     OHOS::DistributedKv::Status status;
     std::vector<OHOS::DistributedKv::Entry> groupentries;
     std::string slotKeyStr = GenerateGroupKey(bundleKey, groupId);
-    status = kvStorePtr_->GetEntries({slotKeyStr + KEY_UNDER_LINE}, groupentries);
+    status = kvStorePtr_->GetEntries(DistributedKv::Key(slotKeyStr + KEY_UNDER_LINE), groupentries);
     if (status != DistributedKv::Status::SUCCESS) {
         return false;
     }
@@ -791,7 +829,7 @@ void NotificationPreferencesDatabase::ParseBundleFromDistureDB(
         std::string bundleKey = item.value.ToString();
         ANS_LOGD("Bundle name is %{public}s.", bundleKey.c_str());
         std::vector<OHOS::DistributedKv::Entry> bundleEntries;
-        kvStorePtr_->GetEntries({GenerateBundleKey(bundleKey)}, bundleEntries);
+        kvStorePtr_->GetEntries(DistributedKv::Key(GenerateBundleKey(bundleKey)), bundleEntries);
         ANS_LOGD("Bundle key is %{public}s.", GenerateBundleKey(bundleKey).c_str());
         NotificationPreferencesInfo::BundleInfo bunldeInfo;
         for (auto bundleEntry : bundleEntries) {
@@ -927,7 +965,7 @@ int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
 std::string NotificationPreferencesDatabase::GenerateSlotKey(
     const std::string &bundleKey, const std::string &type, const std::string &subType) const
 {
-    /*slot key
+    /* slot key
      *
      * KEY_ANS_BUNDLE_bundlename_slot_type_0_id
      * KEY_ANS_BUNDLE_bundlename_slot_type_0_des
@@ -949,7 +987,7 @@ std::string NotificationPreferencesDatabase::GenerateSlotKey(
 std::string NotificationPreferencesDatabase::GenerateGroupKey(
     const std::string &bundleKey, const std::string &type) const
 {
-    /*group key
+    /* group key
      *
      * KEY_ANS_BUNDLE_bundlename_group_id_id0_id:
      * KEY_ANS_BUNDLE_bundlename_group_id_id0_name:
@@ -967,7 +1005,7 @@ std::string NotificationPreferencesDatabase::GenerateGroupKey(
 std::string NotificationPreferencesDatabase::GenerateBundleKey(
     const std::string &bundleKey, const std::string &type) const
 {
-    /*bundle key
+    /* bundle key
      *
      * label_KEY_ANS_KEY_BUNDLE_NAME = ""
      * KEY_ANS_BUNDLE_bundlename_

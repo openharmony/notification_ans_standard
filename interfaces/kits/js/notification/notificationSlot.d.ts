@@ -20,8 +20,8 @@ import notification from '../@ohos.notification';
  *
  * @name NotificationSlot
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface NotificationSlot {

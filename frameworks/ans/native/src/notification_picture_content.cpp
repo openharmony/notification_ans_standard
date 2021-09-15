@@ -38,12 +38,12 @@ std::string NotificationPictureContent::GetBriefText() const
     return briefText_;
 }
 
-void NotificationPictureContent::SetBigPicture(const std::shared_ptr<PixelMap> &bigPicture)
+void NotificationPictureContent::SetBigPicture(const std::shared_ptr<Media::PixelMap> &bigPicture)
 {
     bigPicture_ = bigPicture;
 }
 
-const std::shared_ptr<PixelMap> NotificationPictureContent::GetBigPicture() const
+const std::shared_ptr<Media::PixelMap> NotificationPictureContent::GetBigPicture() const
 {
     return bigPicture_;
 }
@@ -71,18 +71,18 @@ bool NotificationPictureContent::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    // auto valid = bigPicture_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether bigPicture is null");
-    //     return false;
-    // }
+    auto valid = bigPicture_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write the flag which indicate whether bigPicture is null");
+        return false;
+    }
 
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(bigPicture_.get())) {
-    //         ANS_LOGE("Failed to write bigPicture");
-    //         return false;
-    //     }
-    // }
+    if (valid) {
+        if (!parcel.WriteParcelable(bigPicture_.get())) {
+            ANS_LOGE("Failed to write bigPicture");
+            return false;
+        }
+    }
 
     return true;
 }
@@ -115,14 +115,14 @@ bool NotificationPictureContent::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
-    // auto valid = parcel.ReadBool();
-    // if (valid) {
-    //     bigPicture_ = std::shared_ptr<PixelMap>(parcel.ReadParcelable<PixelMap>());
-    //     if (!bigPicture_) {
-    //         ANS_LOGE("Failed to read bigPicture");
-    //         return false;
-    //     }
-    // }
+    auto valid = parcel.ReadBool();
+    if (valid) {
+        bigPicture_ = std::shared_ptr<Media::PixelMap>(parcel.ReadParcelable<Media::PixelMap>());
+        if (!bigPicture_) {
+            ANS_LOGE("Failed to read bigPicture");
+            return false;
+        }
+    }
 
     return true;
 }

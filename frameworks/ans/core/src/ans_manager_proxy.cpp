@@ -1797,7 +1797,7 @@ ErrCode AnsManagerProxy::InnerTransact(uint32_t code, MessageOption &flags, Mess
     }
 }
 
-template <typename T>
+template<typename T>
 bool AnsManagerProxy::WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &data)
 {
     if (!data.WriteInt32(parcelableVector.size())) {
@@ -1814,7 +1814,7 @@ bool AnsManagerProxy::WriteParcelableVector(const std::vector<sptr<T>> &parcelab
     return true;
 }
 
-template <typename T>
+template<typename T>
 bool AnsManagerProxy::ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos, MessageParcel &reply, ErrCode &result)
 {
     if (!reply.ReadInt32(result)) {

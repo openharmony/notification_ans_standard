@@ -118,7 +118,6 @@ HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00100, Fu
  */
 HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00200, Function | MediumTest | Level1)
 {
-    // bundleObject->MockSetIsSystemApp(false);
     NotificationSlot slot(NotificationConstant::SERVICE_REMINDER);
     slot.SetEnableLight(true);
     slot.SetDescription("description");

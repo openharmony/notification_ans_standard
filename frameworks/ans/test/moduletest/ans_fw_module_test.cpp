@@ -36,6 +36,8 @@
 #include "system_ability_definition.h"
 
 using namespace testing::ext;
+using namespace OHOS::Media;
+
 namespace OHOS {
 namespace Notification {
 
@@ -54,7 +56,7 @@ enum class SubscriberEventType {
 
 class SubscriberEvent {
 public:
-    ~SubscriberEvent()
+    virtual ~SubscriberEvent()
     {}
     SubscriberEventType GetType()
     {
@@ -70,7 +72,7 @@ protected:
 
 class OnSubscribeResultEvent : public SubscriberEvent {
 public:
-    ~OnSubscribeResultEvent()
+    ~OnSubscribeResultEvent() override
     {}
     OnSubscribeResultEvent(NotificationConstant::SubscribeResult result)
         : SubscriberEvent(SubscriberEventType::ON_SUBSCRIBERESULT), subscribeResult_(result)
@@ -1062,6 +1064,120 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishVibrationNotification_00100, Function
     EXPECT_TRUE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
     subscriber.ClearEvents();
     SleepForFC();
+}
+
+inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)
+{
+    const int32_t PIXEL_BYTES = 4;
+    std::shared_ptr<PixelMap> pixelMap = std::make_shared<PixelMap>();
+    ImageInfo info;
+    info.size.width = width;
+    info.size.height = height;
+    info.pixelFormat = PixelFormat::ARGB_8888;
+    info.colorSpace = ColorSpace::SRGB;
+    pixelMap->SetImageInfo(info);
+    int32_t rowDataSize = width * PIXEL_BYTES;
+    uint32_t bufferSize = rowDataSize * height;
+    void *buffer = malloc(bufferSize);
+    EXPECT_NE(buffer, nullptr);
+    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, AllocatorType::HEAP_ALLOC, nullptr);
+    return pixelMap;
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_PublishNotificationWithPixelMap_00100
+ * @tc.name      :
+ * @tc.desc      : Publish a notification with pixelMap.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishNotificationWithPixelMap_00100, Function | MediumTest | Level1)
+{
+    const int BIG_PICTURE_WIDTH = 400;
+    const int BIG_PICTURE_HEIGHT = 300;
+    const int ICON_SIZE = 36;
+
+    NotificationRequest req;
+    req.SetSlotType(NotificationConstant::SlotType::OTHER);
+    req.SetLabel("label");
+    std::shared_ptr<NotificationPictureContent> pictureContent = std::make_shared<NotificationPictureContent>();
+    EXPECT_NE(pictureContent, nullptr);
+    pictureContent->SetText("notification text");
+    pictureContent->SetTitle("notification title");
+    std::shared_ptr<PixelMap> bigPicture = MakePixelMap(BIG_PICTURE_WIDTH, BIG_PICTURE_HEIGHT);
+    EXPECT_NE(bigPicture, nullptr);
+    pictureContent->SetBigPicture(bigPicture);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(pictureContent);
+    EXPECT_NE(content, nullptr);
+    req.SetContent(content);
+    std::shared_ptr<PixelMap> littleIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req.SetLittleIcon(littleIcon);
+    std::shared_ptr<PixelMap> bigIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req.SetBigIcon(bigIcon);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_PublishNotificationWithPixelMap_00200
+ * @tc.name      :
+ * @tc.desc      : Publish a notification with oversize pixelMap.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishNotificationWithPixelMap_00200, Function | MediumTest | Level1)
+{
+    const int BIG_PICTURE_WIDTH = 1024;
+    const int BIG_PICTURE_HEIGHT = 1024;
+    const int ICON_SIZE = 36;
+
+    NotificationRequest req;
+    req.SetSlotType(NotificationConstant::SlotType::OTHER);
+    req.SetLabel("label");
+    std::shared_ptr<NotificationPictureContent> pictureContent = std::make_shared<NotificationPictureContent>();
+    EXPECT_NE(pictureContent, nullptr);
+    pictureContent->SetText("notification text");
+    pictureContent->SetTitle("notification title");
+    std::shared_ptr<PixelMap> bigPicture = MakePixelMap(BIG_PICTURE_WIDTH, BIG_PICTURE_HEIGHT);
+    EXPECT_NE(bigPicture, nullptr);
+    pictureContent->SetBigPicture(bigPicture);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(pictureContent);
+    EXPECT_NE(content, nullptr);
+    req.SetContent(content);
+    std::shared_ptr<PixelMap> littleIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req.SetLittleIcon(littleIcon);
+    std::shared_ptr<PixelMap> bigIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req.SetBigIcon(bigIcon);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), (int)ERR_ANS_PICTURE_OVER_SIZE);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_PublishNotificationWithPixelMap_00300
+ * @tc.name      :
+ * @tc.desc      : Publish a notification with oversize pixelMap.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishNotificationWithPixelMap_00300, Function | MediumTest | Level1)
+{
+    const int BIG_PICTURE_WIDTH = 400;
+    const int BIG_PICTURE_HEIGHT = 300;
+    const int ICON_SIZE = 256;
+
+    NotificationRequest req;
+    req.SetSlotType(NotificationConstant::SlotType::OTHER);
+    req.SetLabel("label");
+    std::shared_ptr<NotificationPictureContent> pictureContent = std::make_shared<NotificationPictureContent>();
+    EXPECT_NE(pictureContent, nullptr);
+    pictureContent->SetText("notification text");
+    pictureContent->SetTitle("notification title");
+    std::shared_ptr<PixelMap> bigPicture = MakePixelMap(BIG_PICTURE_WIDTH, BIG_PICTURE_HEIGHT);
+    EXPECT_NE(bigPicture, nullptr);
+    pictureContent->SetBigPicture(bigPicture);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(pictureContent);
+    EXPECT_NE(content, nullptr);
+    req.SetContent(content);
+    std::shared_ptr<PixelMap> littleIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req.SetLittleIcon(littleIcon);
+    std::shared_ptr<PixelMap> bigIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req.SetBigIcon(bigIcon);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req), (int)ERR_ANS_ICON_OVER_SIZE);
 }
 
 }  // namespace Notification

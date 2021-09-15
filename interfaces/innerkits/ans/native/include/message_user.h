@@ -16,13 +16,12 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_MESSAGE_USER_H
 
 #include <string>
-
+#include "pixel_map.h"
 #include "parcel.h"
 #include "uri.h"
 
 namespace OHOS {
 namespace Notification {
-class PixelMap;
 class MessageUser final : public Parcelable {
 public:
     /**
@@ -67,14 +66,14 @@ public:
      * Sets the pixel map of this MessageUser.
      * @param pixelMap Indicates the pixel map to set.
      */
-    void SetPixelMap(const std::shared_ptr<PixelMap> &pixelMap);
+    void SetPixelMap(const std::shared_ptr<Media::PixelMap> &pixelMap);
 
     /**
      * Obtains the pixel map of this MessageUser.
      *
      * @return Returns the pixel map of this MessageUser.
      */
-    const std::shared_ptr<PixelMap> GetPixelMap() const;
+    const std::shared_ptr<Media::PixelMap> GetPixelMap() const;
 
     /**
      * Sets the URI of this MessageUser.
@@ -153,7 +152,7 @@ private:
 private:
     std::string key_{};
     std::string name_{};
-    std::shared_ptr<PixelMap> pixelMap_{nullptr};
+    std::shared_ptr<Media::PixelMap> pixelMap_{nullptr};
     Uri uri_;
     bool isMachine_{false};
     bool isUserImportant_{false};

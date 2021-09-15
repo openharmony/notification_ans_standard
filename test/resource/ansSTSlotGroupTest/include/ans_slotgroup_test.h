@@ -18,7 +18,7 @@
 
 #include <string>
 #include "ability_loader.h"
-#include <notification_helper.h>
+#include "notification_helper.h"
 #ifdef PRINT_LOG
 #undef PRINT_LOG
 #endif

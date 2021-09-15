@@ -20,8 +20,8 @@ import notification from '../@ohos.notification';
  *
  * @name NotificationBasicContent
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface NotificationBasicContent {
@@ -35,8 +35,8 @@ export interface NotificationBasicContent {
  *
  * @name NotificationLongTextContent
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface NotificationLongTextContent extends NotificationBasicContent {
@@ -50,14 +50,14 @@ export interface NotificationLongTextContent extends NotificationBasicContent {
  *
  * @name NotificationMultiLineContent
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface NotificationMultiLineContent extends NotificationBasicContent {
   briefText: string;
   longTitle: string;
-  lines: Array<String>;
+  lines: Array<string>;
 }
 
 /**
@@ -65,8 +65,8 @@ export interface NotificationMultiLineContent extends NotificationBasicContent {
  *
  * @name NotificationMultiLineContent
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface NotificationContent {

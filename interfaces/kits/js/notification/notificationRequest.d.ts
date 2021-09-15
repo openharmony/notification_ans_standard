@@ -13,9 +13,7 @@
  * limitations under the License.
  */
 
-import { AsyncCallback } from './../basic';
 import notification from '../@ohos.notification';
-import image from '../@ohos.multimedia.image';
 import { WantAgent } from '../@ohos.wantAgent';
 import { NotificationContent } from './notificationContent';
 import { NotificationActionButton } from './notificationActionButton';
@@ -25,8 +23,8 @@ import { NotificationActionButton } from './notificationActionButton';
  *
  * @name NotificationRequest
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface NotificationRequest {
@@ -40,14 +38,11 @@ export interface NotificationRequest {
   autoDeletedTime?: number;
   wantAgent?: WantAgent;
   extraInfo?: {[key: string]: any};
-  removalWantAgent?: WantAgent;
-  maxScreenWantAgent?: WantAgent;
   color?: number;
   colorEnabled?: boolean;
   isAlertOnce?: boolean;
   isStopwatch?: boolean;
   isCountDown?: boolean;
-  statusBarText?: string;
   isFloatingIcon?: boolean;
   label?: string;
   badgeIconStyle?: number;
@@ -60,7 +55,7 @@ export interface NotificationRequest {
   /**
    * Obtains the classification of this notification.
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   classification?: string;

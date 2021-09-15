@@ -27,6 +27,7 @@ config("public_ans_core_config") {
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
     "${interfaces_path}/innerkits/wantAgent/include",
+    "//foundation/multimedia/image_standard/interfaces/innerkits/include",
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
   ]
@@ -74,6 +75,7 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

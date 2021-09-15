@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Notification {
-std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const std::shared_ptr<PixelMap> &icon,
+std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const std::shared_ptr<Media::PixelMap> &icon,
     const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
     const std::shared_ptr<AppExecFwk::PacMap> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
     bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
@@ -55,8 +55,15 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
         }
     }
 
-    auto pActionButton = new (std::nothrow) NotificationActionButton(
-        icon, title, wantAgent, realExtras, semanticActionButton, autoCreatedReplies, onlyInputs, textInputs, isContextual);
+    auto pActionButton = new (std::nothrow) NotificationActionButton(icon,
+        title,
+        wantAgent,
+        realExtras,
+        semanticActionButton,
+        autoCreatedReplies,
+        onlyInputs,
+        textInputs,
+        isContextual);
     if (pActionButton == nullptr) {
         ANS_LOGE("create NotificationActionButton object failed");
         return {};
@@ -79,10 +86,10 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(
         actionButton->IsContextDependent());
 }
 
-NotificationActionButton::NotificationActionButton(const std::shared_ptr<PixelMap> &icon, const std::string &title,
-    const std::shared_ptr<WantAgent::WantAgent> &wantAgent, const std::shared_ptr<AppExecFwk::PacMap> &extras,
-    NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
-    const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
+NotificationActionButton::NotificationActionButton(const std::shared_ptr<Media::PixelMap> &icon,
+    const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
+    const std::shared_ptr<AppExecFwk::PacMap> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
+    bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
     const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
     : icon_(icon),
       title_(title),
@@ -95,7 +102,7 @@ NotificationActionButton::NotificationActionButton(const std::shared_ptr<PixelMa
       isContextual_(isContextual)
 {}
 
-const std::shared_ptr<PixelMap> NotificationActionButton::GetIcon() const
+const std::shared_ptr<Media::PixelMap> NotificationActionButton::GetIcon() const
 {
     return icon_;
 }
@@ -217,18 +224,18 @@ bool NotificationActionButton::Marshalling(Parcel &parcel) const
 
     bool valid{false};
 
-    // valid = icon_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether icon is null");
-    //     return false;
-    // }
+    valid = icon_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write the flag which indicate whether icon is null");
+        return false;
+    }
 
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(icon_.get())) {
-    //         ANS_LOGE("Failed to write icon");
-    //         return false;
-    //     }
-    // }
+    if (valid) {
+        if (!parcel.WriteParcelable(icon_.get())) {
+            ANS_LOGE("Failed to write icon");
+            return false;
+        }
+    }
 
     valid = wantAgent_ ? true : false;
     if (!parcel.WriteBool(valid)) {
@@ -305,14 +312,14 @@ bool NotificationActionButton::ReadFromParcel(Parcel &parcel)
 
     bool valid{false};
 
-    // valid = parcel.ReadBool();
-    // if (valid) {
-    //     icon_ = std::shared_ptr<PixelMap>(parcel.ReadParcelable<PixelMap>());
-    //     if (!icon_) {
-    //         ANS_LOGE("Failed to read icon");
-    //         return false;
-    //     }
-    // }
+    valid = parcel.ReadBool();
+    if (valid) {
+        icon_ = std::shared_ptr<Media::PixelMap>(parcel.ReadParcelable<Media::PixelMap>());
+        if (!icon_) {
+            ANS_LOGE("Failed to read icon");
+            return false;
+        }
+    }
 
     valid = parcel.ReadBool();
     if (valid) {

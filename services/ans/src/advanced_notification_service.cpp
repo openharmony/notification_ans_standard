@@ -47,16 +47,16 @@ static const int32_t NOTIFICATION_MAX_COUNT = 1024;
 static const int32_t DEFAULT_RECENT_COUNT = 16;
 
 struct RecentNotification {
-    sptr<Notification> notification{nullptr};
-    bool isActive{false};
-    int deleteReason{0};
-    int64_t deleteTime{0};
+    sptr<Notification> notification = nullptr;
+    bool isActive = false;
+    int deleteReason = 0;
+    int64_t deleteTime = 0;
 };
 }  // namespace
 
 struct AdvancedNotificationService::RecentInfo {
-    std::list<std::shared_ptr<RecentNotification>> list{};
-    size_t recentCount{DEFAULT_RECENT_COUNT};
+    std::list<std::shared_ptr<RecentNotification>> list;
+    size_t recentCount = DEFAULT_RECENT_COUNT;
 };
 
 sptr<AdvancedNotificationService> AdvancedNotificationService::instance_;
@@ -122,6 +122,35 @@ inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRec
     return result;
 }
 
+inline ErrCode CheckPictureSize(const sptr<NotificationRequest> &request)
+{
+    ErrCode result = ERR_OK;
+
+    auto content = request->GetContent();
+    if (content != nullptr && content->GetContentType() == NotificationContent::Type::PICTURE) {
+        std::shared_ptr<NotificationPictureContent> pictureContent =
+            std::static_pointer_cast<NotificationPictureContent>(content->GetNotificationContent());
+        if (pictureContent != nullptr) {
+            auto picture = pictureContent->GetBigPicture();
+            if (picture != nullptr && (uint32_t)picture->GetByteCount() > MAX_PICTURE_SIZE) {
+                result = ERR_ANS_PICTURE_OVER_SIZE;
+            }
+        }
+    }
+
+    auto littleIcon = request->GetLittleIcon();
+    if (littleIcon != nullptr && (uint32_t)littleIcon->GetByteCount() > MAX_ICON_SIZE) {
+        result = ERR_ANS_ICON_OVER_SIZE;
+    }
+
+    auto bigIcon = request->GetBigIcon();
+    if (bigIcon != nullptr && (uint32_t)bigIcon->GetByteCount() > MAX_ICON_SIZE) {
+        result = ERR_ANS_ICON_OVER_SIZE;
+    }
+
+    return result;
+}
+
 inline ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &request)
 {
     std::string bundle = GetClientBundleName();
@@ -137,7 +166,9 @@ inline ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &reque
     request->SetCreatorUid(uid);
     request->SetCreatorPid(pid);
 
-    return ERR_OK;
+    ErrCode result = CheckPictureSize(request);
+
+    return result;
 }
 
 sptr<AdvancedNotificationService> AdvancedNotificationService::GetInstance()
@@ -151,7 +182,9 @@ sptr<AdvancedNotificationService> AdvancedNotificationService::GetInstance()
 }
 
 AdvancedNotificationService::AdvancedNotificationService()
-    : systemEventObserver_({std::bind(&AdvancedNotificationService::OnBundleRemoved, this, std::placeholders::_1)})
+    : systemEventObserver_({
+          std::bind(&AdvancedNotificationService::OnBundleRemoved, this, std::placeholders::_1),
+      })
 {
     runner_ = OHOS::AppExecFwk::EventRunner::Create();
     handler_ = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner_);
@@ -1126,18 +1159,14 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
     }
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         allowed = false;
         result = NotificationPreferences::GetInstance().GetNotificationsEnabled(allowed);
-        if (result == ERR_OK && allowed) {
-            result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
-        }
     }));
     return result;
 }

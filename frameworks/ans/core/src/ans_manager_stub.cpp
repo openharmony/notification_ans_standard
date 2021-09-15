@@ -1160,7 +1160,7 @@ ErrCode AnsManagerStub::HandleShellDump(MessageParcel &data, MessageParcel &repl
     return ERR_OK;
 }
 
-template <typename T>
+template<typename T>
 bool AnsManagerStub::WriteParcelableVector(
     const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result)
 {
@@ -1183,7 +1183,7 @@ bool AnsManagerStub::WriteParcelableVector(
     return true;
 }
 
-template <typename T>
+template<typename T>
 bool AnsManagerStub::ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos, MessageParcel &data)
 {
     int32_t infoSize = 0;
