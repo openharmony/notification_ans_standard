@@ -72,10 +72,10 @@ public:
         }
     }
 
-    ConsumedFunc consumedCb_{nullptr};
-    CanceledFunc canceledCb_{nullptr};
-    std::function<void(NotificationConstant::SubscribeResult)> unSubscriberCb_{nullptr};
-    std::function<void(NotificationConstant::SubscribeResult)> subscriberCb_{nullptr};
+    ConsumedFunc consumedCb_ = nullptr;
+    CanceledFunc canceledCb_ = nullptr;
+    std::function<void(NotificationConstant::SubscribeResult)> unSubscriberCb_ = nullptr;
+    std::function<void(NotificationConstant::SubscribeResult)> subscriberCb_ = nullptr;
 };
 
 class AnsModuleTest : public testing::Test {
@@ -2324,46 +2324,31 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0122, Function | SmallTest | Level1)
 HWTEST_F(AnsModuleTest, AnsModuleTest_0123, Function | SmallTest | Level1)
 {
     int ret = 0;
-
-    // subscriber
     auto subscriber = new TestAnsSubscriber();
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
     subscriber->consumedCb_ = [&ret](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>
                                       sortingMap) { ret++; };
-
     subscriber->canceledCb_ = [](const std::shared_ptr<Notification> &request,
                                   const std::shared_ptr<NotificationSortingMap> &sortingMap,
                                   int deleteReason) { passed = true; };
-
-    // add slot
     std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> socialSlot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
-    sptr<NotificationSlot> reminderSlot = new NotificationSlot(NotificationConstant::SlotType::SERVICE_REMINDER);
-    sptr<NotificationSlot> contentSlot = new NotificationSlot(NotificationConstant::SlotType::CONTENT_INFORMATION);
-    sptr<NotificationSlot> otherSlot = new NotificationSlot(NotificationConstant::SlotType::OTHER);
-    sptr<NotificationSlot> customSlot = new NotificationSlot(NotificationConstant::SlotType::CUSTOM);
-
-    slots.push_back(socialSlot);
-    slots.push_back(reminderSlot);
-    slots.push_back(contentSlot);
-    slots.push_back(otherSlot);
-    slots.push_back(customSlot);
-
+    slots.push_back(new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION));
+    slots.push_back(new NotificationSlot(NotificationConstant::SlotType::SERVICE_REMINDER));
+    slots.push_back(new NotificationSlot(NotificationConstant::SlotType::CONTENT_INFORMATION));
+    slots.push_back(new NotificationSlot(NotificationConstant::SlotType::OTHER));
+    slots.push_back(new NotificationSlot(NotificationConstant::SlotType::CUSTOM));
     EXPECT_EQ(g_advancedNotificationService->AddSlots(slots), 0);
-
-    // create request
-    std::string label = "testLabel";
     sptr<NotificationRequest> req = new NotificationRequest(0);
     sptr<NotificationRequest> req1 = new NotificationRequest(1);
     sptr<NotificationRequest> req2 = new NotificationRequest(2);
     sptr<NotificationRequest> req3 = new NotificationRequest(3);
     sptr<NotificationRequest> req4 = new NotificationRequest(4);
-    req->SetLabel(label);
-    req1->SetLabel(label);
-    req2->SetLabel(label);
-    req3->SetLabel(label);
-    req4->SetLabel(label);
+    req->SetLabel("testLabel");
+    req1->SetLabel("testLabel");
+    req2->SetLabel("testLabel");
+    req3->SetLabel("testLabel");
+    req4->SetLabel("testLabel");
 
     req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     req1->SetSlotType(NotificationConstant::SlotType::SERVICE_REMINDER);
@@ -2371,17 +2356,16 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0123, Function | SmallTest | Level1)
     req3->SetSlotType(NotificationConstant::SlotType::OTHER);
     req4->SetSlotType(NotificationConstant::SlotType::CUSTOM);
 
-    g_advancedNotificationService->Publish(label, req);
+    g_advancedNotificationService->Publish("testLabel", req);
     EXPECT_EQ(ret, 0);
-    g_advancedNotificationService->Publish(label, req1);
+    g_advancedNotificationService->Publish("testLabel", req1);
     EXPECT_EQ(ret, 0);
-    g_advancedNotificationService->Publish(label, req2);
+    g_advancedNotificationService->Publish("testLabel", req2);
     EXPECT_EQ(ret, 0);
-    g_advancedNotificationService->Publish(label, req3);
+    g_advancedNotificationService->Publish("testLabel", req3);
     EXPECT_EQ(ret, 0);
-    g_advancedNotificationService->Publish(label, req4);
+    g_advancedNotificationService->Publish("testLabel", req4);
     EXPECT_EQ(ret, 0);
-
     g_advancedNotificationService->DeleteAll();
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
     EXPECT_FALSE(passed);
@@ -2620,10 +2604,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0130, Function | SmallTest | Level1)
     // subscriber
     auto subscriber = new TestAnsSubscriber();
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
-    subscriber->consumedCb_ = [](
-        const std::shared_ptr<Notification> notification,
-        const std::shared_ptr<NotificationSortingMap> sortingMap)
-        {
+    subscriber->consumedCb_ =
+        [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
             EXPECT_EQ(false, notification->EnableVibrate());
             EXPECT_EQ(NotificationConstant::VisiblenessType::PUBLIC, notification->GetLockscreenVisibleness());
         };

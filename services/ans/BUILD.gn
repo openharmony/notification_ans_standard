@@ -67,6 +67,7 @@ ohos_shared_library("libans") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//utils/native/base:utils",
   ]
 

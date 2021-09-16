@@ -26,6 +26,15 @@
 namespace OHOS {
 namespace Notification {
 namespace {
+
+static const struct option OPTIONS[] = {
+    {"help", no_argument, nullptr, 'h'},
+    {"active", no_argument, nullptr, 'A'},
+    {"recent", no_argument, nullptr, 'R'},
+    {"setRecentCount", required_argument, nullptr, 0},
+    {0, 0, 0, 0},
+};
+
 static const std::string HELP_MSG = "usage: anm <command> [<options>]\n"
                                     "These are common commands list:\n"
                                     "  help                         list available commands\n"
@@ -82,19 +91,11 @@ ErrCode NotificationShellCommand::RunAsHelpCommand()
 
 ErrCode NotificationShellCommand::RunAsDumpCommand()
 {
-    struct option options[] = {
-        {"help", no_argument, nullptr, 'h'},
-        {"active", no_argument, nullptr, 'A'},
-        {"recent", no_argument, nullptr, 'R'},
-        {"setRecentCount", required_argument, nullptr, 0},
-        {0, 0, 0, 0},
-    };
-
     int ind = 0;
-    int option = getopt_long(argc_, argv_, "hAR", options, &ind);
+    int option = getopt_long(argc_, argv_, "hAR", OPTIONS, &ind);
 
     ErrCode ret = ERR_OK;
-    std::vector<std::string> infos{};
+    std::vector<std::string> infos;
 
     switch (option) {
         case 'h':
@@ -118,7 +119,7 @@ ErrCode NotificationShellCommand::RunAsDumpCommand()
             break;
         case 0:
             if (ans_ != nullptr) {
-                ret = ans_->ShellDump(std::string(options[ind].name) + " " + std::string(optarg), infos);
+                ret = ans_->ShellDump(std::string(OPTIONS[ind].name) + " " + std::string(optarg), infos);
             } else {
                 ret = ERR_ANS_SERVICE_NOT_CONNECTED;
             }

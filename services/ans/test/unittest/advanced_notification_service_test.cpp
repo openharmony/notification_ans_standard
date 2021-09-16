@@ -30,6 +30,7 @@
 #include "notification_subscriber.h"
 
 using namespace testing::ext;
+using namespace OHOS::Media;
 
 namespace OHOS {
 namespace Notification {
@@ -116,6 +117,7 @@ void AdvancedNotificationServiceTest::TestAddSlotGroup()
     groups.push_back(group);
     advancedNotificationService_->AddSlotGroups(groups);
 }
+
 /**
  * @tc.number    : AMS_ANS_Publish_00100
  * @tc.name      : ANSPublish00100
@@ -412,7 +414,8 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01200,
 /**
  * @tc.number    : AMS_ANS_Publish_01300
  * @tc.name      : ANSPublish01300
- * @tc.desc      : When a bundle is not allowed to publish a notification, the notification publishing interface returns
+ * @tc.desc      : When a bundle is not allowed to publish a notification, the notification publishing interface
+ returns
  * ERR_ANS_NOT_ALLOWED
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01300, Function | SmallTest | Level1)
@@ -1210,27 +1213,16 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09300,
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_09500
- * @tc.name      : AMS_ANS_IsAllowedNotify_0100
- * @tc.desc      : Test IsAllowedNotify function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09500, Function | SmallTest | Level1)
-{
-    bool allowed = false;
-    EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotify(allowed),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
-}
-
-/**
  * @tc.number    : AdvancedNotificationServiceTest_09600
  * @tc.name      : AMS_ANS_IsAllowedNotify_0200
  * @tc.desc      : Test IsAllowedNotify function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600, Function | SmallTest | Level1)
 {
-    TestAddSlot(NotificationConstant::SlotType::OTHER);
+    EXPECT_EQ((int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     bool allowed = false;
     EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotify(allowed), (int)ERR_OK);
+    EXPECT_TRUE(allowed);
 }
 
 /**
@@ -1272,6 +1264,120 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09900,
     EXPECT_EQ((int)advancedNotificationService_->GetSlotsByBundle(
                   new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), slots),
         (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+}
+
+inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)
+{
+    const int32_t PIXEL_BYTES = 4;
+    std::shared_ptr<PixelMap> pixelMap = std::make_shared<PixelMap>();
+    ImageInfo info;
+    info.size.width = width;
+    info.size.height = height;
+    info.pixelFormat = PixelFormat::ARGB_8888;
+    info.colorSpace = ColorSpace::SRGB;
+    pixelMap->SetImageInfo(info);
+    int32_t rowDataSize = width * PIXEL_BYTES;
+    uint32_t bufferSize = rowDataSize * height;
+    void *buffer = malloc(bufferSize);
+    EXPECT_NE(buffer, nullptr);
+    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, AllocatorType::HEAP_ALLOC, nullptr);
+    return pixelMap;
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10000
+ * @tc.name      : AMS_ANS_Publish_With_PixelMap
+ * @tc.desc      : Publish a notification with pixelMap.
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10000, Function | SmallTest | Level1)
+{
+    const int BIG_PICTURE_WIDTH = 400;
+    const int BIG_PICTURE_HEIGHT = 300;
+    const int ICON_SIZE = 36;
+
+    sptr<NotificationRequest> req = new NotificationRequest(1);
+    EXPECT_NE(req, nullptr);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("label");
+    std::shared_ptr<NotificationPictureContent> pictureContent = std::make_shared<NotificationPictureContent>();
+    EXPECT_NE(pictureContent, nullptr);
+    pictureContent->SetText("notification text");
+    pictureContent->SetTitle("notification title");
+    std::shared_ptr<PixelMap> bigPicture = MakePixelMap(BIG_PICTURE_WIDTH, BIG_PICTURE_HEIGHT);
+    EXPECT_NE(bigPicture, nullptr);
+    pictureContent->SetBigPicture(bigPicture);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(pictureContent);
+    EXPECT_NE(content, nullptr);
+    req->SetContent(content);
+    std::shared_ptr<PixelMap> littleIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req->SetLittleIcon(littleIcon);
+    std::shared_ptr<PixelMap> bigIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req->SetBigIcon(bigIcon);
+    EXPECT_EQ(advancedNotificationService_->Publish("label", req), (int)ERR_OK);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10100
+ * @tc.name      : AMS_ANS_Publish_With_PixelMap_Oversize_00100
+ * @tc.desc      : Publish a notification with oversize pixelMap.
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10100, Function | SmallTest | Level1)
+{
+    const int BIG_PICTURE_WIDTH = 1024;
+    const int BIG_PICTURE_HEIGHT = 1024;
+    const int ICON_SIZE = 36;
+
+    sptr<NotificationRequest> req = new NotificationRequest(1);
+    EXPECT_NE(req, nullptr);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("label");
+    std::shared_ptr<NotificationPictureContent> pictureContent = std::make_shared<NotificationPictureContent>();
+    EXPECT_NE(pictureContent, nullptr);
+    pictureContent->SetText("notification text");
+    pictureContent->SetTitle("notification title");
+    std::shared_ptr<PixelMap> bigPicture = MakePixelMap(BIG_PICTURE_WIDTH, BIG_PICTURE_HEIGHT);
+    EXPECT_NE(bigPicture, nullptr);
+    pictureContent->SetBigPicture(bigPicture);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(pictureContent);
+    EXPECT_NE(content, nullptr);
+    req->SetContent(content);
+    std::shared_ptr<PixelMap> littleIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req->SetLittleIcon(littleIcon);
+    std::shared_ptr<PixelMap> bigIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req->SetBigIcon(bigIcon);
+    EXPECT_EQ(advancedNotificationService_->Publish("label", req), (int)ERR_ANS_PICTURE_OVER_SIZE);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10200
+ * @tc.name      : AMS_ANS_Publish_With_PixelMap_Oversize_00200
+ * @tc.desc      : Publish a notification with oversize pixelMap.
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10200, Function | SmallTest | Level1)
+{
+    const int BIG_PICTURE_WIDTH = 400;
+    const int BIG_PICTURE_HEIGHT = 300;
+    const int ICON_SIZE = 256;
+
+    sptr<NotificationRequest> req = new NotificationRequest(1);
+    EXPECT_NE(req, nullptr);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("label");
+    std::shared_ptr<NotificationPictureContent> pictureContent = std::make_shared<NotificationPictureContent>();
+    EXPECT_NE(pictureContent, nullptr);
+    pictureContent->SetText("notification text");
+    pictureContent->SetTitle("notification title");
+    std::shared_ptr<PixelMap> bigPicture = MakePixelMap(BIG_PICTURE_WIDTH, BIG_PICTURE_HEIGHT);
+    EXPECT_NE(bigPicture, nullptr);
+    pictureContent->SetBigPicture(bigPicture);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(pictureContent);
+    EXPECT_NE(content, nullptr);
+    req->SetContent(content);
+    std::shared_ptr<PixelMap> littleIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req->SetLittleIcon(littleIcon);
+    std::shared_ptr<PixelMap> bigIcon = MakePixelMap(ICON_SIZE, ICON_SIZE);
+    req->SetBigIcon(bigIcon);
+    EXPECT_EQ(advancedNotificationService_->Publish("label", req), (int)ERR_ANS_ICON_OVER_SIZE);
 }
 
 }  // namespace Notification

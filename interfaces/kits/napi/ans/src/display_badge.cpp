@@ -75,9 +75,9 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[2]:callback
     if (argc >= ENABLE_BADGE_DISPLAYED_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[2], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[ENABLE_BADGE_DISPLAYED_MAX_PARA - 1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[2], 1, &params.callback);
+        napi_create_reference(env, argv[ENABLE_BADGE_DISPLAYED_MAX_PARA - 1], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);

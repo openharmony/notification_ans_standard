@@ -239,7 +239,7 @@ napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
     }
 }
 
-napi_value GetActiveNotificationNums(napi_env env, napi_callback_info info)
+napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
@@ -257,19 +257,19 @@ napi_value GetActiveNotificationNums(napi_env env, napi_callback_info info)
     Common::PaddingCallbackPromiseInfo(env, callback, asynccallbackinfo->info, promise);
 
     napi_value resourceName = nullptr;
-    napi_create_string_latin1(env, "getActiveNotificationNums", NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_string_latin1(env, "getActiveNotificationCount", NAPI_AUTO_LENGTH, &resourceName);
     // Asynchronous function call
     napi_create_async_work(
         env,
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            ANS_LOGI("GetActiveNotificationNums napi_create_async_work start");
+            ANS_LOGI("GetActiveNotificationCount napi_create_async_work start");
             AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
             int32_t num = 0;
             asynccallbackinfo->info.errorCode = NotificationHelper::GetActiveNotificationNums(num);
-            ANS_LOGI("GetActiveNotificationNums nums = %{public}d", num);
+            ANS_LOGI("GetActiveNotificationCount count = %{public}d", num);
             if (asynccallbackinfo->info.errorCode != ERR_OK) {
                 asynccallbackinfo->result = Common::NapiGetNull(env);
                 return;
@@ -277,7 +277,7 @@ napi_value GetActiveNotificationNums(napi_env env, napi_callback_info info)
             napi_create_int32(env, num, &asynccallbackinfo->result);
         },
         [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("GetActiveNotificationNums napi_create_async_work end");
+            ANS_LOGI("GetActiveNotificationCount napi_create_async_work end");
             AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
             Common::ReturnCallbackPromise(env, asynccallbackinfo->info, asynccallbackinfo->result);

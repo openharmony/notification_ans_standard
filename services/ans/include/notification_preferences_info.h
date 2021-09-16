@@ -64,15 +64,15 @@ public:
         int GetBundleUid() const;
 
     private:
-        std::string bundleName_ {};
-        int uid_ {};
+        std::string bundleName_;
+        int uid_ = 0;
         int importance_ = BUNDLE_IMPORTANCE;
         bool isShowBadge_ = BUNDLE_SHOW_BADGE;
         int badgeTotalNum_ = BUNDLE_BADGE_TOTAL_NUM;
         bool isPrivateAllowed_ = BUNDLE_PRIVATE_ALLOWED;
         bool isEnabledNotification_ = BUNDLE_ENABLE_NOTIFICATION;
-        std::map<NotificationConstant::SlotType, sptr<NotificationSlot>> slots_ {};
-        std::map<std::string, sptr<NotificationSlotGroup>> groups_ {};
+        std::map<NotificationConstant::SlotType, sptr<NotificationSlot>> slots_;
+        std::map<std::string, sptr<NotificationSlotGroup>> groups_;
     };
 
     NotificationPreferencesInfo()
@@ -92,7 +92,7 @@ public:
 private:
     bool isEnabledAllNotification_ = true;
     NotificationConstant::DisturbMode disturbMode_ = NotificationConstant::DisturbMode::ALLOW_ALL;
-    std::map<std::string, BundleInfo> infos_ {};
+    std::map<std::string, BundleInfo> infos_;
 };
 }  // namespace Notification
 }  // namespace OHOS

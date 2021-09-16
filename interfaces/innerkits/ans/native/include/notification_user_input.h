@@ -28,8 +28,6 @@
 
 namespace OHOS {
 namespace Notification {
-class PixelMap;
-
 class NotificationUserInput : public Parcelable {
 public:
     /**

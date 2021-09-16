@@ -32,8 +32,8 @@ import { NotificationRequest } from './notification/notificationRequest';
  *
  * @name notification
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 declare namespace notification {
@@ -86,7 +86,7 @@ declare namespace notification {
    * @param slot Indicates the notification slot to be created, which is set by {@link NotificationSlot}.
    * This parameter must be specified.
    *
-   * @SystemApi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function addSlot(slot: NotificationSlot, callback: AsyncCallback<void>): void;
@@ -109,7 +109,7 @@ declare namespace notification {
    * @param slots Indicates the notification slots to be created, which is set by {@link NotificationSlot}.
    * This parameter must be specified.
    *
-   * @SystemApi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function addSlots(slots: Array<NotificationSlot>, callback: AsyncCallback<void>): void;
@@ -173,17 +173,15 @@ declare namespace notification {
    *
    * @name ContentType
    * @since 7
-   * @sysCap ans
-   * @devices phone, tablet
+   * @sysCap SystemCapability.Notification.ANS
+   * @devices phone, tablet, tv, wearable, car
    * @permission N/A
    */
   export enum ContentType {
     NOTIFICATION_CONTENT_BASIC_TEXT,
     NOTIFICATION_CONTENT_LONG_TEXT,
     NOTIFICATION_CONTENT_PICTURE,
-    NOTIFICATION_CONTENT_CONVERSATION,
     NOTIFICATION_CONTENT_MULTILINE,
-    NOTIFICATION_CONTENT_MEDIA
   }
 
   /**
@@ -202,7 +200,7 @@ declare namespace notification {
   /**
    * subscribe
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function subscribe(subscriber: NotificationSubscriber, callback: AsyncCallback<void>): void;
@@ -212,7 +210,7 @@ declare namespace notification {
   /**
    * unsubscribe
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function unsubscribe(subscriber: NotificationSubscriber, callback: AsyncCallback<void>): void;
@@ -221,86 +219,79 @@ declare namespace notification {
   /**
    * enableNotification
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function enableNotification(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
   function enableNotification(bundle: BundleOption, enable: boolean): Promise<void>;
 
   /**
-   * canNotify
+   * isNotificationEnabled
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function isNotificationEnabled(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
   function isNotificationEnabled(bundle: BundleOption): Promise<boolean>;
 
   /**
-   * canNotify
+   * isNotificationEnabled
    *
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function isNotificationEnabled(callback: AsyncCallback<boolean>): void;
   function isNotificationEnabled(): Promise<boolean>;
 
   /**
-   * isBadgeDisplayed
+   * displayBadge
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function displayBadge(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
   function displayBadge(bundle: BundleOption, enable: boolean): Promise<void>;
 
   /**
-   * canDisplayBadge
+   * isBadgeDisplayed
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function isBadgeDisplayed(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
   function isBadgeDisplayed(bundle: BundleOption): Promise<boolean>;
 
   /**
-   * isShowBadge
+   * setSlotByBundle
    *
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
-  function isBadgeDisplayed(callback: AsyncCallback<boolean>): void;
-  function isBadgeDisplayed(): Promise<boolean>;
+  function setSlotByBundle(bundle: BundleOption, slot: NotificationSlot, callback: AsyncCallback<void>): void;
+  function setSlotByBundle(bundle: BundleOption, slot: NotificationSlot): Promise<void>;
 
   /**
-   * setSlotAsBundle
+   * getSlotsByBundle
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
-  function setSlotAsBundle(bundle: BundleOption, slot: NotificationSlot, callback: AsyncCallback<void>): void;
-  function setSlotAsBundle(bundle: BundleOption, slot: NotificationSlot): Promise<void>;
+  function getSlotsByBundle(bundle: BundleOption, callback: AsyncCallback<Array<NotificationSlot>>): void;
+  function getSlotsByBundle(bundle: BundleOption): Promise<Array<NotificationSlot>>;
 
   /**
-   * getSlotsAsBundle
+   * getSlotNumByBundle
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
-  function getSlotsAsBundle(bundle: BundleOption, callback: AsyncCallback<Array<NotificationSlot>>): void;
-  function getSlotsAsBundle(bundle: BundleOption): Promise<Array<NotificationSlot>>;
-
-  /**
-   * getSlotNumAsBundle
-   *
-   * @systemapi
-   * @since 7
-   */
-  function getSlotNumAsBundle(bundle: BundleOption, callback: AsyncCallback<number>): void;
-  function getSlotNumAsBundle(bundle: BundleOption): Promise<number>;
+  function getSlotNumByBundle(bundle: BundleOption, callback: AsyncCallback<number>): void;
+  function getSlotNumByBundle(bundle: BundleOption): Promise<number>;
 
   /**
    * remove
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function remove(bundle: BundleOption, notificationKey: NotificationKey, callback: AsyncCallback<void>): void;
@@ -309,7 +300,7 @@ declare namespace notification {
   /**
    * remove
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function remove(hashCode: string, callback: AsyncCallback<void>): void;
@@ -318,7 +309,7 @@ declare namespace notification {
   /**
    * removeAll
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function removeAll(bundle: BundleOption, callback: AsyncCallback<void>): void;
@@ -329,7 +320,7 @@ declare namespace notification {
    * Obtains all active notifications in the current system. The caller must have system permissions to
    * call this method.
    *
-   * @systemapi
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   function getAllActiveNotifications(callback: AsyncCallback<Array<NotificationRequest>>): void;
@@ -340,8 +331,8 @@ declare namespace notification {
    *
    * @since 7
    */
-  function getActiveNotificationNums(callback: AsyncCallback<number>): void;
-  function getActiveNotificationNums(): Promise<number>;
+  function getActiveNotificationCount(callback: AsyncCallback<number>): void;
+  function getActiveNotificationCount(): Promise<number>;
 
   /**
    * Obtains active notifications of the current application in the system.
@@ -368,12 +359,13 @@ declare namespace notification {
    */
   export interface NotificationKey {
     id: number;
-    lable?: string;
+    label?: string;
   }
 
   /**
    * DisturbMode
    *
+   * @systemapi Hide this for inner system use.
    * @since 7
    */
   export enum DoNotDisturbMode {

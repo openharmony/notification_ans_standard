@@ -19,12 +19,11 @@
 #include <memory>
 #include <string>
 #include "notification_basic_content.h"
+#include "pixel_map.h"
 #include "parcel.h"
 
 namespace OHOS {
 namespace Notification {
-class PixelMap;
-
 class NotificationPictureContent : public NotificationBasicContent {
 public:
     /**
@@ -71,13 +70,13 @@ public:
      * Sets the picture to be included in a notification.
      * @param bigPicture Indicates the PixelMap of the picture to be included.
      */
-    void SetBigPicture(const std::shared_ptr<PixelMap> &bigPicture);
+    void SetBigPicture(const std::shared_ptr<Media::PixelMap> &bigPicture);
 
     /**
      * Obtains the PixelMap of the picture specified by calling the setBigPicture(PixelMap) method.
      * @return the PixelMap of the picture included in the notification.
      */
-    const std::shared_ptr<PixelMap> GetBigPicture() const;
+    const std::shared_ptr<Media::PixelMap> GetBigPicture() const;
 
     /**
      * Returns a string representation of the object.
@@ -107,7 +106,7 @@ protected:
 private:
     std::string expandedTitle_{};
     std::string briefText_{};
-    std::shared_ptr<PixelMap> bigPicture_{};
+    std::shared_ptr<Media::PixelMap> bigPicture_{};
 };
 }  // namespace Notification
 }  // namespace OHOS

@@ -22,20 +22,20 @@ import notification from '../@ohos.notification';
  * a notification is canceled.
  *
  * @name NotificationSubscriber
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
- * @systemApi
+ * @systemapi Hide this for inner system use.
  * @since 7
  */
 export interface NotificationSubscriber {
-  onConsumed?:(data: SubscribeCallbackData) => void;
-  onCanceled?:(data: SubscribeCallbackData) => void;
+  onConsume?:(data: SubscribeCallbackData) => void;
+  onCancel?:(data: SubscribeCallbackData) => void;
   onUpdate?:(data: NotificationSortingMap) => void;
-  onConnected?:() => void;
-  onDisConnect?:() => void;
-  onDied?:() => void;
-  onDisturbModeChanged?:(mode: notification.DoNotDisturbMode) => void;
+  onConnect?:() => void;
+  onDisconnect?:() => void;
+  onDestroy?:() => void;
+  onDisturbModeChange?:(mode: notification.DoNotDisturbMode) => void;
 }
 
 /**
@@ -43,10 +43,10 @@ export interface NotificationSubscriber {
  * a notification is canceled.
  *
  * @name SubscribeCallbackData
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
- * @systemApi
+ * @systemapi Hide this for inner system use.
  * @since 7
  */
 export interface SubscribeCallbackData {

@@ -98,10 +98,10 @@ public:
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
 
-    template <typename T>
+    template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &data);
 
-    template <typename T>
+    template<typename T>
     bool ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos, MessageParcel &reply, ErrCode &result);
     static inline BrokerDelegator<AnsManagerProxy> delegator_;
 };
