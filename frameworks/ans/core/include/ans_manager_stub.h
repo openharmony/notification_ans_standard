@@ -40,10 +40,11 @@ public:
     virtual ErrCode CancelAll() override;
     virtual ErrCode AddSlotByType(NotificationConstant::SlotType slotType) override;
     virtual ErrCode AddSlots(const std::vector<sptr<NotificationSlot>> &slots) override;
-    virtual ErrCode RemoveSlotByType(NotificationConstant::SlotType slotType) override;
+    virtual ErrCode RemoveSlotByType(const NotificationConstant::SlotType &slotType) override;
     virtual ErrCode RemoveAllSlots() override;
     virtual ErrCode AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups) override;
-    virtual ErrCode GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) override;
+    virtual ErrCode GetSlotByType(
+        const NotificationConstant::SlotType &slotType, sptr<NotificationSlot> &slot) override;
     virtual ErrCode GetSlots(std::vector<sptr<NotificationSlot>> &slots) override;
     virtual ErrCode GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group) override;
     virtual ErrCode GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups) override;

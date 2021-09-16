@@ -1241,7 +1241,7 @@ ErrCode AnsManagerStub::AddSlots(const std::vector<sptr<NotificationSlot>> &slot
     return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::RemoveSlotByType(NotificationConstant::SlotType slotType)
+ErrCode AnsManagerStub::RemoveSlotByType(const NotificationConstant::SlotType &slotType)
 {
     ANS_LOGW("AnsManagerStub::RemoveSlotByType called!");
     return ERR_INVALID_OPERATION;
@@ -1259,7 +1259,7 @@ ErrCode AnsManagerStub::AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> g
     return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
+ErrCode AnsManagerStub::GetSlotByType(const NotificationConstant::SlotType &slotType, sptr<NotificationSlot> &slot)
 {
     ANS_LOGW("AnsManagerStub::GetSlotByType called!");
     return ERR_INVALID_OPERATION;
