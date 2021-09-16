@@ -833,9 +833,9 @@ void NotificationPreferencesDatabase::ParseBundleFromDistureDB(
         ANS_LOGD("Bundle key is %{public}s.", GenerateBundleKey(bundleKey).c_str());
         NotificationPreferencesInfo::BundleInfo bunldeInfo;
         for (auto bundleEntry : bundleEntries) {
-            if (bundleEntry.key.ToString().find(KEY_SLOT) != std::string::npos) {
+            if (IsSlotKey(bundleKey, bundleEntry.key.ToString())) {
                 ParseSlotFromDisturbeDB(bunldeInfo, bundleKey, bundleEntry);
-            } else if (bundleEntry.key.ToString().find(KEY_GROUP) != std::string::npos) {
+            } else if (IsGroupKey(bundleKey, bundleEntry.key.ToString())) {
                 ParseGroupFromDisturbeDB(bunldeInfo, bundleKey, bundleEntry);
             } else {
                 ParseBundlePropertyFromDisturbeDB(bunldeInfo, bundleKey, bundleEntry);
@@ -960,6 +960,34 @@ int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
         ANS_LOGW("Stoi error is %{public}s.", e.what());
     }
     return value;
+}
+
+bool NotificationPreferencesDatabase::IsSlotKey(const std::string &bundleKey, const std::string &key) const
+{
+    std::string tempStr = FindLastString(bundleKey, key);
+    size_t pos = tempStr.find_first_of(KEY_UNDER_LINE);
+    std::string slotStr;
+    if (pos != std::string::npos) {
+        slotStr = tempStr.substr(0, pos);
+    }
+    if (!slotStr.compare(KEY_SLOT)) {
+        return true;
+    }
+    return false;
+}
+
+bool NotificationPreferencesDatabase::IsGroupKey(const std::string &bundleKey, const std::string &key) const
+{
+    std::string tempStr = FindLastString(bundleKey, key);
+    size_t pos = tempStr.find_first_of(KEY_UNDER_LINE);
+    std::string slotStr;
+    if (pos != std::string::npos) {
+        slotStr = tempStr.substr(0, pos);
+    }
+    if (!slotStr.compare(KEY_GROUP)) {
+        return true;
+    }
+    return false;
 }
 
 std::string NotificationPreferencesDatabase::GenerateSlotKey(
