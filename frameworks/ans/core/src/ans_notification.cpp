@@ -14,6 +14,8 @@
  */
 
 #include "ans_notification.h"
+#include <memory>
+#include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
 #include "iservice_registry.h"
@@ -188,6 +190,12 @@ ErrCode AnsNotification::PublishNotification(const std::string &label, const Not
         return ERR_ANS_INVALID_PARAM;
     }
 
+    ErrCode checkErr = CheckImageSize(request);
+    if (checkErr != ERR_OK) {
+        ANS_LOGE("The size of one picture exceeds the limit");
+        return checkErr;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -212,6 +220,12 @@ ErrCode AnsNotification::PublishNotification(const NotificationRequest &request,
         ANS_LOGE("Refuse to publish the notification because the sequence numbers actions not match those assigned to "
                  "added action buttons.");
         return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode checkErr = CheckImageSize(request);
+    if (checkErr != ERR_OK) {
+        ANS_LOGE("The size of one picture exceeds the limit");
+        return checkErr;
     }
 
     if (!GetAnsManagerProxy()) {
@@ -326,6 +340,12 @@ ErrCode AnsNotification::PublishNotificationAsBundle(
         ANS_LOGE("Refuse to publish the notification because the sequence numbers actions not match those assigned to "
                  "added action buttons.");
         return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode checkErr = CheckImageSize(request);
+    if (checkErr != ERR_OK) {
+        ANS_LOGE("The size of one picture exceeds the limit");
+        return checkErr;
     }
 
     if (!GetAnsManagerProxy()) {
@@ -776,6 +796,92 @@ bool AnsNotification::CanPublishMediaContent(const NotificationRequest &request)
     }
 
     return true;
+}
+
+ErrCode AnsNotification::CheckImageSize(const NotificationRequest &request)
+{
+    auto littleIcon = request.GetLittleIcon();
+    if (littleIcon && (static_cast<uint32_t>(littleIcon->GetByteCount()) > MAX_ICON_SIZE)) {
+        ANS_LOGE("The size of little icon exceeds limit");
+        return ERR_ANS_ICON_OVER_SIZE;
+    }
+
+    auto bigIcon = request.GetBigIcon();
+    if (bigIcon && (static_cast<uint32_t>(bigIcon->GetByteCount()) > MAX_ICON_SIZE)) {
+        ANS_LOGE("The size of big icon exceeds limit");
+        return ERR_ANS_ICON_OVER_SIZE;
+    }
+
+    auto content = request.GetContent();
+    if (content) {
+        auto basicContent = request.GetContent()->GetNotificationContent();
+        if (basicContent) {
+            auto contentType = request.GetNotificationType();
+            switch (contentType) {
+                case NotificationContent::Type::CONVERSATION: {
+                    auto conversationalContent = std::static_pointer_cast<NotificationConversationalContent>(basicContent);
+
+                    auto picture = conversationalContent->GetMessageUser().GetPixelMap();
+                    if (picture && (static_cast<uint32_t>(picture->GetByteCount()) > MAX_ICON_SIZE)) {
+                        ANS_LOGE("The size of picture in conversationalContent exceeds limit");
+                        return ERR_ANS_ICON_OVER_SIZE;
+                    }
+
+                    auto messages = conversationalContent->GetAllConversationalMessages();
+                    for (auto &msg : messages) {
+                        if (!msg) {
+                            continue;
+                        }
+
+                        auto img = msg->GetSender().GetPixelMap();
+                        if (img && (static_cast<uint32_t>(img->GetByteCount()) > MAX_ICON_SIZE)) {
+                            ANS_LOGE("The size of picture in conversationalMessage exceeds limit");
+                            return ERR_ANS_ICON_OVER_SIZE;
+                        }
+                    }
+                } break;
+                case NotificationContent::Type::PICTURE: {
+                    auto pictureContent = std::static_pointer_cast<NotificationPictureContent>(basicContent);
+
+                    auto bigPicture = pictureContent->GetBigPicture();
+                    if (bigPicture && (static_cast<uint32_t>(bigPicture->GetByteCount()) > MAX_PICTURE_SIZE)) {
+                        ANS_LOGE("The size of big picture exceeds limit");
+                        return ERR_ANS_PICTURE_OVER_SIZE;
+                    }
+                } break;
+                default:
+                break;
+            }
+        }
+    }
+
+    auto buttons = request.GetActionButtons();
+    for (auto &btn : buttons) {
+        if (!btn) {
+            continue;
+        }
+
+        auto icon = btn->GetIcon();
+        if (icon && (static_cast<uint32_t>(icon->GetByteCount()) > MAX_ICON_SIZE)) {
+            ANS_LOGE("The size of icon in actionButton exceeds limit");
+            return ERR_ANS_ICON_OVER_SIZE;
+        }
+    }
+
+    auto users = request.GetMessageUsers();
+    for (auto &user : users) {
+        if (!user) {
+            continue;
+        }
+
+        auto icon = user->GetPixelMap();
+        if (icon && (static_cast<uint32_t>(icon->GetByteCount()) > MAX_ICON_SIZE)) {
+            ANS_LOGE("The size of picture in messageUser exceeds limit");
+            return ERR_ANS_ICON_OVER_SIZE;
+        }
+    }
+
+    return ERR_OK;
 }
 }  // namespace Notification
 }  // namespace OHOS

@@ -13,19 +13,18 @@
  * limitations under the License.
  */
 
-import { AsyncCallback } from './../basic';
 import { WantAgent } from '../@ohos.wantAgent';
-import image from '../@ohos.multimedia.image';
 
 /**
  * The action button of notification
  * @name NotificationActionButton
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface NotificationActionButton {
   title: string;
   wantAgent: WantAgent;
+  extras?: {[key: string]: any};
 }

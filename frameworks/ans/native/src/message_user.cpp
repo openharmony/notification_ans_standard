@@ -14,6 +14,7 @@
  */
 
 #include "message_user.h"
+#include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
@@ -45,12 +46,12 @@ std::string MessageUser::GetName() const
     return name_;
 }
 
-void MessageUser::SetPixelMap(const std::shared_ptr<PixelMap> &pixelMap)
+void MessageUser::SetPixelMap(const std::shared_ptr<Media::PixelMap> &pixelMap)
 {
     pixelMap_ = pixelMap;
 }
 
-const std::shared_ptr<PixelMap> MessageUser::GetPixelMap() const
+const std::shared_ptr<Media::PixelMap> MessageUser::GetPixelMap() const
 {
     return pixelMap_;
 }
@@ -98,30 +99,50 @@ std::string MessageUser::Dump() const
 bool MessageUser::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(key_)) {
+        ANS_LOGE("Failed to write key");
         return false;
     }
 
     if (!parcel.WriteString(name_)) {
+        ANS_LOGE("Failed to write name");
         return false;
     }
 
     if (!parcel.WriteBool(isMachine_)) {
+        ANS_LOGE("Failed to write isMachine");
         return false;
     }
 
     if (!parcel.WriteBool(isUserImportant_)) {
+        ANS_LOGE("Failed to write isUserImportant");
         return false;
     }
 
     if (uri_.ToString().empty()) {
         if (!parcel.WriteInt32(VALUE_NULL)) {
+            ANS_LOGE("Failed to write VALUE_NULL");
             return false;
         }
     } else {
         if (!parcel.WriteInt32(VALUE_OBJECT)) {
+            ANS_LOGE("Failed to write VALUE_OBJECT");
             return false;
         }
         if (!parcel.WriteString((uri_.ToString()))) {
+            ANS_LOGE("Failed to write uri");
+            return false;
+        }
+    }
+
+    bool valid = pixelMap_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write the flag which indicate whether pixelMap is null");
+        return false;
+    }
+
+    if (valid) {
+        if (!parcel.WriteParcelable(pixelMap_.get())) {
+            ANS_LOGE("Failed to write pixelMap");
             return false;
         }
     }
@@ -138,11 +159,21 @@ bool MessageUser::ReadFromParcel(Parcel &parcel)
 
     int empty = VALUE_NULL;
     if (!parcel.ReadInt32(empty)) {
+        ANS_LOGE("Failed to read VALUE");
         return false;
     }
 
     if (empty == VALUE_OBJECT) {
         uri_ = Uri((parcel.ReadString()));
+    }
+
+    bool valid = parcel.ReadBool();
+    if (valid) {
+        pixelMap_ = std::shared_ptr<Media::PixelMap>(parcel.ReadParcelable<Media::PixelMap>());
+        if (!pixelMap_) {
+            ANS_LOGE("Failed to read pixelMap");
+            return false;
+        }
     }
 
     return true;

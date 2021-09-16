@@ -80,13 +80,13 @@ private:
         NotificationPreferencesInfo &preferencesInfo) const;
     ErrCode CheckGroupForUpdateSlotGroup(const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationSlotGroup> &group,
         NotificationPreferencesInfo &preferencesInfo) const;
-    template <typename T>
+    template<typename T>
     ErrCode SetBundleProperty(NotificationPreferencesInfo &preferencesInfo, const sptr<NotificationBundleOption> &bundleOption,
         const BundleType &type, const T &value);
-    template <typename T>
+    template<typename T>
     ErrCode SaveBundleProperty(NotificationPreferencesInfo::BundleInfo &bundleInfo, const sptr<NotificationBundleOption> &bundleOption,
         const BundleType &type, const T &value);
-    template <typename T>
+    template<typename T>
     ErrCode GetBundleProperty(const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, T &value) const;
     std::string GenerateBundleKey(const sptr<NotificationBundleOption> &bundleOption) const;
 

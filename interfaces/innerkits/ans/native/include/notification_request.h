@@ -25,12 +25,11 @@
 #include "want_agent.h"
 #include "context.h"
 #include "ohos/aafwk/content/want_params.h"
+#include "pixel_map.h"
 #include "parcel.h"
 
 namespace OHOS {
 namespace Notification {
-class PixelMap;
-
 class NotificationRequest : public Parcelable {
 public:
     enum class BadgeStyle {
@@ -402,25 +401,25 @@ public:
      * Sets the little icon of the notification.
      * @param littleIcon Indicates the icon of the notification.
      */
-    void SetLittleIcon(const std::shared_ptr<PixelMap> &littleIcon);
+    void SetLittleIcon(const std::shared_ptr<Media::PixelMap> &littleIcon);
 
     /**
      * Obtains the icon of the notification.
      * @return the notification icon.
      */
-    const std::shared_ptr<PixelMap> GetLittleIcon() const;
+    const std::shared_ptr<Media::PixelMap> GetLittleIcon() const;
 
     /**
      * Sets the large icon of this notification, which is usually displayed on the right of the notification.
      * @param bigIcon Indicates the large icon to set. It must be a PixelMap object.
      */
-    void SetBigIcon(const std::shared_ptr<PixelMap> &bigIcon);
+    void SetBigIcon(const std::shared_ptr<Media::PixelMap> &bigIcon);
 
     /**
      * Obtains the large icon of this notification.
      * @return the large icon of this notification.
      */
-    const std::shared_ptr<PixelMap> GetBigIcon() const;
+    const std::shared_ptr<Media::PixelMap> GetBigIcon() const;
 
     /**
      * Sets the classification of this notification, which describes the purpose of this notification.
@@ -936,8 +935,8 @@ private:
     std::shared_ptr<WantAgent::WantAgent> removalWantAgent_{};
     std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent_{};
     std::shared_ptr<AAFwk::WantParams> additionalParams_{};
-    std::shared_ptr<PixelMap> littleIcon_{};
-    std::shared_ptr<PixelMap> bigIcon_{};
+    std::shared_ptr<Media::PixelMap> littleIcon_{};
+    std::shared_ptr<Media::PixelMap> bigIcon_{};
     std::shared_ptr<NotificationContent> notificationContent_{};
     std::shared_ptr<NotificationRequest> publicNotification_{};
 

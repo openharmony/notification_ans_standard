@@ -14,22 +14,23 @@
  */
 
 #include "ans_slotgroup_test.h"
-#include <notification_slot_group.h>
+#include "notification_slot_group.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 void AnsSlotGroupSystemTest::OnStart(const Want &want)
 {
-    APP_LOGI("====> ans SlotGroup test start:====>");
+    APP_LOGI("====> ans SlotGroup test start====>");
     Notification::NotificationSlotGroup notificationSlotGroupTest("id_test", "name_test");
+
     if (notificationSlotGroupTest.GetId().empty()) {
         ANS_LOGI("====> Notification slot group id is invalid====>");
     } else {
         ANS_LOGI("====> Notification slot group id is====> %{public}s", notificationSlotGroupTest.GetId().c_str());
     }
+
     ErrCode errcodeAdd = Notification::NotificationHelper::AddNotificationSlotGroup(notificationSlotGroupTest);
-    printf("====> ErrCode Add:====> %d\n", errcodeAdd);
-    APP_LOGI("====> ansSlotGroupTest add add add add add add:====> %{public}d", errcodeAdd);
+    APP_LOGI("====> ansSlotGroupTest add:====> %{public}d", errcodeAdd);
 
     Notification::NotificationSlot notificationSlotFirst(
         Notification::NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
@@ -42,34 +43,26 @@ void AnsSlotGroupSystemTest::OnStart(const Want &want)
     ErrCode errcodeAddSlotFirst = Notification::NotificationHelper::AddNotificationSlot(notificationSlotFirst);
     ErrCode errcodeAddSlotSecond = Notification::NotificationHelper::AddNotificationSlot(notificationSlotSecond);
 
-    APP_LOGI("====> ansSlotGroupTest:: errcodeAddSlotFirst :"
-             "====> %{public}d",
-        errcodeAddSlotFirst);
-    APP_LOGI("====> ansSlotGroupTest:: errcodeAddSlotSecond :"
-             "====> %{public}d",
-        errcodeAddSlotSecond);
+    APP_LOGI("====> ansSlotGroupTest errcodeAddSlotFirst:====> %{public}d", errcodeAddSlotFirst);
+    APP_LOGI("====> ansSlotGroupTest errcodeAddSlotSecond:====> %{public}d", errcodeAddSlotSecond);
+
     sptr<Notification::NotificationSlotGroup> group;
     ErrCode errcodeGet = Notification::NotificationHelper::GetNotificationSlotGroup("id_test", group);
-    APP_LOGI("====> ansSlotGroupTest:: get get get get get get :"
-             "====> %{public}d",
-        errcodeGet);
-    std::string dumpGroupStr = group->Dump();
-    APP_LOGI("====> ansSlotGroupTest:: dump dump dump dump dump :"
-             "====> %{public}s",
-        dumpGroupStr.c_str());
-    APP_LOGI("====> ansSlotGroupTest:: the size of slots :"
-             "====> %{public}zu",
-        group->GetSlots().size());
+    APP_LOGI("====> ansSlotGroupTest get:====> %{public}d", errcodeGet);
+
+    if (group != nullptr) {
+        std::string dumpGroupStr = group->Dump();
+        APP_LOGI("====> ansSlotGroupTest dump:====> %{public}s", dumpGroupStr.c_str());
+        APP_LOGI("====> ansSlotGroupTest the size of slots:====> %{public}zu", group->GetSlots().size());
+    } else {
+        APP_LOGI("====>group is null====>");
+    }
 
     ErrCode errcodeRem = Notification::NotificationHelper::RemoveNotificationSlotGroup("id_test");
-    APP_LOGI("====> ansSlotGroupTest:: remove remove remove remove :"
-             "====> %{public}d",
-        errcodeRem);
+    APP_LOGI("====> ansSlotGroupTest remove:====> %{public}d", errcodeRem);
     sptr<Notification::NotificationSlotGroup> groupTwo;
     ErrCode errcodeGetTwo = Notification::NotificationHelper::GetNotificationSlotGroup("id_test", groupTwo);
-    APP_LOGI("====> ansSlotGroupTest:: get get get get get get :"
-             "====> %{public}d",
-        errcodeGetTwo);
+    APP_LOGI("====> ansSlotGroupTest get:====> %{public}d", errcodeGetTwo);
     Ability::OnStart(want);
 }
 

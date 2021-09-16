@@ -23,12 +23,11 @@
 #include "notification_user_input.h"
 #include "want_agent.h"
 #include "pac_map.h"
+#include "pixel_map.h"
 #include "parcel.h"
 
 namespace OHOS {
 namespace Notification {
-class PixelMap;
-
 class NotificationActionButton : public Parcelable {
 public:
     /**
@@ -47,7 +46,7 @@ public:
      * @return the shared_ptr object owns the created NotificationActionButton object otherwise return empty object if
      * isContextual is true but icon or wantAgent is empty.
      */
-    static std::shared_ptr<NotificationActionButton> Create(const std::shared_ptr<PixelMap> &icon,
+    static std::shared_ptr<NotificationActionButton> Create(const std::shared_ptr<Media::PixelMap> &icon,
         const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
         const std::shared_ptr<AppExecFwk::PacMap> &extras = {},
         NotificationConstant::SemanticActionButton semanticActionButton =
@@ -74,7 +73,7 @@ public:
      * Obtains the icon of this NotificationActionButton.
      * @return the icon of this NotificationActionButton.
      */
-    const std::shared_ptr<PixelMap> GetIcon() const;
+    const std::shared_ptr<Media::PixelMap> GetIcon() const;
 
     /**
      * Obtains the title of this NotificationActionButton.
@@ -208,7 +207,7 @@ private:
      * @param userInputs Indicates the NotificationUserInput object to add.
      * @param isContextual Indicates whether this NotificationActionButton is a contextual action.
      */
-    NotificationActionButton(const std::shared_ptr<PixelMap> &icon, const std::string &title,
+    NotificationActionButton(const std::shared_ptr<Media::PixelMap> &icon, const std::string &title,
         const std::shared_ptr<WantAgent::WantAgent> &wantAgent, const std::shared_ptr<AppExecFwk::PacMap> &extras,
         NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
         const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
@@ -221,7 +220,7 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::shared_ptr<PixelMap> icon_{};
+    std::shared_ptr<Media::PixelMap> icon_{};
     std::string title_{};
     std::shared_ptr<WantAgent::WantAgent> wantAgent_{};
     std::shared_ptr<AppExecFwk::PacMap> extras_{};
