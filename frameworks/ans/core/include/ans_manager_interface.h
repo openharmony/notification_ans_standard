@@ -45,10 +45,10 @@ public:
     virtual ErrCode CancelAll() = 0;
     virtual ErrCode AddSlotByType(NotificationConstant::SlotType slotType) = 0;
     virtual ErrCode AddSlots(const std::vector<sptr<NotificationSlot>> &slots) = 0;
-    virtual ErrCode RemoveSlotByType(NotificationConstant::SlotType slotType) = 0;
+    virtual ErrCode RemoveSlotByType(const NotificationConstant::SlotType &slotType) = 0;
     virtual ErrCode RemoveAllSlots() = 0;
     virtual ErrCode AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups) = 0;
-    virtual ErrCode GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) = 0;
+    virtual ErrCode GetSlotByType(const NotificationConstant::SlotType &slotType, sptr<NotificationSlot> &slot) = 0;
     virtual ErrCode GetSlots(std::vector<sptr<NotificationSlot>> &slots) = 0;
     virtual ErrCode GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group) = 0;
     virtual ErrCode GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups) = 0;

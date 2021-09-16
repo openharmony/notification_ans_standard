@@ -235,7 +235,7 @@ ErrCode AnsManagerProxy::AddSlots(const std::vector<sptr<NotificationSlot>> &slo
     return result;
 }
 
-ErrCode AnsManagerProxy::RemoveSlotByType(NotificationConstant::SlotType slotType)
+ErrCode AnsManagerProxy::RemoveSlotByType(const NotificationConstant::SlotType &slotType)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
@@ -328,7 +328,7 @@ ErrCode AnsManagerProxy::AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> 
     return result;
 }
 
-ErrCode AnsManagerProxy::GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
+ErrCode AnsManagerProxy::GetSlotByType(const NotificationConstant::SlotType &slotType, sptr<NotificationSlot> &slot)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {

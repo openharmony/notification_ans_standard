@@ -1025,7 +1025,7 @@ ErrCode AdvancedNotificationService::Unsubscribe(
 }
 
 ErrCode AdvancedNotificationService::GetSlotByType(
-    const NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot)
+    const NotificationConstant::SlotType &slotType, sptr<NotificationSlot> &slot)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
@@ -1040,7 +1040,7 @@ ErrCode AdvancedNotificationService::GetSlotByType(
     return result;
 }
 
-ErrCode AdvancedNotificationService::RemoveSlotByType(const NotificationConstant::SlotType slotType)
+ErrCode AdvancedNotificationService::RemoveSlotByType(const NotificationConstant::SlotType &slotType)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 

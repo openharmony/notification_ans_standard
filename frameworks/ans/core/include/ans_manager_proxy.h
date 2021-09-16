@@ -34,10 +34,10 @@ public:
     ErrCode CancelAll() override;
     ErrCode AddSlotByType(NotificationConstant::SlotType slotType) override;
     ErrCode AddSlots(const std::vector<sptr<NotificationSlot>> &slots) override;
-    ErrCode RemoveSlotByType(NotificationConstant::SlotType slotType) override;
+    ErrCode RemoveSlotByType(const NotificationConstant::SlotType &slotType) override;
     ErrCode RemoveAllSlots() override;
     ErrCode AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> groups) override;
-    ErrCode GetSlotByType(NotificationConstant::SlotType slotType, sptr<NotificationSlot> &slot) override;
+    ErrCode GetSlotByType(const NotificationConstant::SlotType &slotType, sptr<NotificationSlot> &slot) override;
     ErrCode GetSlots(std::vector<sptr<NotificationSlot>> &slots) override;
     ErrCode GetSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group) override;
     ErrCode GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups) override;

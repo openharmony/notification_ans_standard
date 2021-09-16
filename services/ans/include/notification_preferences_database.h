@@ -87,6 +87,8 @@ private:
     std::string VectorToString(const std::vector<int64_t> &data) const;
     void StringToVector(const std::string &str, std::vector<int64_t> &data) const;
     int StringToInt(const std::string &str) const;
+    bool IsSlotKey(const std::string &bundleKey, const std::string &key) const;
+    bool IsGroupKey(const std::string &bundleKey, const std::string &key) const;
     std::string GenerateSlotKey(
         const std::string &bundleKey, const std::string &type = "", const std::string &subType = "") const;
     std::string GenerateGroupKey(const std::string &bundleKey, const std::string &subType = "") const;

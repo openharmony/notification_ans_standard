@@ -125,6 +125,7 @@ private:
 
     public:
         SubscriberImpl(NotificationSubscriber &subscriber);
+        ~SubscriberImpl(){};
 
         void OnSubscribeResult(NotificationConstant::SubscribeResult result) override;
 
