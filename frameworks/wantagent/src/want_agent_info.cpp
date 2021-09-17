@@ -104,5 +104,4 @@ std::shared_ptr<WantParams> WantAgentInfo::GetExtraInfo() const
 {
     return extraInfo_;
 }
-
 }  // namespace OHOS::Notification::WantAgent

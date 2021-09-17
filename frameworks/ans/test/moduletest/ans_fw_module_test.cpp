@@ -91,6 +91,10 @@ public:
     OnUnSubscribeResultEvent(NotificationConstant::SubscribeResult result)
         : SubscriberEvent(SubscriberEventType::ON_UNSUBSCRIBERESULT), unSubscribeResult_(result)
     {}
+
+    ~OnUnSubscribeResultEvent() override
+    {}
+
     NotificationConstant::SubscribeResult GetUnSubscribeResult()
     {
         return unSubscribeResult_;
@@ -104,12 +108,18 @@ class OnDiedEvent : public SubscriberEvent {
 public:
     OnDiedEvent() : SubscriberEvent(SubscriberEventType::ON_DIED)
     {}
+
+    ~OnDiedEvent() override
+    {}
 };
 
 class OnUpdatedEvent : public SubscriberEvent {
 public:
     OnUpdatedEvent(const std::shared_ptr<NotificationSortingMap> &sortingMap)
         : SubscriberEvent(SubscriberEventType::ON_UPDATE), sortingMap_(sortingMap)
+    {}
+
+    ~OnUpdatedEvent() override
     {}
 
     std::shared_ptr<NotificationSortingMap> GetNotificationSortingMap()
@@ -127,6 +137,9 @@ public:
         : SubscriberEvent(SubscriberEventType::ON_DISTURBMODECHANGED), disturbMode_(disturbMode)
     {}
 
+    ~OnDisturbModeChangedEvent() override
+    {}
+
     int GetDisturbModeChanged()
     {
         return disturbMode_;
@@ -140,6 +153,9 @@ class OnOnCanceledEvent : public SubscriberEvent {
 public:
     OnOnCanceledEvent(const std::shared_ptr<Notification> &request)
         : SubscriberEvent(SubscriberEventType::ON_CANCELED), request_(request)
+    {}
+
+    ~OnOnCanceledEvent() override
     {}
 
     std::shared_ptr<Notification> GetRequest()
@@ -159,6 +175,9 @@ public:
           request_(request),
           sortingMap_(sortingMap),
           deleteReason_(deleteReason)
+    {}
+
+    ~OnOnCanceledWithSortingMapAndDeleteReasonEvent() override
     {}
 
     std::shared_ptr<Notification> GetRequest()
@@ -186,6 +205,9 @@ public:
         : SubscriberEvent(SubscriberEventType::ON_CONSUMED), request_(request)
     {}
 
+    ~OnConsumedEvent() override
+    {}
+
     std::shared_ptr<Notification> GetRequest()
     {
         return request_;
@@ -203,6 +225,9 @@ public:
     {
         type_ = SubscriberEventType::ON_CONSUMED_WITH_SORTINGMAP;
     }
+
+    ~OnConsumedWithSortingMapEvent() override
+    {}
 
     std::shared_ptr<Notification> GetRequest()
     {
@@ -324,6 +349,9 @@ public:
         onCanceledWithSortingMapDelRea_.clear();
         waitOnCanceledWithSortingMapAndDeleteReason_ = false;
     }
+
+    ~EventParser()
+    {}
 
     void parse(std::list<std::shared_ptr<SubscriberEvent>> events)
     {
