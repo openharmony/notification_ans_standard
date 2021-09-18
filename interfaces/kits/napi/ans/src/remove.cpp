@@ -35,15 +35,15 @@ struct BundleAndKeyInfo {
 };
 
 struct RemoveParams {
-    std::optional<std::string> hashcode{};
-    std::optional<BundleAndKeyInfo> bundleAndKeyInfo{};
+    std::optional<std::string> hashcode {};
+    std::optional<BundleAndKeyInfo> bundleAndKeyInfo {};
     napi_ref callback = nullptr;
 };
 
 struct AsyncCallbackInfoRemove {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
-    RemoveParams params{};
+    RemoveParams params {};
     CallbackPromiseInfo info;
 };
 
@@ -78,7 +78,7 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     } else {
         NAPI_ASSERT(env, argc >= REMOVE_BY_BUNDLE_AND_KEY_MIN_PARA, "Wrong number of arguments");
 
-        BundleAndKeyInfo info{};
+        BundleAndKeyInfo info {};
         // argv[0]: BundleOption
         auto retValue = Common::GetBundleOption(env, argv[0], info.option);
         if (retValue == nullptr) {
@@ -128,7 +128,7 @@ napi_value ParseParametersByRemoveAll(const napi_env &env, const napi_callback_i
         // argv[0]: callback
         napi_create_reference(env, argv[0], 1, &params.callback);
     } else {
-        BundleAndKeyInfo info{};
+        BundleAndKeyInfo info {};
         // argv[0]: BundleOption
         auto retValue = Common::GetBundleOption(env, argv[0], info.option);
         NAPI_ASSERT(env, retValue != nullptr, "GetBundleOption failed.");
@@ -149,13 +149,13 @@ napi_value Remove(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    RemoveParams params{};
+    RemoveParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoRemove *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoRemove{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoRemove {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }
@@ -215,13 +215,13 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    RemoveParams params{};
+    RemoveParams params {};
     if (ParseParametersByRemoveAll(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoRemove *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoRemove{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoRemove {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }

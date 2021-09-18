@@ -512,7 +512,7 @@ ErrCode AnsNotification::RemoveNotification(const std::string &key)
 }
 
 ErrCode AnsNotification::RemoveNotification(
-        const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label)
+    const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label)
 {
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
@@ -572,7 +572,7 @@ ErrCode AnsNotification::GetNotificationSlotsForBundle(
 }
 
 ErrCode AnsNotification::UpdateNotificationSlots(
-        const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
+    const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");

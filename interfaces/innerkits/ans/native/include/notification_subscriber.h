@@ -149,9 +149,9 @@ private:
 
     public:
         NotificationSubscriber &subscriber_;
-        sptr<DeathRecipient> recipient_{nullptr};
-        sptr<IAnsManager> proxy_{nullptr};
-        std::mutex mutex_{};
+        sptr<DeathRecipient> recipient_ {nullptr};
+        sptr<IAnsManager> proxy_ {nullptr};
+        std::mutex mutex_ {};
     };
 
 private:

@@ -321,7 +321,7 @@ bool NotificationUserInput::ReadFromParcel(Parcel &parcel)
 
     auto ssize = parcel.ReadInt32();
     for (auto it = 0; it < ssize; ++it) {
-        std::string member{};
+        std::string member {};
         if (!parcel.ReadString(member)) {
             ANS_LOGE("Failed to read permitMimeTypes");
             return false;

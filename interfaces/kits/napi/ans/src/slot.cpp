@@ -421,11 +421,13 @@ napi_value AddSlot(napi_env env, napi_callback_info info)
         return Common::JSParaError(env, paras.callback);
     }
 
-    AsyncCallbackInfoAddSlot *asynccallbackinfo = new (std::nothrow) AsyncCallbackInfoAddSlot{.env = env,
+    AsyncCallbackInfoAddSlot *asynccallbackinfo = new (std::nothrow) AsyncCallbackInfoAddSlot {
+        .env = env,
         .asyncWork = nullptr,
         .slot = paras.slot,
         .inType = paras.inType,
-        .isAddSlotByType = paras.isAddSlotByType};
+        .isAddSlotByType = paras.isAddSlotByType
+    };
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, paras.callback);
     }
@@ -485,7 +487,7 @@ napi_value AddSlots(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoAddSlots *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoAddSlots{.env = env, .asyncWork = nullptr, .slots = paras.slots};
+        new (std::nothrow) AsyncCallbackInfoAddSlots {.env = env, .asyncWork = nullptr, .slots = paras.slots};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, paras.callback);
     }
@@ -535,13 +537,13 @@ napi_value SetSlotByBundle(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    ParametersInfoSetSlotByBundle params{};
+    ParametersInfoSetSlotByBundle params {};
     if (ParseParametersSetSlotByBundle(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoSetSlotByBundle *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoSetSlotByBundle{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoSetSlotByBundle {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }
@@ -602,7 +604,7 @@ napi_value GetSlot(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoGetSlot *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoGetSlot{.env = env, .asyncWork = nullptr, .outType = paras.outType};
+        new (std::nothrow) AsyncCallbackInfoGetSlot {.env = env, .asyncWork = nullptr, .outType = paras.outType};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, paras.callback);
     }
@@ -668,13 +670,13 @@ napi_value GetSlotNumByBundle(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    ParametersInfoGetSlotNumByBundle params{};
+    ParametersInfoGetSlotNumByBundle params {};
     if (ParseParametersGetSlotNumByBundle(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoGetSlotNumByBundle *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoGetSlotNumByBundle{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoGetSlotNumByBundle {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }
@@ -736,7 +738,7 @@ napi_value GetSlots(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoGetSlots *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoGetSlots{.env = env, .asyncWork = nullptr};
+        new (std::nothrow) AsyncCallbackInfoGetSlots {.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, callback);
     }
@@ -815,13 +817,13 @@ napi_value GetSlotsByBundle(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    ParametersInfoGetSlotsByBundle params{};
+    ParametersInfoGetSlotsByBundle params {};
     if (ParseParametersGetSlotsByBundle(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoGetSlotsByBundle *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoGetSlotsByBundle{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoGetSlotsByBundle {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }
@@ -910,7 +912,7 @@ napi_value RemoveSlot(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoRemoveSlot *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoRemoveSlot{.env = env, .asyncWork = nullptr, .outType = paras.outType};
+        new (std::nothrow) AsyncCallbackInfoRemoveSlot {.env = env, .asyncWork = nullptr, .outType = paras.outType};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, paras.callback);
     }
@@ -966,7 +968,7 @@ napi_value RemoveAllSlots(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoRemoveAllSlots *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoRemoveAllSlots{.env = env, .asyncWork = nullptr};
+        new (std::nothrow) AsyncCallbackInfoRemoveAllSlots {.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, callback);
     }

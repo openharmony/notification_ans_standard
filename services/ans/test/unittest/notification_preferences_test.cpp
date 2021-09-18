@@ -843,7 +843,7 @@ HWTEST_F(NotificationPreferencesTest, GetImportance_00100, Function | SmallTest 
 {
     int importance = 1;
     EXPECT_EQ((int)NotificationPreferences::GetInstance().SetImportance(bundleOption_, importance), (int)ERR_OK);
-    int getImportance = 0;;
+    int getImportance = 0;
 
     EXPECT_EQ((int)NotificationPreferences::GetInstance().GetImportance(bundleOption_, getImportance), (int)ERR_OK);
     EXPECT_EQ(getImportance, 1);
@@ -856,7 +856,7 @@ HWTEST_F(NotificationPreferencesTest, GetImportance_00100, Function | SmallTest 
  */
 HWTEST_F(NotificationPreferencesTest, GetImportance_00200, Function | SmallTest | Level1)
 {
-    int getImportance = 0;;
+    int getImportance = 0;
     EXPECT_EQ((int)NotificationPreferences::GetInstance().GetImportance(bundleEmptyOption_, getImportance),
         (int)ERR_ANS_INVALID_PARAM);
 }
@@ -893,7 +893,7 @@ HWTEST_F(NotificationPreferencesTest, GetTotalBadgeNums_00100, Function | SmallT
 {
     int num = 1;
     NotificationPreferences::GetInstance().SetTotalBadgeNums(bundleOption_, num);
-    int totalBadgeNum;
+    int totalBadgeNum = 0;
     EXPECT_EQ((int)NotificationPreferences::GetInstance().GetTotalBadgeNums(bundleOption_, totalBadgeNum), (int)ERR_OK);
     EXPECT_EQ(totalBadgeNum, num);
 }

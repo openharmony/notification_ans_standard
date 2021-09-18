@@ -49,7 +49,7 @@ void NotificationSorting::SetGroupKeyOverride(const std::string &groupKeyOverrid
 
 std::string NotificationSorting::Dump() const
 {
-    std::string contents{""};
+    std::string contents {""};
     if (slot_ != nullptr) {
         contents = slot_->Dump();
     } else {

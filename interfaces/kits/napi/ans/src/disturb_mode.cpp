@@ -68,13 +68,13 @@ napi_value SetDoNotDisturbMode(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    DisturbModeParams params{};
+    DisturbModeParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoDisturbMode *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoDisturbMode{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoDisturbMode {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }

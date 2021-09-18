@@ -210,7 +210,7 @@ ErrCode NotificationHelper::RemoveNotification(const std::string &key)
 }
 
 ErrCode NotificationHelper::RemoveNotification(
-        const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label)
+    const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotification(bundleOption, notificationId, label);
 }

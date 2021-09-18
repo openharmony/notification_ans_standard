@@ -220,16 +220,16 @@ private:
     std::string GenerateNotificationKey(int32_t uid, const std::string &label, int32_t id);
 
 private:
-    bool enableSound_{false};
-    bool enableLight_{false};
-    bool enableViration_{false};
-    std::string key_{""};
-    int32_t ledLightColor_{0};
-    NotificationConstant::VisiblenessType lockscreenVisibleness_{NotificationConstant::VisiblenessType::NO_OVERRIDE};
-    sptr<NotificationRequest> request_{nullptr};
-    int64_t postTime_{0};
-    std::shared_ptr<Uri> sound_{nullptr};
-    std::vector<int64_t> vibrationStyle_{};
+    bool enableSound_ {false};
+    bool enableLight_ {false};
+    bool enableViration_ {false};
+    std::string key_ {""};
+    int32_t ledLightColor_ {0};
+    NotificationConstant::VisiblenessType lockscreenVisibleness_ {NotificationConstant::VisiblenessType::NO_OVERRIDE};
+    sptr<NotificationRequest> request_ {nullptr};
+    int64_t postTime_ {0};
+    std::shared_ptr<Uri> sound_ {nullptr};
+    std::vector<int64_t> vibrationStyle_ {};
 
     friend class AdvancedNotificationService;
     friend class NotificationSlotFilter;

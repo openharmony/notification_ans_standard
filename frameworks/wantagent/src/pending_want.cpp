@@ -347,8 +347,8 @@ void PendingWant::UnregisterCancelListener(
     std::scoped_lock<std::mutex> lock(lock_object);
     bool isEmpty = cancelListeners_.empty();
     cancelListeners_.erase(remove_if(cancelListeners_.begin(),
-                               cancelListeners_.end(),
-                               [cancelListener](std::shared_ptr<CancelListener> x) { return x == cancelListener; }),
+        cancelListeners_.end(),
+        [cancelListener](std::shared_ptr<CancelListener> x) { return x == cancelListener; }),
         cancelListeners_.end());
     if (cancelListeners_.empty() && !isEmpty) {
         AbilityManagerClient::GetInstance()->UnregisterCancelListener(target, cancelReceiver_);

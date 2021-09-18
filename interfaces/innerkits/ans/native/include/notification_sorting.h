@@ -168,14 +168,14 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::string key_{};
-    int32_t ranking_{-1};
-    int32_t importance_{-1};
-    bool isDisplayBadge_{true};
-    bool isHiddenNotification_{};
-    std::string groupKeyOverride_{};
-    int32_t visiblenessOverride_{};
-    sptr<NotificationSlot> slot_{nullptr};
+    std::string key_ {};
+    int32_t ranking_ {-1};
+    int32_t importance_ {-1};
+    bool isDisplayBadge_ {true};
+    bool isHiddenNotification_ {};
+    std::string groupKeyOverride_ {};
+    int32_t visiblenessOverride_ {};
+    sptr<NotificationSlot> slot_ {nullptr};
 
     friend class AdvancedNotificationService;
 };

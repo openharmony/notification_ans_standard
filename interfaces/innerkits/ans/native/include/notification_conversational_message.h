@@ -108,11 +108,11 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    int64_t arrivedTime_{0};
-    std::string text_{};
-    MessageUser sender_{};
-    std::shared_ptr<Uri> uri_{};
-    std::string mimeType_{};
+    int64_t arrivedTime_ {0};
+    std::string text_ {};
+    MessageUser sender_ {};
+    std::shared_ptr<Uri> uri_ {};
+    std::string mimeType_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS
