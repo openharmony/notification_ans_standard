@@ -220,16 +220,17 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::shared_ptr<Media::PixelMap> icon_{};
-    std::string title_{};
-    std::shared_ptr<WantAgent::WantAgent> wantAgent_{};
-    std::shared_ptr<AppExecFwk::PacMap> extras_{};
-    NotificationConstant::SemanticActionButton semanticActionButton_{
-        NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON};
-    bool autoCreatedReplies_{true};
-    std::vector<std::shared_ptr<NotificationUserInput>> mimeTypeOnlyUserInputs_{};
-    std::vector<std::shared_ptr<NotificationUserInput>> userInputs_{};
-    bool isContextual_{false};
+    std::shared_ptr<Media::PixelMap> icon_ {};
+    std::string title_ {};
+    std::shared_ptr<WantAgent::WantAgent> wantAgent_ {};
+    std::shared_ptr<AppExecFwk::PacMap> extras_ {};
+    NotificationConstant::SemanticActionButton semanticActionButton_ {
+        NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON
+    };
+    bool autoCreatedReplies_ {true};
+    std::vector<std::shared_ptr<NotificationUserInput>> mimeTypeOnlyUserInputs_ {};
+    std::vector<std::shared_ptr<NotificationUserInput>> userInputs_ {};
+    bool isContextual_ {false};
 };
 }  // namespace Notification
 }  // namespace OHOS

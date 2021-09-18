@@ -44,8 +44,9 @@ void TriggerCompleteCallBack::SetWantAgentInstance(const std::shared_ptr<Notific
     triggerCompleteInfo_.wantAgent = wantAgent;
 }
 
-void TriggerCompleteCallBack::OnSendFinishedUvAfterWorkCallbacck(uv_work_t *work, int status)
+void TriggerCompleteCallBack::OnSendFinishedUvAfterWorkCallback(uv_work_t *work, int status)
 {
+    HILOG_INFO("TriggerCompleteCallBack::OnSendFinishedUvAfterWorkCallback:status = %{public}d", status);
     TriggerReceiveDataWorker *dataWorkerData = (TriggerReceiveDataWorker *)work->data;
     if (dataWorkerData == nullptr) {
         HILOG_INFO("TriggerReceiveDataWorker instance(uv_work_t) is nullptr");
@@ -145,7 +146,7 @@ void TriggerCompleteCallBack::OnSendFinished(
     dataWorker->wantAgent = triggerCompleteInfo_.wantAgent;
     work->data = (void *)dataWorker;
     int ret =
-        uv_queue_work(loop, work, [](uv_work_t *work) {}, TriggerCompleteCallBack::OnSendFinishedUvAfterWorkCallbacck);
+        uv_queue_work(loop, work, [](uv_work_t *work) {}, TriggerCompleteCallBack::OnSendFinishedUvAfterWorkCallback);
     if (ret != 0) {
         if (dataWorker != nullptr) {
             delete dataWorker;
@@ -266,7 +267,7 @@ void NAPI_GetBundleNamePromiseCompleteCallBack(napi_env env, napi_status status,
 {
     HILOG_INFO("GetBundleName compeleted(Promise Mode)...");
     AsyncGetBundleNameCallbackInfo *asyncCallbackInfo = (AsyncGetBundleNameCallbackInfo *)data;
-    napi_value result;
+    napi_value result = nullptr;
     napi_create_string_utf8(env, asyncCallbackInfo->bundleName.c_str(), NAPI_AUTO_LENGTH, &result);
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -373,9 +374,9 @@ void NAPI_GetUidWrapCompleteCallBack(napi_env env, napi_status status, void *dat
     HILOG_INFO("GetUid compeleted(CallBack Mode)...");
     AsyncGetUidCallbackInfo *asyncCallbackInfo = (AsyncGetUidCallbackInfo *)data;
     napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
-    napi_value callback;
-    napi_value undefined;
-    napi_value callResult = 0;
+    napi_value callback = nullptr;
+    napi_value undefined = nullptr;
+    napi_value callResult = nullptr;
 
     result[0] = GetCallbackErrorResult(asyncCallbackInfo->env, BUSINESS_ERROR_CODE_OK);
     napi_create_int32(env, asyncCallbackInfo->uid, &result[1]);
@@ -394,7 +395,7 @@ void NAPI_GetUidWrapPromiseCompleteCallBack(napi_env env, napi_status status, vo
 {
     HILOG_INFO("GetUid compeleted(Promise Mode)...");
     AsyncGetUidCallbackInfo *asyncCallbackInfo = (AsyncGetUidCallbackInfo *)data;
-    napi_value result;
+    napi_value result = nullptr;
     napi_create_int32(env, asyncCallbackInfo->uid, &result);
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -664,7 +665,7 @@ void NAPI_CancelWrapPromiseCompleteCallBack(napi_env env, napi_status status, vo
 {
     HILOG_INFO("Cancel compeleted(Promise Mode)...");
     AsyncCancelCallbackInfo *asyncCallbackInfo = (AsyncCancelCallbackInfo *)data;
-    napi_value result;
+    napi_value result = nullptr;
     napi_get_null(env, &result);
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -799,8 +800,8 @@ napi_value NAPI_TriggerWrap(napi_env env, napi_callback_info info, AsyncTriggerC
     return ret;
 }
 
-napi_value NAPI_GetTriggerInfo(napi_value argv[NUMBER_OF_PARAMETERS_THREE], size_t argc, napi_env env,
-    napi_callback_info info, Notification::WantAgent::TriggerInfo &triggerInfo)
+napi_value NAPI_GetTriggerInfo(napi_value argv[NUMBER_OF_PARAMETERS_THREE], napi_env env, napi_callback_info info,
+    Notification::WantAgent::TriggerInfo &triggerInfo)
 {
     // Get triggerInfo
     napi_value jsTriggerInfo = argv[1];
@@ -877,7 +878,7 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
     }
 
     Notification::WantAgent::TriggerInfo triggerInfo;
-    napi_value ret = NAPI_GetTriggerInfo(argv, argc, env, info, triggerInfo);
+    napi_value ret = NAPI_GetTriggerInfo(argv, env, info, triggerInfo);
     if (ret == nullptr) {
         return NapiGetNull(env);
     }
@@ -942,7 +943,7 @@ void NAPI_EqualWrapPromiseCompleteCallBack(napi_env env, napi_status status, voi
 {
     HILOG_INFO("Equal compeleted(Promise Mode)...");
     AsyncEqualCallbackInfo *asyncCallbackInfo = (AsyncEqualCallbackInfo *)data;
-    napi_value result;
+    napi_value result = nullptr;
     napi_get_boolean(env, asyncCallbackInfo->result, &result);
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -1178,9 +1179,7 @@ napi_value NAPI_GetWantAgentWrap(
     }
 }
 
-napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo,
-    std::vector<std::shared_ptr<AAFwk::Want>> &wants, int32_t &operationType, int32_t &requestCode,
-    std::vector<Notification::WantAgent::WantAgentConstant::Flags> &wantAgentFlags, AAFwk::WantParams &extraInfo)
+napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo, const WantAgentWantsParas &paras)
 {
     napi_valuetype jsWantAgentInfoType = napi_valuetype::napi_null;
     NAPI_CALL(env, napi_typeof(env, jsWantAgentInfo, &jsWantAgentInfoType));
@@ -1201,15 +1200,15 @@ napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo,
         if (!UnwrapWant(env, jsWant, *want)) {
             return NapiGetNull(env);
         }
-        wants.emplace_back(want);
+        paras.wants.emplace_back(want);
     }
 
     // Get operationType
-    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "operationType", operationType)) {
+    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "operationType", paras.operationType)) {
         return NapiGetNull(env);
     }
     // Get requestCode
-    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "requestCode", requestCode)) {
+    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "requestCode", paras.requestCode)) {
         return NapiGetNull(env);
     }
     // Get wantAgentFlags
@@ -1226,13 +1225,13 @@ napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo,
             NAPI_ASSERT(env, valuetype0 == napi_number, "Wrong argument type. Numbers expected.");
             int32_t value0 = 0;
             NAPI_CALL(env, napi_get_value_int32(env, napiWantAgentFlags, &value0));
-            wantAgentFlags.emplace_back(static_cast<Notification::WantAgent::WantAgentConstant::Flags>(value0));
+            paras.wantAgentFlags.emplace_back(static_cast<Notification::WantAgent::WantAgentConstant::Flags>(value0));
         }
     }
     // Get extraInfo
     napi_value JsExtraInfo = GetPropertyValueByPropertyName(env, jsWantAgentInfo, "extraInfo", napi_object);
     if (JsExtraInfo != nullptr) {
-        if (!UnwrapWantParams(env, JsExtraInfo, extraInfo)) {
+        if (!UnwrapWantParams(env, JsExtraInfo, paras.extraInfo)) {
             return NapiGetNull(env);
         }
     }
@@ -1253,8 +1252,14 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
     int32_t requestCode = -1;
     std::vector<Notification::WantAgent::WantAgentConstant::Flags> wantAgentFlags = {};
     AAFwk::WantParams extraInfo = {};
-    napi_value ret =
-        NAPI_GetWantAgentWants(env, jsWantAgentInfo, wants, operationType, requestCode, wantAgentFlags, extraInfo);
+    WantAgentWantsParas paras = {
+        .wants = wants,
+        .operationType = operationType,
+        .requestCode = requestCode,
+        .wantAgentFlags = wantAgentFlags,
+        .extraInfo = extraInfo,
+    };
+    napi_value ret = NAPI_GetWantAgentWants(env, jsWantAgentInfo, paras);
     if (ret == nullptr) {
         return NapiGetNull(env);
     }

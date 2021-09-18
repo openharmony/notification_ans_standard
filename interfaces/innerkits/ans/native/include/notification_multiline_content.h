@@ -111,9 +111,9 @@ private:
     static const std::vector<std::string>::size_type MAX_LINES;
 
 private:
-    std::string expandedTitle_{};
-    std::string briefText_{};
-    std::vector<std::string> allLines_{};
+    std::string expandedTitle_ {};
+    std::string briefText_ {};
+    std::vector<std::string> allLines_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

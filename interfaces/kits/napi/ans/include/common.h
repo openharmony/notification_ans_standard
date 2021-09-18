@@ -89,7 +89,6 @@ enum InputEditType { EDIT_AUTO, EDIT_DISABLED, EDIT_ENABLED };
 
 struct NotificationSubscribeInfo {
     std::vector<std::string> bundleNames;
-    // std::vector<std::string> deviceIds;
     int userId = 0;
     bool hasSubscribeInfo = false;
 };

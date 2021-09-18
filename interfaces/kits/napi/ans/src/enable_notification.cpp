@@ -127,13 +127,13 @@ napi_value EnableNotification(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    EnableParams params{};
+    EnableParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoEnable *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoEnable{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoEnable {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }
@@ -189,13 +189,13 @@ napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    IsEnableParams params{};
+    IsEnableParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoIsEnable *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoIsEnable{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoIsEnable {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }

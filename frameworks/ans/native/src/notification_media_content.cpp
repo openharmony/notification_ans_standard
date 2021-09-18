@@ -41,7 +41,7 @@ std::vector<uint32_t> NotificationMediaContent::GetShownActions() const
 
 std::string NotificationMediaContent::Dump()
 {
-    std::string numbers{};
+    std::string numbers {};
     std::for_each(sequenceNumbers_.begin(), sequenceNumbers_.end(), [&numbers](int32_t num) {
         numbers += std::to_string(num) + " ";
     });
@@ -56,19 +56,6 @@ bool NotificationMediaContent::Marshalling(Parcel &parcel) const
         ANS_LOGE("Failed to write basic");
         return false;
     }
-
-    // auto valid = avToken_ ? true : false;
-    // if (!parcel.WriteBool(valid)) {
-    //     ANS_LOGE("Failed to write the flag which indicate whether avToken is null");
-    //     return false;
-    // }
-
-    // if (valid) {
-    //     if (!parcel.WriteParcelable(avToken_.get())) {
-    //         ANS_LOGE("Failed to write avToken");
-    //         return false;
-    //     }
-    // }
 
     if (!parcel.WriteUInt32Vector(sequenceNumbers_)) {
         ANS_LOGE("Failed to write sequence numbers");
@@ -95,15 +82,6 @@ bool NotificationMediaContent::ReadFromParcel(Parcel &parcel)
         ANS_LOGE("Failed to read basic");
         return false;
     }
-
-    // auto valid = parcel.ReadBool();
-    // if (valid) {
-    //     avToken_ = std::shared_ptr<AVToken>(parcel.ReadParcelable<AVToken>());
-    //     if (!avToken_) {
-    //         ANS_LOGE("Failed to read avToken");
-    //         return false;
-    //     }
-    // }
 
     if (!parcel.ReadUInt32Vector(&sequenceNumbers_)) {
         ANS_LOGE("Failed to read sequence numbers");

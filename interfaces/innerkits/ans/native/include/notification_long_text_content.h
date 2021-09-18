@@ -114,9 +114,9 @@ private:
     static const std::size_t MAX_LONGTEXT_LENGTH;
 
 private:
-    std::string longText_{};
-    std::string expandedTitle_{};
-    std::string briefText_{};
+    std::string longText_ {};
+    std::string expandedTitle_ {};
+    std::string briefText_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

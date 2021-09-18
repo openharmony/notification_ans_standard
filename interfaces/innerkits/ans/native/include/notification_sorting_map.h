@@ -93,8 +93,8 @@ private:
     void SetNotificationSorting(const std::vector<NotificationSorting> &sortingList);
 
 private:
-    std::vector<std::string> sortedKey_{};
-    std::map<std::string, NotificationSorting> sortings_{};
+    std::vector<std::string> sortedKey_ {};
+    std::map<std::string, NotificationSorting> sortings_ {};
 };
 
 }  // namespace Notification

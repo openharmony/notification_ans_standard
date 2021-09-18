@@ -92,9 +92,9 @@ protected:
     virtual bool ReadFromParcel(Parcel &parcel);
 
 protected:
-    std::string text_{};
-    std::string title_{};
-    std::string additionalText_{};
+    std::string text_ {};
+    std::string title_ {};
+    std::string additionalText_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

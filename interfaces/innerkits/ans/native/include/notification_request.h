@@ -888,61 +888,61 @@ private:
     int64_t GetNowSysTime();
 
 private:
-    int32_t notificationId_{0};
-    uint32_t color_{NotificationRequest::COLOR_DEFAULT};
-    int32_t badgeNumber_{0};
-    int32_t progressValue_{0};
-    int32_t progressMax_{0};
-    int64_t createTime_{0};
-    int64_t deliveryTime_{0};
-    int64_t autoDeletedTime_{0};
+    int32_t notificationId_ {0};
+    uint32_t color_ {NotificationRequest::COLOR_DEFAULT};
+    int32_t badgeNumber_ {0};
+    int32_t progressValue_ {0};
+    int32_t progressMax_ {0};
+    int64_t createTime_ {0};
+    int64_t deliveryTime_ {0};
+    int64_t autoDeletedTime_ {0};
 
-    pid_t creatorPid_{0};
-    pid_t creatorUid_{0};
+    pid_t creatorPid_ {0};
+    pid_t creatorUid_ {0};
 
-    std::string settingsText_{};
-    std::string creatorBundleName_{};
-    std::string ownerBundleName_{};
-    std::string groupValue_{};
-    std::string statusBarText_{};
-    std::string label_{};
-    std::string shortcutId_{};
-    std::string sortingKey_{};
-    std::string classification_{};
+    std::string settingsText_ {};
+    std::string creatorBundleName_ {};
+    std::string ownerBundleName_ {};
+    std::string groupValue_ {};
+    std::string statusBarText_ {};
+    std::string label_ {};
+    std::string shortcutId_ {};
+    std::string sortingKey_ {};
+    std::string classification_ {};
 
-    NotificationConstant::SlotType slotType_{NotificationConstant::SlotType::OTHER};
-    NotificationRequest::GroupAlertType groupAlertType_{NotificationRequest::GroupAlertType::ALL};
-    NotificationConstant::VisiblenessType visiblenessType_{NotificationConstant::VisiblenessType::NO_OVERRIDE};
-    NotificationRequest::BadgeStyle badgeStyle_{NotificationRequest::BadgeStyle::NONE};
-    NotificationContent::Type notificationContentType_{NotificationContent::Type::NONE};
+    NotificationConstant::SlotType slotType_ {NotificationConstant::SlotType::OTHER};
+    NotificationRequest::GroupAlertType groupAlertType_ {NotificationRequest::GroupAlertType::ALL};
+    NotificationConstant::VisiblenessType visiblenessType_ {NotificationConstant::VisiblenessType::NO_OVERRIDE};
+    NotificationRequest::BadgeStyle badgeStyle_ {NotificationRequest::BadgeStyle::NONE};
+    NotificationContent::Type notificationContentType_ {NotificationContent::Type::NONE};
 
-    bool showDeliveryTime_{false};
-    bool tapDismissed_{false};
-    bool colorEnabled_{false};
-    bool alertOneTime_{false};
-    bool showStopwatch_{false};
-    bool isCountdown_{false};
-    bool inProgress_{false};
-    bool groupOverview_{false};
-    bool progressIndeterminate_{false};
-    bool unremovable_{false};
-    bool floatingIcon_{false};
-    bool onlyLocal_{false};
-    bool permitted_{true};
+    bool showDeliveryTime_ {false};
+    bool tapDismissed_ {false};
+    bool colorEnabled_ {false};
+    bool alertOneTime_ {false};
+    bool showStopwatch_ {false};
+    bool isCountdown_ {false};
+    bool inProgress_ {false};
+    bool groupOverview_ {false};
+    bool progressIndeterminate_ {false};
+    bool unremovable_ {false};
+    bool floatingIcon_ {false};
+    bool onlyLocal_ {false};
+    bool permitted_ {true};
 
-    std::shared_ptr<AppExecFwk::Context> context_{};
-    std::shared_ptr<WantAgent::WantAgent> wantAgent_{};
-    std::shared_ptr<WantAgent::WantAgent> removalWantAgent_{};
-    std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent_{};
-    std::shared_ptr<AAFwk::WantParams> additionalParams_{};
-    std::shared_ptr<Media::PixelMap> littleIcon_{};
-    std::shared_ptr<Media::PixelMap> bigIcon_{};
-    std::shared_ptr<NotificationContent> notificationContent_{};
-    std::shared_ptr<NotificationRequest> publicNotification_{};
+    std::shared_ptr<AppExecFwk::Context> context_ {};
+    std::shared_ptr<WantAgent::WantAgent> wantAgent_ {};
+    std::shared_ptr<WantAgent::WantAgent> removalWantAgent_ {};
+    std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent_ {};
+    std::shared_ptr<AAFwk::WantParams> additionalParams_ {};
+    std::shared_ptr<Media::PixelMap> littleIcon_ {};
+    std::shared_ptr<Media::PixelMap> bigIcon_ {};
+    std::shared_ptr<NotificationContent> notificationContent_ {};
+    std::shared_ptr<NotificationRequest> publicNotification_ {};
 
-    std::vector<std::shared_ptr<NotificationActionButton>> actionButtons_{};
-    std::vector<std::shared_ptr<MessageUser>> messageUsers_{};
-    std::vector<std::string> userInputHistory_{};
+    std::vector<std::shared_ptr<NotificationActionButton>> actionButtons_ {};
+    std::vector<std::shared_ptr<MessageUser>> messageUsers_ {};
+    std::vector<std::string> userInputHistory_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

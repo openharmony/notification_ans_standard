@@ -138,6 +138,14 @@ struct TriggerReceiveDataWorker {
     AAFwk::WantParams resultExtras;
 };
 
+struct WantAgentWantsParas {
+    std::vector<std::shared_ptr<AAFwk::Want>> &wants;
+    int32_t &operationType;
+    int32_t &requestCode;
+    std::vector<Notification::WantAgent::WantAgentConstant::Flags> &wantAgentFlags;
+    AAFwk::WantParams &extraInfo;
+};
+
 class TriggerCompleteCallBack : public CompletedCallback {
 public:
     TriggerCompleteCallBack();
@@ -152,7 +160,7 @@ public:
 private:
     CallbackInfo triggerCompleteInfo_;
 
-    static void OnSendFinishedUvAfterWorkCallbacck(uv_work_t *work, int status);
+    static void OnSendFinishedUvAfterWorkCallback(uv_work_t *work, int status);
 };
 
 napi_value WantAgentInit(napi_env env, napi_value exports);

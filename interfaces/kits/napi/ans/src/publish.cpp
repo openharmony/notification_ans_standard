@@ -88,7 +88,7 @@ napi_value Publish(napi_env env, napi_callback_info info)
 
     napi_value promise = nullptr;
     AsyncCallbackInfoPublish *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoPublish{.env = env, .asyncWork = nullptr};
+        new (std::nothrow) AsyncCallbackInfoPublish {.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }

@@ -46,7 +46,7 @@ int32_t NotificationBundleOption::GetUid() const
 
 std::string NotificationBundleOption::Dump()
 {
-    return "NotificationBundleOption[ bundleName = " + bundleName_ +", uid = " + std::to_string(uid_) + " ]";
+    return "NotificationBundleOption[ bundleName = " + bundleName_ + ", uid = " + std::to_string(uid_) + " ]";
 }
 
 bool NotificationBundleOption::Marshalling(Parcel &parcel) const

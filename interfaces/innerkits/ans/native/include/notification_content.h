@@ -173,8 +173,8 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    NotificationContent::Type contentType_{NotificationContent::Type::NONE};
-    std::shared_ptr<NotificationBasicContent> content_{};
+    NotificationContent::Type contentType_ {NotificationContent::Type::NONE};
+    std::shared_ptr<NotificationBasicContent> content_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

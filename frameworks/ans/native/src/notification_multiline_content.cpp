@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Notification {
-const std::vector<std::string>::size_type NotificationMultiLineContent::MAX_LINES{7};
+const std::vector<std::string>::size_type NotificationMultiLineContent::MAX_LINES {7};
 
 void NotificationMultiLineContent::SetExpandedTitle(const std::string &exTitle)
 {
@@ -58,7 +58,7 @@ std::vector<std::string> NotificationMultiLineContent::GetAllLines() const
 
 std::string NotificationMultiLineContent::Dump()
 {
-    std::string lines{};
+    std::string lines {};
     std::for_each(
         allLines_.begin(), allLines_.end(), [&lines](const std::string &line) { lines += " " + line + ","; });
     lines.pop_back();
