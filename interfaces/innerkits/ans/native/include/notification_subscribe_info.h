@@ -94,7 +94,7 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::vector<std::string> appNames_{};
+    std::vector<std::string> appNames_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

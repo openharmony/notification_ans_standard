@@ -152,7 +152,7 @@ public:
      * @param want An Want describing the service to be started.
      * @param flags May be FLAG_ONE_SHOT, FLAG_NO_CREATE,
      * FLAG_CANCEL_CURRENT, FLAG_UPDATE_CURRENT,
-     *FLAG_IMMUTABLE.
+     * FLAG_IMMUTABLE.
      *
      * @return Returns an existing or new PendingWant matching the given
      * parameters.  May return null only if FLAG_NO_CREATE has been

@@ -20,28 +20,28 @@
 
 namespace OHOS {
 namespace Notification {
-const std::string NotificationRequest::CLASSIFICATION_ALARM{"alarm"};
-const std::string NotificationRequest::CLASSIFICATION_CALL{"call"};
-const std::string NotificationRequest::CLASSIFICATION_EMAIL{"email"};
-const std::string NotificationRequest::CLASSIFICATION_ERROR{"err"};
-const std::string NotificationRequest::CLASSIFICATION_EVENT{"event"};
-const std::string NotificationRequest::CLASSIFICATION_MESSAGE{"msg"};
-const std::string NotificationRequest::CLASSIFICATION_NAVIGATION{"navigation"};
-const std::string NotificationRequest::CLASSIFICATION_PROGRESS{"progress"};
-const std::string NotificationRequest::CLASSIFICATION_PROMO{"promo"};
-const std::string NotificationRequest::CLASSIFICATION_RECOMMENDATION{"recommendation"};
-const std::string NotificationRequest::CLASSIFICATION_REMINDER{"reminder"};
-const std::string NotificationRequest::CLASSIFICATION_SERVICE{"service"};
-const std::string NotificationRequest::CLASSIFICATION_SOCIAL{"social"};
-const std::string NotificationRequest::CLASSIFICATION_STATUS{"status"};
-const std::string NotificationRequest::CLASSIFICATION_SYSTEM{"sys"};
-const std::string NotificationRequest::CLASSIFICATION_TRANSPORT{"transport"};
+const std::string NotificationRequest::CLASSIFICATION_ALARM {"alarm"};
+const std::string NotificationRequest::CLASSIFICATION_CALL {"call"};
+const std::string NotificationRequest::CLASSIFICATION_EMAIL {"email"};
+const std::string NotificationRequest::CLASSIFICATION_ERROR {"err"};
+const std::string NotificationRequest::CLASSIFICATION_EVENT {"event"};
+const std::string NotificationRequest::CLASSIFICATION_MESSAGE {"msg"};
+const std::string NotificationRequest::CLASSIFICATION_NAVIGATION {"navigation"};
+const std::string NotificationRequest::CLASSIFICATION_PROGRESS {"progress"};
+const std::string NotificationRequest::CLASSIFICATION_PROMO {"promo"};
+const std::string NotificationRequest::CLASSIFICATION_RECOMMENDATION {"recommendation"};
+const std::string NotificationRequest::CLASSIFICATION_REMINDER {"reminder"};
+const std::string NotificationRequest::CLASSIFICATION_SERVICE {"service"};
+const std::string NotificationRequest::CLASSIFICATION_SOCIAL {"social"};
+const std::string NotificationRequest::CLASSIFICATION_STATUS {"status"};
+const std::string NotificationRequest::CLASSIFICATION_SYSTEM {"sys"};
+const std::string NotificationRequest::CLASSIFICATION_TRANSPORT {"transport"};
 
-const uint32_t NotificationRequest::COLOR_DEFAULT{0};
+const uint32_t NotificationRequest::COLOR_DEFAULT {0};
 
-const uint32_t NotificationRequest::COLOR_MASK{0xFF000000};
-const std::size_t NotificationRequest::MAX_USER_INPUT_HISTORY{5};
-const std::size_t NotificationRequest::MAX_ACTION_BUTTONS{3};
+const uint32_t NotificationRequest::COLOR_MASK {0xFF000000};
+const std::size_t NotificationRequest::MAX_USER_INPUT_HISTORY {5};
+const std::size_t NotificationRequest::MAX_ACTION_BUTTONS {3};
 
 NotificationRequest::NotificationRequest(int32_t notificationId) : notificationId_(notificationId)
 {
@@ -943,12 +943,12 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
 
     if (!parcel.WriteBool(permitted_)) {
         ANS_LOGE("Failed to write flag indicating whether to allow the platform to \
-                  generate contextual NotificationActionButton objects");
+            generate contextual NotificationActionButton objects");
         return false;
     }
 
     // write objects which managed by std::shared_ptr
-    bool valid{false};
+    bool valid {false};
 
     valid = wantAgent_ ? true : false;
     if (!parcel.WriteBool(valid)) {
@@ -1177,7 +1177,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     onlyLocal_ = parcel.ReadBool();
     permitted_ = parcel.ReadBool();
 
-    bool valid{false};
+    bool valid {false};
 
     valid = parcel.ReadBool();
     if (valid) {

@@ -133,10 +133,10 @@ private:
     NotificationConversationalContent() = default;
 
 private:
-    MessageUser messageUser_{};
-    std::string conversationTitle_{};
-    bool isGroup_{false};
-    MessageVector messages_{};
+    MessageUser messageUser_ {};
+    std::string conversationTitle_ {};
+    bool isGroup_ {false};
+    MessageVector messages_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

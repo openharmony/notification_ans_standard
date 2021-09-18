@@ -1107,8 +1107,10 @@ inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)
     int32_t rowDataSize = width * PIXEL_BYTES;
     uint32_t bufferSize = rowDataSize * height;
     void *buffer = malloc(bufferSize);
+    if (buffer != nullptr) {
+        pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, AllocatorType::HEAP_ALLOC, nullptr);
+    }
     EXPECT_NE(buffer, nullptr);
-    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, AllocatorType::HEAP_ALLOC, nullptr);
     return pixelMap;
 }
 

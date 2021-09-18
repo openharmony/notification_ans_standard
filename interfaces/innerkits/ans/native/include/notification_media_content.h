@@ -99,8 +99,8 @@ protected:
     bool ReadFromParcel(Parcel &parcel) override;
 
 private:
-    std::shared_ptr<AVToken> avToken_{};
-    std::vector<uint32_t> sequenceNumbers_{};
+    std::shared_ptr<AVToken> avToken_ {};
+    std::vector<uint32_t> sequenceNumbers_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

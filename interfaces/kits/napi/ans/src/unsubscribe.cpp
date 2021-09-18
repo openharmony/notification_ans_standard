@@ -73,7 +73,7 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoUnsubscribe *asynccallbackinfo = new (std::nothrow)
-        AsyncCallbackInfoUnsubscribe{.env = env, .asyncWork = nullptr, .objectInfo = paras.objectInfo};
+        AsyncCallbackInfoUnsubscribe {.env = env, .asyncWork = nullptr, .objectInfo = paras.objectInfo};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, paras.callback);
     }

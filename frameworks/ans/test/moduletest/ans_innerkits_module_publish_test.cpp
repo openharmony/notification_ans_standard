@@ -514,7 +514,10 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00100, Function
     int32_t rowDataSize = (PIXEL_MAP_TEST_WIDTH + 3) / 4 * 4;
     uint32_t bufferSize = rowDataSize * PIXEL_MAP_TEST_HEIGHT;
     void *buffer = malloc(bufferSize);
-    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, Media::AllocatorType::HEAP_ALLOC, nullptr);
+    if (buffer != nullptr) {
+        pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, Media::AllocatorType::HEAP_ALLOC, nullptr);
+    }
+    EXPECT_NE(buffer, nullptr);
 
     req.SetBigIcon(pixelMap);
     req.SetLittleIcon(pixelMap);

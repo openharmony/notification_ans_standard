@@ -106,7 +106,7 @@ napi_value Cancel(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoCancel *asynccallbackinfo = new (std::nothrow)
-        AsyncCallbackInfoCancel{.env = env, .asyncWork = nullptr, .id = paras.id, .label = paras.label};
+        AsyncCallbackInfoCancel {.env = env, .asyncWork = nullptr, .id = paras.id, .label = paras.label};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, paras.callback);
     }
@@ -164,7 +164,7 @@ napi_value CancelAll(napi_env env, napi_callback_info info)
     }
 
     AsyncCallbackInfoCancel *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoCancel{.env = env, .asyncWork = nullptr};
+        new (std::nothrow) AsyncCallbackInfoCancel {.env = env, .asyncWork = nullptr};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, callback);
     }

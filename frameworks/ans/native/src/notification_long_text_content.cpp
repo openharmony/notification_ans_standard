@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Notification {
-const std::size_t NotificationLongTextContent::MAX_LONGTEXT_LENGTH{1024};
+const std::size_t NotificationLongTextContent::MAX_LONGTEXT_LENGTH {1024};
 
 NotificationLongTextContent::NotificationLongTextContent(const std::string &longText)
 {
