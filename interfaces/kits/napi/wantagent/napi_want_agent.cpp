@@ -46,6 +46,7 @@ void TriggerCompleteCallBack::SetWantAgentInstance(const std::shared_ptr<Notific
 
 void TriggerCompleteCallBack::OnSendFinishedUvAfterWorkCallback(uv_work_t *work, int status)
 {
+    HILOG_INFO("TriggerCompleteCallBack::OnSendFinishedUvAfterWorkCallback:status = %{public}d", status);
     TriggerReceiveDataWorker *dataWorkerData = (TriggerReceiveDataWorker *)work->data;
     if (dataWorkerData == nullptr) {
         HILOG_INFO("TriggerReceiveDataWorker instance(uv_work_t) is nullptr");
@@ -799,8 +800,8 @@ napi_value NAPI_TriggerWrap(napi_env env, napi_callback_info info, AsyncTriggerC
     return ret;
 }
 
-napi_value NAPI_GetTriggerInfo(napi_value argv[NUMBER_OF_PARAMETERS_THREE], size_t argc, napi_env env,
-    napi_callback_info info, Notification::WantAgent::TriggerInfo &triggerInfo)
+napi_value NAPI_GetTriggerInfo(napi_value argv[NUMBER_OF_PARAMETERS_THREE], napi_env env, napi_callback_info info,
+    Notification::WantAgent::TriggerInfo &triggerInfo)
 {
     // Get triggerInfo
     napi_value jsTriggerInfo = argv[1];
@@ -877,7 +878,7 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
     }
 
     Notification::WantAgent::TriggerInfo triggerInfo;
-    napi_value ret = NAPI_GetTriggerInfo(argv, argc, env, info, triggerInfo);
+    napi_value ret = NAPI_GetTriggerInfo(argv, env, info, triggerInfo);
     if (ret == nullptr) {
         return NapiGetNull(env);
     }
@@ -1178,9 +1179,7 @@ napi_value NAPI_GetWantAgentWrap(
     }
 }
 
-napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo,
-    std::vector<std::shared_ptr<AAFwk::Want>> &wants, int32_t &operationType, int32_t &requestCode,
-    std::vector<Notification::WantAgent::WantAgentConstant::Flags> &wantAgentFlags, AAFwk::WantParams &extraInfo)
+napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo, const WantAgentWantsParas &paras)
 {
     napi_valuetype jsWantAgentInfoType = napi_valuetype::napi_null;
     NAPI_CALL(env, napi_typeof(env, jsWantAgentInfo, &jsWantAgentInfoType));
@@ -1201,15 +1200,15 @@ napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo,
         if (!UnwrapWant(env, jsWant, *want)) {
             return NapiGetNull(env);
         }
-        wants.emplace_back(want);
+        paras.wants.emplace_back(want);
     }
 
     // Get operationType
-    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "operationType", operationType)) {
+    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "operationType", paras.operationType)) {
         return NapiGetNull(env);
     }
     // Get requestCode
-    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "requestCode", requestCode)) {
+    if (!UnwrapInt32ByPropertyName(env, jsWantAgentInfo, "requestCode", paras.requestCode)) {
         return NapiGetNull(env);
     }
     // Get wantAgentFlags
@@ -1226,13 +1225,13 @@ napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo,
             NAPI_ASSERT(env, valuetype0 == napi_number, "Wrong argument type. Numbers expected.");
             int32_t value0 = 0;
             NAPI_CALL(env, napi_get_value_int32(env, napiWantAgentFlags, &value0));
-            wantAgentFlags.emplace_back(static_cast<Notification::WantAgent::WantAgentConstant::Flags>(value0));
+            paras.wantAgentFlags.emplace_back(static_cast<Notification::WantAgent::WantAgentConstant::Flags>(value0));
         }
     }
     // Get extraInfo
     napi_value JsExtraInfo = GetPropertyValueByPropertyName(env, jsWantAgentInfo, "extraInfo", napi_object);
     if (JsExtraInfo != nullptr) {
-        if (!UnwrapWantParams(env, JsExtraInfo, extraInfo)) {
+        if (!UnwrapWantParams(env, JsExtraInfo, paras.extraInfo)) {
             return NapiGetNull(env);
         }
     }
@@ -1253,8 +1252,14 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
     int32_t requestCode = -1;
     std::vector<Notification::WantAgent::WantAgentConstant::Flags> wantAgentFlags = {};
     AAFwk::WantParams extraInfo = {};
-    napi_value ret =
-        NAPI_GetWantAgentWants(env, jsWantAgentInfo, wants, operationType, requestCode, wantAgentFlags, extraInfo);
+    WantAgentWantsParas paras = {
+        .wants = wants,
+        .operationType = operationType,
+        .requestCode = requestCode,
+        .wantAgentFlags = wantAgentFlags,
+        .extraInfo = extraInfo,
+    };
+    napi_value ret = NAPI_GetWantAgentWants(env, jsWantAgentInfo, paras);
     if (ret == nullptr) {
         return NapiGetNull(env);
     }
