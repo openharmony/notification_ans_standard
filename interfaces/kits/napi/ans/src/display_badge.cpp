@@ -127,13 +127,13 @@ napi_value DisplayBadge(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    EnableBadgeParams params{};
+    EnableBadgeParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoEnableBadge *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoEnableBadge{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoEnableBadge {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }
@@ -192,13 +192,13 @@ napi_value IsBadgeDisplayed(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    IsDisplayBadgeParams params{};
+    IsDisplayBadgeParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::JSParaError(env, params.callback);
     }
 
     AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoIsDisplayBadge{.env = env, .asyncWork = nullptr, .params = params};
+        new (std::nothrow) AsyncCallbackInfoIsDisplayBadge {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }

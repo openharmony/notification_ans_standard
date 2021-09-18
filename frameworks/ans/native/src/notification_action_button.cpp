@@ -42,7 +42,7 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
     }
 
     std::vector<std::shared_ptr<NotificationUserInput>> onlyInputs = mimeTypeOnlyInputs;
-    std::vector<std::shared_ptr<NotificationUserInput>> textInputs{};
+    std::vector<std::shared_ptr<NotificationUserInput>> textInputs {};
     for (auto &userInput : userInputs) {
         if (!userInput) {
             continue;
@@ -222,7 +222,7 @@ bool NotificationActionButton::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    bool valid{false};
+    bool valid {false};
 
     valid = icon_ ? true : false;
     if (!parcel.WriteBool(valid)) {
@@ -310,7 +310,7 @@ bool NotificationActionButton::ReadFromParcel(Parcel &parcel)
 
     semanticActionButton_ = static_cast<NotificationConstant::SemanticActionButton>(parcel.ReadInt32());
 
-    bool valid{false};
+    bool valid {false};
 
     valid = parcel.ReadBool();
     if (valid) {
@@ -342,7 +342,7 @@ bool NotificationActionButton::ReadFromParcel(Parcel &parcel)
     auto vsize = parcel.ReadInt32();
     for (auto it = 0; it < vsize; ++it) {
         valid = parcel.ReadBool();
-        NotificationUserInput *member{nullptr};
+        NotificationUserInput *member {nullptr};
         if (valid) {
             member = parcel.ReadParcelable<NotificationUserInput>();
             if (nullptr == member) {

@@ -674,7 +674,7 @@ bool NotificationPreferencesDatabase::StoreDeathRecipient()
     return true;
 }
 
-template <typename T>
+template<typename T>
 OHOS::DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
     const std::string &bundleKey, const BundleType &type, const T &t)
 {

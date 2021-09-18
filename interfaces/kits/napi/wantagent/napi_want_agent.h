@@ -19,6 +19,7 @@
 #include <mutex>
 #include <memory>
 #include <map>
+#include <uv.h>
 
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
@@ -33,7 +34,6 @@
 #include "trigger_info.h"
 
 namespace OHOS {
-
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Notification;
 using namespace OHOS::Notification::WantAgent;
@@ -138,6 +138,14 @@ struct TriggerReceiveDataWorker {
     AAFwk::WantParams resultExtras;
 };
 
+struct WantAgentWantsParas {
+    std::vector<std::shared_ptr<AAFwk::Want>> &wants;
+    int32_t &operationType;
+    int32_t &requestCode;
+    std::vector<Notification::WantAgent::WantAgentConstant::Flags> &wantAgentFlags;
+    AAFwk::WantParams &extraInfo;
+};
+
 class TriggerCompleteCallBack : public CompletedCallback {
 public:
     TriggerCompleteCallBack();
@@ -151,11 +159,13 @@ public:
 
 private:
     CallbackInfo triggerCompleteInfo_;
+
+    static void OnSendFinishedUvAfterWorkCallback(uv_work_t *work, int status);
 };
 
 napi_value WantAgentInit(napi_env env, napi_value exports);
 
-void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const char *propName);
+void SetNamedPropertyByInteger(napi_env env, napi_value dstObj, int32_t objName, const std::string &propName);
 napi_value WantAgentFlagsInit(napi_env env, napi_value exports);
 napi_value WantAgentOperationTypeInit(napi_env env, napi_value exports);
 
@@ -173,6 +183,5 @@ napi_value NapiGetNull(napi_env env);
 void DeleteRecordByCode(const int32_t code);
 static std::map<AsyncGetWantAgentCallbackInfo *, const int32_t> g_WantAgentMap;
 static std::recursive_mutex g_mutex;
-
 }  // namespace OHOS
 #endif  // NAPI_WANT_AGENT_H

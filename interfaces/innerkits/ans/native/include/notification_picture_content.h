@@ -104,9 +104,9 @@ protected:
     bool ReadFromParcel(Parcel &parcel) override;
 
 private:
-    std::string expandedTitle_{};
-    std::string briefText_{};
-    std::shared_ptr<Media::PixelMap> bigPicture_{};
+    std::string expandedTitle_ {};
+    std::string briefText_ {};
+    std::shared_ptr<Media::PixelMap> bigPicture_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

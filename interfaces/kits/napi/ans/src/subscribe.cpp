@@ -209,10 +209,10 @@ void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::No
             napi_create_object(dataWorkerData->env, &result);
             int error = 0;
             if (!SetSubscribeCallbackData(dataWorkerData->env,
-                    dataWorkerData->request,
-                    dataWorkerData->sortingMap,
-                    dataWorkerData->deleteReason,
-                    result)) {
+                dataWorkerData->request,
+                dataWorkerData->sortingMap,
+                dataWorkerData->deleteReason,
+                result)) {
                 result = Common::NapiGetNull(dataWorkerData->env);
                 error = ERROR;
             } else {
@@ -296,10 +296,10 @@ void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::No
             napi_create_object(dataWorkerData->env, &result);
             int error = 0;
             if (!SetSubscribeCallbackData(dataWorkerData->env,
-                    dataWorkerData->request,
-                    dataWorkerData->sortingMap,
-                    NO_DELETE_REASON,
-                    result)) {
+                dataWorkerData->request,
+                dataWorkerData->sortingMap,
+                NO_DELETE_REASON,
+                result)) {
                 result = Common::NapiGetNull(dataWorkerData->env);
                 error = ERROR;
             } else {
@@ -917,8 +917,9 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
     }
     ANS_LOGI("Subscribe objectInfo = %{public}p", objectInfo);
 
-    AsyncCallbackInfoSubscribe *asynccallbackinfo = new (std::nothrow) AsyncCallbackInfoSubscribe{
-        .env = env, .asyncWork = nullptr, .objectInfo = objectInfo, .subscriberInfo = subscriberInfo};
+    AsyncCallbackInfoSubscribe *asynccallbackinfo = new (std::nothrow) AsyncCallbackInfoSubscribe {
+        .env = env, .asyncWork = nullptr, .objectInfo = objectInfo, .subscriberInfo = subscriberInfo
+    };
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, callback);
     }

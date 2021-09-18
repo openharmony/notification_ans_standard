@@ -2617,7 +2617,7 @@ napi_value Common::GetNotificationSlot(const napi_env &env, const napi_value &va
         napi_get_value_int32(env, nobj, &inLevel);
         ANS_LOGI("level is: %{public}d", inLevel);
 
-        NotificationSlot::NotificationLevel outLevel{NotificationSlot::NotificationLevel::LEVEL_NONE};
+        NotificationSlot::NotificationLevel outLevel {NotificationSlot::NotificationLevel::LEVEL_NONE};
         if (!SlotLevelJSToC(SlotLevel(inLevel), outLevel)) {
             return nullptr;
         }
@@ -2753,7 +2753,7 @@ napi_value Common::GetBundleOption(const napi_env &env, const napi_value &value,
 {
     ANS_LOGI("enter");
 
-    bool hasProperty{false};
+    bool hasProperty {false};
     napi_valuetype valuetype = napi_undefined;
     napi_value result = nullptr;
 
@@ -2784,7 +2784,7 @@ napi_value Common::GetNotificationKey(const napi_env &env, const napi_value &val
 {
     ANS_LOGI("enter");
 
-    bool hasProperty{false};
+    bool hasProperty {false};
     napi_valuetype valuetype = napi_undefined;
     napi_value result = nullptr;
 

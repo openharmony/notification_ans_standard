@@ -265,13 +265,13 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::string inputKey_{};
-    std::string tag_{};
-    std::vector<std::string> options_{};
-    bool permitFreeFormInput_{true};
-    std::set<std::string> permitMimeTypes_{};
-    std::shared_ptr<AppExecFwk::PacMap> pacMap_{};
-    NotificationConstant::InputEditType editType_{NotificationConstant::InputEditType::EDIT_AUTO};
+    std::string inputKey_ {};
+    std::string tag_ {};
+    std::vector<std::string> options_ {};
+    bool permitFreeFormInput_ {true};
+    std::set<std::string> permitMimeTypes_ {};
+    std::shared_ptr<AppExecFwk::PacMap> pacMap_ {};
+    NotificationConstant::InputEditType editType_ {NotificationConstant::InputEditType::EDIT_AUTO};
 };
 }  // namespace Notification
 }  // namespace OHOS
