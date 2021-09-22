@@ -1905,6 +1905,7 @@ napi_value GetNotificationLongTextContent(const napi_env &env, const napi_value 
     napi_value basicContentResult = nullptr;
     bool hasProperty = false;
     char str[STR_MAX_SIZE] = {0};
+    char long_str[LONG_STR_MAX_SIZE + 1] = {0};
     size_t strLen = 0;
 
     NAPI_CALL(env, napi_has_named_property(env, result, "longText", &hasProperty));
@@ -1966,9 +1967,9 @@ napi_value GetNotificationLongTextContent(const napi_env &env, const napi_value 
         napi_get_named_property(env, contentResult, "longText", &longContentResult);
         NAPI_CALL(env, napi_typeof(env, longContentResult, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-        NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, str, LONG_STR_MAX_SIZE - 1, &strLen));
-        longContent->SetLongText(str);
-        ANS_LOGI("longText::longText = %{public}s", str);
+        NAPI_CALL(env, napi_get_value_string_utf8(env, longContentResult, long_str, LONG_STR_MAX_SIZE, &strLen));
+        longContent->SetLongText(long_str);
+        ANS_LOGI("longText::longText = %{public}s", long_str);
     } else {
         ANS_LOGE("Property longText expected.");
         return nullptr;
