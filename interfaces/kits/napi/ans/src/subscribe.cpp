@@ -165,9 +165,11 @@ void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::No
     ANS_LOGI("OnCanceled deleteReason = %{public}d", deleteReason);
 
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(canceCallbackInfo_.env, &loop);
-#endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
 
     NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
     if (dataWorker == nullptr) {
@@ -253,9 +255,11 @@ void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::No
     ANS_LOGI("OnConsumed sortingMap size = %{public}zu", sortingMap->GetKey().size());
 
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(consumeCallbackInfo_.env, &loop);
-#endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
 
     NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
     if (dataWorker == nullptr) {
@@ -330,9 +334,11 @@ void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> 
     ANS_LOGI("OnUpdate sortingMap size = %{public}zu", sortingMap->GetKey().size());
 
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(updateCallbackInfo_.env, &loop);
-#endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
 
     NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
     if (dataWorker == nullptr) {
@@ -397,9 +403,11 @@ void SubscriberInstance::OnSubscribeResult(NotificationConstant::SubscribeResult
     ANS_LOGI("OnSubscribeResult result = %{public}d", result);
 
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(subscribeCallbackInfo_.env, &loop);
-#endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
 
     NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
     if (dataWorker == nullptr) {
@@ -459,9 +467,11 @@ void SubscriberInstance::OnUnsubscribeResult(NotificationConstant::SubscribeResu
     ANS_LOGI("OnUnsubscribeResult result = %{public}d", result);
 
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(unsubscribeCallbackInfo_.env, &loop);
-#endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
 
     NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
     if (dataWorker == nullptr) {
@@ -523,9 +533,11 @@ void SubscriberInstance::OnDied()
     }
 
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(dieCallbackInfo_.env, &loop);
-#endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
 
     NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
     if (dataWorker == nullptr) {
@@ -582,9 +594,11 @@ void SubscriberInstance::OnDisturbModeChanged(int disturbMode)
     ANS_LOGI("OnDisturbModeChanged disturbMode = %{public}d", disturbMode);
 
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
     napi_get_uv_event_loop(disturbModeCallbackInfo_.env, &loop);
-#endif  // NAPI_VERSION >= 2
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
 
     NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
     if (dataWorker == nullptr) {

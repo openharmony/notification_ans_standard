@@ -339,7 +339,7 @@ private:
         EXPECT_EQ(false, notificationRequest.IsAlertOneTime());
         EXPECT_EQ(0, notificationRequest.GetAutoDeletedTime());
         EXPECT_EQ("classification", notificationRequest.GetClassification());
-        EXPECT_EQ(0, notificationRequest.GetColor());
+        EXPECT_EQ((uint32_t)0, notificationRequest.GetColor());
     }
 
     void CheckCaseNineResult(NotificationRequest notificationRequest)
@@ -482,12 +482,14 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00100, Function
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
     std::shared_ptr<NotificationMediaContent> mediaContent = std::make_shared<NotificationMediaContent>();
+    EXPECT_NE(mediaContent, nullptr);
     mediaContent->SetAVToken(nullptr);
     std::vector<uint32_t> actions;
     actions.push_back(0);
     mediaContent->SetShownActions(actions);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00100::mediaContent:" << mediaContent->Dump();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(mediaContent);
+    EXPECT_NE(content, nullptr);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00100::Content:" << content->Dump();
     NotificationRequest req;
     req.SetContent(content);
@@ -500,11 +502,13 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00100, Function
     req.SetCreatorBundleName("creatorbundlename");
     req.SetLabel("ANS_Interface_MT_Publish_00100");
     std::shared_ptr<NotificationRequest> requestPtr = std::make_shared<NotificationRequest>();
+    EXPECT_NE(requestPtr, nullptr);
     requestPtr->SetLabel("ANS_Interface_MT_Publish_00100_REQUEST");
     req.SetPublicNotification(requestPtr);
 
     // pixelmap
     auto pixelMap = std::make_shared<Media::PixelMap>();
+    EXPECT_NE(pixelMap, nullptr);
     Media::ImageInfo imageInfo;
     imageInfo.size.width = PIXEL_MAP_TEST_WIDTH;
     imageInfo.size.height = PIXEL_MAP_TEST_HEIGHT;
@@ -522,6 +526,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00100, Function
     req.SetBigIcon(pixelMap);
     req.SetLittleIcon(pixelMap);
     std::shared_ptr<MessageUser> messageUserPtr = std::make_shared<MessageUser>();
+    EXPECT_NE(messageUserPtr, nullptr);
     messageUserPtr->SetName("ANS_Interface_MT_Publish_00100_Message_User");
     messageUserPtr->SetKey("key");
     messageUserPtr->SetPixelMap(nullptr);
@@ -558,7 +563,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00200, Function
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
     std::shared_ptr<NotificationMediaContent> mediaContent = std::make_shared<NotificationMediaContent>();
+    EXPECT_NE(mediaContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(mediaContent);
+    EXPECT_NE(content, nullptr);
     WantAgent::WantAgentInfo paramsInfo;
     std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
     std::shared_ptr<NotificationActionButton> actionButton =
@@ -615,7 +622,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00300, Function
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
     std::shared_ptr<NotificationMediaContent> mediaContent = std::make_shared<NotificationMediaContent>();
+    EXPECT_NE(mediaContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(mediaContent);
+    EXPECT_NE(content, nullptr);
     WantAgent::WantAgentInfo paramsInfo;
     std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
     if (nullptr == wantAgent) {
@@ -672,14 +681,17 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00400, Function
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00400::messgaeUser is::" << messageUser.Dump();
     std::shared_ptr<NotificationConversationalContent> conversationContent =
         std::make_shared<NotificationConversationalContent>(messageUser);
+    EXPECT_NE(conversationContent, nullptr);
     conversationContent->SetConversationTitle("ConversationTitle");
     conversationContent->SetConversationGroup(false);
     conversationContent->AddConversationalMessage("text", 0, sender);
     std::shared_ptr<NotificationConversationalMessage> messagePtr =
         std::make_shared<NotificationConversationalMessage>("messageptr", 0, sender);
+    EXPECT_NE(messagePtr, nullptr);
     conversationContent->AddConversationalMessage(messagePtr);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00400::conversationContent is::" << conversationContent->Dump();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(conversationContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
@@ -710,11 +722,13 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00500, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationMultiLineContent> multiLineContent = std::make_shared<NotificationMultiLineContent>();
+    EXPECT_NE(multiLineContent, nullptr);
     multiLineContent->SetExpandedTitle("expandedtitle");
     multiLineContent->SetBriefText("brieftext");
     multiLineContent->AddSingleLine("singleLine");
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00500::multiLineContent::" << multiLineContent->Dump();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(multiLineContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
@@ -745,11 +759,13 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00600, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationPictureContent> pictureContent = std::make_shared<NotificationPictureContent>();
+    EXPECT_NE(pictureContent, nullptr);
     pictureContent->SetExpandedTitle("expendedtitle");
     pictureContent->SetBriefText("brieftext");
     pictureContent->SetBigPicture(nullptr);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00600::pictureContent is::" << pictureContent->Dump();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(pictureContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
@@ -781,11 +797,13 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00700, Function
     MessageUser messageUser;
     std::shared_ptr<NotificationLongTextContent> longTextContent =
         std::make_shared<NotificationLongTextContent>("longtext");
+    EXPECT_NE(longTextContent, nullptr);
     longTextContent->SetExpandedTitle("expendedtitle");
     longTextContent->SetBriefText("brieftext");
     longTextContent->SetLongText("longtext");
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00700::longTextContentis::" << longTextContent->Dump();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(longTextContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
@@ -815,8 +833,10 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00800, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00800::normalContentis::" << normalContent->Dump();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::CONTENT_INFORMATION);
@@ -856,7 +876,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00900, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
@@ -901,7 +923,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_01000, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::SERVICE_REMINDER);
@@ -932,7 +956,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_02000, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
@@ -962,7 +988,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_03000, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::CUSTOM);
@@ -995,7 +1023,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_04000, Function
     EXPECT_EQ(0, NotificationHelper::SetDisturbMode(NotificationConstant::ALLOW_ALARMS));
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
@@ -1028,7 +1058,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_05000, Function
     EXPECT_EQ(0, NotificationHelper::SetDisturbMode(NotificationConstant::ALLOW_ALL));
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
@@ -1062,7 +1094,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_06000, Function
     EXPECT_EQ(0, NotificationHelper::SetDisturbMode(NotificationConstant::ALLOW_NONE));
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
@@ -1093,7 +1127,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_07000, Function
     WaitOnSubscribeResult();
     MessageUser messageUser;
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
@@ -1125,7 +1161,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
     std::shared_ptr<NotificationLongTextContent> implContent = std::make_shared<NotificationLongTextContent>();
+    EXPECT_NE(implContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    EXPECT_NE(content, nullptr);
     EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::CancelAllNotifications());
     sleep(SLEEP_TIME);
     EXPECT_EQ(OnCanceledReceived, true);
