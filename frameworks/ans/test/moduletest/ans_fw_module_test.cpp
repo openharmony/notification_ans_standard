@@ -1098,6 +1098,9 @@ inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)
 {
     const int32_t PIXEL_BYTES = 4;
     std::shared_ptr<PixelMap> pixelMap = std::make_shared<PixelMap>();
+    if (pixelMap == nullptr) {
+        return pixelMap;
+    }
     ImageInfo info;
     info.size.width = width;
     info.size.height = height;
