@@ -80,24 +80,24 @@ inline void SleepForFC()
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
     {}
-    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
     {}
-    virtual void OnDied() override
+    void OnDied() override
     {}
-    virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
+    void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {}
-    virtual void OnDisturbModeChanged(int disturbMode) override
+    void OnDisturbModeChanged(int disturbMode) override
     {}
-    virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
+    void OnCanceled(const std::shared_ptr<Notification> &request) override
     {}
-    virtual void OnCanceled(const std::shared_ptr<Notification> &request,
+    void OnCanceled(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override
     {}
-    virtual void OnConsumed(const std::shared_ptr<Notification> &request) override
+    void OnConsumed(const std::shared_ptr<Notification> &request) override
     {}
-    virtual void OnConsumed(const std::shared_ptr<Notification> &request,
+    void OnConsumed(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {}
 };
@@ -1219,7 +1219,8 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09300,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600, Function | SmallTest | Level1)
 {
-    EXPECT_EQ((int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
+    EXPECT_EQ(
+        (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     bool allowed = false;
     EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotify(allowed), (int)ERR_OK);
     EXPECT_TRUE(allowed);
@@ -1270,6 +1271,9 @@ inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)
 {
     const int32_t PIXEL_BYTES = 4;
     std::shared_ptr<PixelMap> pixelMap = std::make_shared<PixelMap>();
+    if (pixelMap == nullptr) {
+        return nullptr;
+    }
     ImageInfo info;
     info.size.width = width;
     info.size.height = height;
@@ -1279,8 +1283,9 @@ inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)
     int32_t rowDataSize = width * PIXEL_BYTES;
     uint32_t bufferSize = rowDataSize * height;
     void *buffer = malloc(bufferSize);
-    EXPECT_NE(buffer, nullptr);
-    pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, AllocatorType::HEAP_ALLOC, nullptr);
+    if (buffer != nullptr) {
+        pixelMap->SetPixelsAddr(buffer, nullptr, bufferSize, AllocatorType::HEAP_ALLOC, nullptr);
+    }
     return pixelMap;
 }
 

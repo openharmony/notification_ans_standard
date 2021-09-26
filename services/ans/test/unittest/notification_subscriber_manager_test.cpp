@@ -36,24 +36,24 @@ public:
 private:
     class TestAnsSubscriber : public NotificationSubscriber {
     public:
-        virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+        void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
         {}
-        virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+        void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
         {}
-        virtual void OnDied() override
+        void OnDied() override
         {}
-        virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
+        void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
         {}
-        virtual void OnDisturbModeChanged(int disturbMode) override
+        void OnDisturbModeChanged(int disturbMode) override
         {}
-        virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
+        void OnCanceled(const std::shared_ptr<Notification> &request) override
         {}
-        virtual void OnCanceled(const std::shared_ptr<Notification> &request,
+        void OnCanceled(const std::shared_ptr<Notification> &request,
             const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override
         {}
-        virtual void OnConsumed(const std::shared_ptr<Notification> &request) override
+        void OnConsumed(const std::shared_ptr<Notification> &request) override
         {}
-        virtual void OnConsumed(const std::shared_ptr<Notification> &request,
+        void OnConsumed(const std::shared_ptr<Notification> &request,
             const std::shared_ptr<NotificationSortingMap> &sortingMap) override
         {}
     };
