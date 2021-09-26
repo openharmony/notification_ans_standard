@@ -99,22 +99,14 @@ inline bool IsSystemApp()
 inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRecord> &record)
 {
     sptr<NotificationSlot> slot;
-    ErrCode result = NotificationPreferences::GetInstance().GetNotificationSlot(
-        record->bundleOption, record->request->GetSlotType(), slot);
+    NotificationConstant::SlotType slotType = record->request->GetSlotType();
+    ErrCode result = NotificationPreferences::GetInstance().GetNotificationSlot(record->bundleOption, slotType, slot);
     if ((result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) ||
         (result == ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST)) {
-        result = NotificationPreferences::GetInstance().GetNotificationSlot(
-            record->bundleOption, NotificationConstant::SlotType::OTHER, slot);
-        if ((result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) ||
-            (result == ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST)) {
-            slot = new NotificationSlot(NotificationConstant::SlotType::OTHER);
-            std::vector<sptr<NotificationSlot>> slots;
-            slots.push_back(slot);
-            result = NotificationPreferences::GetInstance().AddNotificationSlots(record->bundleOption, slots);
-        }
-        if (result == ERR_OK) {
-            record->request->SetSlotType(NotificationConstant::SlotType::OTHER);
-        }
+        slot = new NotificationSlot(slotType);
+        std::vector<sptr<NotificationSlot>> slots;
+        slots.push_back(slot);
+        result = NotificationPreferences::GetInstance().AddNotificationSlots(record->bundleOption, slots);
     }
     if (result == ERR_OK) {
         record->slot = slot;
@@ -182,9 +174,6 @@ sptr<AdvancedNotificationService> AdvancedNotificationService::GetInstance()
 }
 
 AdvancedNotificationService::AdvancedNotificationService()
-    : systemEventObserver_({
-          std::bind(&AdvancedNotificationService::OnBundleRemoved, this, std::placeholders::_1),
-      })
 {
     runner_ = OHOS::AppExecFwk::EventRunner::Create();
     handler_ = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner_);
@@ -193,6 +182,11 @@ AdvancedNotificationService::AdvancedNotificationService()
         std::bind(&AdvancedNotificationService::OnDistributedKvStoreDeathRecipient, this));
 
     StartFilters();
+
+    ISystemEvent iSystemEvent = {
+        std::bind(&AdvancedNotificationService::OnBundleRemoved, this, std::placeholders::_1),
+    };
+    systemEventObserver_ = std::make_shared<SystemEventObserver>(iSystemEvent);
 
     dataManager_.RegisterKvStoreServiceDeathRecipient(distributedKvStoreDeathRecipient_);
 }
@@ -824,8 +818,8 @@ std::vector<std::string> AdvancedNotificationService::GetNotificationKeys(
     std::vector<std::string> keys;
 
     for (auto record : notificationList_) {
-        if ((bundleOption != nullptr) && (record->bundleOption->GetBundleName() != bundleOption->GetBundleName() &&
-                                             (record->bundleOption->GetUid() != bundleOption->GetUid()))) {
+        if ((bundleOption != nullptr) && (record->bundleOption->GetBundleName() != bundleOption->GetBundleName()) &&
+            (record->bundleOption->GetUid() != bundleOption->GetUid())) {
             continue;
         }
         keys.push_back(record->notification->GetKey());

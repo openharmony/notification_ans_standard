@@ -246,39 +246,39 @@ private:
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
     {
         std::shared_ptr<OnSubscribeResultEvent> event = std::make_shared<OnSubscribeResultEvent>(result);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
     {
         std::shared_ptr<OnUnSubscribeResultEvent> event = std::make_shared<OnUnSubscribeResultEvent>(result);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    virtual void OnDied() override
+    void OnDied() override
     {}
-    virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
+    void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {
         std::shared_ptr<OnUpdatedEvent> event = std::make_shared<OnUpdatedEvent>(sortingMap);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    virtual void OnDisturbModeChanged(int disturbMode) override
+    void OnDisturbModeChanged(int disturbMode) override
     {
         std::shared_ptr<OnDisturbModeChangedEvent> event = std::make_shared<OnDisturbModeChangedEvent>(disturbMode);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
+    void OnCanceled(const std::shared_ptr<Notification> &request) override
     {
         std::shared_ptr<OnOnCanceledEvent> event = std::make_shared<OnOnCanceledEvent>(request);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    virtual void OnCanceled(const std::shared_ptr<Notification> &request,
+    void OnCanceled(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override
     {
         std::shared_ptr<OnOnCanceledWithSortingMapAndDeleteReasonEvent> event =
@@ -286,14 +286,14 @@ public:
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    virtual void OnConsumed(const std::shared_ptr<Notification> &request) override
+    void OnConsumed(const std::shared_ptr<Notification> &request) override
     {
         std::shared_ptr<OnConsumedEvent> event = std::make_shared<OnConsumedEvent>(request);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
 
-    virtual void OnConsumed(const std::shared_ptr<Notification> &request,
+    void OnConsumed(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {
         std::shared_ptr<OnConsumedWithSortingMapEvent> event =

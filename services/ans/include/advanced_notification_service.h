@@ -150,7 +150,7 @@ private:
     std::list<std::chrono::system_clock::time_point> flowControlTimestampList_;
     std::shared_ptr<RecentInfo> recentInfo_ = nullptr;
     std::shared_ptr<DistributedKvStoreDeathRecipient> distributedKvStoreDeathRecipient_ = nullptr;
-    SystemEventObserver systemEventObserver_;
+    std::shared_ptr<SystemEventObserver> systemEventObserver_ = nullptr;
     DistributedKv::DistributedKvDataManager dataManager_;
 };
 
