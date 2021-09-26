@@ -56,7 +56,7 @@ public:
     void TearDown();
     class WantSender : public AAFwk::WantSenderStub {
     public:
-        virtual void Send(SenderInfo &senderInfo) override;
+        void Send(SenderInfo &senderInfo) override;
     };
 };
 

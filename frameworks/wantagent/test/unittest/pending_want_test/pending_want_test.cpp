@@ -74,12 +74,12 @@ public:
 
     class WantSender : public AAFwk::WantSenderStub {
     public:
-        virtual void Send(SenderInfo &senderInfo) override;
+        void Send(SenderInfo &senderInfo) override;
     };
 
     class CancelListenerSon : public CancelListener {
     public:
-        virtual void OnCancelled(int resultCode) override;
+        void OnCancelled(int resultCode) override;
     };
 };
 

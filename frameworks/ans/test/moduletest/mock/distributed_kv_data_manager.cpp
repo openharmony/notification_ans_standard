@@ -17,7 +17,6 @@
 
 #include "distributed_kv_data_manager.h"
 #include "constant.h"
-//#include "ikvstore.h"
 #include "mock_single_kv_store.h"
 #include "types.h"
 

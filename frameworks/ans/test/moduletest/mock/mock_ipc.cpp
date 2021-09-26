@@ -35,6 +35,6 @@ int IPCSkeleton::GetCallingPid()
 
 void IPCSkeleton::SetCallingUid(int uid)
 {
-  uid_ = uid;
+    uid_ = uid;
 }
 }  // namespace OHOS

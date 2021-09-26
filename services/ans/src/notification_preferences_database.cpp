@@ -81,7 +81,8 @@ const std::map<std::string,
             KEY_SLOT_VIBRATION_STYLE,
             std::bind(&NotificationPreferencesDatabase::ParseSlotEnableBypassDnd, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3),
-        }};
+        },
+};
 
 const std::map<std::string,
     std::function<void(NotificationPreferencesDatabase *, NotificationPreferencesInfo::BundleInfo &, std::string &)>>
@@ -115,7 +116,8 @@ const std::map<std::string,
             KEY_BUNDLE_ENABLE_NOTIFICATION,
             std::bind(&NotificationPreferencesDatabase::ParseBundleEnableNotification, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3),
-        }};
+        },
+};
 
 NotificationPreferencesDatabase::NotificationPreferencesDatabase()
 {
@@ -674,7 +676,7 @@ bool NotificationPreferencesDatabase::StoreDeathRecipient()
     return true;
 }
 
-template<typename T>
+template <typename T>
 OHOS::DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
     const std::string &bundleKey, const BundleType &type, const T &t)
 {
