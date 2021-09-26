@@ -325,7 +325,7 @@ public:
 
     /**
      * Adds a NotificationActionButton to this notification.
-     * The system typically places action buttons next to the notification content.
+     * An operation button is usually placed next to the notification content by the system. 
      * Each action button must contain an icon, a title, and an WantAgent. When a notification is expanded,
      * a maximum of three action buttons can be displayed from left to right in the order they were added.
      * When the notification is collapsed, no action buttons will be displayed.

@@ -159,8 +159,6 @@ public:
 
 private:
     CallbackInfo triggerCompleteInfo_;
-
-    static void OnSendFinishedUvAfterWorkCallback(uv_work_t *work, int status);
 };
 
 napi_value WantAgentInit(napi_env env, napi_value exports);
