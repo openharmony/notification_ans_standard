@@ -41,7 +41,7 @@ ErrCode NotificationPreferences::AddNotificationSlots(
 {
 
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty() || slots.empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || slots.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
@@ -67,7 +67,7 @@ ErrCode NotificationPreferences::AddNotificationSlotGroups(
     const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty() || groups.empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || groups.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -92,7 +92,7 @@ ErrCode NotificationPreferences::AddNotificationSlotGroups(
 
 ErrCode NotificationPreferences::AddNotificationBundleProperty(const sptr<NotificationBundleOption> &bundleOption)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -113,7 +113,7 @@ ErrCode NotificationPreferences::RemoveNotificationSlot(
     const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
@@ -133,7 +133,7 @@ ErrCode NotificationPreferences::RemoveNotificationSlot(
 ErrCode NotificationPreferences::RemoveNotificationAllSlots(const sptr<NotificationBundleOption> &bundleOption)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
@@ -159,7 +159,7 @@ ErrCode NotificationPreferences::RemoveNotificationSlotGroups(
     const sptr<NotificationBundleOption> &bundleOption, const std::vector<std::string> &groupIds)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty() || groupIds.empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || groupIds.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
@@ -183,7 +183,7 @@ ErrCode NotificationPreferences::RemoveNotificationSlotGroups(
 ErrCode NotificationPreferences::RemoveNotificationForBundle(const sptr<NotificationBundleOption> &bundleOption)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -210,7 +210,7 @@ ErrCode NotificationPreferences::UpdateNotificationSlots(
     const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty() || slots.empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || slots.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -239,7 +239,7 @@ ErrCode NotificationPreferences::UpdateNotificationSlotGroups(
 {
 
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty() || groups.empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || groups.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -266,7 +266,7 @@ ErrCode NotificationPreferences::GetNotificationSlot(const sptr<NotificationBund
     const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -286,7 +286,7 @@ ErrCode NotificationPreferences::GetNotificationSlot(const sptr<NotificationBund
 ErrCode NotificationPreferences::GetNotificationAllSlots(
     const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlot>> &slots)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -305,7 +305,7 @@ ErrCode NotificationPreferences::GetNotificationAllSlots(
 ErrCode NotificationPreferences::GetNotificationSlotsNumForBundle(
     const sptr<NotificationBundleOption> &bundleOption, int &num)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -322,7 +322,7 @@ ErrCode NotificationPreferences::GetNotificationSlotsNumForBundle(
 ErrCode NotificationPreferences::GetNotificationSlotGroup(
     const sptr<NotificationBundleOption> &bundleOption, const std::string &groupId, sptr<NotificationSlotGroup> &group)
 {
-    if (bundleOption->GetBundleName().empty() || groupId.empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || groupId.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -342,7 +342,7 @@ ErrCode NotificationPreferences::GetNotificationSlotGroup(
 ErrCode NotificationPreferences::GetNotificationAllSlotGroups(
     const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<NotificationSlotGroup>> &groups)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -360,7 +360,7 @@ ErrCode NotificationPreferences::GetNotificationAllSlotGroups(
 ErrCode NotificationPreferences::GetNotificationAllSlotInSlotGroup(const sptr<NotificationBundleOption> &bundleOption,
     const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots)
 {
-    if (bundleOption->GetBundleName().empty() || groupId.empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || groupId.empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -377,7 +377,7 @@ ErrCode NotificationPreferences::GetNotificationAllSlotInSlotGroup(const sptr<No
 
 ErrCode NotificationPreferences::IsShowBadge(const sptr<NotificationBundleOption> &bundleOption, bool &enable)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     return GetBundleProperty(bundleOption, BundleType::BUNDLE_SHOW_BADGE_TYPE, enable);
@@ -385,7 +385,7 @@ ErrCode NotificationPreferences::IsShowBadge(const sptr<NotificationBundleOption
 
 ErrCode NotificationPreferences::SetShowBadge(const sptr<NotificationBundleOption> &bundleOption, const bool enable)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -399,7 +399,7 @@ ErrCode NotificationPreferences::SetShowBadge(const sptr<NotificationBundleOptio
 
 ErrCode NotificationPreferences::GetImportance(const sptr<NotificationBundleOption> &bundleOption, int &importance)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -409,7 +409,7 @@ ErrCode NotificationPreferences::GetImportance(const sptr<NotificationBundleOpti
 ErrCode NotificationPreferences::SetImportance(
     const sptr<NotificationBundleOption> &bundleOption, const int &importance)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
@@ -423,7 +423,7 @@ ErrCode NotificationPreferences::SetImportance(
 ErrCode NotificationPreferences::GetTotalBadgeNums(
     const sptr<NotificationBundleOption> &bundleOption, int &totalBadgeNum)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     return GetBundleProperty(bundleOption, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, totalBadgeNum);
@@ -431,7 +431,7 @@ ErrCode NotificationPreferences::GetTotalBadgeNums(
 
 ErrCode NotificationPreferences::SetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, const int num)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
@@ -445,7 +445,7 @@ ErrCode NotificationPreferences::SetTotalBadgeNums(const sptr<NotificationBundle
 ErrCode NotificationPreferences::GetPrivateNotificationsAllowed(
     const sptr<NotificationBundleOption> &bundleOption, bool &allow)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     return GetBundleProperty(bundleOption, BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE, allow);
@@ -454,7 +454,7 @@ ErrCode NotificationPreferences::GetPrivateNotificationsAllowed(
 ErrCode NotificationPreferences::SetPrivateNotificationsAllowed(
     const sptr<NotificationBundleOption> &bundleOption, const bool allow)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
@@ -468,7 +468,7 @@ ErrCode NotificationPreferences::SetPrivateNotificationsAllowed(
 ErrCode NotificationPreferences::GetNotificationsEnabledForBundle(
     const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
     return GetBundleProperty(bundleOption, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
@@ -477,7 +477,7 @@ ErrCode NotificationPreferences::GetNotificationsEnabledForBundle(
 ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(
     const sptr<NotificationBundleOption> &bundleOption, const bool enabled)
 {
-    if (bundleOption->GetBundleName().empty()) {
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -535,15 +535,13 @@ ErrCode NotificationPreferences::SetDisturbMode(const NotificationConstant::Dist
 
 ErrCode NotificationPreferences::ClearNotificationInRestoreFactorySettings()
 {
-    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    preferencesInfo.ClearBundleInfo();
     ErrCode result = ERR_OK;
     if (!preferncesDB_->RemoveAllDataFromDisturbeDB()) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
     if (result == ERR_OK) {
-        preferencesInfo_ = preferencesInfo;
+        preferencesInfo_ = NotificationPreferencesInfo();
     }
     return result;
 }
