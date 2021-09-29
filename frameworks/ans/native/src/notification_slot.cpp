@@ -98,24 +98,28 @@ void NotificationSlot::SetType(NotificationConstant::SlotType type)
             SetName("SOCIAL_COMMUNICATION");
             SetLockscreenVisibleness(NotificationConstant::VisiblenessType::PUBLIC);
             SetEnableVibration(true);
+            SetLevel(LEVEL_HIGH);
             break;
         case NotificationConstant::SlotType::SERVICE_REMINDER:
             id_ = "SERVICE_REMINDER";
             SetName("SERVICE_REMINDER");
             SetLockscreenVisibleness(NotificationConstant::VisiblenessType::PUBLIC);
             SetEnableVibration(true);
+            SetLevel(LEVEL_DEFAULT);
             break;
         case NotificationConstant::SlotType::CONTENT_INFORMATION:
             id_ = "CONTENT_INFORMATION";
             SetName("CONTENT_INFORMATION");
             SetLockscreenVisibleness(NotificationConstant::VisiblenessType::SECRET);
             SetEnableVibration(false);
+            SetLevel(LEVEL_LOW);
             break;
         case NotificationConstant::SlotType::OTHER:
             id_ = "OTHER";
             SetName("OTHER");
             SetLockscreenVisibleness(NotificationConstant::VisiblenessType::SECRET);
             SetEnableVibration(false);
+            SetLevel(LEVEL_MIN);
             break;
         default:
             break;
@@ -214,67 +218,83 @@ std::string NotificationSlot::Dump() const
 bool NotificationSlot::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(id_)) {
+        ANS_LOGE("Failed to write id");
         return false;
     }
 
     if (!parcel.WriteString(name_)) {
+        ANS_LOGE("Failed to write name");
         return false;
     }
 
     if (!parcel.WriteBool(isLightEnabled_)) {
+        ANS_LOGE("Failed to write isLightEnabled");
         return false;
     }
 
     if (!parcel.WriteBool(isVibrationEnabled_)) {
+        ANS_LOGE("Failed to write isVibrationEnabled");
         return false;
     }
 
     if (!parcel.WriteBool(isShowBadge_)) {
+        ANS_LOGE("Failed to write isShowBadge");
         return false;
     }
 
     if (!parcel.WriteBool(isBypassDnd_)) {
+        ANS_LOGE("Failed to write isBypassDnd");
         return false;
     }
 
     if (!parcel.WriteString(description_)) {
+        ANS_LOGE("Failed to write description");
         return false;
     }
 
     if (!parcel.WriteInt32(lightColor_)) {
+        ANS_LOGE("Failed to write lightColor");
         return false;
     }
 
     if (!parcel.WriteInt32(static_cast<int32_t>(level_))) {
+        ANS_LOGE("Failed to write level");
         return false;
     }
 
     if (!parcel.WriteInt32(static_cast<int32_t>(type_))) {
+        ANS_LOGE("Failed to write type");
         return false;
     }
 
     if (!parcel.WriteInt32(static_cast<int32_t>(lockScreenVisibleness_))) {
+        ANS_LOGE("Failed to write lockScreenVisibleness");
         return false;
     }
 
     if (!parcel.WriteString(groupId_)) {
+        ANS_LOGE("Failed to write groupId");
         return false;
     }
 
     if (sound_.ToString().empty()) {
         if (!parcel.WriteInt32(VALUE_NULL)) {
+            ANS_LOGE("Failed to write int");
             return false;
         }
     } else {
         if (!parcel.WriteInt32(VALUE_OBJECT)) {
+            ANS_LOGE("Failed to write int");
             return false;
         }
         if (!parcel.WriteString((sound_.ToString()))) {
+            ANS_LOGE("Failed to write sound");
             return false;
         }
     }
 
     if (!parcel.WriteInt64Vector(vibrationValues_)) {
+        ANS_LOGE("Failed to write vibrationValues");
         return false;
     }
 
@@ -298,6 +318,7 @@ bool NotificationSlot::ReadFromParcel(Parcel &parcel)
 
     int empty = VALUE_NULL;
     if (!parcel.ReadInt32(empty)) {
+        ANS_LOGE("Failed to read int");
         return false;
     }
 
