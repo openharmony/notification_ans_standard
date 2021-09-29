@@ -30,10 +30,6 @@ config("public_ans_config") {
   ]
 }
 
-config("json_config") {
-  cflags_cc = [ "-fexceptions" ]
-}
-
 ohos_moduletest("ans_fw_module_test") {
   module_out_path = module_output_path
   include_dirs = [
