@@ -956,11 +956,7 @@ void NotificationPreferencesDatabase::StringToVector(const std::string &str, std
 int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
 {
     int value = 0;
-    try {
-        value = stoi(str, nullptr);
-    } catch (const std::exception &e) {
-        ANS_LOGW("Stoi error is %{public}s.", e.what());
-    }
+    value = stoi(str, nullptr);
     return value;
 }
 

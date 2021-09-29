@@ -17,10 +17,6 @@ import("//build/test.gni")
 
 module_output_path = "ans_standard/unittest"
 
-config("json_config") {
-  cflags_cc = [ "-fexceptions" ]
-}
-
 ohos_unittest("ans_unit_test") {
   module_out_path = module_output_path
   include_dirs = [
@@ -71,10 +67,7 @@ ohos_unittest("ans_unit_test") {
     "permission_filter_test.cpp",
   ]
 
-  configs = [
-    "//utils/native/base:utils_config",
-    ":json_config",
-  ]
+  configs = [ "//utils/native/base:utils_config" ]
 
   deps = [
     "${core_path}:ans_core",

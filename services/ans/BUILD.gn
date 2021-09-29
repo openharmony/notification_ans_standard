@@ -31,15 +31,8 @@ config("public_ans_config") {
   ]
 }
 
-config("json_config") {
-  cflags_cc = [ "-fexceptions" ]
-}
-
 ohos_shared_library("libans") {
-  include_dirs = [
-    "include",
-    "//third_party/json/include",
-  ]
+  include_dirs = [ "include" ]
 
   sources = [
     "src/advanced_notification_service.cpp",
@@ -58,7 +51,6 @@ ohos_shared_library("libans") {
   configs = [
     ":public_ans_config",
     "//utils/native/base:utils_config",
-    ":json_config",
   ]
 
   deps = [
