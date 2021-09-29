@@ -14,7 +14,7 @@
  */
 
 #include "notification_slot_group.h"
-
+#include "ans_log_wrapper.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -88,33 +88,40 @@ std::string NotificationSlotGroup::Dump() const
 bool NotificationSlotGroup::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(id_)) {
+        ANS_LOGE("Failed to write id");
         return false;
     }
 
     if (!parcel.WriteString(name_)) {
+        ANS_LOGE("Failed to write name");
         return false;
     }
 
     if (!parcel.WriteString(description_)) {
+        ANS_LOGE("Failed to write description");
         return false;
     }
 
     if (slots_.size() == 0) {
         if (!parcel.WriteInt32(0)) {
+            ANS_LOGE("Failed to write the size of slots");
             return false;
         }
     } else {
         if (!parcel.WriteInt32(slots_.size())) {
+            ANS_LOGE("Failed to write the size of slots");
             return false;
         }
-        for (auto it = slots_.begin(); it != slots_.end(); ++it) {
-            if (!it->Marshalling(parcel)) {
+        for (size_t it = 0; it < slots_.size(); ++it) {
+            if (!parcel.WriteParcelable(&slots_.at(it))) {
+                ANS_LOGE("Failed to write slots");
                 return false;
             }
         }
     }
 
     if (!parcel.WriteBool(isDisabled_)) {
+        ANS_LOGE("Failed to write isDisabled");
         return false;
     }
 
@@ -131,6 +138,7 @@ bool NotificationSlotGroup::ReadFromParcel(Parcel &parcel)
         for (int32_t i = 0; i < size; ++i) {
             auto slot = parcel.ReadParcelable<NotificationSlot>();
             if (nullptr == slot) {
+                ANS_LOGE("Failed to read slot");
                 return false;
             }
             slots_.emplace_back(*slot);
