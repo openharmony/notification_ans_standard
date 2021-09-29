@@ -17,10 +17,6 @@ import("//build/test.gni")
 
 module_output_path = "ans_standard/moduletest"
 
-config("json_config") {
-  cflags_cc = [ "-fexceptions" ]
-}
-
 ohos_moduletest("ans_module_test") {
   module_out_path = module_output_path
   include_dirs = [
@@ -64,10 +60,7 @@ ohos_moduletest("ans_module_test") {
     "mock/mock_single_kv_store.cpp",
   ]
 
-  configs = [
-    "//utils/native/base:utils_config",
-    ":json_config",
-  ]
+  configs = [ "//utils/native/base:utils_config" ]
 
   deps = [
     "${core_path}:ans_core",
