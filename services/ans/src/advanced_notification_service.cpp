@@ -1190,6 +1190,10 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
         }
     }
 
+    if (targetBundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         allowed = false;
