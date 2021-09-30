@@ -14,6 +14,7 @@
  */
 
 import notification from '../@ohos.notification';
+import image from './@ohos.multimedia.image';
 
 /**
  * Constructs basic notifications.
@@ -61,9 +62,24 @@ export interface NotificationMultiLineContent extends NotificationBasicContent {
 }
 
 /**
- * Constructs a notification that includes multiple lines of text.
+ * Constructs a notification that includes a picture.
  *
- * @name NotificationMultiLineContent
+ * @name NotificationPictureContent
+ * @since 7
+ * @sysCap SystemCapability.Notification.ANS
+ * @devices phone, tablet, tv, wearable, car
+ * @permission N/A
+ */
+export interface NotificationPictureContent extends NotificationBasicContent {
+  briefText: string;
+  expandedTitle: string;
+  picture: image.PixelMap;
+}
+
+/**
+ * Constructs a notification.
+ *
+ * @name NotificationContent
  * @since 7
  * @sysCap SystemCapability.Notification.ANS
  * @devices phone, tablet, tv, wearable, car
@@ -74,4 +90,5 @@ export interface NotificationContent {
   normal?: NotificationBasicContent;
   longText?: NotificationLongTextContent;
   multiLine?: NotificationMultiLineContent;
+  picture?: NotificationPictureContent;
 }

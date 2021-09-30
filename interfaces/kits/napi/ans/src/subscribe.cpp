@@ -927,7 +927,7 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
     SubscriberInstance *objectInfo = nullptr;
     NotificationSubscribeInfo subscriberInfo;
     if (ParseParameters(env, info, subscriberInfo, objectInfo, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
     ANS_LOGI("Subscribe objectInfo = %{public}p", objectInfo);
 

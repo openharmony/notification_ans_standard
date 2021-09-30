@@ -20,8 +20,7 @@ import { Want } from '../ability/want';
  *
  * @name TriggerInfo
  * @since 7
- * @sysCap ans
- * @devices phone, tablet
+ * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  */
 export interface TriggerInfo {

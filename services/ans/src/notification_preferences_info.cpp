@@ -100,6 +100,7 @@ bool NotificationPreferencesInfo::BundleInfo::GetSlot(
 
 bool NotificationPreferencesInfo::BundleInfo::GetAllSlots(std::vector<sptr<NotificationSlot>> &slots)
 {
+    slots.clear();
     std::for_each(slots_.begin(),
         slots_.end(),
         [&slots](std::map<NotificationConstant::SlotType, sptr<NotificationSlot>>::reference iter) {

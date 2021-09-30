@@ -21,6 +21,7 @@
  * @sysCap SystemCapability.Notification.ANS
  * @devices phone, tablet, tv, wearable, car
  * @permission N/A
+ * @systemapi Hide this for inner system use.
  */
 export interface NotificationSubscribeInfo {
   bundleNames?: Array<string>;

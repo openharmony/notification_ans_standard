@@ -14,6 +14,7 @@
  */
 
 import notification from '../@ohos.notification';
+import image from '../@ohos.multimedia.image';
 import { WantAgent } from '../@ohos.wantAgent';
 import { NotificationContent } from './notificationContent';
 import { NotificationActionButton } from './notificationActionButton';
@@ -48,6 +49,8 @@ export interface NotificationRequest {
   badgeIconStyle?: number;
   showDeliveryTime?: boolean;
   actionButtons?: Array<NotificationActionButton>;
+  smallIcon?: image.PixelMap;
+  largeIcon?: image.PixelMap;
   readonly creatorBundleName?: string;
   readonly creatorUid?: number;
   readonly creatorPid?: number;
