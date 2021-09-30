@@ -98,6 +98,13 @@ napi_value Common::NapiGetNull(napi_env env)
     return result;
 }
 
+napi_value Common::NapiGetUndefined(napi_env env)
+{
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
 napi_value Common::GetCallbackErrorValue(napi_env env, int errCode)
 {
     napi_value result = nullptr;
@@ -2824,6 +2831,9 @@ bool Common::ContentTypeJSToC(const enum ContentType &inType, enum NotificationC
         case ContentType::NOTIFICATION_CONTENT_MULTILINE:
             outType = NotificationContent::Type::MULTILINE;
             break;
+        case ContentType::NOTIFICATION_CONTENT_PICTURE:
+            outType = NotificationContent::Type::PICTURE;
+            break;
         default:
             ANS_LOGE("ContentType %{public}d is an invalid value", inType);
             return false;
@@ -2842,6 +2852,9 @@ bool Common::ContentTypeCToJS(const enum NotificationContent::Type &inType, enum
             break;
         case NotificationContent::Type::MULTILINE:
             outType = ContentType::NOTIFICATION_CONTENT_MULTILINE;
+            break;
+        case NotificationContent::Type::PICTURE:
+            outType = ContentType::NOTIFICATION_CONTENT_PICTURE;
             break;
         default:
             ANS_LOGE("ContentType %{public}d is an invalid value", inType);

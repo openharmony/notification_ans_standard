@@ -956,7 +956,9 @@ void NotificationPreferencesDatabase::StringToVector(const std::string &str, std
 int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
 {
     int value = 0;
-    value = stoi(str, nullptr);
+    if (!str.empty()) {
+        value = stoi(str, nullptr);
+    }
     return value;
 }
 
