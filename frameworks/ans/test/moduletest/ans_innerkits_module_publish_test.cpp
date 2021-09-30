@@ -58,8 +58,8 @@ const int32_t CASE_FIFTEEN = 15;
 const int32_t CASE_SIXTEEN = 16;
 const int32_t CALLING_UID = 9999;
 
-const int32_t PIXEL_MAP_TEST_WIDTH = 1024;
-const int32_t PIXEL_MAP_TEST_HEIGHT = 1024;
+const int32_t PIXEL_MAP_TEST_WIDTH = 32;
+const int32_t PIXEL_MAP_TEST_HEIGHT = 32;
 
 std::mutex g_subscribe_mtx;
 std::mutex g_consumed_mtx;
@@ -190,9 +190,9 @@ private:
         EXPECT_EQ(outImageInfo.pixelFormat, Media::PixelFormat::ALPHA_8);
         EXPECT_EQ(outImageInfo.colorSpace, Media::ColorSpace::SRGB);
 
-        EXPECT_EQ(nullptr, notificationRequest.GetBigIcon());
-        EXPECT_EQ(nullptr, notificationRequest.GetLittleIcon());
-        EXPECT_EQ(nullptr, notificationRequest.GetLittleIcon());
+        EXPECT_NE(nullptr, notificationRequest.GetBigIcon());
+        EXPECT_NE(nullptr, notificationRequest.GetLittleIcon());
+        EXPECT_NE(nullptr, notificationRequest.GetLittleIcon());
         std::vector<std::shared_ptr<MessageUser>> messageUser = notificationRequest.GetMessageUsers();
         for (auto user : messageUser) {
             if (user != nullptr) {

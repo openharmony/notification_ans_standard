@@ -418,7 +418,7 @@ napi_value AddSlot(napi_env env, napi_callback_info info)
 
     ParametersInfoAddSlot paras;
     if (ParseParametersByAddSlot(env, info, paras) == nullptr) {
-        return Common::JSParaError(env, paras.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoAddSlot *asynccallbackinfo = new (std::nothrow) AsyncCallbackInfoAddSlot {
@@ -483,7 +483,7 @@ napi_value AddSlots(napi_env env, napi_callback_info info)
 
     ParametersInfoAddSlots paras;
     if (ParseParametersByAddSlots(env, info, paras) == nullptr) {
-        return Common::JSParaError(env, paras.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoAddSlots *asynccallbackinfo =
@@ -539,7 +539,7 @@ napi_value SetSlotByBundle(napi_env env, napi_callback_info info)
 
     ParametersInfoSetSlotByBundle params {};
     if (ParseParametersSetSlotByBundle(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoSetSlotByBundle *asynccallbackinfo =
@@ -600,7 +600,7 @@ napi_value GetSlot(napi_env env, napi_callback_info info)
 
     ParametersInfoGetSlot paras;
     if (ParseParametersByGetSlot(env, info, paras) == nullptr) {
-        return Common::JSParaError(env, paras.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoGetSlot *asynccallbackinfo =
@@ -672,7 +672,7 @@ napi_value GetSlotNumByBundle(napi_env env, napi_callback_info info)
 
     ParametersInfoGetSlotNumByBundle params {};
     if (ParseParametersGetSlotNumByBundle(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoGetSlotNumByBundle *asynccallbackinfo =
@@ -734,7 +734,7 @@ napi_value GetSlots(napi_env env, napi_callback_info info)
 
     napi_ref callback = nullptr;
     if (ParseParametersByGetSlots(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoGetSlots *asynccallbackinfo =
@@ -819,7 +819,7 @@ napi_value GetSlotsByBundle(napi_env env, napi_callback_info info)
 
     ParametersInfoGetSlotsByBundle params {};
     if (ParseParametersGetSlotsByBundle(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoGetSlotsByBundle *asynccallbackinfo =
@@ -908,7 +908,7 @@ napi_value RemoveSlot(napi_env env, napi_callback_info info)
 
     ParametersInfoRemoveSlot paras;
     if (ParseParametersByRemoveSlot(env, info, paras) == nullptr) {
-        return Common::JSParaError(env, paras.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoRemoveSlot *asynccallbackinfo =
@@ -964,7 +964,7 @@ napi_value RemoveAllSlots(napi_env env, napi_callback_info info)
 
     napi_ref callback = nullptr;
     if (ParseParametersByRemoveAllSlots(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoRemoveAllSlots *asynccallbackinfo =

@@ -83,7 +83,7 @@ napi_value Publish(napi_env env, napi_callback_info info)
 
     ParametersInfoPublish params;
     if (ParseParameters(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     napi_value promise = nullptr;

@@ -102,7 +102,7 @@ napi_value Cancel(napi_env env, napi_callback_info info)
 
     ParametersInfoCancel paras;
     if (ParseParameters(env, info, paras) == nullptr) {
-        return Common::JSParaError(env, paras.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoCancel *asynccallbackinfo = new (std::nothrow)
@@ -160,7 +160,7 @@ napi_value CancelAll(napi_env env, napi_callback_info info)
 
     napi_ref callback = nullptr;
     if (ParseParametersByCancelAll(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoCancel *asynccallbackinfo =

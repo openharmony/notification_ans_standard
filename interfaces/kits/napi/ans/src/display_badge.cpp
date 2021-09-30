@@ -129,7 +129,7 @@ napi_value DisplayBadge(napi_env env, napi_callback_info info)
 
     EnableBadgeParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoEnableBadge *asynccallbackinfo =
@@ -194,7 +194,7 @@ napi_value IsBadgeDisplayed(napi_env env, napi_callback_info info)
 
     IsDisplayBadgeParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo =

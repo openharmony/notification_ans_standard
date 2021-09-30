@@ -23,6 +23,7 @@ import { NotificationSorting } from './notificationSorting';
  * @sysCap SystemCapability.Notification.ANS
  * @devices phone, tablet, tv, wearable, car
  * @permission N/A
+ * @systemapi Hide this for inner system use.
  */
 interface NotificationSortingMap {
   readonly sortings: {[key: string]: NotificationSorting};

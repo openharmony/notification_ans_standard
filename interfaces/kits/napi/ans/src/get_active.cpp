@@ -73,7 +73,7 @@ napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
 
     napi_ref callback = nullptr;
     if (ParseParametersByAllActive(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoActive *asynccallbackinfo =
@@ -159,7 +159,7 @@ napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
 
     napi_ref callback = nullptr;
     if (ParseParametersByGetActive(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoActive *asynccallbackinfo =
@@ -245,7 +245,7 @@ napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
 
     napi_ref callback = nullptr;
     if (ParseParametersByGetActive(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoActive *asynccallbackinfo =

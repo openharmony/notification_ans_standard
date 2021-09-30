@@ -592,11 +592,11 @@ napi_value NAPI_GetWant(napi_env env, napi_callback_info info)
 void DeleteRecordByCode(const int32_t code)
 {
     std::lock_guard<std::recursive_mutex> guard(g_mutex);
-    for (const auto &item : g_WantAgentMap) {
+    for (const auto &item : *g_WantAgentMap) {
         auto code_ = item.second;
         auto record = item.first;
         if (code_ == code) {
-            g_WantAgentMap.erase(record);
+            g_WantAgentMap->erase(record);
             if (record != nullptr) {
                 delete record;
                 record = nullptr;
@@ -608,9 +608,7 @@ void DeleteRecordByCode(const int32_t code)
 auto NAPI_CancelWrapExecuteCallBack = [](napi_env env, void *data) {
     HILOG_INFO("Cancel called(CallBack Mode)...");
     AsyncCancelCallbackInfo *asyncCallbackInfo = static_cast<AsyncCancelCallbackInfo *>(data);
-    int32_t code = WantAgentHelper::GetHashCode(asyncCallbackInfo->wantAgent);
     WantAgentHelper::Cancel(asyncCallbackInfo->wantAgent);
-    DeleteRecordByCode(code);
 };
 
 auto NAPI_CancelWrapCompleteCallBack = [](napi_env env, napi_status status, void *data) {
@@ -1033,7 +1031,7 @@ auto NAPI_GetWantAgentWrapExecuteCallBack = [](napi_env env, void *data) {
     }
     int32_t code = Notification::WantAgent::WantAgentHelper::GetHashCode(asyncCallbackInfo->wantAgent);
     std::lock_guard<std::recursive_mutex> guard(g_mutex);
-    g_WantAgentMap.emplace(asyncCallbackInfo, code);
+    g_WantAgentMap->emplace(asyncCallbackInfo, code);
 };
 
 auto NAPI_GetWantAgentWrapCompleteCallBack = [](napi_env env, napi_status status, void *data) {

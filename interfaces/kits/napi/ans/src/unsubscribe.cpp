@@ -69,7 +69,7 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
 
     ParametersInfoUnsubscribe paras;
     if (ParseParameters(env, info, paras) == nullptr) {
-        return Common::JSParaError(env, paras.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoUnsubscribe *asynccallbackinfo = new (std::nothrow)

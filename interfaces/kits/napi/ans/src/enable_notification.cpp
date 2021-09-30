@@ -129,7 +129,7 @@ napi_value EnableNotification(napi_env env, napi_callback_info info)
 
     EnableParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoEnable *asynccallbackinfo =
@@ -191,7 +191,7 @@ napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)
 
     IsEnableParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoIsEnable *asynccallbackinfo =
