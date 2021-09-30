@@ -120,6 +120,8 @@ public:
 
     static napi_value NapiGetNull(napi_env env);
 
+    static napi_value NapiGetUndefined(napi_env env);
+
     static napi_value GetCallbackErrorValue(napi_env env, int errCode);
 
     static void PaddingCallbackPromiseInfo(
