@@ -74,7 +74,7 @@ ohos_shared_library("wantagent_innerkits") {
     "ces_standard:cesfwk_core",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 
   if (is_double_framework) {
