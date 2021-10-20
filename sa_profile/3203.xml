@@ -17,6 +17,8 @@
     <systemability>
         <name>3203</name>
         <libpath>/system/lib/libans.z.so</libpath>
+        <depend>3299</depend>
+        <depend-time-out>5000</depend-time-out>
         <run-on-create>true</run-on-create>
         <distributed>false</distributed>
         <dump-level>1</dump-level>

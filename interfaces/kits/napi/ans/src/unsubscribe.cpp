@@ -16,6 +16,8 @@
 #include "unsubscribe.h"
 #include "subscribe.h"
 
+#include "ans_inner_errors.h"
+
 namespace OHOS {
 namespace NotificationNapi {
 const int UNSUBSCRIBE_MAX_PARA = 2;
@@ -48,8 +50,9 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     SubscriberInstancesInfo subscriberInstancesInfo;
     if (!HasNotificationSubscriber(env, argv[0], subscriberInstancesInfo)) {
-        return nullptr;
+        ANS_LOGW("Subscriber not found");
     }
+
     paras.objectInfo = subscriberInstancesInfo.subscriber;
     ANS_LOGI("ObjectInfo = %{public}p start", paras.objectInfo);
 
@@ -90,6 +93,12 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("Unsubscribe napi_create_async_work start");
             AsyncCallbackInfoUnsubscribe *asynccallbackinfo = (AsyncCallbackInfoUnsubscribe *)data;
+
+            if (asynccallbackinfo->objectInfo == nullptr) {
+                ANS_LOGE("invalid object info");
+                asynccallbackinfo->info.errorCode = ERR_ANS_INVALID_PARAM;
+                return;
+            }
 
             asynccallbackinfo->info.errorCode =
                 NotificationHelper::UnSubscribeNotification(*(asynccallbackinfo->objectInfo));

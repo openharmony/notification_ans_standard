@@ -1403,10 +1403,10 @@ void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleO
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    handler_->PostTask(std::bind([&]() {
+    handler_->PostTask(std::bind([bundleOption]() {
         ErrCode result = NotificationPreferences::GetInstance().RemoveNotificationForBundle(bundleOption);
         if (result != ERR_OK) {
-            ANS_LOGE("NotificationPreferences::RemoveNotificationForBundle failed: %{public}d", result);
+            ANS_LOGW("NotificationPreferences::RemoveNotificationForBundle failed: %{public}d", result);
         }
     }));
 }
