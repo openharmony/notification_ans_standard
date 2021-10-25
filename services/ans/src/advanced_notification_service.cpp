@@ -502,8 +502,13 @@ ErrCode AdvancedNotificationService::GetSlots(std::vector<sptr<NotificationSlot>
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetNotificationAllSlots(bundleOption, slots); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetNotificationAllSlots(bundleOption, slots);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            slots.clear();
+        }
+    }));
     return result;
 }
 
@@ -519,6 +524,9 @@ ErrCode AdvancedNotificationService::GetSlotGroup(const std::string &groupId, sp
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         result = NotificationPreferences::GetInstance().GetNotificationSlotGroup(bundleOption, groupId, group);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_NOT_EXIST;
+        }
     }));
     return result;
 }
@@ -533,8 +541,13 @@ ErrCode AdvancedNotificationService::GetSlotGroups(std::vector<sptr<Notification
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetNotificationAllSlotGroups(bundleOption, groups); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetNotificationAllSlotGroups(bundleOption, groups);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            groups.clear();
+        }
+    }));
     return result;
 }
 
@@ -548,6 +561,9 @@ ErrCode AdvancedNotificationService::RemoveSlotGroups(const std::vector<std::str
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         result = NotificationPreferences::GetInstance().RemoveNotificationSlotGroups(bundleOption, groupIds);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_ID_INVALID;
+        }
     }));
     return result;
 }
@@ -709,6 +725,10 @@ ErrCode AdvancedNotificationService::GetPrivateNotificationsAllowed(bool &allow)
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         result = NotificationPreferences::GetInstance().GetPrivateNotificationsAllowed(bundleOption, allow);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            allow = false;
+        }
     }));
     return result;
 }
@@ -843,8 +863,13 @@ ErrCode AdvancedNotificationService::GetSlotsByBundle(
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().GetNotificationAllSlots(bundle, slots); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetNotificationAllSlots(bundle, slots);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            slots.clear();
+        }
+    }));
     return result;
 }
 
@@ -863,8 +888,12 @@ ErrCode AdvancedNotificationService::UpdateSlots(
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().UpdateNotificationSlots(bundle, slots); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().UpdateNotificationSlots(bundle, slots);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
+        }
+    }));
     return result;
 }
 
@@ -883,8 +912,12 @@ ErrCode AdvancedNotificationService::UpdateSlotGroups(
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().UpdateNotificationSlotGroups(bundle, groups); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().UpdateNotificationSlotGroups(bundle, groups);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_NOT_EXIST;
+        }
+    }));
     return result;
 }
 
@@ -943,8 +976,13 @@ ErrCode AdvancedNotificationService::GetShowBadgeEnabled(bool &enabled)
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().IsShowBadge(bundleOption, enabled); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().IsShowBadge(bundleOption, enabled);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            enabled = false;
+        }
+    }));
     return result;
 }
 
@@ -1029,8 +1067,12 @@ ErrCode AdvancedNotificationService::GetSlotByType(
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
+        }
+    }));
     return result;
 }
 
@@ -1044,8 +1086,12 @@ ErrCode AdvancedNotificationService::RemoveSlotByType(const NotificationConstant
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleOption, slotType); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleOption, slotType);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
+        }
+    }));
     return result;
 }
 
@@ -1200,6 +1246,10 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
         result = NotificationPreferences::GetInstance().GetNotificationsEnabled(allowed);
         if (result == ERR_OK && allowed) {
             result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(targetBundle, allowed);
+            if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+                result = ERR_OK;
+                allowed = true;
+            }
         }
     }));
     return result;
@@ -1428,8 +1478,12 @@ ErrCode AdvancedNotificationService::RemoveAllSlots()
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().RemoveNotificationAllSlots(bundleOption); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().RemoveNotificationAllSlots(bundleOption);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+        }
+    }));
     return result;
 }
 
@@ -1555,8 +1609,13 @@ ErrCode AdvancedNotificationService::GetSlotNumAsBundle(const sptr<NotificationB
 
     ErrCode result = ERR_OK;
 
-    handler_->PostSyncTask(std::bind(
-        [&]() { result = NotificationPreferences::GetInstance().GetNotificationSlotsNumForBundle(bundle, num); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetNotificationSlotsNumForBundle(bundle, num);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            num = 0;
+        }
+    }));
 
     return result;
 }
