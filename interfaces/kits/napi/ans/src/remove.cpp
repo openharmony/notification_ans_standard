@@ -151,7 +151,7 @@ napi_value Remove(napi_env env, napi_callback_info info)
 
     RemoveParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoRemove *asynccallbackinfo =
@@ -217,7 +217,7 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
 
     RemoveParams params {};
     if (ParseParametersByRemoveAll(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoRemove *asynccallbackinfo =

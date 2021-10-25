@@ -1251,7 +1251,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09800,
     bool allowed = true;
     EXPECT_EQ((int)advancedNotificationService_->IsSpecialBundleAllowedNotify(
                   new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID), allowed),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        (int)ERR_OK);
 }
 
 /**
@@ -1264,7 +1264,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09900,
     std::vector<sptr<NotificationSlot>> slots;
     EXPECT_EQ((int)advancedNotificationService_->GetSlotsByBundle(
                   new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), slots),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        (int)ERR_OK);
 }
 
 inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)

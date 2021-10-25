@@ -23,8 +23,10 @@ const int ACTIVE_OR_NUMS_MAX_PARA = 1;
 struct AsyncCallbackInfoActive {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
-    napi_value result = nullptr;
     CallbackPromiseInfo info;
+    std::vector<sptr<OHOS::Notification::Notification>> notifications;
+    std::vector<sptr<OHOS::Notification::NotificationRequest>> requests;
+    int32_t num = 0;
 };
 
 napi_value ParseParametersByAllActive(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
@@ -67,13 +69,65 @@ napi_value ParseParametersByGetActive(const napi_env &env, const napi_callback_i
     return Common::NapiGetNull(env);
 }
 
+void AsyncCompleteCallbackGetAllActiveNotifications(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("GetAllActiveNotifications napi_create_async_work end");
+
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+
+    AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+    napi_value result = nullptr;
+    if (asynccallbackinfo->info.errorCode != ERR_OK) {
+        result = Common::NapiGetNull(env);
+    } else {
+        napi_value arr = nullptr;
+        int count = 0;
+        napi_create_array(env, &arr);
+        for (auto vec : asynccallbackinfo->notifications) {
+            if (!vec) {
+                ANS_LOGW("Invalid Notification object ptr");
+                continue;
+            }
+            napi_value notificationResult = nullptr;
+            napi_create_object(env, &notificationResult);
+            if (!Common::SetNotification(env, vec.GetRefPtr(), notificationResult)) {
+                ANS_LOGW("Set Notification object failed");
+                continue;
+            }
+            napi_set_element(env, arr, count, notificationResult);
+            count++;
+        }
+        ANS_LOGI("GetAllActiveNotifications count = %{public}d", count);
+        result = arr;
+        if ((count == 0) && (asynccallbackinfo->notifications.size() > 0)) {
+            asynccallbackinfo->info.errorCode = ERROR;
+            result = Common::NapiGetNull(env);
+        }
+    }
+
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
+    }
+}
+
 napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
     if (ParseParametersByAllActive(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoActive *asynccallbackinfo =
@@ -95,52 +149,10 @@ napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
             ANS_LOGI("GetAllActiveNotifications napi_create_async_work start");
             AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
-            std::vector<sptr<OHOS::Notification::Notification>> notifications;
-            asynccallbackinfo->info.errorCode = NotificationHelper::GetAllActiveNotifications(notifications);
-            if (asynccallbackinfo->info.errorCode != ERR_OK) {
-                asynccallbackinfo->result = Common::NapiGetNull(env);
-                return;
-            }
-            napi_value arr = nullptr;
-            int count = 0;
-            napi_create_array(env, &arr);
-            for (auto vec : notifications) {
-                if (!vec) {
-                    ANS_LOGW("Invalid Notification object ptr");
-                    continue;
-                }
-                napi_value result = nullptr;
-                napi_create_object(env, &result);
-                if (!Common::SetNotification(env, vec.GetRefPtr(), result)) {
-                    ANS_LOGW("Set Notification object failed");
-                    continue;
-                }
-                napi_set_element(env, arr, count, result);
-                count++;
-            }
-            ANS_LOGI("GetAllActiveNotifications count = %{public}d", count);
-            asynccallbackinfo->result = arr;
-            if ((count == 0) && (notifications.size() > 0)) {
-                asynccallbackinfo->info.errorCode = ERROR;
-                asynccallbackinfo->result = Common::NapiGetNull(env);
-            }
+            asynccallbackinfo->info.errorCode =
+                NotificationHelper::GetAllActiveNotifications(asynccallbackinfo->notifications);
         },
-        [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("GetAllActiveNotifications napi_create_async_work end");
-            AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, asynccallbackinfo->result);
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
-        },
+        AsyncCompleteCallbackGetAllActiveNotifications,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 
@@ -153,13 +165,64 @@ napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
     }
 }
 
+void AsyncCompleteCallbackGetActiveNotifications(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("GetActiveNotifications napi_create_async_work end");
+
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+
+    AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+    napi_value result = nullptr;
+    if (asynccallbackinfo->info.errorCode != ERR_OK) {
+        result = Common::NapiGetNull(env);
+    } else {
+        napi_value arr = nullptr;
+        int count = 0;
+        napi_create_array(env, &arr);
+        for (auto vec : asynccallbackinfo->requests) {
+            if (!vec) {
+                ANS_LOGW("Invalid NotificationRequest object ptr");
+                continue;
+            }
+            napi_value requestResult = nullptr;
+            napi_create_object(env, &requestResult);
+            if (!Common::SetNotificationRequest(env, vec.GetRefPtr(), requestResult)) {
+                ANS_LOGW("Set NotificationRequest object failed");
+                continue;
+            }
+            napi_set_element(env, arr, count, requestResult);
+            count++;
+        }
+        ANS_LOGI("GetActiveNotifications count = %{public}d", count);
+        result = arr;
+        if ((count == 0) && (asynccallbackinfo->requests.size() > 0)) {
+            asynccallbackinfo->info.errorCode = ERROR;
+            result = Common::NapiGetNull(env);
+        }
+    }
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
+    }
+}
+
 napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
     if (ParseParametersByGetActive(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoActive *asynccallbackinfo =
@@ -181,52 +244,10 @@ napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
             ANS_LOGI("GetActiveNotifications napi_create_async_work start");
             AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
-            std::vector<sptr<OHOS::Notification::NotificationRequest>> requests;
-            asynccallbackinfo->info.errorCode = NotificationHelper::GetActiveNotifications(requests);
-            if (asynccallbackinfo->info.errorCode != ERR_OK) {
-                asynccallbackinfo->result = Common::NapiGetNull(env);
-                return;
-            }
-            napi_value arr = nullptr;
-            int count = 0;
-            napi_create_array(env, &arr);
-            for (auto vec : requests) {
-                if (!vec) {
-                    ANS_LOGW("Invalid NotificationRequest object ptr");
-                    continue;
-                }
-                napi_value result = nullptr;
-                napi_create_object(env, &result);
-                if (!Common::SetNotificationRequest(env, vec.GetRefPtr(), result)) {
-                    ANS_LOGW("Set NotificationRequest object failed");
-                    continue;
-                }
-                napi_set_element(env, arr, count, result);
-                count++;
-            }
-            ANS_LOGI("GetActiveNotifications count = %{public}d", count);
-            asynccallbackinfo->result = arr;
-            if ((count == 0) && (requests.size() > 0)) {
-                asynccallbackinfo->info.errorCode = ERROR;
-                asynccallbackinfo->result = Common::NapiGetNull(env);
-            }
+            asynccallbackinfo->info.errorCode =
+                NotificationHelper::GetActiveNotifications(asynccallbackinfo->requests);
         },
-        [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("GetActiveNotifications napi_create_async_work end");
-            AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, asynccallbackinfo->result);
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
-        },
+        AsyncCompleteCallbackGetActiveNotifications,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 
@@ -239,13 +260,43 @@ napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
     }
 }
 
+void AsyncCompleteCallbackGetActiveNotificationCount(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("GetActiveNotificationCount napi_create_async_work end");
+
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+
+    AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+    napi_value result = nullptr;
+    if (asynccallbackinfo->info.errorCode != ERR_OK) {
+        result = Common::NapiGetNull(env);
+    } else {
+        napi_create_int32(env, asynccallbackinfo->num, &result);
+    }
+
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
+    }
+}
+
 napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
     if (ParseParametersByGetActive(env, info, callback) == nullptr) {
-        return Common::JSParaError(env, callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoActive *asynccallbackinfo =
@@ -267,31 +318,10 @@ napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
             ANS_LOGI("GetActiveNotificationCount napi_create_async_work start");
             AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
-            int32_t num = 0;
-            asynccallbackinfo->info.errorCode = NotificationHelper::GetActiveNotificationNums(num);
-            ANS_LOGI("GetActiveNotificationCount count = %{public}d", num);
-            if (asynccallbackinfo->info.errorCode != ERR_OK) {
-                asynccallbackinfo->result = Common::NapiGetNull(env);
-                return;
-            }
-            napi_create_int32(env, num, &asynccallbackinfo->result);
+            asynccallbackinfo->info.errorCode = NotificationHelper::GetActiveNotificationNums(asynccallbackinfo->num);
+            ANS_LOGI("GetActiveNotificationCount count = %{public}d", asynccallbackinfo->num);
         },
-        [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("GetActiveNotificationCount napi_create_async_work end");
-            AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, asynccallbackinfo->result);
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
-        },
+        AsyncCompleteCallbackGetActiveNotificationCount,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 
