@@ -1453,10 +1453,26 @@ void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleO
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    handler_->PostTask(std::bind([bundleOption]() {
+    handler_->PostTask(std::bind([this, bundleOption]() {
         ErrCode result = NotificationPreferences::GetInstance().RemoveNotificationForBundle(bundleOption);
         if (result != ERR_OK) {
             ANS_LOGW("NotificationPreferences::RemoveNotificationForBundle failed: %{public}d", result);
+        }
+
+        std::vector<std::string> keys = GetNotificationKeys(bundleOption);
+        for (auto key : keys) {
+            sptr<Notification> notification = nullptr;
+            result = RemoveFromNotificationList(key, notification, true);
+            if (result != ERR_OK) {
+                continue;
+            }
+
+            if (notification != nullptr) {
+                int reason = NotificationConstant::PACKAGE_CHANGED_REASON_DELETE;
+                UpdateRecentNotification(notification, true, reason);
+                sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+                NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+            }
         }
     }));
 }
