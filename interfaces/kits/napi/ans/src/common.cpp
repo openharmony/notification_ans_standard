@@ -138,7 +138,7 @@ void Common::ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInf
     if (info.isCallback) {
         SetCallback(env, info.callback, info.errorCode, result);
     } else {
-        SetPromise(env, info.deferred, result);
+        SetPromise(env, info.deferred, info.errorCode, result);
     }
     ANS_LOGI("ReturnCallbackPromise end");
 }
@@ -160,10 +160,15 @@ void Common::SetCallback(
     ANS_LOGI("end");
 }
 
-void Common::SetPromise(const napi_env &env, const napi_deferred &deferred, const napi_value &result)
+void Common::SetPromise(
+    const napi_env &env, const napi_deferred &deferred, const int &errorCode, const napi_value &result)
 {
     ANS_LOGI("enter");
-    napi_resolve_deferred(env, deferred, result);
+    if (errorCode == ERR_OK) {
+        napi_resolve_deferred(env, deferred, result);
+    } else {
+        napi_reject_deferred(env, deferred, GetCallbackErrorValue(env, errorCode));
+    }
     ANS_LOGI("end");
 }
 
@@ -175,7 +180,7 @@ napi_value Common::JSParaError(const napi_env &env, const napi_ref &callback)
         napi_value promise = nullptr;
         napi_deferred deferred = nullptr;
         napi_create_promise(env, &deferred, &promise);
-        SetPromise(env, deferred, Common::NapiGetNull(env));
+        SetPromise(env, deferred, ERROR, Common::NapiGetNull(env));
         return promise;
     }
 }
