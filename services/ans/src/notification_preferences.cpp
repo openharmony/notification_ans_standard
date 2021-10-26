@@ -295,7 +295,7 @@ ErrCode NotificationPreferences::GetNotificationAllSlots(
     if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.GetAllSlots(slots);
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
 
@@ -333,7 +333,7 @@ ErrCode NotificationPreferences::GetNotificationSlotGroup(
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_NOT_EXIST;
         }
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;
@@ -351,7 +351,7 @@ ErrCode NotificationPreferences::GetNotificationAllSlotGroups(
     if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.GetAllGroups(groups);
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;
@@ -369,7 +369,7 @@ ErrCode NotificationPreferences::GetNotificationAllSlotInSlotGroup(const sptr<No
     if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.GetAllSlotsInGroup(groupId, slots);
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;
@@ -608,7 +608,7 @@ ErrCode NotificationPreferences::CheckSlotForRemoveSlot(const sptr<NotificationB
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
         }
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;
@@ -628,7 +628,7 @@ ErrCode NotificationPreferences::CheckGroupForRemoveSlotGroup(const sptr<Notific
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_ID_INVALID;
         }
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;
@@ -655,7 +655,7 @@ ErrCode NotificationPreferences::CheckSlotForUpdateSlot(const sptr<NotificationB
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
         }
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
 
@@ -677,7 +677,7 @@ ErrCode NotificationPreferences::CheckGroupForUpdateSlotGroup(const sptr<Notific
             result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_NOT_EXIST;
         }
     } else {
-        ANS_LOGE("Notification slot is nullptr.");
+        ANS_LOGW("Notification slot is nullptr.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;
@@ -760,7 +760,7 @@ ErrCode NotificationPreferences::GetBundleProperty(
                 break;
         }
     } else {
-        ANS_LOGE("Notification bundle does not exsit.");
+        ANS_LOGW("Notification bundle does not exsit.");
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
     return result;

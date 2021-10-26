@@ -96,7 +96,7 @@ void AnsModuleTest::SetUpTestCase()
 void AnsModuleTest::TearDownTestCase()
 {
     passed = false;
-    g_advancedNotificationService = new AdvancedNotificationService();
+    g_advancedNotificationService = nullptr;
     NotificationPreferences::GetInstance().ClearNotificationInRestoreFactorySettings();
 }
 
@@ -109,7 +109,7 @@ void AnsModuleTest::SetUp()
 
 void AnsModuleTest::TearDown()
 {
-    sptr<AdvancedNotificationService> g_advancedNotificationService = nullptr;
+    g_advancedNotificationService = nullptr;
     NotificationPreferences::GetInstance().ClearNotificationInRestoreFactorySettings();
     passed = false;
 }
@@ -746,14 +746,14 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0033, Function | SmallTest | Level1)
 
     // publish request
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
 /**
  * @tc.number    : AnsModuleTest_0034
  * @tc.name      : AMS_ANS_GetActiveNotifications_03400
- * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
+ * @tc.desc      : Test publish notification when slot type is SOCIAL_COMMUNICATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0034, Function | SmallTest | Level1)
 {
@@ -773,6 +773,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0034, Function | SmallTest | Level1)
     std::vector<sptr<NotificationSlot>> slots;
     sptr<NotificationSlot> slot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     slot->SetEnableVibration(true);
+    slot->SetSound(Uri("/sound/test.mp3"));
     slots.push_back(slot);
     g_advancedNotificationService->AddSlots(slots);
 
@@ -1116,14 +1117,14 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0051, Function | SmallTest | Level1)
 
     std::vector<sptr<NotificationSlot>> slotsRef{};
     g_advancedNotificationService->GetSlots(slotsRef);
-    EXPECT_EQ(5, static_cast<int>(slotsRef.size()));
+    EXPECT_EQ(1, static_cast<int>(slotsRef.size()));
     std::vector<std::string> slotsId{};
     for (const auto &i : slotsRef) {
         slotsId.push_back(i->GetId());
     }
     g_advancedNotificationService->RemoveSlotByType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     g_advancedNotificationService->GetSlots(slotsRef);
-    EXPECT_EQ(9, static_cast<int>(slotsRef.size()));
+    EXPECT_EQ(0, static_cast<int>(slotsRef.size()));
 }
 
 /**
@@ -1148,7 +1149,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0052, Function | SmallTest | Level1)
     g_advancedNotificationService->RemoveSlotByType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     g_advancedNotificationService->RemoveSlotByType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     g_advancedNotificationService->GetSlots(slotsRef);
-    EXPECT_EQ(9, static_cast<int>(slotsRef.size()));
+    EXPECT_EQ(0, static_cast<int>(slotsRef.size()));
 }
 
 /**
@@ -1258,8 +1259,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0058, Function | SmallTest | Level1)
     req->SetBadgeNumber(1);
 
     // SetShowBadgeEnabledForBundle true
-    sptr<NotificationBundleOption> bundleOption;
-    bundleOption->SetBundleName("bundleName");
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption("bundleName", 0);
     g_advancedNotificationService->SetShowBadgeEnabledForBundle(bundleOption, true);
 
     g_advancedNotificationService->Publish(label, req);
@@ -1288,7 +1288,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0060, Function | SmallTest | Level1)
     sptr<NotificationSlot> slot = new NotificationSlot();
     slot->EnableBadge(true);
     slots.push_back(slot);
-    EXPECT_EQ(g_advancedNotificationService->AddSlots(slots), 0);
+    EXPECT_EQ(g_advancedNotificationService->AddSlots(slots), ERR_OK);
 
     // create request
     std::string label = "testLabel";
@@ -1297,15 +1297,20 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0060, Function | SmallTest | Level1)
     req->SetStatusBarText("text");
     req->SetBadgeNumber(1);
 
-    // not allow publish notification
-    g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", false);
-    g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(false, passed);
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption("bundleName", 1);
+    ASSERT_NE(bundleOption, nullptr);
 
-    // allow publish
-    g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", true);
+    // not allow publish notification
+    g_advancedNotificationService->SetNotificationsEnabledForSpecialBundle("", bundleOption, false);
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(true, passed);
+    EXPECT_FALSE(passed);
+
+    passed = false;
+    // allow publish
+    g_advancedNotificationService->SetNotificationsEnabledForSpecialBundle("", bundleOption, true);
+    g_advancedNotificationService->Publish(label, req);
+    EXPECT_TRUE(passed);
+
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1339,16 +1344,20 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0061, Function | SmallTest | Level1)
     req->SetStatusBarText("text");
     req->SetBadgeNumber(1);
 
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption("bundleName", 1);
+    ASSERT_NE(bundleOption, nullptr);
+
     // allow publish notification
-    g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", true);
+    g_advancedNotificationService->SetNotificationsEnabledForSpecialBundle("", bundleOption, true);
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(true, passed);
+    EXPECT_TRUE(passed);
 
     // not allow publish
     passed = false;
-    g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", false);
+    g_advancedNotificationService->SetNotificationsEnabledForSpecialBundle("", bundleOption, false);
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(false, passed);
+    EXPECT_FALSE(passed);
+
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1395,7 +1404,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0062, Function | SmallTest | Level1)
     // publish request
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Publish(label, req1);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1440,7 +1449,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0063, Function | SmallTest | Level1)
     // publish request
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Publish(label, req1);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
 }
 
@@ -1500,7 +1509,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0066, Function | SmallTest | Level1)
 
     // remove request
     g_advancedNotificationService->Delete("1_testLabel_0");
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
 }
 
@@ -1543,7 +1552,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0100, Function | SmallTest | Level1)
 
     // publish request
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(passed, false);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1574,7 +1583,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0101, Function | SmallTest | Level1)
 
     // publish request
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(passed, false);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1605,7 +1614,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0102, Function | SmallTest | Level1)
 
     // publish request
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(passed, false);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1731,7 +1740,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0106, Function | SmallTest | Level1)
 
     // publish request
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(passed, false);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1977,7 +1986,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0113, Function | SmallTest | Level1)
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Publish(label, req1);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
 }
 
 /**
@@ -2036,7 +2045,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0114, Function | SmallTest | Level1)
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Publish(label, req1);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
 }
 
 /**
@@ -2095,7 +2104,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0116, Function | SmallTest | Level1)
     // publish request
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Publish(label, req1);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
 }
 
@@ -2155,7 +2164,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0117, Function | SmallTest | Level1)
     // publish request
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Publish(label, req1);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
 }
 
@@ -2357,18 +2366,18 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0123, Function | SmallTest | Level1)
     req4->SetSlotType(NotificationConstant::SlotType::CUSTOM);
 
     g_advancedNotificationService->Publish("testLabel", req);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, 1);
     g_advancedNotificationService->Publish("testLabel", req1);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, 2);
     g_advancedNotificationService->Publish("testLabel", req2);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, 3);
     g_advancedNotificationService->Publish("testLabel", req3);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, 4);
     g_advancedNotificationService->Publish("testLabel", req4);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, 5);
     g_advancedNotificationService->DeleteAll();
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
 }
 
 /**
@@ -2406,7 +2415,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0124, Function | SmallTest | Level1)
     // publish request
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
 }
 
 /**
@@ -2439,7 +2448,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0125, Function | SmallTest | Level1)
     // publish request
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
 }
 
 /**
@@ -2477,7 +2486,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0126, Function | SmallTest | Level1)
     // publish request
     g_advancedNotificationService->Publish(label, req);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
-    EXPECT_FALSE(passed);
+    EXPECT_TRUE(passed);
 }
 
 /**

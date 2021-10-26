@@ -179,7 +179,21 @@ napi_value GetCallbackErrorResult(napi_env env, int errCode);
 napi_value NapiGetNull(napi_env env);
 
 void DeleteRecordByCode(const int32_t code);
-static std::map<AsyncGetWantAgentCallbackInfo *, const int32_t> g_WantAgentMap;
+static std::unique_ptr<std::map<AsyncGetWantAgentCallbackInfo *, const int32_t>,
+    std::function<void(std::map<AsyncGetWantAgentCallbackInfo *, const int32_t> *)>>
+    g_WantAgentMap(new std::map<AsyncGetWantAgentCallbackInfo *, const int32_t>,
+        [](std::map<AsyncGetWantAgentCallbackInfo *, const int32_t> *map) {
+            if (map == nullptr) {
+                return;
+            }
+            for (auto &item : *map) {
+                if (item.first != nullptr) {
+                    delete item.first;
+                }
+            }
+            map->clear();
+            delete map;
+        });
 static std::recursive_mutex g_mutex;
 }  // namespace OHOS
 #endif  // NAPI_WANT_AGENT_H

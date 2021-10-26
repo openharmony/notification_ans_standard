@@ -70,7 +70,7 @@ napi_value SetDoNotDisturbMode(napi_env env, napi_callback_info info)
 
     DisturbModeParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
-        return Common::JSParaError(env, params.callback);
+        return Common::NapiGetUndefined(env);
     }
 
     AsyncCallbackInfoDisturbMode *asynccallbackinfo =

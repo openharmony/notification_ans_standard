@@ -132,7 +132,8 @@ public:
     static void SetCallback(
         const napi_env &env, const napi_ref &callbackIn, const int &errorCode, const napi_value &result);
 
-    static void SetPromise(const napi_env &env, const napi_deferred &deferred, const napi_value &result);
+    static void SetPromise(
+        const napi_env &env, const napi_deferred &deferred, const int &errorCode, const napi_value &result);
 
     static napi_value JSParaError(const napi_env &env, const napi_ref &callback);
 

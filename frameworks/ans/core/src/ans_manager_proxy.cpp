@@ -354,10 +354,12 @@ ErrCode AnsManagerProxy::GetSlotByType(const NotificationConstant::SlotType &slo
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    slot = reply.ReadParcelable<NotificationSlot>();
-    if (slot == nullptr) {
-        ANS_LOGW("[GetSlotByType] fail: read slot failed");
-        return ERR_ANS_PARCELABLE_FAILED;
+    if (result == ERR_OK) {
+        slot = reply.ReadParcelable<NotificationSlot>();
+        if (slot == nullptr) {
+            ANS_LOGW("[GetSlotByType] fail: read slot failed");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
     }
 
     return result;
@@ -418,10 +420,12 @@ ErrCode AnsManagerProxy::GetSlotGroup(const std::string &groupId, sptr<Notificat
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    group = reply.ReadParcelable<NotificationSlotGroup>();
-    if (group == nullptr) {
-        ANS_LOGW("[GetSlotGroup] fail: read group failed");
-        return ERR_ANS_PARCELABLE_FAILED;
+    if (result == ERR_OK) {
+        group = reply.ReadParcelable<NotificationSlotGroup>();
+        if (group == nullptr) {
+            ANS_LOGW("[GetSlotGroup] fail: read group failed");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
     }
 
     return result;

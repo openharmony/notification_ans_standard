@@ -175,7 +175,7 @@ private:
     bool isHiddenNotification_ {};
     std::string groupKeyOverride_ {};
     int32_t visiblenessOverride_ {};
-    sptr<NotificationSlot> slot_ {nullptr};
+    sptr<NotificationSlot> slot_ = new NotificationSlot(NotificationConstant::SlotType::OTHER);
 
     friend class AdvancedNotificationService;
 };
