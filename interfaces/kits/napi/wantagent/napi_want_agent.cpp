@@ -25,6 +25,13 @@
 #include "want_agent_helper.h"
 
 namespace OHOS {
+#define NAPI_ASSERT_RETURN_NULL(env, assertion, message)    \
+do {                                                        \
+    if (!(assertion)) {                                     \
+        HILOG_INFO(message);                                \
+        return nullptr;                                     \
+    }                                                       \
+} while (0)
 constexpr int32_t BUSINESS_ERROR_CODE_OK = 0;
 
 TriggerCompleteCallBack::TriggerCompleteCallBack()
@@ -306,7 +313,7 @@ napi_value NAPI_GetBundleName(napi_env env, napi_callback_info info)
 
     napi_valuetype wantAgentType = napi_valuetype::napi_null;
     napi_typeof(env, argv[0], &wantAgentType);
-    NAPI_ASSERT(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT_RETURN_NULL(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
 
     Notification::WantAgent::WantAgent *pWantAgent = nullptr;
     napi_unwrap(env, argv[0], (void **)&(pWantAgent));
@@ -319,7 +326,7 @@ napi_value NAPI_GetBundleName(napi_env env, napi_callback_info info)
     if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype = napi_valuetype::napi_null;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
     AsyncGetBundleNameCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetBundleNameCallbackInfo{
@@ -431,7 +438,7 @@ napi_value NAPI_GetUid(napi_env env, napi_callback_info info)
 
     napi_valuetype wantAgentType = napi_valuetype::napi_null;
     napi_typeof(env, argv[0], &wantAgentType);
-    NAPI_ASSERT(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT_RETURN_NULL(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
 
     Notification::WantAgent::WantAgent *pWantAgent = nullptr;
     napi_unwrap(env, argv[0], (void **)&(pWantAgent));
@@ -443,7 +450,7 @@ napi_value NAPI_GetUid(napi_env env, napi_callback_info info)
     if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype = napi_valuetype::napi_null;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
     AsyncGetUidCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetUidCallbackInfo{
@@ -553,7 +560,7 @@ napi_value NAPI_GetWant(napi_env env, napi_callback_info info)
 
     napi_valuetype wantAgentType = napi_valuetype::napi_null;
     napi_typeof(env, argv[0], &wantAgentType);
-    NAPI_ASSERT(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT_RETURN_NULL(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
 
     Notification::WantAgent::WantAgent *pWantAgent = nullptr;
     napi_unwrap(env, argv[0], (void **)&(pWantAgent));
@@ -565,7 +572,7 @@ napi_value NAPI_GetWant(napi_env env, napi_callback_info info)
     if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype = napi_valuetype::napi_null;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
     AsyncGetWantCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetWantCallbackInfo{
@@ -693,7 +700,7 @@ napi_value NAPI_Cancel(napi_env env, napi_callback_info info)
 
     napi_valuetype wantAgentType = napi_valuetype::napi_null;
     napi_typeof(env, argv[0], &wantAgentType);
-    NAPI_ASSERT(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT_RETURN_NULL(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
 
     Notification::WantAgent::WantAgent *pWantAgent = nullptr;
     napi_unwrap(env, argv[0], (void **)&(pWantAgent));
@@ -705,7 +712,7 @@ napi_value NAPI_Cancel(napi_env env, napi_callback_info info)
     if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype = napi_valuetype::napi_null;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
     AsyncCancelCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncCancelCallbackInfo{
@@ -778,7 +785,7 @@ napi_value NAPI_GetTriggerInfo(napi_value argv[NUMBER_OF_PARAMETERS_THREE], uint
     napi_value jsTriggerInfo = argv[1];
     napi_valuetype valueType = napi_valuetype::napi_null;
     NAPI_CALL(env, napi_typeof(env, jsTriggerInfo, &valueType));
-    NAPI_ASSERT(env, valueType == napi_object, "param type mismatch!");
+    NAPI_ASSERT_RETURN_NULL(env, valueType == napi_object, "param type mismatch!");
 
     // Get triggerInfo code
     int32_t code = -1;
@@ -823,7 +830,7 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
 
     napi_valuetype wantAgentType = napi_valuetype::napi_null;
     napi_typeof(env, argv[0], &wantAgentType);
-    NAPI_ASSERT(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT_RETURN_NULL(env, wantAgentType == napi_object, "Wrong argument type. Object expected.");
 
     Notification::WantAgent::WantAgent *pWantAgent = nullptr;
     napi_unwrap(env, argv[0], (void **)&(pWantAgent));
@@ -844,7 +851,7 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
     if (argc >= NUMBER_OF_PARAMETERS_THREE) {
         napi_valuetype valuetype;
         NAPI_CALL(env, napi_typeof(env, argv[NUMBER_OF_PARAMETERS_TWO], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
 
@@ -969,7 +976,7 @@ napi_value NAPI_Equal(napi_env env, napi_callback_info info)
 
     napi_valuetype wantAgentFirstType = napi_valuetype::napi_null;
     napi_typeof(env, argv[0], &wantAgentFirstType);
-    NAPI_ASSERT(env, wantAgentFirstType == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT_RETURN_NULL(env, wantAgentFirstType == napi_object, "Wrong argument type. Object expected.");
 
     Notification::WantAgent::WantAgent *pWantAgentFirst = nullptr;
     napi_unwrap(env, argv[0], (void **)&(pWantAgentFirst));
@@ -979,7 +986,7 @@ napi_value NAPI_Equal(napi_env env, napi_callback_info info)
 
     napi_valuetype wantAgentSecondType = napi_valuetype::napi_null;
     napi_typeof(env, argv[1], &wantAgentSecondType);
-    NAPI_ASSERT(env, wantAgentSecondType == napi_object, "Wrong argument type. Object expected.");
+    NAPI_ASSERT_RETURN_NULL(env, wantAgentSecondType == napi_object, "Wrong argument type. Object expected.");
 
     Notification::WantAgent::WantAgent *pWantAgentSecond = nullptr;
     napi_unwrap(env, argv[1], (void **)&(pWantAgentSecond));
@@ -991,7 +998,7 @@ napi_value NAPI_Equal(napi_env env, napi_callback_info info)
     if (argc >= NUMBER_OF_PARAMETERS_THREE) {
         napi_valuetype valuetype = napi_valuetype::napi_null;
         NAPI_CALL(env, napi_typeof(env, argv[NUMBER_OF_PARAMETERS_TWO], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
     AsyncEqualCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncEqualCallbackInfo{
@@ -1148,7 +1155,7 @@ napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo, cons
 {
     napi_valuetype jsWantAgentInfoType = napi_valuetype::napi_null;
     NAPI_CALL(env, napi_typeof(env, jsWantAgentInfo, &jsWantAgentInfoType));
-    NAPI_ASSERT(env, jsWantAgentInfoType == napi_object, "param type mismatch!");
+    NAPI_ASSERT_RETURN_NULL(env, jsWantAgentInfoType == napi_object, "param type mismatch!");
 
     napi_value jsWants = GetPropertyValueByPropertyName(env, jsWantAgentInfo, "wants", napi_object);
     bool isArray = false;
@@ -1187,7 +1194,7 @@ napi_value NAPI_GetWantAgentWants(napi_env env, napi_value jsWantAgentInfo, cons
             napi_get_element(env, JsWantAgentFlags, i, &napiWantAgentFlags);
             napi_valuetype valuetype0 = napi_valuetype::napi_null;
             NAPI_CALL(env, napi_typeof(env, napiWantAgentFlags, &valuetype0));
-            NAPI_ASSERT(env, valuetype0 == napi_number, "Wrong argument type. Numbers expected.");
+            NAPI_ASSERT_RETURN_NULL(env, valuetype0 == napi_number, "Wrong argument type. Numbers expected.");
             int32_t value0 = 0;
             NAPI_CALL(env, napi_get_value_int32(env, napiWantAgentFlags, &value0));
             paras.wantAgentFlags.emplace_back(static_cast<Notification::WantAgent::WantAgentConstant::Flags>(value0));
@@ -1242,7 +1249,7 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
     if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
 
