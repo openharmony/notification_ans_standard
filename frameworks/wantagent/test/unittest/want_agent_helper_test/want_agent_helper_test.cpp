@@ -506,9 +506,8 @@ HWTEST_F(WantAgentHelperTest, WantAgentHelper_2200, Function | MediumTest | Leve
 HWTEST_F(WantAgentHelperTest, WantAgentHelper_2300, Function | MediumTest | Level1)
 {
     std::shared_ptr<WantAgentHelper> wantAgentHelper = std::make_shared<WantAgentHelper>();
-    sptr<IWantSender> target(new (std::nothrow) WantSender());
-    std::shared_ptr<PendingWant> pendingWant = std::make_shared<PendingWant>(target);
-    std::shared_ptr<WantAgent> wantAgent = std::make_shared<WantAgent>(pendingWant);
+    WantAgentInfo wantAgentInfo;
+    auto wantAgent = wantAgentHelper->GetWantAgent(nullptr, wantAgentInfo);
     auto type = wantAgentHelper->GetType(wantAgent);
     EXPECT_EQ(type, WantAgentConstant::OperationType::UNKNOWN_TYPE);
 }
