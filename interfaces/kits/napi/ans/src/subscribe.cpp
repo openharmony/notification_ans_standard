@@ -232,6 +232,38 @@ void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::No
 void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request)
 {}
 
+void UvQueueWorkOnConsumed(uv_work_t *work, int status)
+{
+    ANS_LOGI("OnConsumed uv_work_t start");
+
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        return;
+    }
+    napi_value result = nullptr;
+    napi_create_object(dataWorkerData->env, &result);
+    if (!SetSubscribeCallbackData(dataWorkerData->env,
+        dataWorkerData->request,
+        dataWorkerData->sortingMap,
+        NO_DELETE_REASON,
+        result)) {
+        ANS_LOGE("Failed to convert data to JS");
+    } else {
+        Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
+    }
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
 void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request,
     const std::shared_ptr<NotificationSortingMap> &sortingMap)
 {
@@ -283,36 +315,35 @@ void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::No
     uv_queue_work(loop,
         work,
         [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnConsumed uv_work_t start");
+        UvQueueWorkOnConsumed);
+}
 
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
+void UvQueueWorkOnUpdate(uv_work_t *work, int status)
+{
+    ANS_LOGI("OnUpdate uv_work_t start");
 
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                return;
-            }
-            napi_value result = nullptr;
-            napi_create_object(dataWorkerData->env, &result);
-            if (!SetSubscribeCallbackData(dataWorkerData->env,
-                dataWorkerData->request,
-                dataWorkerData->sortingMap,
-                NO_DELETE_REASON,
-                result)) {
-                ANS_LOGE("Failed to convert data to JS");
-            } else {
-                Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
-            }
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
 
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        return;
+    }
+    napi_value result = nullptr;
+    napi_create_object(dataWorkerData->env, &result);
+    if (!Common::SetNotificationSortingMap(dataWorkerData->env, dataWorkerData->sortingMap, result)) {
+        ANS_LOGE("Failed to convert data to JS");
+    } else {
+        Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
+    }
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
 }
 
 void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap)
@@ -358,32 +389,7 @@ void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> 
     uv_queue_work(loop,
         work,
         [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnUpdate uv_work_t start");
-
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
-
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                return;
-            }
-            napi_value result = nullptr;
-            napi_create_object(dataWorkerData->env, &result);
-            if (!Common::SetNotificationSortingMap(dataWorkerData->env, dataWorkerData->sortingMap, result)) {
-                ANS_LOGE("Failed to convert data to JS");
-            } else {
-                Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
-            }
-
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
+        UvQueueWorkOnUpdate);
 }
 
 void SubscriberInstance::OnConnected()
