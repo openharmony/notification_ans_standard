@@ -961,8 +961,13 @@ ErrCode AdvancedNotificationService::GetShowBadgeEnabledForBundle(
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().IsShowBadge(bundle, enabled); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().IsShowBadge(bundle, enabled);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            enabled = false;
+        }
+    }));
     return result;
 }
 
@@ -1045,11 +1050,11 @@ ErrCode AdvancedNotificationService::Unsubscribe(
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (subscriber == nullptr) {
-        ANS_LOGE("Client is not a system app");
         return ERR_ANS_INVALID_PARAM;
     }
 
     if (!IsSystemApp()) {
+        ANS_LOGE("Client is not a system app");
         return ERR_ANS_NON_SYSTEM_APP;
     }
 

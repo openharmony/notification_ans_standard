@@ -35,16 +35,16 @@ class TestAnsSubscriber : public NotificationSubscriber {
 public:
     ~TestAnsSubscriber(){};
 
-    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnConnected() override
     {
         if (subscriberCb_ != nullptr) {
-            subscriberCb_(result);
+            subscriberCb_();
         }
     }
-    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnDisconnected() override
     {
         if (unSubscriberCb_ != nullptr) {
-            unSubscriberCb_(result);
+            unSubscriberCb_();
         }
     }
     void OnDied() override
@@ -74,8 +74,8 @@ public:
 
     ConsumedFunc consumedCb_ = nullptr;
     CanceledFunc canceledCb_ = nullptr;
-    std::function<void(NotificationConstant::SubscribeResult)> unSubscriberCb_ = nullptr;
-    std::function<void(NotificationConstant::SubscribeResult)> subscriberCb_ = nullptr;
+    std::function<void()> unSubscriberCb_ = nullptr;
+    std::function<void()> subscriberCb_ = nullptr;
 };
 
 class AnsModuleTest : public testing::Test {
@@ -1465,7 +1465,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0064, Function | SmallTest | Level1)
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->unSubscriberCb_ = [](NotificationConstant::SubscribeResult) { passed = true; };
+    subscriber->unSubscriberCb_ = []() { passed = true; };
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
     EXPECT_TRUE(passed);
 }
@@ -1480,7 +1480,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0065, Function | SmallTest | Level1)
     // subscriber
     auto subscriber = new TestAnsSubscriber();
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
-    subscriber->unSubscriberCb_ = [](NotificationConstant::SubscribeResult) { passed = true; };
+    subscriber->unSubscriberCb_ = []() { passed = true; };
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
     EXPECT_TRUE(passed);
 }
@@ -1848,7 +1848,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0110, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
-    subscriber->unSubscriberCb_ = [](NotificationConstant::SubscribeResult) { passed = true; };
+    subscriber->unSubscriberCb_ = []() { passed = true; };
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
 
     // unsubscriber
@@ -1867,7 +1867,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0111, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
-    subscriber->subscriberCb_ = [](NotificationConstant::SubscribeResult) { passed = true; };
+    subscriber->subscriberCb_ = []() { passed = true; };
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
     EXPECT_EQ(passed, true);

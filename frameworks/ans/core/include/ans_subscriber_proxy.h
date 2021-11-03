@@ -29,8 +29,8 @@ public:
     ~AnsSubscriberProxy() override;
     DISALLOW_COPY_AND_MOVE(AnsSubscriberProxy);
 
-    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override;
-    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override;
+    void OnConnected() override;
+    void OnDisconnected() override;
     void OnConsumed(const sptr<Notification> &notification) override;
     void OnConsumed(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap) override;

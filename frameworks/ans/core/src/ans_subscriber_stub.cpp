@@ -28,10 +28,10 @@ namespace OHOS {
 namespace Notification {
 AnsSubscriberStub::AnsSubscriberStub()
 {
-    interfaces_.emplace(ON_SUBSCRIBE,
-        std::bind(&AnsSubscriberStub::HandleOnSubscribe, this, std::placeholders::_1, std::placeholders::_2));
-    interfaces_.emplace(ON_UNSUBSCRIBE,
-        std::bind(&AnsSubscriberStub::HandleOnUnsubscribe, this, std::placeholders::_1, std::placeholders::_2));
+    interfaces_.emplace(ON_CONNECTED,
+        std::bind(&AnsSubscriberStub::HandleOnConnected, this, std::placeholders::_1, std::placeholders::_2));
+    interfaces_.emplace(ON_DISCONNECTED,
+        std::bind(&AnsSubscriberStub::HandleOnDisconnected, this, std::placeholders::_1, std::placeholders::_2));
     interfaces_.emplace(ON_CONSUMED,
         std::bind(&AnsSubscriberStub::HandleOnConsumed, this, std::placeholders::_1, std::placeholders::_2));
     interfaces_.emplace(ON_CONSUMED_MAP,
@@ -75,19 +75,15 @@ int32_t AnsSubscriberStub::OnRemoteRequest(
     return NO_ERROR;
 }
 
-ErrCode AnsSubscriberStub::HandleOnSubscribe(MessageParcel &data, MessageParcel &reply)
+ErrCode AnsSubscriberStub::HandleOnConnected(MessageParcel &data, MessageParcel &reply)
 {
-    NotificationConstant::SubscribeResult result =
-        static_cast<NotificationConstant::SubscribeResult>(data.ReadUint32());
-    OnSubscribeResult(result);
+    OnConnected();
     return ERR_OK;
 }
 
-ErrCode AnsSubscriberStub::HandleOnUnsubscribe(MessageParcel &data, MessageParcel &reply)
+ErrCode AnsSubscriberStub::HandleOnDisconnected(MessageParcel &data, MessageParcel &reply)
 {
-    NotificationConstant::SubscribeResult result =
-        static_cast<NotificationConstant::SubscribeResult>(data.ReadUint32());
-    OnUnsubscribeResult(result);
+    OnDisconnected();
     return ERR_OK;
 }
 
@@ -194,10 +190,10 @@ ErrCode AnsSubscriberStub::HandleOnDisturbModeChanged(MessageParcel &data, Messa
     return ERR_OK;
 }
 
-void AnsSubscriberStub::OnSubscribeResult(NotificationConstant::SubscribeResult result)
+void AnsSubscriberStub::OnConnected()
 {}
 
-void AnsSubscriberStub::OnUnsubscribeResult(NotificationConstant::SubscribeResult result)
+void AnsSubscriberStub::OnDisconnected()
 {}
 
 void AnsSubscriberStub::OnConsumed(const sptr<Notification> &notification)

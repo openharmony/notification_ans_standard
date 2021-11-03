@@ -36,9 +36,9 @@ public:
 private:
     class TestAnsSubscriber : public NotificationSubscriber {
     public:
-        void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+        void OnConnected() override
         {}
-        void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+        void OnDisconnected() override
         {}
         void OnDied() override
         {}

@@ -34,8 +34,8 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Notification.IAnsSubscriber");
 
-    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) = 0;
-    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) = 0;
+    virtual void OnConnected() = 0;
+    virtual void OnDisconnected() = 0;
     virtual void OnConsumed(const sptr<Notification> &notification) = 0;
     virtual void OnConsumed(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap) = 0;
@@ -47,8 +47,8 @@ public:
 
 protected:
     enum TransactId : uint32_t {
-        ON_SUBSCRIBE = FIRST_CALL_TRANSACTION,
-        ON_UNSUBSCRIBE,
+        ON_CONNECTED = FIRST_CALL_TRANSACTION,
+        ON_DISCONNECTED,
         ON_CONSUMED,
         ON_CONSUMED_MAP,
         ON_CANCELED,

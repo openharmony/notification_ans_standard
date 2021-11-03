@@ -77,7 +77,7 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     return Common::NapiGetNull(env);
 }
 
-napi_value ParseParametersByCancelAll(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
+napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
 {
     ANS_LOGI("enter");
 
@@ -159,7 +159,7 @@ napi_value CancelAll(napi_env env, napi_callback_info info)
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
-    if (ParseParametersByCancelAll(env, info, callback) == nullptr) {
+    if (ParseParameters(env, info, callback) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
 

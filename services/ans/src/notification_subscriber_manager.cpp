@@ -53,13 +53,12 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
         return ERR_ANS_INVALID_PARAM;
     }
 
-    AppExecFwk::EventHandler::Callback addSubscriberFunc =
-        std::bind(&NotificationSubscriberManager::AddSubscriberInner, this, subscriber, subscribeInfo);
-
-    if (!handler_->PostTask(addSubscriberFunc, AppExecFwk::EventQueue::Priority::HIGH)) {
-        return ERR_ANS_TASK_ERR;
-    }
-    return ERR_OK;
+    ErrCode result = ERR_ANS_TASK_ERR;
+    handler_->PostSyncTask(std::bind([this, &subscriber, &subscribeInfo, &result]() {
+        result = this->AddSubscriberInner(subscriber, subscribeInfo);
+    }),
+        AppExecFwk::EventQueue::Priority::HIGH);
+    return result;
 }
 
 ErrCode NotificationSubscriberManager::RemoveSubscriber(
@@ -70,13 +69,12 @@ ErrCode NotificationSubscriberManager::RemoveSubscriber(
         return ERR_ANS_INVALID_PARAM;
     }
 
-    AppExecFwk::EventHandler::Callback removeSubscriberFunc =
-        std::bind(&NotificationSubscriberManager::RemoveSubscriberInner, this, subscriber, subscribeInfo);
-
-    if (!handler_->PostTask(removeSubscriberFunc, AppExecFwk::EventQueue::Priority::HIGH)) {
-        return ERR_ANS_TASK_ERR;
-    }
-    return ERR_OK;
+    ErrCode result = ERR_ANS_TASK_ERR;
+    handler_->PostSyncTask(std::bind([this, &subscriber, &subscribeInfo, &result]() {
+        result = this->RemoveSubscriberInner(subscriber, subscribeInfo);
+    }),
+        AppExecFwk::EventQueue::Priority::HIGH);
+    return result;
 }
 
 void NotificationSubscriberManager::NotifyConsumed(
@@ -214,7 +212,7 @@ void NotificationSubscriberManager::RemoveRecordInfo(
     }
 }
 
-void NotificationSubscriberManager::AddSubscriberInner(
+ErrCode NotificationSubscriberManager::AddSubscriberInner(
     const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
 {
     std::shared_ptr<SubscriberRecord> record = FindSubscriberRecord(subscriber);
@@ -223,31 +221,29 @@ void NotificationSubscriberManager::AddSubscriberInner(
         record = CreateSubscriberRecord(subscriber);
         if (record == nullptr) {
             ANS_LOGE("CreateSubscriberRecord failed.");
-            subscriber->OnSubscribeResult(NotificationConstant::RESOURCES_FAIL);
-            return;
+            return ERR_ANS_NO_MEMORY;
         }
         subscriberRecordList_.push_back(record);
 
         record->subscriber->AsObject()->AddDeathRecipient(recipient_);
 
-        record->subscriber->OnSubscribeResult(NotificationConstant::SUCCESS);
+        record->subscriber->OnConnected();
         ANS_LOGI("subscriber is connected.");
     }
 
     AddRecordInfo(record, subscribeInfo);
 
-    return;
+    return ERR_OK;
 }
 
-void NotificationSubscriberManager::RemoveSubscriberInner(
+ErrCode NotificationSubscriberManager::RemoveSubscriberInner(
     const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
 {
     std::shared_ptr<SubscriberRecord> record = FindSubscriberRecord(subscriber);
 
     if (record == nullptr) {
         ANS_LOGE("subscriber not found.");
-        subscriber->OnUnsubscribeResult(NotificationConstant::SUCCESS);
-        return;
+        return ERR_ANS_INVALID_PARAM;
     }
 
     RemoveRecordInfo(record, subscribeInfo);
@@ -257,11 +253,11 @@ void NotificationSubscriberManager::RemoveSubscriberInner(
 
         subscriberRecordList_.remove(record);
 
-        record->subscriber->OnUnsubscribeResult(NotificationConstant::SUCCESS);
+        record->subscriber->OnDisconnected();
         ANS_LOGI("subscriber is disconnected.");
     }
 
-    return;
+    return ERR_OK;
 }
 
 void NotificationSubscriberManager::NotifyConsumedInner(

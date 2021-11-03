@@ -57,9 +57,9 @@ private:
     void AddRecordInfo(std::shared_ptr<SubscriberRecord> &record, const sptr<NotificationSubscribeInfo> &subscribeInfo);
     void RemoveRecordInfo(
         std::shared_ptr<SubscriberRecord> &record, const sptr<NotificationSubscribeInfo> &subscribeInfo);
-    void AddSubscriberInner(
+    ErrCode AddSubscriberInner(
         const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
-    void RemoveSubscriberInner(
+    ErrCode RemoveSubscriberInner(
         const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
 
     void NotifyConsumedInner(
