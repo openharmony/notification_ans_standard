@@ -141,6 +141,37 @@ SubscriberInstance::~SubscriberInstance()
 void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request)
 {}
 
+void UvQueueWorkOnCanceled(uv_work_t *work, int status) {
+    ANS_LOGI("OnCanceled uv_work_t start");
+
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        return;
+    }
+    napi_value result = nullptr;
+    napi_create_object(dataWorkerData->env, &result);
+    if (!SetSubscribeCallbackData(dataWorkerData->env,
+        dataWorkerData->request,
+        dataWorkerData->sortingMap,
+        dataWorkerData->deleteReason,
+        result)) {
+        ANS_LOGE("Failed to convert data to JS");
+    } else {
+        Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
+    }
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
 void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request,
     const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason)
 {
@@ -194,36 +225,7 @@ void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::No
     uv_queue_work(loop,
         work,
         [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnCanceled uv_work_t start");
-
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
-
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                return;
-            }
-            napi_value result = nullptr;
-            napi_create_object(dataWorkerData->env, &result);
-            if (!SetSubscribeCallbackData(dataWorkerData->env,
-                dataWorkerData->request,
-                dataWorkerData->sortingMap,
-                dataWorkerData->deleteReason,
-                result)) {
-                ANS_LOGE("Failed to convert data to JS");
-            } else {
-                Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
-            }
-
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
+        UvQueueWorkOnCanceled);
 }
 
 void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request)
