@@ -141,7 +141,8 @@ SubscriberInstance::~SubscriberInstance()
 void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request)
 {}
 
-void UvQueueWorkOnCanceled(uv_work_t *work, int status) {
+void UvQueueWorkOnCanceled(uv_work_t *work, int status)
+{
     ANS_LOGI("OnCanceled uv_work_t start");
 
     if (work == nullptr) {
