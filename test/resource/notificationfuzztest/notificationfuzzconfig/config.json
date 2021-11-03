@@ -1,0 +1,153 @@
+{
+    "flag": 10,
+    "NotificationSubscriber": {
+        "OnCanceledNotification": [],
+        "OnCanceledNotificationNotificationSortingMapint": [],
+        "OnSubscribeResult": [],
+        "OnConsumedNotification": [],
+        "OnConsumedNotificationNotificationSortingMap": [],
+        "OnUnsubscribeResultNotificationConstantSubscribeResult": [],
+        "OnUpdate": [],
+        "OnDied": []
+    },
+    "NotificationSubscribeInfo": {
+        "AddAppName": [],
+        "AddAppNames": [],
+        "GetAppNames": []
+    },
+    "NotificationSorting": {
+        "GetRanking": [],
+        "GetKey": [],
+        "GetImportance": [],
+        "GetSlot": [],
+        "GetVisiblenessOverride": [],
+        "IsDisplayBadge": [],
+        "IsHiddenNotification": [],
+        "GetGroupKeyOverride": []
+    },
+    "NotificationSortingMap": {
+        "GetKey": [],
+        "GetNotificationSorting": []
+    },
+    "NotificationHelper": {
+        "AddNotificationSlot": [],
+        "AddSlotByType": [],
+        "AddNotificationSlots": [],
+        "RemoveNotificationSlot": [],
+        "RemoveAllSlots": [],
+        "GetNotificationSlot": [],
+        "GetNotificationSlots": [],
+        "AddNotificationSlotGroup": [],
+        "AddNotificationSlotGroups": [],
+        "RemoveNotificationSlotGroup": [],
+        "GetNotificationSlotGroup": [],
+        "GetNotificationSlotGroups": [],
+        "GetNotificationSlotNumAsBundle": [],
+        "PublishNotificationNotificationRequest": [],
+        "PublishNotificationstringNotificationRequest": [],
+        "PublishNotificationNotificationRequeststring": [],
+        "CancelNotificationint32_t": [],
+        "CancelNotificationstringint32_t": [],
+        "CancelAllNotifications": [],
+        "GetActiveNotificationNums": [],
+        "GetActiveNotifications": [],
+        "GetCurrentAppSorting": [],
+        "SetNotificationAgent": [],
+        "GetNotificationAgent": [],
+        "CanPublishNotificationAsBundle": [],
+        "PublishNotificationAsBundle": [],
+        "SetNotificationBadgeNum": [],
+        "SetNotificationBadgeNumint32_t": [],
+        "IsAllowedNotifybool": [],
+        "AreNotificationsSuspended": [],
+        "HasNotificationPolicyAccessPermission": [],
+        "GetBundleImportance": [],
+        "SubscribeNotificationNotificationSubscriber": [],
+        "SubscribeNotificationNotificationSubscriberNotificationSubscribeInfo": [],
+        "UnSubscribeNotificationNotificationSubscriber": [],
+        "UnSubscribeNotificationNotificationSubscriberNotificationSubscribeInfo": [],
+        "RemoveNotificationstring": [],
+        "RemoveNotificationNotificationBundleOptionint32_tstring": [],
+        "RemoveAllNotifications": [],
+        "RemoveNotificationsByBundle": [],
+        "RemoveNotifications": [],
+        "GetNotificationSlotsForBundle": [],
+        "UpdateNotificationSlots": [],
+        "UpdateNotificationSlotGroups": [],
+        "GetAllActiveNotificationsNotification": [],
+        "GetAllActiveNotificationsstringNotification": [],
+        "IsAllowedNotify": [],
+        "SetNotificationsEnabledForAllBundles": [],
+        "SetNotificationsEnabledForDefaultBundle": [],
+        "SetNotificationsEnabledForSpecifiedBundle": [],
+        "SetShowBadgeEnabledForBundle": [],
+        "GetShowBadgeEnabledForBundle": [],
+        "GetShowBadgeEnabled": [],
+        "SetDisturbMode": [],
+        "GetDisturbMode": []
+    },
+    "WantAgentHelper": {
+        "GetWantAgentOHOSAppExecFwkContextWantAgentInfo": [],
+        "GetWantAgentWantAgentInfo": [],
+        "GetType": [],
+        "TriggerWantAgent": [],
+        "Cancel": [],
+        "JudgeEquality": [],
+        "GetHashCode": [],
+        "GetBundleName": [],
+        "GetUid": [],
+        "GetWant": [],
+        "RegisterCancelListener": [],
+        "UnregisterCancelListener": []
+    },
+    "LauncherService": {
+        "GetAbilityList": [],
+        "GetAbilityInfo": [],
+        "GetApplicationInfo": [],
+        "IsBundleEnabled": [],
+        "IsAbilityEnabled": [],
+        "GetShortcutInfos": [],
+        "RegisterCallback": [],
+        "UnRegisterCallback": []
+    },
+    "IAbilityContinuation": {
+        "OnStartContinuation": [],
+        "OnSaveData": [],
+        "OnRestoreData": [],
+        "OnCompleteContinuation": []
+    },
+    "Ability": {
+        "StartAbility": [],
+        "OnRequestPermissionsFromUserResult": []
+    },
+    "AbilityContext": {
+        "StartAbility": []
+    },
+    "Context": {
+        "VerifyPermission": [],
+        "VerifyCallingPermission": [],
+        "VerifySelfPermission": [],
+        "VerifyCallingOrSelfPermission": [],
+        "CanRequestPermission": [],
+        "RequestPermissionsFromUser": [],
+        "MoveMissionToEnd": [],
+        "SetMissionInformation": [],
+        "LockMission": [],
+        "UnlockMission": [],
+        "GetMissionId": [],
+        "GetUITaskDispatcher": [],
+        "GetMainTaskDispatcher": [],
+        "CreateParallelTaskDispatcher": [],
+        "CreateSerialTaskDispatcher": [],
+        "GetGlobalTaskDispatcher": []
+    },
+    "AbilityLifecycleCallbacks": {
+        "OnAbilityActive": []
+    },
+    "IAbilityManager": {
+        "MoveMissionToEnd": [],
+        "IsFirstInMission": [],
+        "PowerOn": [],
+        "PowerOff": []
+    }
+}

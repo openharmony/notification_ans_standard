@@ -31,8 +31,8 @@ public:
     virtual int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
-    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override;
-    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override;
+    void OnConnected() override;
+    void OnDisconnected() override;
     void OnConsumed(const sptr<Notification> &notification) override;
     void OnConsumed(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap) override;
@@ -45,8 +45,8 @@ public:
 private:
     std::map<uint32_t, std::function<ErrCode(MessageParcel &, MessageParcel &)>> interfaces_;
 
-    ErrCode HandleOnSubscribe(MessageParcel &data, MessageParcel &reply);
-    ErrCode HandleOnUnsubscribe(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleOnConnected(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleOnDisconnected(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleOnConsumed(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleOnConsumedMap(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleOnCanceled(MessageParcel &data, MessageParcel &reply);

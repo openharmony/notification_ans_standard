@@ -98,6 +98,10 @@ public:
     virtual ErrCode IsSpecialBundleAllowedNotify(
         const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
+    virtual ErrCode CancelGroup(const std::string &groupName) override;
+    virtual ErrCode RemoveGroupByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
+
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
 
 private:
@@ -155,6 +159,8 @@ private:
     ErrCode HandleIsAllowedNotify(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleShellDump(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleCancelGroup(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleRemoveGroupByBundle(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

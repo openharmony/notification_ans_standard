@@ -39,9 +39,9 @@ public:
 
     virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override;
 
-    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override;
+    virtual void OnConnected() override;
 
-    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override;
+    virtual void OnDisconnected() override;
 
     virtual void OnDied() override;
 

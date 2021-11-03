@@ -24,5 +24,8 @@ config("system_test_config") {
 group("systemtest") {
   testonly = true
 
-  deps = [ "resource\ansSTSlotGroupTest:ansSTSlotGroupTest" ]
+  deps = [
+    "common\acts:actsnotificationtest",
+    "resource\ansSTSlotGroupTest:ansSTSlotGroupTest",
+  ]
 }

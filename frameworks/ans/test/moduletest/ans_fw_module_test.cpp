@@ -74,34 +74,20 @@ class OnSubscribeResultEvent : public SubscriberEvent {
 public:
     ~OnSubscribeResultEvent() override
     {}
-    OnSubscribeResultEvent(NotificationConstant::SubscribeResult result)
-        : SubscriberEvent(SubscriberEventType::ON_SUBSCRIBERESULT), subscribeResult_(result)
-    {}
-    NotificationConstant::SubscribeResult GetSubscribeResult()
-    {
-        return subscribeResult_;
-    }
 
-private:
-    NotificationConstant::SubscribeResult subscribeResult_;
+    OnSubscribeResultEvent()
+        : SubscriberEvent(SubscriberEventType::ON_SUBSCRIBERESULT)
+    {}
 };
 
 class OnUnSubscribeResultEvent : public SubscriberEvent {
 public:
-    OnUnSubscribeResultEvent(NotificationConstant::SubscribeResult result)
-        : SubscriberEvent(SubscriberEventType::ON_UNSUBSCRIBERESULT), unSubscribeResult_(result)
+    OnUnSubscribeResultEvent()
+        : SubscriberEvent(SubscriberEventType::ON_UNSUBSCRIBERESULT)
     {}
 
     ~OnUnSubscribeResultEvent() override
     {}
-
-    NotificationConstant::SubscribeResult GetUnSubscribeResult()
-    {
-        return unSubscribeResult_;
-    }
-
-private:
-    NotificationConstant::SubscribeResult unSubscribeResult_;
 };
 
 class OnDiedEvent : public SubscriberEvent {
@@ -246,15 +232,15 @@ private:
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnConnected() override
     {
-        std::shared_ptr<OnSubscribeResultEvent> event = std::make_shared<OnSubscribeResultEvent>(result);
+        std::shared_ptr<OnSubscribeResultEvent> event = std::make_shared<OnSubscribeResultEvent>();
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnDisconnected() override
     {
-        std::shared_ptr<OnUnSubscribeResultEvent> event = std::make_shared<OnUnSubscribeResultEvent>(result);
+        std::shared_ptr<OnUnSubscribeResultEvent> event = std::make_shared<OnUnSubscribeResultEvent>();
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
@@ -357,8 +343,7 @@ public:
     {
         for (auto event : events) {
             if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
-                std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
-                waitOnSubscriber_ = ev->GetSubscribeResult();
+                waitOnSubscriber_ = true;
             } else if (event->GetType() == SubscriberEventType::ON_CONSUMED) {
                 std::shared_ptr<OnConsumedEvent> ev = std::static_pointer_cast<OnConsumedEvent>(event);
                 waitOnConsumed_ = true;
@@ -381,9 +366,7 @@ public:
                 onCanceledWithSortingMapSor_.push_back(ev->GetSortingMap());
                 onCanceledWithSortingMapDelRea_.push_back(ev->GetDeleteReason());
             } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
-                std::shared_ptr<OnUnSubscribeResultEvent> ev =
-                    std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
-                waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+                waitOnUnSubscriber_ = true;
             }
         }
     }
@@ -408,12 +391,12 @@ public:
         waitOnUnSubscriber_ = NotificationConstant::SubscribeResult::RESOURCES_FAIL;
     }
 
-    uint32_t getWaitOnSubscriber()
+    bool getWaitOnSubscriber()
     {
         return waitOnSubscriber_;
     }
 
-    uint32_t getWaitOnUnSubscriber()
+    bool getWaitOnUnSubscriber()
     {
         return waitOnUnSubscriber_;
     }
@@ -474,8 +457,8 @@ public:
     }
 
 private:
-    uint32_t waitOnSubscriber_;
-    uint32_t waitOnUnSubscriber_;
+    bool waitOnSubscriber_ = false;
+    bool waitOnUnSubscriber_ = false;
     bool waitOnConsumed_ = false;
     std::vector<std::shared_ptr<Notification>> onConsumedReq_;
     std::vector<std::shared_ptr<Notification>> onConsumedWithSortingMapReq_;
@@ -572,8 +555,8 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | L
     }
     EXPECT_EQ((uint32_t)eventParser.getOnConsumedReq().size(), MAX_ACTIVE_NUM_PERSECOND);
     EXPECT_EQ((uint32_t)eventParser.getOnConsumedWithSortingMapReq().size(), MAX_ACTIVE_NUM_PERSECOND);
-    EXPECT_EQ(eventParser.getWaitOnSubscriber(), NotificationConstant::SubscribeResult::SUCCESS);
-    EXPECT_EQ(eventParser.getWaitOnUnSubscriber(), NotificationConstant::SubscribeResult::SUCCESS);
+    EXPECT_TRUE(eventParser.getWaitOnSubscriber());
+    EXPECT_TRUE(eventParser.getWaitOnUnSubscriber());
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -759,19 +742,17 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_UnSubscriber_00100, Function | MediumTest | 
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
-    uint32_t waitOnSubscriber_;
-    uint32_t waitOnUnSubscriber_;
+    bool waitOnSubscriber = false;
+    bool waitOnUnSubscriber = false;
 
     for (auto event : events) {
         if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
-            std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
-            waitOnSubscriber_ = ev->GetSubscribeResult();
+            waitOnSubscriber = true;
         } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
-            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
-            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+            waitOnUnSubscriber = true;
         }
     }
-    EXPECT_EQ(waitOnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
+    EXPECT_TRUE(waitOnSubscriber);
 
     subscriber.ClearEvents();
     SleepForFC();
@@ -794,28 +775,29 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_UnSubscriber_00200, Function | MediumTest | 
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), (int)ERR_OK);
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
-    uint32_t waitOnSubscriber_;
-    uint32_t waitOnUnSubscriber_;
+    bool waitOnSubscriber = false;
+    bool waitOnUnSubscriber = false;
     for (auto event : events) {
         if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
-            std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
-            waitOnSubscriber_ = ev->GetSubscribeResult();
+            waitOnSubscriber = true;
         } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
-            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
-            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+            waitOnUnSubscriber = true;
         }
     }
-    EXPECT_EQ(waitOnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
-    waitOnSubscriber_ = NotificationConstant::SubscribeResult::PREMISSION_FAIL;
-    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), (int)ERR_OK);
+    EXPECT_TRUE(waitOnSubscriber);
+    EXPECT_TRUE(waitOnUnSubscriber);
+
+    waitOnSubscriber = false;
+    waitOnUnSubscriber = false;
+    subscriber.ClearEvents();
+    EXPECT_NE(NotificationHelper::UnSubscribeNotification(subscriber, info), (int)ERR_OK);
     events = subscriber.GetEvents();
     for (auto event : events) {
         if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
-            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
-            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+            waitOnUnSubscriber = true;
         }
     }
-    EXPECT_EQ(waitOnUnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
+    EXPECT_FALSE(waitOnUnSubscriber);
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -833,18 +815,16 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_Subscriber_00100, Function | MediumTest | Le
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
-    uint32_t waitOnSubscriber_;
-    uint32_t waitOnUnSubscriber_;
+    bool waitOnSubscriber = false;
+    bool waitOnUnSubscriber = false;
     for (auto event : events) {
         if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
-            std::shared_ptr<OnSubscribeResultEvent> ev = std::static_pointer_cast<OnSubscribeResultEvent>(event);
-            waitOnSubscriber_ = ev->GetSubscribeResult();
+            waitOnSubscriber = true;
         } else if (event->GetType() == SubscriberEventType::ON_UNSUBSCRIBERESULT) {
-            std::shared_ptr<OnUnSubscribeResultEvent> ev = std::static_pointer_cast<OnUnSubscribeResultEvent>(event);
-            waitOnUnSubscriber_ = ev->GetUnSubscribeResult();
+            waitOnUnSubscriber = true;
         }
     }
-    EXPECT_EQ(waitOnSubscriber_, NotificationConstant::SubscribeResult::SUCCESS);
+    EXPECT_TRUE(waitOnSubscriber);
     subscriber.ClearEvents();
     SleepForFC();
 }

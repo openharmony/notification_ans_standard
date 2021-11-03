@@ -101,6 +101,10 @@ public:
     ErrCode IsAllowedNotify(bool &allowed) override;
     ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
+    ErrCode CancelGroup(const std::string &groupName) override;
+    ErrCode RemoveGroupByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
+
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
 
     // SystemEvent

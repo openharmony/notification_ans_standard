@@ -141,6 +141,37 @@ SubscriberInstance::~SubscriberInstance()
 void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request)
 {}
 
+void UvQueueWorkOnCanceled(uv_work_t *work, int status) {
+    ANS_LOGI("OnCanceled uv_work_t start");
+
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        return;
+    }
+    napi_value result = nullptr;
+    napi_create_object(dataWorkerData->env, &result);
+    if (!SetSubscribeCallbackData(dataWorkerData->env,
+        dataWorkerData->request,
+        dataWorkerData->sortingMap,
+        dataWorkerData->deleteReason,
+        result)) {
+        ANS_LOGE("Failed to convert data to JS");
+    } else {
+        Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
+    }
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
 void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request,
     const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason)
 {
@@ -194,39 +225,7 @@ void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::No
     uv_queue_work(loop,
         work,
         [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnCanceled uv_work_t start");
-
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
-
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                return;
-            }
-            napi_value result = nullptr;
-            napi_create_object(dataWorkerData->env, &result);
-            int error = 0;
-            if (!SetSubscribeCallbackData(dataWorkerData->env,
-                dataWorkerData->request,
-                dataWorkerData->sortingMap,
-                dataWorkerData->deleteReason,
-                result)) {
-                result = Common::NapiGetNull(dataWorkerData->env);
-                error = ERROR;
-            } else {
-                error = NO_ERROR;
-            }
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, error, result);
-
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
+        UvQueueWorkOnCanceled);
 }
 
 void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request)
@@ -298,18 +297,15 @@ void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::No
             }
             napi_value result = nullptr;
             napi_create_object(dataWorkerData->env, &result);
-            int error = 0;
             if (!SetSubscribeCallbackData(dataWorkerData->env,
                 dataWorkerData->request,
                 dataWorkerData->sortingMap,
                 NO_DELETE_REASON,
                 result)) {
-                result = Common::NapiGetNull(dataWorkerData->env);
-                error = ERROR;
+                ANS_LOGE("Failed to convert data to JS");
             } else {
-                error = NO_ERROR;
+                Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
             }
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, error, result);
 
             delete dataWorkerData;
             dataWorkerData = nullptr;
@@ -376,14 +372,11 @@ void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> 
             }
             napi_value result = nullptr;
             napi_create_object(dataWorkerData->env, &result);
-            int error = 0;
             if (!Common::SetNotificationSortingMap(dataWorkerData->env, dataWorkerData->sortingMap, result)) {
-                result = Common::NapiGetNull(dataWorkerData->env);
-                error = ERROR;
+                ANS_LOGE("Failed to convert data to JS");
             } else {
-                error = NO_ERROR;
+                Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
             }
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, error, result);
 
             delete dataWorkerData;
             dataWorkerData = nullptr;
@@ -392,7 +385,7 @@ void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> 
         });
 }
 
-void SubscriberInstance::OnSubscribeResult(NotificationConstant::SubscribeResult result)
+void SubscriberInstance::OnConnected()
 {
     ANS_LOGI("enter");
 
@@ -400,7 +393,6 @@ void SubscriberInstance::OnSubscribeResult(NotificationConstant::SubscribeResult
         ANS_LOGI("subscribe callback unset");
         return;
     }
-    ANS_LOGI("OnSubscribeResult result = %{public}d", result);
 
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(subscribeCallbackInfo_.env, &loop);
@@ -415,7 +407,6 @@ void SubscriberInstance::OnSubscribeResult(NotificationConstant::SubscribeResult
         return;
     }
 
-    dataWorker->result = (int)result;
     dataWorker->env = subscribeCallbackInfo_.env;
     dataWorker->ref = subscribeCallbackInfo_.ref;
 
@@ -443,11 +434,8 @@ void SubscriberInstance::OnSubscribeResult(NotificationConstant::SubscribeResult
                 ANS_LOGE("dataWorkerData is null");
                 return;
             }
-            // result: number
-            napi_value result = nullptr;
-            napi_create_int32(dataWorkerData->env, dataWorkerData->result, &result);
 
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, NO_ERROR, result);
+            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
 
             delete dataWorkerData;
             dataWorkerData = nullptr;
@@ -456,7 +444,7 @@ void SubscriberInstance::OnSubscribeResult(NotificationConstant::SubscribeResult
         });
 }
 
-void SubscriberInstance::OnUnsubscribeResult(NotificationConstant::SubscribeResult result)
+void SubscriberInstance::OnDisconnected()
 {
     ANS_LOGI("enter");
 
@@ -464,7 +452,6 @@ void SubscriberInstance::OnUnsubscribeResult(NotificationConstant::SubscribeResu
         ANS_LOGI("unsubscribe callback unset");
         return;
     }
-    ANS_LOGI("OnUnsubscribeResult result = %{public}d", result);
 
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(unsubscribeCallbackInfo_.env, &loop);
@@ -479,7 +466,6 @@ void SubscriberInstance::OnUnsubscribeResult(NotificationConstant::SubscribeResu
         return;
     }
 
-    dataWorker->result = (int)result;
     dataWorker->env = unsubscribeCallbackInfo_.env;
     dataWorker->ref = unsubscribeCallbackInfo_.ref;
     dataWorker->subscriber = this;
@@ -508,11 +494,8 @@ void SubscriberInstance::OnUnsubscribeResult(NotificationConstant::SubscribeResu
                 ANS_LOGE("dataWorkerData is null");
                 return;
             }
-            // result: number
-            napi_value result = nullptr;
-            napi_create_int32(dataWorkerData->env, dataWorkerData->result, &result);
 
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, NO_ERROR, result);
+            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
 
             DelSubscriberInstancesInfo(dataWorkerData->env, dataWorkerData->subscriber);
 
@@ -574,7 +557,7 @@ void SubscriberInstance::OnDied()
             }
 
             Common::SetCallback(
-                dataWorkerData->env, dataWorkerData->ref, NO_ERROR, Common::NapiGetNull(dataWorkerData->env));
+                dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
 
             delete dataWorkerData;
             dataWorkerData = nullptr;
@@ -584,68 +567,7 @@ void SubscriberInstance::OnDied()
 }
 
 void SubscriberInstance::OnDisturbModeChanged(int disturbMode)
-{
-    ANS_LOGI("enter");
-
-    if (disturbModeCallbackInfo_.ref == nullptr) {
-        ANS_LOGI("disturbModeChange callback unset");
-        return;
-    }
-    ANS_LOGI("OnDisturbModeChanged disturbMode = %{public}d", disturbMode);
-
-    uv_loop_s *loop = nullptr;
-    napi_get_uv_event_loop(disturbModeCallbackInfo_.env, &loop);
-    if (loop == nullptr) {
-        ANS_LOGE("loop instance is nullptr");
-        return;
-    }
-
-    NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
-    if (dataWorker == nullptr) {
-        ANS_LOGE("new dataWorker failed");
-        return;
-    }
-
-    dataWorker->disturbMode = disturbMode;
-    dataWorker->env = disturbModeCallbackInfo_.env;
-    dataWorker->ref = disturbModeCallbackInfo_.ref;
-
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        ANS_LOGE("new work failed");
-        return;
-    }
-
-    work->data = (void *)dataWorker;
-
-    uv_queue_work(loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnDisturbModeChanged uv_work_t start");
-
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
-
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                return;
-            }
-            // disturbMode: number
-            napi_value result = nullptr;
-            napi_create_int32(dataWorkerData->env, dataWorkerData->disturbMode, &result);
-
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, NO_ERROR, result);
-
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
-}
+{}
 
 void SubscriberInstance::SetCancelCallbackInfo(const napi_env &env, const napi_ref &ref)
 {

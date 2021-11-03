@@ -587,8 +587,24 @@ public:
      * @return Returns get disturb mode result.
      */
     static ErrCode GetDisturbMode(NotificationConstant::DisturbMode &disturbMode);
-};
 
+    /**
+     * Cancel the notification of the specified group of this application.
+     *
+     * @param groupName the specified group name.
+     * @return Returns cancel group result.
+     */
+    static ErrCode CancelGroup(const std::string &groupName);
+
+    /**
+     * Remove the notification of the specified group of the specified application.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the specified application.
+     * @param groupName the specified group name.
+     * @return Returns remove group by bundle result.
+     */
+    static ErrCode RemoveGroupByBundle(const NotificationBundleOption &bundleOption, const std::string &groupName);
+};
 }  // namespace Notification
 }  // namespace OHOS
 
