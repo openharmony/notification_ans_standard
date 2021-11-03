@@ -59,11 +59,9 @@ public:
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) = 0;
 
     /**
-     * @brief Called back when the subscriber is connected to the Advanced Notification Service (ANS).
-     *
-     * @param result Indicates subscribe result.
+     * Called back when the subscriber is connected to the Advanced Notification Service (ANS).
      **/
-    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) = 0;
+    virtual void OnConnected() = 0;
 
     /**
      * @brief Called back when the subscriber receives a new notification.
@@ -83,11 +81,9 @@ public:
         const std::shared_ptr<Notification> &request, const std::shared_ptr<NotificationSortingMap> &sortingMap) = 0;
 
     /**
-     * @brief Called back when the subscriber is disconnected from the ANS.
-     *
-     * @param result Indicates unsubscribe result.
+     * Called back when the subscriber is disconnected from the ANS.
      **/
-    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) = 0;
+    virtual void OnDisconnected() = 0;
 
     /**
      * @brief Called back when the ranking information about the current notification changes.
@@ -127,9 +123,9 @@ private:
         SubscriberImpl(NotificationSubscriber &subscriber);
         ~SubscriberImpl(){};
 
-        void OnSubscribeResult(NotificationConstant::SubscribeResult result) override;
+        void OnConnected() override;
 
-        void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override;
+        void OnDisconnected() override;
 
         void OnConsumed(const sptr<Notification> &notification) override;
 

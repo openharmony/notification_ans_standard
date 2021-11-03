@@ -80,9 +80,9 @@ inline void SleepForFC()
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnConnected() override
     {}
-    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnDisconnected() override
     {}
     void OnDied() override
     {}
@@ -618,14 +618,18 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02700,
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02800
  * @tc.name      : AMS_ANS_GetShowBadgeEnabledForBundle_0100
- * @tc.desc      : Test GetShowBadgeEnabledForBundle function when no bundle
+ * @tc.desc      : Test GetShowBadgeEnabledForBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02800, Function | SmallTest | Level1)
 {
+    EXPECT_EQ(advancedNotificationService_->SetShowBadgeEnabledForBundle(
+                  new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), true),
+        (int)ERR_OK);
     bool allow = false;
     EXPECT_EQ((int)advancedNotificationService_->GetShowBadgeEnabledForBundle(
                   new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), allow),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        (int)ERR_OK);
+    EXPECT_TRUE(allow);
 }
 
 /**
@@ -1068,7 +1072,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06900,
     bool allow = false;
     EXPECT_EQ((int)advancedNotificationService_->GetShowBadgeEnabledForBundle(
                   new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), allow),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        (int)ERR_OK);
 }
 
 /**
@@ -1385,5 +1389,55 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10200,
     EXPECT_EQ(advancedNotificationService_->Publish("label", req), (int)ERR_ANS_ICON_OVER_SIZE);
 }
 
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10300
+ * @tc.name      : AMS_ANS_Cancel_By_Group_10300
+ * @tc.desc      : Cancel notification by group name.
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10300, Function | SmallTest | Level1)
+{
+    sptr<NotificationRequest> req = new NotificationRequest(1);
+    ASSERT_NE(req, nullptr);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("label");
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    ASSERT_NE(normalContent, nullptr);
+    normalContent->SetText("text");
+    normalContent->SetTitle("title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    ASSERT_NE(content, nullptr);
+    req->SetContent(content);
+    std::string groupName = "group";
+    req->SetGroupName(groupName);
+    EXPECT_EQ(advancedNotificationService_->Publish("label", req), (int)ERR_OK);
+    EXPECT_EQ(advancedNotificationService_->CancelGroup(groupName), (int)ERR_OK);
+    SleepForFC();
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10400
+ * @tc.name      : AMS_ANS_Remove_By_Group_10400
+ * @tc.desc      : Remove notification by group name.
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10400, Function | SmallTest | Level1)
+{
+    sptr<NotificationRequest> req = new NotificationRequest(1);
+    ASSERT_NE(req, nullptr);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("label");
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    ASSERT_NE(normalContent, nullptr);
+    normalContent->SetText("text");
+    normalContent->SetTitle("title");
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    ASSERT_NE(content, nullptr);
+    req->SetContent(content);
+    std::string groupName = "group";
+    req->SetGroupName(groupName);
+    EXPECT_EQ(advancedNotificationService_->Publish("label", req), (int)ERR_OK);
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID);
+    EXPECT_EQ(advancedNotificationService_->RemoveGroupByBundle(bundleOption, groupName), (int)ERR_OK);
+    SleepForFC();
+}
 }  // namespace Notification
 }  // namespace OHOS

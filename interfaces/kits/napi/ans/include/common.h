@@ -132,6 +132,9 @@ public:
     static void SetCallback(
         const napi_env &env, const napi_ref &callbackIn, const int &errorCode, const napi_value &result);
 
+    static void SetCallback(
+        const napi_env &env, const napi_ref &callbackIn, const napi_value &result);
+
     static void SetPromise(
         const napi_env &env, const napi_deferred &deferred, const int &errorCode, const napi_value &result);
 
@@ -214,6 +217,7 @@ public:
     static napi_value CreateWantAgentByJS(const napi_env &env, const std::shared_ptr<WantAgent::WantAgent> &agent);
 
 private:
+    static const int ARGS_ONE = 1;
     static const int ARGS_TWO = 2;
     static const int PARAM0 = 0;
     static const int PARAM1 = 1;

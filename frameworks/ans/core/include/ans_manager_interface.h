@@ -104,6 +104,10 @@ public:
     virtual ErrCode IsAllowedNotify(bool &allowed) = 0;
     virtual ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) = 0;
 
+    virtual ErrCode CancelGroup(const std::string &groupName) = 0;
+    virtual ErrCode RemoveGroupByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) = 0;
+
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) = 0;
 
 protected:
@@ -158,6 +162,8 @@ protected:
         GET_CURRENT_APP_SORTING,
         IS_ALLOWED_NOTIFY,
         IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
+        CANCEL_GROUP,
+        REMOVE_GROUP_BY_BUNDLE,
         SHELL_DUMP,
     };
 };

@@ -61,6 +61,8 @@ const int32_t CALLING_UID = 9999;
 const int32_t PIXEL_MAP_TEST_WIDTH = 32;
 const int32_t PIXEL_MAP_TEST_HEIGHT = 32;
 
+const int32_t CANCELGROUP_NID = 10101;
+
 std::mutex g_subscribe_mtx;
 std::mutex g_consumed_mtx;
 std::mutex g_unsubscribe_mtx;
@@ -72,12 +74,12 @@ const std::string CLASSIFICATION_ALARM{"alarm"};
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    virtual void OnConnected() override
     {
         g_subscribe_mtx.unlock();
     }
 
-    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    virtual void OnDisconnected() override
     {
         g_unsubscribe_mtx.unlock();
     }
@@ -93,6 +95,7 @@ public:
 
     virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
     {
+        GTEST_LOG_(INFO) << "ANS_Interface_MT::OnCanceled request : " << request->GetNotificationRequest().Dump();
         OnCanceledReceived = true;
     }
 
@@ -347,7 +350,7 @@ private:
         EXPECT_EQ(NotificationConstant::OTHER, notificationRequest.GetSlotType());
         EXPECT_EQ(false, notificationRequest.IsColorEnabled());
         EXPECT_EQ(false, notificationRequest.IsCountdownTimer());
-        EXPECT_EQ("groupvalue", notificationRequest.GetGroupValue());
+        EXPECT_EQ("groupvalue", notificationRequest.GetGroupName());
         EXPECT_EQ(true, notificationRequest.IsOnlyLocal());
         EXPECT_EQ("setting text", notificationRequest.GetSettingsText());
         EXPECT_EQ(false, notificationRequest.IsShowStopwatch());
@@ -885,7 +888,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00900, Function
     req.SetNotificationId(CASE_NINE);
     req.SetColorEnabled(false);
     req.SetCountdownTimer(false);
-    req.SetGroupValue("groupvalue");
+    req.SetGroupName("groupvalue");
     req.SetOnlyLocal(true);
     req.SetSettingsText("setting text");
     req.SetShowStopwatch(false);
@@ -1133,7 +1136,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_07000, Function
     NotificationRequest req;
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
-    req.SetGroupValue("groupnotifcation");
+    req.SetGroupName("groupnotifcation");
     req.SetGroupOverview(true);
     req.SetNotificationId(CASE_SIXTEEN);
     req.SetGroupAlertType(NotificationRequest::GroupAlertType::ALL);
@@ -1202,6 +1205,78 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
     WaitOnUnsubscribeResult();
     OnCanceledReceived = false;
+}
+
+/**
+ * @tc.number    : ANS_FW_MT_CancelGroup_10100
+ * @tc.name      : CancelGroup_10100
+ * @tc.desc      : Cancel the notifications of the same group.
+ * @tc.expected  : All notifications of the same group have been cancelled.
+ */
+HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_CancelGroup_10100, Function | MediumTest | Level1)
+{
+    NotificationSubscribeInfo info = NotificationSubscribeInfo();
+    info.AddAppName("bundleName");
+
+    auto subscriber = TestAnsSubscriber();
+    g_subscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
+    WaitOnSubscribeResult();
+
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_CancelGroup_10100::normalContentis::" << normalContent->Dump();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
+
+    NotificationRequest req;
+    req.SetContent(content);
+    req.SetSlotType(NotificationConstant::OTHER);
+    req.SetNotificationId(CANCELGROUP_NID);
+    req.SetLabel("CancelGroup_10100");
+    req.SetGroupName("group10100");
+
+    g_consumed_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+    WaitOnConsumed();
+    OnConsumedReceived = false;
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_CancelGroup_10100:: call CancelGroup : effective parameters";
+    EXPECT_EQ(0, NotificationHelper::CancelGroup("group10100"));
+
+    sleep(SLEEP_TIME);
+    OnCanceledReceived = false;
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_CancelGroup_10100:: call CancelGroup : invalid parameters";
+    EXPECT_EQ(0, NotificationHelper::CancelGroup("ngroup"));
+
+    sleep(SLEEP_TIME);
+    OnCanceledReceived = false;
+
+    req.SetOwnerBundleName("mybundlename");
+    req.SetCreatorBundleName("mybundlename");
+    g_consumed_mtx.unlock();
+    g_consumed_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+    WaitOnConsumed();
+    OnConsumedReceived = false;
+
+    NotificationBundleOption bo("bundlename", 0);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_CancelGroup_10100:: call RemoveGroupByBundle : effective parameters";
+    EXPECT_NE(0, NotificationHelper::RemoveGroupByBundle(bo, "group10100"));
+
+    sleep(SLEEP_TIME);
+    OnCanceledReceived = false;
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_CancelGroup_10100:: call RemoveGroupByBundle : invalid parameters";
+    EXPECT_NE(0, NotificationHelper::RemoveGroupByBundle(bo, "ngroup"));
+
+    sleep(SLEEP_TIME);
+    OnCanceledReceived = false;
+
+    g_unsubscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
+    WaitOnUnsubscribeResult();
 }
 }  // namespace Notification
 }  // namespace OHOS

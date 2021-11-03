@@ -176,6 +176,12 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
             std::bind(&AnsManagerStub::HandleIsSpecialBundleAllowedNotify, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
+        {AnsManagerStub::CANCEL_GROUP,
+            std::bind(&AnsManagerStub::HandleCancelGroup, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::REMOVE_GROUP_BY_BUNDLE,
+            std::bind(&AnsManagerStub::HandleRemoveGroupByBundle, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::SHELL_DUMP,
             std::bind(
                 &AnsManagerStub::HandleShellDump, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
@@ -1137,6 +1143,48 @@ ErrCode AnsManagerStub::HandleIsSpecialBundleAllowedNotify(MessageParcel &data, 
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleCancelGroup(MessageParcel &data, MessageParcel &reply)
+{
+    std::string groupName;
+    if (!data.ReadString(groupName)) {
+        ANS_LOGW("[HandleCancelGroup] fail: read groupName failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = CancelGroup(groupName);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleCancelGroup] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleRemoveGroupByBundle(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleRemoveGroupByBundle] fail: read bundleOption failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    std::string groupName;
+    if (!data.ReadString(groupName)) {
+        ANS_LOGW("[HandleRemoveGroupByBundle] fail: read groupName failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = RemoveGroupByBundle(bundleOption, groupName);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleRemoveGroupByBundle] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleShellDump(MessageParcel &data, MessageParcel &reply)
 {
     std::string dumpOption;
@@ -1509,6 +1557,19 @@ ErrCode AnsManagerStub::IsAllowedNotify(bool &allowed)
 ErrCode AnsManagerStub::IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
 {
     ANS_LOGW("AnsManagerStub::IsSpecialBundleAllowedNotify called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::CancelGroup(const std::string &groupName)
+{
+    ANS_LOGW("AnsManagerStub::CancelGroup called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::RemoveGroupByBundle(
+    const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName)
+{
+    ANS_LOGW("AnsManagerStub::RemoveGroupByBundle called!");
     return ERR_INVALID_OPERATION;
 }
 

@@ -77,7 +77,8 @@ static napi_value GetNotificationMultiLineContent(
 static napi_value GetNotificationMultiLineContentLines(const napi_env &env, const napi_value &result,
     std::shared_ptr<OHOS::Notification::NotificationMultiLineContent> &multiLineContent);
 static napi_value GetNotificationExtraInfo(const napi_env &env, const napi_value &value, NotificationRequest &request);
-
+static napi_value GetNotificationGroupName(
+    const napi_env &env, const napi_value &value, NotificationRequest &request);
 Common::Common()
 {}
 
@@ -157,6 +158,20 @@ void Common::SetCallback(
     results[PARAM0] = GetCallbackErrorValue(env, errorCode);
     results[PARAM1] = result;
     NAPI_CALL_RETURN_VOID(env, napi_call_function(env, undefined, callback, ARGS_TWO, &results[PARAM0], &resultout));
+    ANS_LOGI("end");
+}
+
+void Common::SetCallback(
+    const napi_env &env, const napi_ref &callbackIn, const napi_value &result)
+{
+    ANS_LOGI("enter");
+    napi_value undefined = nullptr;
+    napi_get_undefined(env, &undefined);
+
+    napi_value callback = nullptr;
+    napi_value resultout = nullptr;
+    napi_get_reference_value(env, callbackIn, &callback);
+    NAPI_CALL_RETURN_VOID(env, napi_call_function(env, undefined, callback, ARGS_ONE, &result, &resultout));
     ANS_LOGI("end");
 }
 
@@ -410,6 +425,10 @@ napi_value Common::SetNotificationRequest(
             napi_set_named_property(env, result, "largeIcon", largeIconResult);
         }
     }
+
+    // groupName?: string
+    napi_create_string_utf8(env, request->GetGroupName().c_str(), NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, "groupName", value);
 
     // readonly creatorBundleName?: string
     napi_create_string_utf8(env, request->GetCreatorBundleName().c_str(), NAPI_AUTO_LENGTH, &value);
@@ -1141,6 +1160,11 @@ napi_value Common::GetNotificationRequest(const napi_env &env, const napi_value 
         return nullptr;
     }
 
+    // groupName?: string
+    if (GetNotificationGroupName(env, value, request) == nullptr) {
+        return nullptr;
+    }
+
     return Common::NapiGetNull(env);
 }
 
@@ -1390,6 +1414,28 @@ napi_value GetNotificationExtraInfo(const napi_env &env, const napi_value &value
 
         std::shared_ptr<AAFwk::WantParams> extras = std::make_shared<AAFwk::WantParams>(wantParams);
         request.SetAdditionalData(extras);
+    }
+
+    return Common::NapiGetNull(env);
+}
+
+napi_value GetNotificationGroupName(const napi_env &env, const napi_value &value, NotificationRequest &request)
+{
+    ANS_LOGI("enter");
+
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+    bool hasProperty = false;
+    char str[STR_MAX_SIZE] = {0};
+    size_t strLen = 0;
+
+    NAPI_CALL(env, napi_has_named_property(env, value, "groupName", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "groupName", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
+        request.SetGroupName(str);
     }
 
     return Common::NapiGetNull(env);

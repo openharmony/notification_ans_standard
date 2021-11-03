@@ -53,46 +53,36 @@ ErrCode AnsSubscriberProxy::InnerTransact(
     }
 }
 
-void AnsSubscriberProxy::OnSubscribeResult(NotificationConstant::SubscribeResult result)
+void AnsSubscriberProxy::OnConnected()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnSubscribeResult] fail: write interface token failed.");
-        return;
-    }
-
-    if (!data.WriteUint32(result)) {
-        ANS_LOGW("[OnSubscribeResult] fail: write result failed");
+        ANS_LOGW("[OnConnected] fail: write interface token failed.");
         return;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
-    ErrCode transactResult = InnerTransact(ON_SUBSCRIBE, option, data, reply);
-    if (transactResult != ERR_OK) {
-        ANS_LOGW("[OnSubscribeResult] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+    ErrCode result = InnerTransact(ON_CONNECTED, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[OnConnected] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
 
-void AnsSubscriberProxy::OnUnsubscribeResult(NotificationConstant::SubscribeResult result)
+void AnsSubscriberProxy::OnDisconnected()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnUnsubscribeResult] fail: write interface token failed.");
-        return;
-    }
-
-    if (!data.WriteUint32(result)) {
-        ANS_LOGW("[OnUnsubscribeResult] fail: write result failed");
+        ANS_LOGW("[OnDisconnected] fail: write interface token failed.");
         return;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
-    ErrCode transactResult = InnerTransact(ON_UNSUBSCRIBE, option, data, reply);
-    if (transactResult != ERR_OK) {
-        ANS_LOGW("[OnUnsubscribeResult] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+    ErrCode result = InnerTransact(ON_DISCONNECTED, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[OnDisconnected] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }

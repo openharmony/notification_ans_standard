@@ -594,6 +594,23 @@ public:
     ErrCode GetDisturbMode(NotificationConstant::DisturbMode &disturbMode);
 
     /**
+     * Cancel the notification of the specified group of this application.
+     *
+     * @param groupName the specified group name.
+     * @return Returns cancel group result.
+     */
+    ErrCode CancelGroup(const std::string &groupName);
+
+    /**
+     * Remove the notification of the specified group of the specified application.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the specified application.
+     * @param groupName the specified group name.
+     * @return Returns remove group by bundle result.
+     */
+    ErrCode RemoveGroupByBundle(const NotificationBundleOption &bundleOption, const std::string &groupName);
+
+    /**
      * Reset ans manager proxy when OnRemoteDied called.
      */
     void ResetAnsManagerProxy();

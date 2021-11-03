@@ -961,8 +961,13 @@ ErrCode AdvancedNotificationService::GetShowBadgeEnabledForBundle(
     }
 
     ErrCode result = ERR_OK;
-    handler_->PostSyncTask(
-        std::bind([&]() { result = NotificationPreferences::GetInstance().IsShowBadge(bundle, enabled); }));
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().IsShowBadge(bundle, enabled);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            enabled = false;
+        }
+    }));
     return result;
 }
 
@@ -1045,11 +1050,11 @@ ErrCode AdvancedNotificationService::Unsubscribe(
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (subscriber == nullptr) {
-        ANS_LOGE("Client is not a system app");
         return ERR_ANS_INVALID_PARAM;
     }
 
     if (!IsSystemApp()) {
+        ANS_LOGE("Client is not a system app");
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
@@ -1636,5 +1641,85 @@ ErrCode AdvancedNotificationService::GetSlotNumAsBundle(const sptr<NotificationB
     return result;
 }
 
+ErrCode AdvancedNotificationService::CancelGroup(const std::string &groupName)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (groupName.empty()) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    handler_->PostSyncTask(std::bind([&]() {
+        std::vector<std::shared_ptr<NotificationRecord>> removeList;
+        for (auto record : notificationList_) {
+            if ((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
+                (record->bundleOption->GetUid() == bundleOption->GetUid()) &&
+                (record->request->GetGroupName() == groupName)) {
+                removeList.push_back(record);
+            }
+        }
+
+        for (auto record : removeList) {
+            notificationList_.remove(record);
+
+            if (record->notification != nullptr) {
+                int reason = NotificationConstant::APP_CANCEL_REASON_DELETE;
+                UpdateRecentNotification(record->notification, true, reason);
+                sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+                NotificationSubscriberManager::GetInstance()->NotifyCanceled(record->notification, sortingMap, reason);
+            }
+        }
+    }));
+
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::RemoveGroupByBundle(
+    const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (bundleOption == nullptr || groupName.empty()) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    handler_->PostSyncTask(std::bind([&]() {
+        std::vector<std::shared_ptr<NotificationRecord>> removeList;
+        for (auto record : notificationList_) {
+            if ((record->bundleOption->GetBundleName() == bundle->GetBundleName()) &&
+                (record->bundleOption->GetUid() == bundle->GetUid()) && !record->request->IsUnremovable() &&
+                (record->request->GetGroupName() == groupName)) {
+                removeList.push_back(record);
+            }
+        }
+
+        for (auto record : removeList) {
+            notificationList_.remove(record);
+
+            if (record->notification != nullptr) {
+                int reason = NotificationConstant::CANCEL_REASON_DELETE;
+                UpdateRecentNotification(record->notification, true, reason);
+                sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+                NotificationSubscriberManager::GetInstance()->NotifyCanceled(record->notification, sortingMap, reason);
+            }
+        }
+    }));
+
+    return ERR_OK;
+}
 }  // namespace Notification
 }  // namespace OHOS

@@ -325,7 +325,7 @@ public:
 
     /**
      * Adds a NotificationActionButton to this notification.
-     * An operation button is usually placed next to the notification content by the system. 
+     * An operation button is usually placed next to the notification content by the system.
      * Each action button must contain an icon, a title, and an WantAgent. When a notification is expanded,
      * a maximum of three action buttons can be displayed from left to right in the order they were added.
      * When the notification is collapsed, no action buttons will be displayed.
@@ -530,8 +530,8 @@ public:
 
     /**
      * Sets whether to use this notification as the overview of its group.
-     * This method helps display the notifications that are assigned the same group value by calling
-     * setGroupValue(string) as one stack in the notification bar.
+     * This method helps display the notifications that are assigned the same group name by calling
+     * setGroupName(string) as one stack in the notification bar.
      * Each group requires only one group overview. After a notification is set as the group overview,
      * it becomes invisible if another notification in the same group is published.
      * @param overView Specifies whether to set this notification as the group overview.
@@ -542,21 +542,21 @@ public:
      * Sets the group information for this notification.
      * If no groups are set for notifications, all notifications from the same application will appear
      * in the notification bar as one stack with the number of stacked notifications displayed.
-     * If notifications are grouped and there are multiple groups identified by different groupValue,
-     * notifications with different groupValue will appear in separate stacks.
+     * If notifications are grouped and there are multiple groups identified by different groupName,
+     * notifications with different groupName will appear in separate stacks.
      * Note that one of the notifications in a group must be set as the overview of its group by calling
      * setGroupOverview(bool), and other notifications are considered as child notifications.
-     * Otherwise, notifications will not be displayed as one group even if they are assigned the same groupValue by
-     * calling setGroupValue(string).
-     * @param groupValue Specifies whether to set this notification as the group overview.
+     * Otherwise, notifications will not be displayed as one group even if they are assigned the same groupName by
+     * calling setGroupName(string).
+     * @param groupName Specifies whether to set this notification as the group overview.
      */
-    void SetGroupValue(const std::string &groupValue);
+    void SetGroupName(const std::string &groupName);
 
     /**
      * Obtains the group information about this notification.
      * @return the group information about this notification.
      */
-    std::string GetGroupValue() const;
+    std::string GetGroupName() const;
 
     /**
      * Checks whether this notification is relevant only to the local device and cannot be displayed on remote devices.
@@ -903,7 +903,7 @@ private:
     std::string settingsText_ {};
     std::string creatorBundleName_ {};
     std::string ownerBundleName_ {};
-    std::string groupValue_ {};
+    std::string groupName_ {};
     std::string statusBarText_ {};
     std::string label_ {};
     std::string shortcutId_ {};

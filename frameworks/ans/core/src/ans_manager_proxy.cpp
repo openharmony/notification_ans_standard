@@ -1744,6 +1744,70 @@ ErrCode AnsManagerProxy::IsSpecialBundleAllowedNotify(const sptr<NotificationBun
     return result;
 }
 
+ErrCode AnsManagerProxy::CancelGroup(const std::string &groupName)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[CancelGroup] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(groupName)) {
+        ANS_LOGW("[CancelGroup] fail: write groupName failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(CANCEL_GROUP, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[CancelGroup] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[CancelGroup] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerProxy::RemoveGroupByBundle(
+    const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[RemoveGroupByBundle] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteParcelable(bundleOption)) {
+        ANS_LOGW("[RemoveGroupByBundle] fail:: write bundleOption failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(groupName)) {
+        ANS_LOGW("[RemoveGroupByBundle] fail: write groupName failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(REMOVE_GROUP_BY_BUNDLE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[RemoveGroupByBundle] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[RemoveGroupByBundle] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
 ErrCode AnsManagerProxy::ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo)
 {
     MessageParcel data;

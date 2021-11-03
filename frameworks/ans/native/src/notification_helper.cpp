@@ -305,5 +305,16 @@ ErrCode NotificationHelper::GetDisturbMode(NotificationConstant::DisturbMode &di
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetDisturbMode(disturbMode);
 }
+
+ErrCode NotificationHelper::CancelGroup(const std::string &groupName)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->CancelGroup(groupName);
+}
+
+ErrCode NotificationHelper::RemoveGroupByBundle(
+    const NotificationBundleOption &bundleOption, const std::string &groupName)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveGroupByBundle(bundleOption, groupName);
+}
 }  // namespace Notification
 }  // namespace OHOS

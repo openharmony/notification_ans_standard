@@ -39,22 +39,22 @@ NotificationSubscriber::SubscriberImpl::SubscriberImpl(NotificationSubscriber &s
     recipient_ = new DeathRecipient(*this);
 };
 
-void NotificationSubscriber::SubscriberImpl::OnSubscribeResult(NotificationConstant::SubscribeResult result)
+void NotificationSubscriber::SubscriberImpl::OnConnected()
 {
-    if (result == 0 && GetAnsManagerProxy()) {
+    if (GetAnsManagerProxy()) {
         proxy_->AsObject()->AddDeathRecipient(recipient_);
         ANS_LOGD("%s, Add death recipient.", __func__);
     }
-    subscriber_.OnSubscribeResult(result);
+    subscriber_.OnConnected();
 }
 
-void NotificationSubscriber::SubscriberImpl::OnUnsubscribeResult(NotificationConstant::SubscribeResult result)
+void NotificationSubscriber::SubscriberImpl::OnDisconnected()
 {
-    if (result == 0 && GetAnsManagerProxy()) {
+    if (GetAnsManagerProxy()) {
         proxy_->AsObject()->RemoveDeathRecipient(recipient_);
         ANS_LOGD("%s, Remove death recipient.", __func__);
     }
-    subscriber_.OnUnsubscribeResult(result);
+    subscriber_.OnDisconnected();
 }
 
 void NotificationSubscriber::SubscriberImpl::OnConsumed(const sptr<Notification> &notification)

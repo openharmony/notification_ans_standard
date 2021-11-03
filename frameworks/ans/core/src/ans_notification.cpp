@@ -165,7 +165,7 @@ ErrCode AnsNotification::GetNotificationSlotNumAsBundle(const NotificationBundle
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->GetSlotNumAsBundle(bo, num);
 }
 
@@ -519,7 +519,7 @@ ErrCode AnsNotification::RemoveNotification(
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->RemoveNotification(bo, notificationId, label);
 }
 
@@ -530,7 +530,7 @@ ErrCode AnsNotification::RemoveAllNotifications(const NotificationBundleOption &
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->RemoveAllNotifications(bo);
 }
 
@@ -541,7 +541,7 @@ ErrCode AnsNotification::RemoveNotificationsByBundle(const NotificationBundleOpt
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->DeleteByBundle(bo);
 }
 
@@ -567,7 +567,7 @@ ErrCode AnsNotification::GetNotificationSlotsForBundle(
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->GetSlotsByBundle(bo, slots);
 }
 
@@ -579,7 +579,7 @@ ErrCode AnsNotification::UpdateNotificationSlots(
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->UpdateSlots(bo, slots);
 }
 
@@ -591,7 +591,7 @@ ErrCode AnsNotification::UpdateNotificationSlotGroups(
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->UpdateSlotGroups(bo, groups);
 }
 
@@ -626,7 +626,7 @@ ErrCode AnsNotification::IsAllowedNotify(const NotificationBundleOption &bundleO
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->IsSpecialBundleAllowedNotify(bo, allowed);
 }
 
@@ -656,7 +656,7 @@ ErrCode AnsNotification::SetNotificationsEnabledForSpecifiedBundle(
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->SetNotificationsEnabledForSpecialBundle(deviceId, bo, enabled);
 }
 
@@ -667,7 +667,7 @@ ErrCode AnsNotification::SetShowBadgeEnabledForBundle(const NotificationBundleOp
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->SetShowBadgeEnabledForBundle(bo, enabled);
 }
 
@@ -678,7 +678,7 @@ ErrCode AnsNotification::GetShowBadgeEnabledForBundle(const NotificationBundleOp
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationBundleOption> bo(new NotificationBundleOption(bundleOption));
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->GetShowBadgeEnabledForBundle(bo, enabled);
 }
 
@@ -708,6 +708,28 @@ ErrCode AnsNotification::GetDisturbMode(NotificationConstant::DisturbMode &distu
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
     return ansManagerProxy_->GetDisturbMode(disturbMode);
+}
+
+ErrCode AnsNotification::CancelGroup(const std::string &groupName)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->CancelGroup(groupName);
+}
+
+ErrCode AnsNotification::RemoveGroupByBundle(
+    const NotificationBundleOption &bundleOption, const std::string &groupName)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
+    return ansManagerProxy_->RemoveGroupByBundle(bo, groupName);
 }
 
 void AnsNotification::ResetAnsManagerProxy()
@@ -754,7 +776,7 @@ bool AnsNotification::GetAnsManagerProxy()
                 return false;
             }
 
-            recipient_ = new AnsManagerDeathRecipient();
+            recipient_ = new (std::nothrow) AnsManagerDeathRecipient();
             if (!recipient_) {
                 ANS_LOGE("Failed to create death recipient");
                 return false;

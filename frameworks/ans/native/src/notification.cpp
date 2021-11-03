@@ -100,7 +100,7 @@ std::string Notification::GetGroup() const
     if (request_ == nullptr) {
         return "";
     }
-    return request_->GetGroupValue();
+    return request_->GetGroupName();
 }
 
 int32_t Notification::GetId() const
@@ -160,7 +160,7 @@ bool Notification::IsGroup() const
     if (request_ == nullptr) {
         return false;
     }
-    return !(request_->GetGroupValue() == "");
+    return !(request_->GetGroupName() == "");
 }
 
 bool Notification::IsFloatingIcon() const

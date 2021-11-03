@@ -74,7 +74,7 @@ NotificationRequest::NotificationRequest(const NotificationRequest &other)
     this->settingsText_ = other.settingsText_;
     this->creatorBundleName_ = other.creatorBundleName_;
     this->ownerBundleName_ = other.ownerBundleName_;
-    this->groupValue_ = other.groupValue_;
+    this->groupName_ = other.groupName_;
     this->statusBarText_ = other.statusBarText_;
     this->label_ = other.label_;
     this->shortcutId_ = other.shortcutId_;
@@ -133,7 +133,7 @@ NotificationRequest &NotificationRequest::operator=(const NotificationRequest &o
     this->settingsText_ = other.settingsText_;
     this->creatorBundleName_ = other.creatorBundleName_;
     this->ownerBundleName_ = other.ownerBundleName_;
-    this->groupValue_ = other.groupValue_;
+    this->groupName_ = other.groupName_;
     this->statusBarText_ = other.statusBarText_;
     this->label_ = other.label_;
     this->shortcutId_ = other.shortcutId_;
@@ -472,14 +472,14 @@ void NotificationRequest::SetGroupOverview(bool overView)
     groupOverview_ = overView;
 }
 
-void NotificationRequest::SetGroupValue(const std::string &groupValue)
+void NotificationRequest::SetGroupName(const std::string &groupName)
 {
-    groupValue_ = groupValue;
+    groupName_ = groupName;
 }
 
-std::string NotificationRequest::GetGroupValue() const
+std::string NotificationRequest::GetGroupName() const
 {
-    return groupValue_;
+    return groupName_;
 }
 
 bool NotificationRequest::IsOnlyLocal() const
@@ -720,7 +720,7 @@ std::string NotificationRequest::Dump()
            ", creatorBundleName = " + creatorBundleName_ +
            ", creatorPid = " + std::to_string(static_cast<int32_t>(creatorPid_)) +
            ", creatorUid = " + std::to_string(static_cast<int32_t>(creatorUid_)) +
-           ", ownerBundleName = " + ownerBundleName_ + ", groupValue = " + groupValue_ +
+           ", ownerBundleName = " + ownerBundleName_ + ", groupName = " + groupName_ +
            ", statusBarText = " + statusBarText_ + ", label = " + label_ + ", shortcutId = " + shortcutId_ +
            ", sortingKey = " + sortingKey_ +
            ", groupAlertType = " + std::to_string(static_cast<int32_t>(groupAlertType_)) +
@@ -824,8 +824,8 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    if (!parcel.WriteString(groupValue_)) {
-        ANS_LOGE("Failed to write group value");
+    if (!parcel.WriteString(groupName_)) {
+        ANS_LOGE("Failed to write group name");
         return false;
     }
 
@@ -1127,8 +1127,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
-    if (!parcel.ReadString(groupValue_)) {
-        ANS_LOGE("Failed to read group value");
+    if (!parcel.ReadString(groupName_)) {
+        ANS_LOGE("Failed to read group name");
         return false;
     }
 

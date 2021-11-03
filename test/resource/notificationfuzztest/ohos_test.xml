@@ -1,4 +1,5 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
  * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,22 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ -->
+<configuration ver="2.0">
 
-#ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_CANCEL_H
-#define BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_CANCEL_H
+<target name="ActsNotificationFuzzTest">
+      <depend resource="notificationfuzzconfig/." pushpath="/data/fuzztestconfig" findpath="res" presetcmd=""/>
+      <preparer>
+        <option name="push" value="notificationfuzzconfig/. -> /data/fuzztestconfig" src="res" />
+      </preparer>
+</target>
 
-#include "common.h"
-
-namespace OHOS {
-namespace NotificationNapi {
-using namespace OHOS::Notification;
-
-napi_value Cancel(napi_env env, napi_callback_info info);
-napi_value CancelAll(napi_env env, napi_callback_info info);
-napi_value CancelGroup(napi_env env, napi_callback_info info);
-
-}  // namespace NotificationNapi
-}  // namespace OHOS
-
-#endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_CANCEL_H
+</configuration>
