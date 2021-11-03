@@ -80,9 +80,9 @@ inline void SleepForFC()
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnConnected() override
     {}
-    void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    void OnDisconnected() override
     {}
     void OnDied() override
     {}
@@ -618,14 +618,18 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02700,
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02800
  * @tc.name      : AMS_ANS_GetShowBadgeEnabledForBundle_0100
- * @tc.desc      : Test GetShowBadgeEnabledForBundle function when no bundle
+ * @tc.desc      : Test GetShowBadgeEnabledForBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02800, Function | SmallTest | Level1)
 {
+    EXPECT_EQ(advancedNotificationService_->SetShowBadgeEnabledForBundle(
+                  new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), true),
+        (int)ERR_OK);
     bool allow = false;
     EXPECT_EQ((int)advancedNotificationService_->GetShowBadgeEnabledForBundle(
                   new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), allow),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        (int)ERR_OK);
+    EXPECT_TRUE(allow);
 }
 
 /**
@@ -1068,7 +1072,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06900,
     bool allow = false;
     EXPECT_EQ((int)advancedNotificationService_->GetShowBadgeEnabledForBundle(
                   new NotificationBundleOption(TEST_DEFUALT_BUNDLE, NON_SYSTEM_APP_UID), allow),
-        (int)ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST);
+        (int)ERR_OK);
 }
 
 /**

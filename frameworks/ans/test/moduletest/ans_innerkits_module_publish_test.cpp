@@ -72,12 +72,12 @@ const std::string CLASSIFICATION_ALARM{"alarm"};
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    virtual void OnSubscribeResult(NotificationConstant::SubscribeResult result) override
+    virtual void OnConnected() override
     {
         g_subscribe_mtx.unlock();
     }
 
-    virtual void OnUnsubscribeResult(NotificationConstant::SubscribeResult result) override
+    virtual void OnDisconnected() override
     {
         g_unsubscribe_mtx.unlock();
     }
@@ -93,6 +93,7 @@ public:
 
     virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
     {
+        GTEST_LOG_(INFO) << "ANS_Interface_MT::OnCanceled request : " << request->GetNotificationRequest().Dump();
         OnCanceledReceived = true;
     }
 

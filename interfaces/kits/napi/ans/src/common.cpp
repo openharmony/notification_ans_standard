@@ -160,6 +160,20 @@ void Common::SetCallback(
     ANS_LOGI("end");
 }
 
+void Common::SetCallback(
+    const napi_env &env, const napi_ref &callbackIn, const napi_value &result)
+{
+    ANS_LOGI("enter");
+    napi_value undefined = nullptr;
+    napi_get_undefined(env, &undefined);
+
+    napi_value callback = nullptr;
+    napi_value resultout = nullptr;
+    napi_get_reference_value(env, callbackIn, &callback);
+    NAPI_CALL_RETURN_VOID(env, napi_call_function(env, undefined, callback, ARGS_ONE, &result, &resultout));
+    ANS_LOGI("end");
+}
+
 void Common::SetPromise(
     const napi_env &env, const napi_deferred &deferred, const int &errorCode, const napi_value &result)
 {

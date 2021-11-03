@@ -588,7 +588,6 @@ public:
      */
     static ErrCode GetDisturbMode(NotificationConstant::DisturbMode &disturbMode);
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 
