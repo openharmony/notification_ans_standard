@@ -60,7 +60,7 @@ void AnsSlotGroupSystemTest::OnStart(const Want &want)
     if (group != nullptr) {
         std::string dumpGroupStr = group->Dump();
         APP_LOGI("====>obtained group dump====> %{public}s", dumpGroupStr.c_str());
-        APP_LOGI("====>the number of slots in the obtained group====> %{public}uz", group->GetSlots().size());
+        APP_LOGI("====>the number of slots in the obtained group====> %{public}zu", group->GetSlots().size());
 
         ErrCode errcodeRem = Notification::NotificationHelper::RemoveNotificationSlotGroup("id_test");
         APP_LOGI("====>remove the group whose id is id_test, ErrCode is====> %{public}d", errcodeRem);
@@ -76,7 +76,7 @@ void AnsSlotGroupSystemTest::OnStart(const Want &want)
         if (groupSecond != nullptr) {
             dumpGroupStr = groupSecond->Dump();
             APP_LOGI("====>the second time obtained group dump====> %{public}s", dumpGroupStr.c_str());
-            APP_LOGI("====>the number of slots in second obtained group: %{public}uz", groupSecond->GetSlots().size());
+            APP_LOGI("====>the number of slots in second obtained group: %{public}zu", groupSecond->GetSlots().size());
 
             Notification::NotificationSlotGroup slotGroupFirst("id_first", "name_first");
             ErrCode errAddGroupFirst = Notification::NotificationHelper::AddNotificationSlotGroup(slotGroupFirst);
