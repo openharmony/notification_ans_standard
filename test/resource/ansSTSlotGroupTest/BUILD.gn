@@ -67,6 +67,6 @@ ohos_shared_library("libraryAnsSTSlotGroupTest") {
     "ipc:ipc_core",
   ]
 
-  subsystem_name = "notification"
-  part_name = "ans_standard"
+  subsystem_name = "anssystemtest"
+  part_name = "test"
 }

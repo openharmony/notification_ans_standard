@@ -30,6 +30,7 @@
         "abilities": [{
             "name": "AnsSlotGroupSystemTest",
             "icon": "$media:snowball",
+            "srcLanguage": "c++",
             "label": "AnsSlotGroupSystemTest Ability zofa label",
             "launchType": "singletop",
             "orientation": "unspecified",
