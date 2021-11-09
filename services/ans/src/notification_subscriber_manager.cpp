@@ -298,7 +298,6 @@ void NotificationSubscriberManager::NotifyUpdatedInner(const sptr<NotificationSo
 void NotificationSubscriberManager::NotifyDisturbModeChangedInner(const NotificationConstant::DisturbMode &mode)
 {
     for (auto record : subscriberRecordList_) {
-
         record->subscriber->OnDisturbModeChanged(mode);
     }
 }
