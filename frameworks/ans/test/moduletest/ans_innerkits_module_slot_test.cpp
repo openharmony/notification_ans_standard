@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 #include <functional>
 
+#include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_manager_proxy.h"
 #include "advanced_notification_service.h"
@@ -313,6 +314,74 @@ HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00500, Fu
     EXPECT_EQ(0, NotificationHelper::RemoveNotificationSlot(NotificationConstant::OTHER));
     EXPECT_EQ((int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST,
         NotificationHelper::GetNotificationSlot(NotificationConstant::OTHER, spSlot));
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_NotificationSlot_00600
+ * @tc.name      : NotificationSlot_00600
+ * @tc.desc      : Create notification slot(type is SOCIAL_COMMUNICATION), get sound and vibration.
+ * @tc.expected  : Create notification slot success, get sound and vibration success.
+ */
+HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00600, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::SOCIAL_COMMUNICATION);
+    EXPECT_EQ("SOCIAL_COMMUNICATION", slot.GetName());
+    EXPECT_EQ(NotificationConstant::VisiblenessType::PUBLIC, slot.GetLockScreenVisibleness());
+    EXPECT_EQ(DEFAULT_NOTIFICATION_SOUND.ToString(), slot.GetSound().ToString());
+    EXPECT_TRUE(slot.CanVibrate());
+    EXPECT_EQ(DEFAULT_NOTIFICATION_VIBRATION, slot.GetVibrationStyle());
+    EXPECT_EQ(NotificationSlot::NotificationLevel::LEVEL_HIGH, slot.GetLevel());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_NotificationSlot_00700
+ * @tc.name      : NotificationSlot_00700
+ * @tc.desc      : Create notification slot(type is SERVICE_REMINDER),  get sound and vibration.
+ * @tc.expected  : Create notification slot success, get sound and vibration success.
+ */
+HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00700, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::SERVICE_REMINDER);
+    EXPECT_EQ("SERVICE_REMINDER", slot.GetName());
+    EXPECT_EQ(NotificationConstant::VisiblenessType::PUBLIC, slot.GetLockScreenVisibleness());
+    EXPECT_EQ(DEFAULT_NOTIFICATION_SOUND.ToString(), slot.GetSound().ToString());
+    EXPECT_TRUE(slot.CanVibrate());
+    EXPECT_EQ(DEFAULT_NOTIFICATION_VIBRATION, slot.GetVibrationStyle());
+    EXPECT_EQ(NotificationSlot::NotificationLevel::LEVEL_DEFAULT, slot.GetLevel());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_NotificationSlot_00800
+ * @tc.name      : NotificationSlot_00800
+ * @tc.desc      : Create notification slot(type is CONTENT_INFORMATION), get sound and vibration.
+ * @tc.expected  : Create notification slot success, get sound and vibration success.
+ */
+HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00800, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::CONTENT_INFORMATION);
+    EXPECT_EQ("CONTENT_INFORMATION", slot.GetName());
+    EXPECT_EQ(NotificationConstant::VisiblenessType::SECRET, slot.GetLockScreenVisibleness());
+    EXPECT_EQ("", slot.GetSound().ToString());
+    EXPECT_FALSE(slot.CanVibrate());
+    EXPECT_EQ(0, slot.GetVibrationStyle().size());
+    EXPECT_EQ(NotificationSlot::NotificationLevel::LEVEL_LOW, slot.GetLevel());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_NotificationSlot_00900
+ * @tc.name      : NotificationSlot_00900
+ * @tc.desc      : Create notification slot(type is OTHER), get sound and vibration.
+ * @tc.expected  : Create notification slot success, get sound and vibration success.
+ */
+HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00900, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::OTHER);
+    EXPECT_EQ("OTHER", slot.GetName());
+    EXPECT_EQ(NotificationConstant::VisiblenessType::SECRET, slot.GetLockScreenVisibleness());
+    EXPECT_EQ("", slot.GetSound().ToString());
+    EXPECT_FALSE(slot.CanVibrate());
+    EXPECT_EQ(0, slot.GetVibrationStyle().size());
+    EXPECT_EQ(NotificationSlot::NotificationLevel::LEVEL_MIN, slot.GetLevel());
 }
 
 /**
