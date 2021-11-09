@@ -16,6 +16,10 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_CONST_DEFINE_H
 #define BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_CONST_DEFINE_H
 
+#include <vector>
+
+#include "uri.h"
+
 namespace OHOS {
 namespace Notification {
 
@@ -27,6 +31,10 @@ constexpr uint32_t MAX_SLOT_NUM = 5;
 constexpr uint32_t MAX_SLOT_GROUP_NUM = 4;
 constexpr uint32_t MAX_ICON_SIZE = 50 * 1024;
 constexpr uint32_t MAX_PICTURE_SIZE = 2 * 1024 * 1024;
+
+// Default sound for notification
+const static Uri DEFAULT_NOTIFICATION_SOUND("file://system/etc/Light.ogg");
+const static std::vector<int64_t> DEFAULT_NOTIFICATION_VIBRATION = {200};
 
 }  // namespace Notification
 }  // namespace OHOS

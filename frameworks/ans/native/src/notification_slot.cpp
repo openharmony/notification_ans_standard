@@ -15,6 +15,7 @@
 
 #include "notification_slot.h"
 #include "ans_log_wrapper.h"
+#include "ans_const_define.h"
 
 namespace OHOS {
 namespace Notification {
@@ -97,14 +98,16 @@ void NotificationSlot::SetType(NotificationConstant::SlotType type)
             id_ = "SOCIAL_COMMUNICATION";
             SetName("SOCIAL_COMMUNICATION");
             SetLockscreenVisibleness(NotificationConstant::VisiblenessType::PUBLIC);
-            SetEnableVibration(true);
+            SetSound(DEFAULT_NOTIFICATION_SOUND);
+            SetVibrationStyle(DEFAULT_NOTIFICATION_VIBRATION);
             SetLevel(LEVEL_HIGH);
             break;
         case NotificationConstant::SlotType::SERVICE_REMINDER:
             id_ = "SERVICE_REMINDER";
             SetName("SERVICE_REMINDER");
             SetLockscreenVisibleness(NotificationConstant::VisiblenessType::PUBLIC);
-            SetEnableVibration(true);
+            SetSound(DEFAULT_NOTIFICATION_SOUND);
+            SetVibrationStyle(DEFAULT_NOTIFICATION_VIBRATION);
             SetLevel(LEVEL_DEFAULT);
             break;
         case NotificationConstant::SlotType::CONTENT_INFORMATION:
