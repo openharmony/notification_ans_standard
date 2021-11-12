@@ -160,6 +160,11 @@ ErrCode AnsNotification::GetNotificationSlotGroups(std::vector<sptr<Notification
 
 ErrCode AnsNotification::GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -514,6 +519,11 @@ ErrCode AnsNotification::RemoveNotification(const std::string &key)
 ErrCode AnsNotification::RemoveNotification(
     const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -525,6 +535,11 @@ ErrCode AnsNotification::RemoveNotification(
 
 ErrCode AnsNotification::RemoveAllNotifications(const NotificationBundleOption &bundleOption)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -536,6 +551,11 @@ ErrCode AnsNotification::RemoveAllNotifications(const NotificationBundleOption &
 
 ErrCode AnsNotification::RemoveNotificationsByBundle(const NotificationBundleOption &bundleOption)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -574,6 +594,11 @@ ErrCode AnsNotification::GetNotificationSlotsForBundle(
 ErrCode AnsNotification::UpdateNotificationSlots(
     const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -586,6 +611,11 @@ ErrCode AnsNotification::UpdateNotificationSlots(
 ErrCode AnsNotification::UpdateNotificationSlotGroups(
     const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -651,6 +681,11 @@ ErrCode AnsNotification::SetNotificationsEnabledForDefaultBundle(const std::stri
 ErrCode AnsNotification::SetNotificationsEnabledForSpecifiedBundle(
     const NotificationBundleOption &bundleOption, const std::string &deviceId, bool enabled)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -662,6 +697,11 @@ ErrCode AnsNotification::SetNotificationsEnabledForSpecifiedBundle(
 
 ErrCode AnsNotification::SetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool enabled)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -673,6 +713,11 @@ ErrCode AnsNotification::SetShowBadgeEnabledForBundle(const NotificationBundleOp
 
 ErrCode AnsNotification::GetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool &enabled)
 {
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -712,6 +757,11 @@ ErrCode AnsNotification::GetDisturbMode(NotificationConstant::DisturbMode &distu
 
 ErrCode AnsNotification::CancelGroup(const std::string &groupName)
 {
+    if (groupName.empty()) {
+        ANS_LOGE("Invalid group name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -723,6 +773,11 @@ ErrCode AnsNotification::CancelGroup(const std::string &groupName)
 ErrCode AnsNotification::RemoveGroupByBundle(
     const NotificationBundleOption &bundleOption, const std::string &groupName)
 {
+    if (bundleOption.GetBundleName().empty() || groupName.empty()) {
+        ANS_LOGE("Invalid parameter.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
