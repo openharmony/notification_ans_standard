@@ -227,11 +227,7 @@ void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::No
 
     work->data = (void *)dataWorker;
 
-    int ret = uv_queue_work(loop,
-        work,
-        [](uv_work_t *work) {},
-        UvQueueWorkOnCanceled);
-
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkOnCanceled);
     if (ret != 0) {
         delete dataWorker;
         dataWorker = nullptr;
@@ -327,10 +323,7 @@ void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::No
 
     work->data = (void *)dataWorker;
 
-    int ret = uv_queue_work(loop,
-        work,
-        [](uv_work_t *work) {},
-        UvQueueWorkOnConsumed);
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkOnConsumed);
     if (ret != 0) {
         delete dataWorker;
         dataWorker = nullptr;
@@ -411,16 +404,37 @@ void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> 
 
     work->data = (void *)dataWorker;
 
-    int ret = uv_queue_work(loop,
-        work,
-        [](uv_work_t *work) {},
-        UvQueueWorkOnUpdate);
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkOnUpdate);
     if (ret != 0) {
         delete dataWorker;
         dataWorker = nullptr;
         delete work;
         work = nullptr;
     }
+}
+
+void UvQueueWorkOnConnected(uv_work_t *work, int status) {
+    ANS_LOGI("OnConnected uv_work_t start");
+
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        delete work;
+        work = nullptr;
+        return;
+    }
+
+    Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
 }
 
 void SubscriberInstance::OnConnected()
@@ -458,38 +472,39 @@ void SubscriberInstance::OnConnected()
 
     work->data = (void *)dataWorker;
 
-    int ret = uv_queue_work(loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnSubscribeResult uv_work_t start");
-
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
-
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                delete work;
-                work = nullptr;
-                return;
-            }
-
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
-
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkOnConnected);
     if (ret != 0) {
         delete dataWorker;
         dataWorker = nullptr;
         delete work;
         work = nullptr;
     }
+}
+
+void UvQueueWorkOnDisconnected(uv_work_t *work, int status) {
+    ANS_LOGI("OnDisconnected uv_work_t start");
+
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        delete work;
+        work = nullptr;
+        return;
+    }
+
+    Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
+
+    DelSubscriberInstancesInfo(dataWorkerData->env, dataWorkerData->subscriber);
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
 }
 
 void SubscriberInstance::OnDisconnected()
@@ -528,40 +543,38 @@ void SubscriberInstance::OnDisconnected()
 
     work->data = (void *)dataWorker;
 
-    int ret = uv_queue_work(loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnUnsubscribeResult uv_work_t start");
-
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
-
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                delete work;
-                work = nullptr;
-                return;
-            }
-
-            Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
-
-            DelSubscriberInstancesInfo(dataWorkerData->env, dataWorkerData->subscriber);
-
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkOnDisconnected);
     if (ret != 0) {
         delete dataWorker;
         dataWorker = nullptr;
         delete work;
         work = nullptr;
     }
+}
+
+void UvQueueWorkOnDied(uv_work_t *work, int status) {
+    ANS_LOGI("OnDied uv_work_t start");
+
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        delete work;
+        work = nullptr;
+        return;
+    }
+
+    Common::SetCallback(
+        dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
 }
 
 void SubscriberInstance::OnDied()
@@ -599,33 +612,7 @@ void SubscriberInstance::OnDied()
 
     work->data = (void *)dataWorker;
 
-    int ret = uv_queue_work(loop,
-        work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            ANS_LOGI("OnDied uv_work_t start");
-
-            if (work == nullptr) {
-                ANS_LOGE("work is null");
-                return;
-            }
-
-            NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
-            if (dataWorkerData == nullptr) {
-                ANS_LOGE("dataWorkerData is null");
-                delete work;
-                work = nullptr;
-                return;
-            }
-
-            Common::SetCallback(
-                dataWorkerData->env, dataWorkerData->ref, Common::NapiGetNull(dataWorkerData->env));
-
-            delete dataWorkerData;
-            dataWorkerData = nullptr;
-            delete work;
-            work = nullptr;
-        });
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkOnDied);
     if (ret != 0) {
         delete dataWorker;
         dataWorker = nullptr;
