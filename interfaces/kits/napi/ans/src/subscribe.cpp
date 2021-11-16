@@ -413,7 +413,8 @@ void SubscriberInstance::OnUpdate(const std::shared_ptr<NotificationSortingMap> 
     }
 }
 
-void UvQueueWorkOnConnected(uv_work_t *work, int status) {
+void UvQueueWorkOnConnected(uv_work_t *work, int status)
+{
     ANS_LOGI("OnConnected uv_work_t start");
 
     if (work == nullptr) {
@@ -481,7 +482,8 @@ void SubscriberInstance::OnConnected()
     }
 }
 
-void UvQueueWorkOnDisconnected(uv_work_t *work, int status) {
+void UvQueueWorkOnDisconnected(uv_work_t *work, int status)
+{
     ANS_LOGI("OnDisconnected uv_work_t start");
 
     if (work == nullptr) {
@@ -552,7 +554,8 @@ void SubscriberInstance::OnDisconnected()
     }
 }
 
-void UvQueueWorkOnDied(uv_work_t *work, int status) {
+void UvQueueWorkOnDied(uv_work_t *work, int status)
+{
     ANS_LOGI("OnDied uv_work_t start");
 
     if (work == nullptr) {
