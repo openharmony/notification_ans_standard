@@ -57,6 +57,7 @@ auto OnSendFinishedUvAfterWorkCallback = [](uv_work_t *work, int status) {
     TriggerReceiveDataWorker *dataWorkerData = static_cast<TriggerReceiveDataWorker *>(work->data);
     if (dataWorkerData == nullptr) {
         HILOG_INFO("TriggerReceiveDataWorker instance(uv_work_t) is nullptr");
+        delete work;
         return;
     }
     napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
