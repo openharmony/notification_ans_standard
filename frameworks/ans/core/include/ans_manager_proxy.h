@@ -57,8 +57,6 @@ public:
         const sptr<NotificationRequest> notification, const std::string &representativeBundle) override;
     ErrCode SetNotificationBadgeNum(int num) override;
     ErrCode GetBundleImportance(int &importance) override;
-    ErrCode SetDisturbMode(NotificationConstant::DisturbMode mode) override;
-    ErrCode GetDisturbMode(NotificationConstant::DisturbMode &mode) override;
     ErrCode HasNotificationPolicyAccessPermission(bool &granted) override;
     ErrCode SetPrivateNotificationsAllowed(bool allow) override;
     ErrCode GetPrivateNotificationsAllowed(bool &allow) override;
@@ -93,6 +91,9 @@ public:
     ErrCode IsAllowedNotify(bool &allowed) override;
     ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
+    ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport) override;
     ErrCode CancelGroup(const std::string &groupName) override;
     ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;

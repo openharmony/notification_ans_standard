@@ -22,6 +22,7 @@
 #include "ans_subscriber_interface.h"
 #include "iremote_broker.h"
 #include "notification_bundle_option.h"
+#include "notification_do_not_disturb_date.h"
 #include "notification_constant.h"
 #include "notification_request.h"
 #include "notification_slot.h"
@@ -68,8 +69,6 @@ public:
         const sptr<NotificationRequest> notification, const std::string &representativeBundle) = 0;
     virtual ErrCode SetNotificationBadgeNum(int num) = 0;
     virtual ErrCode GetBundleImportance(int &importance) = 0;
-    virtual ErrCode SetDisturbMode(NotificationConstant::DisturbMode mode) = 0;
-    virtual ErrCode GetDisturbMode(NotificationConstant::DisturbMode &mode) = 0;
     virtual ErrCode HasNotificationPolicyAccessPermission(bool &granted) = 0;
     virtual ErrCode SetPrivateNotificationsAllowed(bool allow) = 0;
     virtual ErrCode GetPrivateNotificationsAllowed(bool &allow) = 0;
@@ -104,6 +103,9 @@ public:
     virtual ErrCode IsAllowedNotify(bool &allowed) = 0;
     virtual ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) = 0;
 
+    virtual ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> & date) = 0;
+    virtual ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> & date) = 0;
+    virtual ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport) = 0;
     virtual ErrCode CancelGroup(const std::string &groupName) = 0;
     virtual ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) = 0;
@@ -137,8 +139,6 @@ protected:
         PUBLISH_AS_BUNDLE,
         SET_NOTIFICATION_BADGE_NUM,
         GET_BUNDLE_IMPORTANCE,
-        SET_DISTURB_MODE,
-        GET_DISTURB_MODE,
         IS_NOTIFICATION_POLICY_ACCESS_GRANTED,
         SET_PRIVATIVE_NOTIFICATIONS_ALLOWED,
         GET_PRIVATIVE_NOTIFICATIONS_ALLOWED,
@@ -162,6 +162,9 @@ protected:
         GET_CURRENT_APP_SORTING,
         IS_ALLOWED_NOTIFY,
         IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
+        SET_DO_NOT_DISTURB_DATE,
+        GET_DO_NOT_DISTURB_DATE,
+        DOES_SUPPORT_DO_NOT_DISTURB_MODE,
         CANCEL_GROUP,
         REMOVE_GROUP_BY_BUNDLE,
         SHELL_DUMP,

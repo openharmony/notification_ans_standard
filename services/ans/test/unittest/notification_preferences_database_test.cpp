@@ -241,17 +241,71 @@ HWTEST_F(NotificationPreferencesDatabaseTest, PutNotificationsEnabled_00100, Fun
 }
 
 /**
- * @tc.number    : PutDisturbMode_00100
+ * @tc.number    : PutDoNotDisturbDate_00100
  * @tc.name      :
- * @tc.desc      : Put disturbe mode into disturbe DB, return is true.
+ * @tc.desc      : Put disturbe mode into disturbe DB when DoNotDisturbType is NONE, return is true.
  */
-HWTEST_F(NotificationPreferencesDatabaseTest, PutDisturbMode_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesDatabaseTest, PutDoNotDisturbDate_00100, Function | SmallTest | Level1)
 {
-    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALARMS));
-    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALL));
-    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_NONE));
-    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_PRIORITY));
-    EXPECT_TRUE(preferncesDB_->PutDisturbMode(OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_UNKNOWN));
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+    EXPECT_TRUE(preferncesDB_->PutDoNotDisturbDate(date));
+}
+
+/**
+ * @tc.number    : PutDoNotDisturbDate_00200
+ * @tc.name      :
+ * @tc.desc      : Put disturbe mode into disturbe DB when DoNotDisturbType is ONCE, return is true.
+ */
+HWTEST_F(NotificationPreferencesDatabaseTest, PutDoNotDisturbDate_00200, Function | SmallTest | Level1)
+{
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
+    EXPECT_TRUE(preferncesDB_->PutDoNotDisturbDate(date));
+}
+
+/**
+ * @tc.number    : PutDoNotDisturbDate_00300
+ * @tc.name      :
+ * @tc.desc      : Put disturbe mode into disturbe DB when DoNotDisturbType is DAILY, return is true.
+ */
+HWTEST_F(NotificationPreferencesDatabaseTest, PutDoNotDisturbDate_00300, Function | SmallTest | Level1)
+{
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
+
+    EXPECT_TRUE(preferncesDB_->PutDoNotDisturbDate(date));
+}
+
+/**
+ * @tc.number    : PutDoNotDisturbDate_00400
+ * @tc.name      :
+ * @tc.desc      : Put disturbe mode into disturbe DB when DoNotDisturbType is CLEARLY, return is true.
+ */
+HWTEST_F(NotificationPreferencesDatabaseTest, PutDoNotDisturbDate_00400, Function | SmallTest | Level1)
+{
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::CLEARLY, beginDate, endDate);
+
+    EXPECT_TRUE(preferncesDB_->PutDoNotDisturbDate(date));
 }
 
 /**
@@ -387,7 +441,7 @@ HWTEST_F(NotificationPreferencesDatabaseTest, GetKvStore_00100, Function | Small
 
 /**
  * @tc.name      : CheckKvStore_00100
- * @tc.number    : 
+ * @tc.number    :
  * @tc.desc      : Check disturbe DB is exsit, return is true.
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, CheckKvStore_00100, Function | SmallTest | Level1)

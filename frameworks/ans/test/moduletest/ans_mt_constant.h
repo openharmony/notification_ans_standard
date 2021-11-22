@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 namespace {
 const std::string APP_NAME = "bundleName";
 const std::string NOTIFICATION_LABEL_0 = "Label0";
@@ -34,7 +33,6 @@ constexpr int CANCEL_REASON_DELETE = 2;
 constexpr int APP_CANCEL_REASON_DELETE = 8;
 constexpr int APP_CANCEL_ALL_REASON_DELETE = 9;
 }  // namespace
-
 }  // namespace Notification
 }  // namespace OHOS
 

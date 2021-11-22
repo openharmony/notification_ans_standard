@@ -38,7 +38,7 @@ public:
     void OnCanceled(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap,
         int deleteReason) override;
     void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) override;
-    void OnDisturbModeChanged(NotificationConstant::DisturbMode mode) override;
+    void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

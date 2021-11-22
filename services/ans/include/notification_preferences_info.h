@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "notification_bundle_option.h"
+#include "notification_do_not_disturb_date.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
 #include "preferences_constant.h"
@@ -81,8 +82,8 @@ public:
     {}
     void SetEnabledAllNotification(const bool &value);
     bool GetEnabledAllNotification() const;
-    void SetDisturbMode(const NotificationConstant::DisturbMode &mode);
-    NotificationConstant::DisturbMode GetDisturbMode() const;
+    void SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date);
+    sptr<NotificationDoNotDisturbDate> GetDoNotDisturbDate() const;
     void SetBundleInfo(const BundleInfo &info);
     bool GetBundleInfo(const sptr<NotificationBundleOption> &bundleOption, BundleInfo &info) const;
     bool RemoveBundleInfo(const sptr<NotificationBundleOption> &bundleOption);
@@ -91,7 +92,7 @@ public:
 
 private:
     bool isEnabledAllNotification_ = true;
-    NotificationConstant::DisturbMode disturbMode_ = NotificationConstant::DisturbMode::ALLOW_ALL;
+    sptr<NotificationDoNotDisturbDate> doNotDisturbDate_ = new NotificationDoNotDisturbDate();
     std::map<std::string, BundleInfo> infos_;
 };
 }  // namespace Notification

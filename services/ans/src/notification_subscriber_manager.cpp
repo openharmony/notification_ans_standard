@@ -118,17 +118,17 @@ void NotificationSubscriberManager::NotifyUpdated(const sptr<NotificationSorting
     handler_->PostTask(NotifyUpdatedFunc);
 }
 
-void NotificationSubscriberManager::NotifyDisturbModeChanged(const NotificationConstant::DisturbMode &mode)
+void NotificationSubscriberManager::NotifyDoNotDisturbDateChanged(const sptr<NotificationDoNotDisturbDate> &date)
 {
     if (handler_ == nullptr) {
         ANS_LOGE("handler is nullptr");
         return;
     }
 
-    AppExecFwk::EventHandler::Callback NotifyDisturbModeChangedFunc =
-        std::bind(&NotificationSubscriberManager::NotifyDisturbModeChangedInner, this, mode);
+    AppExecFwk::EventHandler::Callback func =
+        std::bind(&NotificationSubscriberManager::NotifyDoNotDisturbDateChangedInner, this, date);
 
-    handler_->PostTask(NotifyDisturbModeChangedFunc);
+    handler_->PostTask(func);
 }
 
 void NotificationSubscriberManager::OnRemoteDied(const wptr<IRemoteObject> &object)
@@ -295,10 +295,10 @@ void NotificationSubscriberManager::NotifyUpdatedInner(const sptr<NotificationSo
     }
 }
 
-void NotificationSubscriberManager::NotifyDisturbModeChangedInner(const NotificationConstant::DisturbMode &mode)
+void NotificationSubscriberManager::NotifyDoNotDisturbDateChangedInner(const sptr<NotificationDoNotDisturbDate> &date)
 {
     for (auto record : subscriberRecordList_) {
-        record->subscriber->OnDisturbModeChanged(mode);
+        record->subscriber->OnDoNotDisturbDateChange(date);
     }
 }
 }  // namespace Notification

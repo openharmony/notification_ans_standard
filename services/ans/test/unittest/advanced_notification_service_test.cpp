@@ -88,7 +88,7 @@ public:
     {}
     void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {}
-    void OnDisturbModeChanged(int disturbMode) override
+    void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {}
     void OnCanceled(const std::shared_ptr<Notification> &request) override
     {}
@@ -119,7 +119,7 @@ void AdvancedNotificationServiceTest::TestAddSlotGroup()
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00100
+ * @tc.number    : ANS_Publish_00100
  * @tc.name      : ANSPublish00100
  * @tc.desc      : Publish a normal text type notification.
  */
@@ -143,7 +143,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00100,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00200
+ * @tc.number    : ANS_Publish_00200
  * @tc.name      : ANSPublish00200
  * @tc.desc      : Publish a normal text type notification twice.
  */
@@ -168,7 +168,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00200,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00300
+ * @tc.number    : ANS_Publish_00300
  * @tc.name      : ANSPublish00300
  * @tc.desc      : When slotType is CUSTOM and not systemApp, the notification publish fails,
  * and the notification publish interface returns ERR_ANS_NON_SYSTEM_APP.
@@ -193,7 +193,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00300,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00400
+ * @tc.number    : ANS_Publish_00400
  * @tc.name      : ANSPublish00400
  * @tc.desc      : When the obtained bundleName is empty, the notification publish interface returns
  * ERR_ANS_INVALID_BUNDLE.
@@ -218,7 +218,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00400,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00500
+ * @tc.number    : ANS_Publish_00500
  * @tc.name      : ANSPublish00500
  * @tc.desc      : When the obtained bundleName does not have a corresponding slot in the database,
  * create the corresponding slot and publish a notification.
@@ -243,7 +243,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00500,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00600
+ * @tc.number    : ANS_Publish_00600
  * @tc.name      : ANSPublish00600
  * @tc.desc      : When the obtained bundleName have a corresponding slot in the database,
  * the test publish interface can successfully publish a notification of normal text type.
@@ -268,7 +268,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00600,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00700
+ * @tc.number    : ANS_Publish_00700
  * @tc.name      : ANSPublish00700
  * @tc.desc      : When the obtained bundleName have a corresponding slot in the database,
  * create the corresponding slot and publish a notification.
@@ -292,7 +292,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00700,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00800
+ * @tc.number    : ANS_Publish_00800
  * @tc.name      : ANSPublish00800
  * @tc.desc      : Create a slot of type SOCIAL_COMMUNICATION and successfully publish a notification
  */
@@ -316,7 +316,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00800,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_00900
+ * @tc.number    : ANS_Publish_00900
  * @tc.name      : ANSPublish00900
  * @tc.desc      : Create a slot of type SERVICE_REMINDER and successfully publish a notification
  */
@@ -340,7 +340,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_00900,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_01000
+ * @tc.number    : ANS_Publish_01000
  * @tc.name      : ANSPublish01000
  * @tc.desc      : Create a slot of type CONTENT_INFORMATION and successfully publish a notification
  */
@@ -364,7 +364,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01000,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_01100
+ * @tc.number    : ANS_Publish_01100
  * @tc.name      : ANSPublish01100
  * @tc.desc      : Create a slot of type OTHER and successfully publish a notification
  */
@@ -388,7 +388,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01100,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_01200
+ * @tc.number    : ANS_Publish_01200
  * @tc.name      : ANSPublish01200
  * @tc.desc      : Create a slot of type CUSTOM and successfully publish a notification
  */
@@ -412,7 +412,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01200,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_01300
+ * @tc.number    : ANS_Publish_01300
  * @tc.name      : ANSPublish01300
  * @tc.desc      : When a bundle is not allowed to publish a notification, the notification publishing interface
  returns
@@ -441,7 +441,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01300,
 }
 
 /**
- * @tc.number    : AMS_ANS_Publish_01400
+ * @tc.number    : ANS_Publish_01400
  * @tc.name      : ANSPublish01400
  * @tc.desc      :
  */
@@ -455,7 +455,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01400,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_01600
- * @tc.name      : AMS_ANS_GetSlot_0200
+ * @tc.name      : ANS_GetSlot_0200
  * @tc.desc      : Test GetSlots function when add two identical data
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01600, Function | SmallTest | Level1)
@@ -474,7 +474,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01600,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_01700
- * @tc.name      : AMS_ANS_GetSlotGroup_0100
+ * @tc.name      : ANS_GetSlotGroup_0100
  * @tc.desc      : Test GetSlotGroup function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01700, Function | SmallTest | Level1)
@@ -493,7 +493,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01700,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_01800
- * @tc.name      : AMS_ANS_SetNotificationBadgeNum_0100
+ * @tc.name      : ANS_SetNotificationBadgeNum_0100
  * @tc.desc      : Test SetNotificationBadgeNum function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01800, Function | SmallTest | Level1)
@@ -504,7 +504,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_01900
- * @tc.name      : AMS_ANS_GetBundleImportance_0100
+ * @tc.name      : ANS_GetBundleImportance_0100
  * @tc.desc      : Test GetBundleImportance function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01900, Function | SmallTest | Level1)
@@ -516,7 +516,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_01900,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02000
- * @tc.name      : AMS_ANS_SetPrivateNotificationsAllowed_0100
+ * @tc.name      : ANS_SetPrivateNotificationsAllowed_0100
  * @tc.desc      : Test SetPrivateNotificationsAllowed function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02000, Function | SmallTest | Level1)
@@ -527,7 +527,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02100
- * @tc.name      : AMS_ANS_GetPrivateNotificationsAllowed_0100
+ * @tc.name      : ANS_GetPrivateNotificationsAllowed_0100
  * @tc.desc      : Test GetPrivateNotificationsAllowed function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02100, Function | SmallTest | Level1)
@@ -541,7 +541,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02100,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02200
- * @tc.name      : AMS_ANS_UpdateSlots_0100
+ * @tc.name      : ANS_UpdateSlots_0100
  * @tc.desc      : Test UpdateSlots function when no slot
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02200, Function | SmallTest | Level1)
@@ -557,7 +557,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02200,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02300
- * @tc.name      : AMS_ANS_UpdateSlots_0200
+ * @tc.name      : ANS_UpdateSlots_0200
  * @tc.desc      : Test UpdateSlots function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02300, Function | SmallTest | Level1)
@@ -573,7 +573,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02300,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02400
- * @tc.name      : AMS_ANS_UpdateSlotGroups_0100
+ * @tc.name      : ANS_UpdateSlotGroups_0100
  * @tc.desc      : Test UpdateSlotGroups function when no group
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02400, Function | SmallTest | Level1)
@@ -589,7 +589,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02400,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02500
- * @tc.name      : AMS_ANS_UpdateSlotGroups_0200
+ * @tc.name      : ANS_UpdateSlotGroups_0200
  * @tc.desc      : Test UpdateSlotGroups function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02500, Function | SmallTest | Level1)
@@ -605,7 +605,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02500,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02700
- * @tc.name      : AMS_ANS_SetShowBadgeEnabledForBundle_0100
+ * @tc.name      : ANS_SetShowBadgeEnabledForBundle_0100
  * @tc.desc      : Test the SetShowBadgeEnabledForBundle function when the parameter is wrong
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02700, Function | SmallTest | Level1)
@@ -617,7 +617,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02700,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02800
- * @tc.name      : AMS_ANS_GetShowBadgeEnabledForBundle_0100
+ * @tc.name      : ANS_GetShowBadgeEnabledForBundle_0100
  * @tc.desc      : Test GetShowBadgeEnabledForBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02800, Function | SmallTest | Level1)
@@ -634,7 +634,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_02900
- * @tc.name      : AMS_ANS_GetActiveNotifications_0100
+ * @tc.name      : ANS_GetActiveNotifications_0100
  * @tc.desc      : Test GetActiveNotifications function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02900, Function | SmallTest | Level1)
@@ -644,33 +644,8 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_02900,
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_03400
- * @tc.name      : AMS_ANS_SetDisturbMode_0100
- * @tc.desc      : Test SetDisturbMode function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03400, Function | SmallTest | Level1)
-{
-    EXPECT_EQ(
-        (int)advancedNotificationService_->SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_NONE), (int)ERR_OK);
-}
-
-/**
- * @tc.number    : AdvancedNotificationServiceTest_03500
- * @tc.name      : AMS_ANS_GetDisturbMode_0100
- * @tc.desc      : Test GetDisturbMode function
- */
-HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03500, Function | SmallTest | Level1)
-{
-    EXPECT_EQ(
-        (int)advancedNotificationService_->SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_NONE), (int)ERR_OK);
-    NotificationConstant::DisturbMode mode;
-    EXPECT_EQ((int)advancedNotificationService_->GetDisturbMode(mode), (int)ERR_OK);
-    EXPECT_EQ(mode, NotificationConstant::DisturbMode::ALLOW_NONE);
-}
-
-/**
  * @tc.number    : AdvancedNotificationServiceTest_03700
- * @tc.name      : AMS_ANS_Delete_0100
+ * @tc.name      : ANS_Delete_0100
  * @tc.desc      : Test Delete function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03700, Function | SmallTest | Level1)
@@ -681,7 +656,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03700,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_03800
- * @tc.name      : AMS_ANS_DeleteByBundle_0100
+ * @tc.name      : ANS_DeleteByBundle_0100
  * @tc.desc      : Test DeleteByBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03800, Function | SmallTest | Level1)
@@ -693,7 +668,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_03900
- * @tc.name      : AMS_ANS_DeleteAll_0100
+ * @tc.name      : ANS_DeleteAll_0100
  * @tc.desc      : Test DeleteAll function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03900, Function | SmallTest | Level1)
@@ -703,7 +678,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_03900,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_04000
- * @tc.name      : AMS_ANS_GetSlotsByBundle_0100
+ * @tc.name      : ANS_GetSlotsByBundle_0100
  * @tc.desc      : Test GetSlotsByBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04000, Function | SmallTest | Level1)
@@ -718,7 +693,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_04100
- * @tc.name      : AMS_ANS_GetSpecialActiveNotifications_0100
+ * @tc.name      : ANS_GetSpecialActiveNotifications_0100
  * @tc.desc      : Test GetSpecialActiveNotifications function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04100, Function | SmallTest | Level1)
@@ -754,7 +729,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04100,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_04600
- * @tc.name      : AMS_ANS_Publish_0500
+ * @tc.name      : ANS_Publish_0500
  * @tc.desc      : publish function when NotificationsEnabled is false
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04600, Function | SmallTest | Level1)
@@ -770,7 +745,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04600,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_04700
- * @tc.name      : AMS_ANS_Cancel_0100
+ * @tc.name      : ANS_Cancel_0100
  * @tc.desc      : public two notification to cancel one of them
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04700, Function | SmallTest | Level1)
@@ -794,7 +769,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04700,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_04800
- * @tc.name      : AMS_ANS_Cancel_0200
+ * @tc.name      : ANS_Cancel_0200
  * @tc.desc      : Test Cancel function when notification no exists
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04800, Function | SmallTest | Level1)
@@ -806,7 +781,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_04900
- * @tc.name      : AMS_ANS_CancelAll_0100
+ * @tc.name      : ANS_CancelAll_0100
  * @tc.desc      : Test CancelAll function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04900, Function | SmallTest | Level1)
@@ -819,7 +794,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_04900,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05000
- * @tc.name      : AMS_ANS_Cancel_0100
+ * @tc.name      : ANS_Cancel_0100
  * @tc.desc      : Test Cancel function when unremovable is true
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05000, Function | SmallTest | Level1)
@@ -837,7 +812,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05100
- * @tc.name      : AMS_ANS_AddSlots_0100
+ * @tc.name      : ANS_AddSlots_0100
  * @tc.desc      : Test AddSlots function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05100, Function | SmallTest | Level1)
@@ -852,7 +827,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05100,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05200
- * @tc.name      : AMS_ANS_RemoveSlotByType_0100
+ * @tc.name      : ANS_RemoveSlotByType_0100
  * @tc.desc      : Test RemoveSlotByType function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05200, Function | SmallTest | Level1)
@@ -863,7 +838,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05200,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05300
- * @tc.name      : AMS_ANS_RemoveSlotByType_0200
+ * @tc.name      : ANS_RemoveSlotByType_0200
  * @tc.desc      : Test RemoveSlotByType function when no type
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05300, Function | SmallTest | Level1)
@@ -875,7 +850,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05300,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05400
- * @tc.name      : AMS_ANS_AddSlotGroups_0100
+ * @tc.name      : ANS_AddSlotGroups_0100
  * @tc.desc      : Test AddSlotGroups function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05400, Function | SmallTest | Level1)
@@ -890,7 +865,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05400,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05500
- * @tc.name      : AMS_ANS_RemoveSlotGroups_0100
+ * @tc.name      : ANS_RemoveSlotGroups_0100
  * @tc.desc      : Test RemoveSlotGroups function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05500, Function | SmallTest | Level1)
@@ -903,7 +878,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05500,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05600
- * @tc.name      : AMS_ANS_GetSlot_0100
+ * @tc.name      : ANS_GetSlot_0100
  * @tc.desc      : Test GetSlot function for data
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05600, Function | SmallTest | Level1)
@@ -921,7 +896,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05600,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05800
- * @tc.name      : AMS_ANS_GetSlotGroup_0100
+ * @tc.name      : ANS_GetSlotGroup_0100
  * @tc.desc      : Test GetSlotGroup function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05800, Function | SmallTest | Level1)
@@ -940,7 +915,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_05900
- * @tc.name      : AMS_ANS_SetNotificationBadgeNum_0100
+ * @tc.name      : ANS_SetNotificationBadgeNum_0100
  * @tc.desc      : Test SetNotificationBadgeNum function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05900, Function | SmallTest | Level1)
@@ -951,7 +926,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_05900,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06000
- * @tc.name      : AMS_ANS_GetBundleImportance_0100
+ * @tc.name      : ANS_GetBundleImportance_0100
  * @tc.desc      : Test GetBundleImportance function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06000, Function | SmallTest | Level1)
@@ -963,7 +938,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06100
- * @tc.name      : AMS_ANS_SetPrivateNotificationsAllowed_0100
+ * @tc.name      : ANS_SetPrivateNotificationsAllowed_0100
  * @tc.desc      : Test SetPrivateNotificationsAllowed function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06100, Function | SmallTest | Level1)
@@ -974,7 +949,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06100,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06200
- * @tc.name      : AMS_ANS_GetPrivateNotificationsAllowed_0100
+ * @tc.name      : ANS_GetPrivateNotificationsAllowed_0100
  * @tc.desc      : Test GetPrivateNotificationsAllowed function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06200, Function | SmallTest | Level1)
@@ -988,7 +963,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06200,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06300
- * @tc.name      : AMS_ANS_UpdateSlots_0100
+ * @tc.name      : ANS_UpdateSlots_0100
  * @tc.desc      : Test UpdateSlots function when no slot
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06300, Function | SmallTest | Level1)
@@ -1004,7 +979,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06300,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06400
- * @tc.name      : AMS_ANS_UpdateSlots_0200
+ * @tc.name      : ANS_UpdateSlots_0200
  * @tc.desc      : Test UpdateSlots function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06400, Function | SmallTest | Level1)
@@ -1020,7 +995,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06400,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06500
- * @tc.name      : AMS_ANS_UpdateSlotGroups_0100
+ * @tc.name      : ANS_UpdateSlotGroups_0100
  * @tc.desc      : Test UpdateSlotGroups function when no group
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06500, Function | SmallTest | Level1)
@@ -1036,7 +1011,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06500,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06600
- * @tc.name      : AMS_ANS_UpdateSlotGroups_0200
+ * @tc.name      : ANS_UpdateSlotGroups_0200
  * @tc.desc      : Test UpdateSlotGroups function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06600, Function | SmallTest | Level1)
@@ -1052,7 +1027,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06600,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06800
- * @tc.name      : AMS_ANS_SetShowBadgeEnabledForBundle_0100
+ * @tc.name      : ANS_SetShowBadgeEnabledForBundle_0100
  * @tc.desc      : Test the SetShowBadgeEnabledForBundle function when the parameter is wrong
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06800, Function | SmallTest | Level1)
@@ -1064,7 +1039,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_06900
- * @tc.name      : AMS_ANS_GetShowBadgeEnabledForBundle_0100
+ * @tc.name      : ANS_GetShowBadgeEnabledForBundle_0100
  * @tc.desc      : Test GetShowBadgeEnabledForBundle function when no bundle
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06900, Function | SmallTest | Level1)
@@ -1077,7 +1052,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_06900,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_07000
- * @tc.name      : AMS_ANS_GetActiveNotifications_0100
+ * @tc.name      : ANS_GetActiveNotifications_0100
  * @tc.desc      : Test GetActiveNotifications function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_07000, Function | SmallTest | Level1)
@@ -1088,7 +1063,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_07000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_07800
- * @tc.name      : AMS_ANS_Delete_0100
+ * @tc.name      : ANS_Delete_0100
  * @tc.desc      : Test Delete function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_07800, Function | SmallTest | Level1)
@@ -1099,7 +1074,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_07800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_07900
- * @tc.name      : AMS_ANS_DeleteByBundle_0100
+ * @tc.name      : ANS_DeleteByBundle_0100
  * @tc.desc      : Test DeleteByBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_07900, Function | SmallTest | Level1)
@@ -1111,7 +1086,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_07900,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_08000
- * @tc.name      : AMS_ANS_DeleteAll_0100
+ * @tc.name      : ANS_DeleteAll_0100
  * @tc.desc      : Test DeleteAll function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08000, Function | SmallTest | Level1)
@@ -1121,7 +1096,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_08300
- * @tc.name      : AMS_ANS_Subscribe_0100
+ * @tc.name      : ANS_Subscribe_0100
  * @tc.desc      : Test Subscribe function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08300, Function | SmallTest | Level1)
@@ -1134,7 +1109,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08300,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_08600
- * @tc.name      : AMS_ANS_GetShowBadgeEnabledForBundle_0200
+ * @tc.name      : ANS_GetShowBadgeEnabledForBundle_0200
  * @tc.desc      : Test GetShowBadgeEnabledForBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08600, Function | SmallTest | Level1)
@@ -1152,7 +1127,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08600,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_08700
- * @tc.name      : AMS_ANS_GetSlotByType_0100
+ * @tc.name      : ANS_GetSlotByType_0100
  * @tc.desc      : Test GetSlotByType function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08700, Function | SmallTest | Level1)
@@ -1165,7 +1140,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08700,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_08900
- * @tc.name      : AMS_ANS_GetSlotGroups_0100
+ * @tc.name      : ANS_GetSlotGroups_0100
  * @tc.desc      : Test GetSlotGroups function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08900, Function | SmallTest | Level1)
@@ -1182,7 +1157,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_08900,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_09000
- * @tc.name      : AMS_ANS_GetAllActiveNotifications_0100
+ * @tc.name      : ANS_GetAllActiveNotifications_0100
  * @tc.desc      : Test GetAllActiveNotifications function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09000, Function | SmallTest | Level1)
@@ -1193,7 +1168,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_09200
- * @tc.name      : AMS_ANS_SetNotificationsEnabledForAllBundles_0200
+ * @tc.name      : ANS_SetNotificationsEnabledForAllBundles_0200
  * @tc.desc      : Test SetNotificationsEnabledForAllBundles function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09200, Function | SmallTest | Level1)
@@ -1204,7 +1179,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09200,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_09300
- * @tc.name      : AMS_ANS_SetNotificationsEnabledForSpecialBundle_0100
+ * @tc.name      : ANS_SetNotificationsEnabledForSpecialBundle_0100
  * @tc.desc      : Test SetNotificationsEnabledForSpecialBundle function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09300, Function | SmallTest | Level1)
@@ -1218,7 +1193,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09300,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_09600
- * @tc.name      : AMS_ANS_IsAllowedNotify_0200
+ * @tc.name      : ANS_IsAllowedNotify_0200
  * @tc.desc      : Test IsAllowedNotify function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600, Function | SmallTest | Level1)
@@ -1232,7 +1207,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_09700
- * @tc.name      : AMS_ANS_IsSpecialBundleAllowedNotify_0100
+ * @tc.name      : ANS_IsSpecialBundleAllowedNotify_0100
  * @tc.desc      : Test IsSpecialBundleAllowedNotify function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09700, Function | SmallTest | Level1)
@@ -1246,7 +1221,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09700,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_09800
- * @tc.name      : AMS_ANS_IsSpecialBundleAllowedNotify_0200
+ * @tc.name      : ANS_IsSpecialBundleAllowedNotify_0200
  * @tc.desc      : Test IsSpecialBundleAllowedNotify function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09800, Function | SmallTest | Level1)
@@ -1260,7 +1235,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09800,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_09900
- * @tc.name      : AMS_ANS_GetSlotsByBundle_0200
+ * @tc.name      : ANS_GetSlotsByBundle_0200
  * @tc.desc      : Test GetSlotsByBundle function when no bundle
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09900, Function | SmallTest | Level1)
@@ -1295,7 +1270,7 @@ inline std::shared_ptr<PixelMap> MakePixelMap(int32_t width, int32_t height)
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_10000
- * @tc.name      : AMS_ANS_Publish_With_PixelMap
+ * @tc.name      : ANS_Publish_With_PixelMap
  * @tc.desc      : Publish a notification with pixelMap.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10000, Function | SmallTest | Level1)
@@ -1327,7 +1302,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10000,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_10100
- * @tc.name      : AMS_ANS_Publish_With_PixelMap_Oversize_00100
+ * @tc.name      : ANS_Publish_With_PixelMap_Oversize_00100
  * @tc.desc      : Publish a notification with oversize pixelMap.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10100, Function | SmallTest | Level1)
@@ -1359,7 +1334,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10100,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_10200
- * @tc.name      : AMS_ANS_Publish_With_PixelMap_Oversize_00200
+ * @tc.name      : ANS_Publish_With_PixelMap_Oversize_00200
  * @tc.desc      : Publish a notification with oversize pixelMap.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10200, Function | SmallTest | Level1)
@@ -1391,7 +1366,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10200,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_10300
- * @tc.name      : AMS_ANS_Cancel_By_Group_10300
+ * @tc.name      : ANS_Cancel_By_Group_10300
  * @tc.desc      : Cancel notification by group name.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10300, Function | SmallTest | Level1)
@@ -1416,7 +1391,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10300,
 
 /**
  * @tc.number    : AdvancedNotificationServiceTest_10400
- * @tc.name      : AMS_ANS_Remove_By_Group_10400
+ * @tc.name      : ANS_Remove_By_Group_10400
  * @tc.desc      : Remove notification by group name.
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10400, Function | SmallTest | Level1)
@@ -1438,6 +1413,149 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10400,
     sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(TEST_DEFUALT_BUNDLE, SYSTEM_APP_UID);
     EXPECT_EQ(advancedNotificationService_->RemoveGroupByBundle(bundleOption, groupName), (int)ERR_OK);
     SleepForFC();
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10500
+ * @tc.name      : ANS_SetDisturbMode_10500
+ * @tc.desc      : Test SetDisturbMode function
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10500, Function | SmallTest | Level1)
+{
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+
+    timePoint = std::chrono::system_clock::now();
+    beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    endDate = endDuration.count();
+    date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+
+    timePoint = std::chrono::system_clock::now();
+    beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    endDate = endDuration.count();
+    date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::CLEARLY, beginDate, endDate);
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10600
+ * @tc.name      : ANS_GetDisturbMode_10600
+ * @tc.desc      : Test GetDisturbMode function
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10600, Function | SmallTest | Level1)
+{
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+
+    sptr<NotificationDoNotDisturbDate> result = nullptr;
+    EXPECT_EQ((int)advancedNotificationService_->GetDoNotDisturbDate(result), (int)ERR_OK);
+    ASSERT_NE(result, nullptr);
+    EXPECT_EQ(result->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::NONE);
+    EXPECT_EQ(result->GetBeginDate(), 0);
+    EXPECT_EQ(result->GetEndDate(), 0);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10700
+ * @tc.name      : ANS_GetDisturbMode_10700
+ * @tc.desc      : Test GetDisturbMode function
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10700, Function | SmallTest | Level1)
+{
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    timePoint = std::chrono::time_point_cast<std::chrono::minutes>(timePoint);
+    timePoint += std::chrono::hours(1);
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+
+    sptr<NotificationDoNotDisturbDate> result = nullptr;
+    EXPECT_EQ((int)advancedNotificationService_->GetDoNotDisturbDate(result), (int)ERR_OK);
+    ASSERT_NE(result, nullptr);
+    EXPECT_EQ(result->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::ONCE);
+    EXPECT_EQ(result->GetBeginDate(), beginDate);
+    EXPECT_EQ(result->GetEndDate(), endDate);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10800
+ * @tc.name      : ANS_GetDisturbMode_10800
+ * @tc.desc      : Test GetDisturbMode function
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10800, Function | SmallTest | Level1)
+{
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    timePoint = std::chrono::time_point_cast<std::chrono::minutes>(timePoint);
+    timePoint += std::chrono::hours(1);
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
+
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+    sptr<NotificationDoNotDisturbDate> result = nullptr;
+    EXPECT_EQ((int)advancedNotificationService_->GetDoNotDisturbDate(result), (int)ERR_OK);
+    ASSERT_NE(result, nullptr);
+    EXPECT_EQ(result->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::DAILY);
+    EXPECT_EQ(result->GetBeginDate(), beginDate);
+    EXPECT_EQ(result->GetEndDate(), endDate);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_10900
+ * @tc.name      : ANS_GetDisturbMode_10900
+ * @tc.desc      : Test GetDisturbMode function
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10900, Function | SmallTest | Level1)
+{
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    timePoint = std::chrono::time_point_cast<std::chrono::minutes>(timePoint);
+    timePoint += std::chrono::hours(1);
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::CLEARLY, beginDate, endDate);
+    EXPECT_EQ((int)advancedNotificationService_->SetDoNotDisturbDate(date), (int)ERR_OK);
+
+    sptr<NotificationDoNotDisturbDate> result = nullptr;
+    EXPECT_EQ((int)advancedNotificationService_->GetDoNotDisturbDate(result), (int)ERR_OK);
+    ASSERT_NE(result, nullptr);
+    EXPECT_EQ(result->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::CLEARLY);
+    EXPECT_EQ(result->GetBeginDate(), beginDate);
+    EXPECT_EQ(result->GetEndDate(), endDate);
 }
 }  // namespace Notification
 }  // namespace OHOS

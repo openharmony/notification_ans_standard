@@ -78,7 +78,7 @@ const std::map<std::string,
                 std::placeholders::_2, std::placeholders::_3),
         },
         {
-            KEY_SLOT_VIBRATION_STYLE,
+            KEY_SLOT_ENABLE_BYPASS_DND,
             std::bind(&NotificationPreferencesDatabase::ParseSlotEnableBypassDnd, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3),
         },
@@ -370,21 +370,42 @@ bool NotificationPreferencesDatabase::PutNotificationsEnabled(const bool &enable
     return true;
 }
 
-bool NotificationPreferencesDatabase::PutDisturbMode(const NotificationConstant::DisturbMode &mode)
+bool NotificationPreferencesDatabase::PutDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date)
 {
+    if (date == nullptr) {
+        ANS_LOGE("Invalid date.");
+        return false;
+    }
+
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
 
-    OHOS::DistributedKv::Key disturbModeKey(KEY_DISTURB_MODE);
-    OHOS::DistributedKv::Value disturbModeValue(std::to_string(mode));
-    OHOS::DistributedKv::Status status;
-    status = kvStorePtr_->Put(disturbModeKey, disturbModeValue);
+    OHOS::DistributedKv::Entry type;
+    type.key = OHOS::DistributedKv::Key(KEY_DO_NOT_DISTURB_TYPE);
+    type.value = OHOS::DistributedKv::Value(std::to_string((int)date->GetDoNotDisturbType()));
+
+    OHOS::DistributedKv::Entry beginDate;
+    beginDate.key = OHOS::DistributedKv::Key(KEY_DO_NOT_DISTURB_BEGIN_DATE);
+    beginDate.value = OHOS::DistributedKv::Value(std::to_string(date->GetBeginDate()));
+
+    OHOS::DistributedKv::Entry endDate;
+    endDate.key = OHOS::DistributedKv::Key(KEY_DO_NOT_DISTURB_END_DATE);
+    endDate.value = OHOS::DistributedKv::Value(std::to_string(date->GetEndDate()));
+
+    std::vector<OHOS::DistributedKv::Entry> entries = {
+        type,
+        beginDate,
+        endDate,
+    };
+
+    OHOS::DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
     if (status != OHOS::DistributedKv::Status::SUCCESS) {
-        ANS_LOGE("Store disturbe modeFailed. %{public}d", status);
+        ANS_LOGE("Store DoNotDisturbDate failed. %{public}d", status);
         return false;
     }
+
     return true;
 }
 
@@ -485,7 +506,9 @@ bool NotificationPreferencesDatabase::PutBundlePropertyValueToDisturbeDB(
 bool NotificationPreferencesDatabase::ParseFromDisturbeDB(NotificationPreferencesInfo &info)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    ParseDisturbeMode(info);
+    ParseDoNotDisturbType(info);
+    ParseDoNotDisturbBeginDate(info);
+    ParseDoNotDisturbEndDate(info);
     ParseEnableAllNotification(info);
 
     if (!CheckKvStore()) {
@@ -784,7 +807,7 @@ void NotificationPreferencesDatabase::GenerateSlotEntry(const std::string &bundl
         std::to_string(static_cast<int>(slot->GetLockScreenVisibleness())),
         entries);
     GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_SOUND), slot->GetSound().ToString(), entries);
-    GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_VIBRATION_STYLE),
+    GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_ENABLE_BYPASS_DND),
         std::to_string(slot->IsEnableBypassDnd()),
         entries);
     GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_VIBRATION_STYLE),
@@ -919,6 +942,11 @@ void NotificationPreferencesDatabase::ParseSlot(
         auto func = iter->second;
         func(this, slot, valueStr);
     }
+
+    if (!typeStr.compare(KEY_SLOT_VIBRATION_STYLE)) {
+        GetValueFromDisturbeDB(findString + KEY_SLOT_ENABLE_VRBRATION,
+            [&](OHOS::DistributedKv::Value &value) { ParseSlotEnableVrbration(slot, value.ToString()); });
+    }
 }
 
 std::string NotificationPreferencesDatabase::FindLastString(
@@ -958,6 +986,15 @@ int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
     int value = 0;
     if (!str.empty()) {
         value = stoi(str, nullptr);
+    }
+    return value;
+}
+
+int64_t NotificationPreferencesDatabase::StringToInt64(const std::string &str) const
+{
+    int value = 0;
+    if (!str.empty()) {
+        value = stoll(str, nullptr);
     }
     return value;
 }
@@ -1064,18 +1101,53 @@ std::string NotificationPreferencesDatabase::SubUniqueIdentifyFromString(
     return slotType;
 }
 
-void NotificationPreferencesDatabase::ParseDisturbeMode(NotificationPreferencesInfo &info)
+void NotificationPreferencesDatabase::ParseDoNotDisturbType(NotificationPreferencesInfo &info)
 {
     GetValueFromDisturbeDB(
-        KEY_DISTURB_MODE, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+        KEY_DO_NOT_DISTURB_TYPE, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
             if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
-                PutDisturbMode(info.GetDisturbMode());
+                PutDoNotDisturbDate(info.GetDoNotDisturbDate());
             } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
                 if (!value.ToString().empty()) {
-                    info.SetDisturbMode(static_cast<NotificationConstant::DisturbMode>(StringToInt(value.ToString())));
+                    auto date = info.GetDoNotDisturbDate();
+                    date->SetDoNotDisturbType((NotificationConstant::DoNotDisturbType)StringToInt(value.ToString()));
                 }
             } else {
                 ANS_LOGW("Parse disturbe mode failed, use defalut value.");
+            }
+        });
+}
+
+void NotificationPreferencesDatabase::ParseDoNotDisturbBeginDate(NotificationPreferencesInfo &info)
+{
+    GetValueFromDisturbeDB(
+        KEY_DO_NOT_DISTURB_BEGIN_DATE, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+                PutDoNotDisturbDate(info.GetDoNotDisturbDate());
+            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+                if (!value.ToString().empty()) {
+                    auto date = info.GetDoNotDisturbDate();
+                    date->SetBeginDate(StringToInt64(value.ToString()));
+                }
+            } else {
+                ANS_LOGW("Parse disturbe start time failed, use defalut value.");
+            }
+        });
+}
+
+void NotificationPreferencesDatabase::ParseDoNotDisturbEndDate(NotificationPreferencesInfo &info)
+{
+    GetValueFromDisturbeDB(
+        KEY_DO_NOT_DISTURB_END_DATE, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+                PutDoNotDisturbDate(info.GetDoNotDisturbDate());
+            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+                if (!value.ToString().empty()) {
+                    auto date = info.GetDoNotDisturbDate();
+                    date->SetEndDate(StringToInt64(value.ToString()));
+                }
+            } else {
+                ANS_LOGW("Parse disturbe end time failed, use defalut value.");
             }
         });
 }
@@ -1213,6 +1285,7 @@ void NotificationPreferencesDatabase::ParseSlotLockscreenVisibleness(
 
 void NotificationPreferencesDatabase::ParseSlotSound(sptr<NotificationSlot> &slot, const std::string &value) const
 {
+    ANS_LOGD("ParseSlotSound slot sound is %{public}s.", value.c_str());
     std::string slotUri = value;
     Uri uri(slotUri);
     slot->SetSound(uri);
@@ -1221,6 +1294,7 @@ void NotificationPreferencesDatabase::ParseSlotSound(sptr<NotificationSlot> &slo
 void NotificationPreferencesDatabase::ParseSlotVibrationSytle(
     sptr<NotificationSlot> &slot, const std::string &value) const
 {
+    ANS_LOGD("ParseSlotVibrationSytle slot vibration style is %{public}s.", value.c_str());
     std::vector<int64_t> vibrationStyle;
     StringToVector(value, vibrationStyle);
     slot->SetVibrationStyle(vibrationStyle);

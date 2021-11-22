@@ -31,6 +31,7 @@ constexpr uint32_t MAX_SLOT_NUM = 5;
 constexpr uint32_t MAX_SLOT_GROUP_NUM = 4;
 constexpr uint32_t MAX_ICON_SIZE = 50 * 1024;
 constexpr uint32_t MAX_PICTURE_SIZE = 2 * 1024 * 1024;
+constexpr bool SUPPORT_DO_NOT_DISTRUB = true;
 
 // Default sound for notification
 const static Uri DEFAULT_NOTIFICATION_SOUND("file://system/etc/Light.ogg");

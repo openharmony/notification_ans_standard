@@ -22,8 +22,8 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "ans_permission_define.h"
 #include "bundle_manager_helper.h"
-#include "disturb_filter.h"
 #include "ipc_skeleton.h"
 #include "notification_constant.h"
 #include "notification_filter.h"
@@ -31,6 +31,7 @@
 #include "notification_slot.h"
 #include "notification_slot_filter.h"
 #include "notification_subscriber_manager.h"
+#include "permission/permission_kit.h"
 #include "permission_filter.h"
 
 namespace OHOS {
@@ -45,6 +46,8 @@ static const int32_t NOTIFICATION_MIN_COUNT = 0;
 static const int32_t NOTIFICATION_MAX_COUNT = 1024;
 
 static const int32_t DEFAULT_RECENT_COUNT = 16;
+
+constexpr int HOURS_IN_ONE_DAY = 24;
 
 struct RecentNotification {
     sptr<Notification> notification = nullptr;
@@ -65,7 +68,6 @@ std::mutex AdvancedNotificationService::instanceMutex_;
 static const std::shared_ptr<INotificationFilter> NOTIFICATION_FILTERS[] = {
     std::make_shared<PermissionFilter>(),
     std::make_shared<NotificationSlotFilter>(),
-    std::make_shared<DisturbFilter>(),
 };
 
 inline std::string GetClientBundleName()
@@ -658,37 +660,6 @@ ErrCode AdvancedNotificationService::GetBundleImportance(int &importance)
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(
         std::bind([&]() { result = NotificationPreferences::GetInstance().GetImportance(bundleOption, importance); }));
-    return result;
-}
-
-ErrCode AdvancedNotificationService::SetDisturbMode(NotificationConstant::DisturbMode mode)
-{
-    ANS_LOGD("%{public}s", __FUNCTION__);
-
-    if (!IsSystemApp()) {
-        return ERR_ANS_NON_SYSTEM_APP;
-    }
-
-    ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind([&]() {
-        result = NotificationPreferences::GetInstance().SetDisturbMode(mode);
-        if (result == ERR_OK) {
-            NotificationSubscriberManager::GetInstance()->NotifyDisturbModeChanged(mode);
-        }
-    }));
-    return result;
-}
-
-ErrCode AdvancedNotificationService::GetDisturbMode(NotificationConstant::DisturbMode &mode)
-{
-    ANS_LOGD("%{public}s", __FUNCTION__);
-
-    if (!IsSystemApp()) {
-        return ERR_ANS_NON_SYSTEM_APP;
-    }
-
-    ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind([&]() { result = NotificationPreferences::GetInstance().GetDisturbMode(mode); }));
     return result;
 }
 
@@ -1720,6 +1691,184 @@ ErrCode AdvancedNotificationService::RemoveGroupByBundle(
     }));
 
     return ERR_OK;
+}
+
+inline int64_t ResetSeconds(int64_t date)
+{
+    auto milliseconds = std::chrono::milliseconds(date);
+    auto tp = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(milliseconds);
+    auto tp_minutes = std::chrono::time_point_cast<std::chrono::minutes>(tp);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(tp_minutes.time_since_epoch());
+    return duration.count();
+}
+
+inline int64_t GetCurrentTime()
+{
+    auto now = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    return duration.count();
+}
+
+inline tm GetLocalTime(time_t time)
+{
+    tm result = {0};
+    tm *lt = localtime(&time);
+    if (lt != nullptr) {
+        result = *lt;
+    }
+    return result;
+}
+
+void AdvancedNotificationService::AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate)
+{
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    time_t nowT = std::chrono::system_clock::to_time_t(now);
+    tm nowTm = GetLocalTime(nowT);
+
+    auto beginDateMilliseconds = std::chrono::milliseconds(beginDate);
+    auto beginDateTimePoint =
+        std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(beginDateMilliseconds);
+    time_t beginDateT = std::chrono::system_clock::to_time_t(beginDateTimePoint);
+    tm beginDateTm = GetLocalTime(beginDateT);
+
+    auto endDateMilliseconds = std::chrono::milliseconds(endDate);
+    auto endDateTimePoint =
+        std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(endDateMilliseconds);
+    time_t endDateT = std::chrono::system_clock::to_time_t(endDateTimePoint);
+    tm endDateTm = GetLocalTime(endDateT);
+
+    tm todayBeginTm = nowTm;
+    todayBeginTm.tm_sec = 0;
+    todayBeginTm.tm_min = beginDateTm.tm_min;
+    todayBeginTm.tm_hour = beginDateTm.tm_hour;
+
+    tm todayEndTm = nowTm;
+    todayEndTm.tm_sec = 0;
+    todayEndTm.tm_min = endDateTm.tm_min;
+    todayEndTm.tm_hour = endDateTm.tm_hour;
+
+    time_t todayBeginT = mktime(&todayBeginTm);
+    if (todayBeginT == -1) {
+        return;
+    }
+    time_t todayEndT = mktime(&todayEndTm);
+    if (todayEndT == -1) {
+        return;
+    }
+
+    auto newBeginTimePoint = std::chrono::system_clock::from_time_t(todayBeginT);
+    auto newEndTimePoint = std::chrono::system_clock::from_time_t(todayEndT);
+
+    if (newBeginTimePoint >= newEndTimePoint) {
+        newEndTimePoint += std::chrono::hours(HOURS_IN_ONE_DAY);
+    }
+
+    if (newEndTimePoint < now) {
+        newBeginTimePoint += std::chrono::hours(HOURS_IN_ONE_DAY);
+        newEndTimePoint += std::chrono::hours(HOURS_IN_ONE_DAY);
+    }
+
+    auto newBeginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(newBeginTimePoint.time_since_epoch());
+    beginDate = newBeginDuration.count();
+
+    auto newEndDuration = std::chrono::duration_cast<std::chrono::milliseconds>(newEndTimePoint.time_since_epoch());
+    endDate = newEndDuration.count();
+}
+
+ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (date == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode result = ERR_OK;
+
+    int64_t beginDate = ResetSeconds(date->GetBeginDate());
+    int64_t endDate = ResetSeconds(date->GetEndDate());
+
+    if (date->GetDoNotDisturbType() == NotificationConstant::DoNotDisturbType::NONE) {
+        beginDate = 0;
+        endDate = 0;
+    }
+    if (date->GetDoNotDisturbType() == NotificationConstant::DoNotDisturbType::ONCE) {
+        AdjustDateForDndTypeOnce(beginDate, endDate);
+    }
+
+    const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
+        date->GetDoNotDisturbType(),
+        beginDate,
+        endDate
+    );
+
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetDoNotDisturbDate(newConfig);
+        if (result == ERR_OK) {
+            NotificationSubscriberManager::GetInstance()->NotifyDoNotDisturbDateChanged(newConfig);
+        }
+    }));
+
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    ErrCode result = ERR_OK;
+
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<NotificationDoNotDisturbDate> currentConfig = nullptr;
+        result = NotificationPreferences::GetInstance().GetDoNotDisturbDate(currentConfig);
+        if (result == ERR_OK) {
+            int64_t now = GetCurrentTime();
+            switch (currentConfig->GetDoNotDisturbType()) {
+                case NotificationConstant::DoNotDisturbType::CLEARLY:
+                case NotificationConstant::DoNotDisturbType::ONCE:
+                    if (now >= currentConfig->GetEndDate()) {
+                        date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+                        NotificationPreferences::GetInstance().SetDoNotDisturbDate(date);
+                    } else {
+                        date = currentConfig;
+                    }
+                    break;
+                default:
+                    date = currentConfig;
+                    break;
+            }
+        }
+    }));
+
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSupport)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    doesSupport = SUPPORT_DO_NOT_DISTRUB;
+    return ERR_OK;
+}
+
+bool AdvancedNotificationService::CheckPermission(const std::string &bundleName)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    bool isGranted = false;
+    if (bundleName.empty()) {
+        ANS_LOGE("Bundle name is empty.");
+        return isGranted;
+    }
+    int result = Security::Permission::PermissionKit::VerifyPermission(bundleName, ANS_PERMISSION_CONTROLLER, 0);
+    if (Security::Permission::TypePermissionState::PERMISSION_GRANTED == result) {
+        isGranted = true;
+    } else {
+        ANS_LOGE("Permission granted failed.");
+    }
+    return isGranted;
 }
 }  // namespace Notification
 }  // namespace OHOS

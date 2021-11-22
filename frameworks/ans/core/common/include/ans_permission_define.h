@@ -13,29 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_DISTURB_FILTER_H
-#define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_DISTURB_FILTER_H
+#ifndef BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_PERMISSION_DEFINE_H
+#define BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_PERMISSION_DEFINE_H
 
-#include "notification_filter.h"
+#include <string>
 
 namespace OHOS {
 namespace Notification {
-
-class DisturbFilter : public INotificationFilter {
-public:
-    DisturbFilter(){};
-    ~DisturbFilter(){};
-
-    void OnStart() override;
-    void OnStop() override;
-
-    ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) override;
-
-private:
-    void GetTimeInterval(int64_t &beginDate, int64_t &endDate);
-};
-
+// Permission
+const std::string ANS_PERMISSION_CONTROLLER = "ohos.permission.NOTIFICATION_CONTROLLER";
 }  // namespace Notification
 }  // namespace OHOS
 
-#endif  // BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_DISTURB_FILTER_H
+#endif  // BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_PERMISSION_DEFINE_H

@@ -33,7 +33,7 @@ public:
 
 /**
  * @tc.number    : AdvancedNotificationServiceAbilityTest_00100
- * @tc.name      : AMS_ANS_AdvancedNotificationServiceAbility_0100
+ * @tc.name      : ANS_AdvancedNotificationServiceAbility_0100
  * @tc.desc      : Structure AdvancedNotificationServiceAbility with systemAbilityId and runOnCreate
  */
 HWTEST_F(

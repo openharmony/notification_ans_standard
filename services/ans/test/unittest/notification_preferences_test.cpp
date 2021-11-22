@@ -1036,29 +1036,46 @@ HWTEST_F(NotificationPreferencesTest, GetNotificationsEnabled_00100, Function | 
 }
 
 /**
- * @tc.number    : SetDisturbMode_00100
+ * @tc.number    : SetDoNotDisturbDate_00100
  * @tc.name      :
  * @tc.desc      : Set disturbe mode into disturbe DB, return is ERR_OK
  */
-HWTEST_F(NotificationPreferencesTest, SetDisturbMode_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, SetDoNotDisturbDate_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_ALL),
-        (int)ERR_OK);
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
+
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDoNotDisturbDate(date), (int)ERR_OK);
 }
 
 /**
- * @tc.number    : GetDisturbMode_00100
+ * @tc.number    : GetDoNotDisturbDate_00100
  * @tc.name      :
  * @tc.desc      : Get disturbe mode from disturbe DB, return is ERR_OK
  */
-HWTEST_F(NotificationPreferencesTest, GetDisturbMode_00100, Function | SmallTest | Level1)
+HWTEST_F(NotificationPreferencesTest, GetDoNotDisturbDate_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_ALL),
-        (int)ERR_OK);
-    NotificationConstant::DisturbMode mode;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDisturbMode(mode), (int)ERR_OK);
-    EXPECT_EQ((int)NotificationConstant::DisturbMode::ALLOW_ALL, mode);
-}
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDoNotDisturbDate(date), (int)ERR_OK);
 
+    sptr<NotificationDoNotDisturbDate> getDate;
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDoNotDisturbDate(getDate), (int)ERR_OK);
+    EXPECT_EQ(getDate->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::DAILY);
+    EXPECT_EQ(getDate->GetBeginDate(), beginDate);
+    EXPECT_EQ(getDate->GetEndDate(), endDate);
+}
 }  // namespace Notification
 }  // namespace OHOS

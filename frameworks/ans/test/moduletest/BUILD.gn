@@ -82,6 +82,7 @@ ohos_moduletest("ans_fw_module_test") {
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
+    "mock/permission_kit.cpp",
   ]
 
   configs = [ "//utils/native/base:utils_config" ]
@@ -112,6 +113,7 @@ ohos_moduletest("ans_fw_module_test") {
     "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -163,6 +165,7 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
+    "mock/permission_kit.cpp",
   ]
 
   configs = [ "//utils/native/base:utils_config" ]
@@ -193,6 +196,7 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -243,6 +247,7 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
+    "mock/permission_kit.cpp",
   ]
 
   configs = [ "//utils/native/base:utils_config" ]
@@ -271,6 +276,7 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -321,6 +327,7 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
+    "mock/permission_kit.cpp",
   ]
 
   configs = [ "//utils/native/base:utils_config" ]
@@ -349,6 +356,7 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

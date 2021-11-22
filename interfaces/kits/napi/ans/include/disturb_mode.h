@@ -21,7 +21,9 @@ namespace OHOS {
 namespace NotificationNapi {
 using namespace OHOS::Notification;
 
-napi_value SetDoNotDisturbMode(napi_env env, napi_callback_info info);
+napi_value SetDoNotDisturbDate(napi_env env, napi_callback_info info);
+napi_value GetDoNotDisturbDate(napi_env env, napi_callback_info info);
+napi_value SupportDoNotDisturbMode(napi_env env, napi_callback_info info);
 
 }  // namespace NotificationNapi
 }  // namespace OHOS

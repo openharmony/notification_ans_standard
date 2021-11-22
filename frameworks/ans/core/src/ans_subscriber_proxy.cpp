@@ -253,24 +253,24 @@ void AnsSubscriberProxy::OnUpdated(const sptr<NotificationSortingMap> &notificat
     }
 }
 
-void AnsSubscriberProxy::OnDisturbModeChanged(NotificationConstant::DisturbMode mode)
+void AnsSubscriberProxy::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnDisturbModeChanged] fail: write interface token failed.");
+        ANS_LOGW("[OnDoNotDisturbDateChange] fail: write interface token failed.");
         return;
     }
 
-    if (!data.WriteUint32(mode)) {
-        ANS_LOGW("[OnDisturbModeChanged] fail: write mode failed");
+    if (!data.WriteParcelable(date)) {
+        ANS_LOGW("[OnDoNotDisturbDateChange] fail: write date failed");
         return;
     }
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_ASYNC};
-    ErrCode result = InnerTransact(ON_DISTURB_MODE_CHANGED, option, data, reply);
+    ErrCode result = InnerTransact(ON_DND_DATE_CHANGED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnDisturbModeChanged] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGW("[OnDoNotDisturbDateChange] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }

@@ -19,7 +19,9 @@
 namespace OHOS {
 namespace Notification {
 
-const static std::string KEY_DISTURB_MODE = "ans_disturbMode";
+const static std::string KEY_DO_NOT_DISTURB_TYPE = "ans_doNotDisturbType";
+const static std::string KEY_DO_NOT_DISTURB_BEGIN_DATE = "ans_doNotDisturbBeginDate";
+const static std::string KEY_DO_NOT_DISTURB_END_DATE = "ans_doNotDisturbEndDate";
 const static std::string KEY_ENABLE_ALL_NOTIFICATION = "ans_notificationAll";
 const static std::string KEY_BUNDLE_LABEL = "label_ans_bundle_";
 const static std::string KEY_UNDER_LINE = "_";

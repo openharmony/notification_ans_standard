@@ -44,7 +44,7 @@ private:
         {}
         void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
         {}
-        void OnDisturbModeChanged(int disturbMode) override
+        void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
         {}
         void OnCanceled(const std::shared_ptr<Notification> &request) override
         {}
@@ -92,7 +92,7 @@ void NotificationSubscriberManagerTest::TearDown()
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_001
- * @tc.name      : AMS_ANS_NotifyUpdated_0100
+ * @tc.name      : ANS_NotifyUpdated_0100
  * @tc.desc      : Test NotifyUpdated function.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_001, Function | SmallTest | Level1)
@@ -104,18 +104,19 @@ HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_00
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_002
- * @tc.name      : AMS_ANS_NotifyDisturbModeChanged_0100
+ * @tc.name      : ANS_NotifyDisturbModeChanged_0100
  * @tc.desc      : Test NotifyDisturbModeChanged function.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_002, Function | SmallTest | Level1)
 {
-    NotificationConstant::DisturbMode mode;
-    notificationSubscriberManager_->NotifyDisturbModeChanged(mode);
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+    notificationSubscriberManager_->NotifyDoNotDisturbDateChanged(date);
 }
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_003
- * @tc.name      : AMS_ANS_NotifyConsumed_0100
+ * @tc.name      : ANS_NotifyConsumed_0100
  * @tc.desc      : Test NotifyConsumed function.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_003, Function | SmallTest | Level1)
@@ -129,7 +130,7 @@ HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_00
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_004
- * @tc.name      : AMS_ANS_NotifyCanceled_0100
+ * @tc.name      : ANS_NotifyCanceled_0100
  * @tc.desc      : Test NotifyCanceled function.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_004, Function | SmallTest | Level1)
@@ -144,7 +145,7 @@ HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_00
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_005
- * @tc.name      : AMS_ANS_AddSubscriber_0100
+ * @tc.name      : ANS_AddSubscriber_0100
  * @tc.desc      : Test AddSubscriber function, return is ERR_OK.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_005, Function | SmallTest | Level1)
@@ -157,7 +158,7 @@ HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_00
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_006
- * @tc.name      : AMS_ANS_AddSubscriber_0100
+ * @tc.name      : ANS_AddSubscriber_0100
  * @tc.desc      : Test AddSubscriber function when subscriber is nullptr, return is ERR_ANS_INVALID_PARAM.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_006, Function | SmallTest | Level1)
@@ -168,7 +169,7 @@ HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_00
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_007
- * @tc.name      : AMS_ANS_RemoveSubscriber_0100
+ * @tc.name      : ANS_RemoveSubscriber_0100
  * @tc.desc      : Test RemoveSubscriber function, return is ERR_OK.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_007, Function | SmallTest | Level1)
@@ -180,7 +181,7 @@ HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_00
 
 /**
  * @tc.number    : NotificationSubscriberManagerTest_006
- * @tc.name      : AMS_ANS_AddSubscriber_0100
+ * @tc.name      : ANS_AddSubscriber_0100
  * @tc.desc      : Test RemoveSubscriber function when subscriber is nullptr, return is ERR_ANS_INVALID_PARAM.
  */
 HWTEST_F(NotificationSubscriberManagerTest, NotificationSubscriberManagerTest_008, Function | SmallTest | Level1)

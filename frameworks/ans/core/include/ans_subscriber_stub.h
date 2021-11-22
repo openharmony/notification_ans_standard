@@ -40,7 +40,7 @@ public:
     void OnCanceled(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap,
         int deleteReason) override;
     void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) override;
-    void OnDisturbModeChanged(NotificationConstant::DisturbMode mode) override;
+    void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) override;
 
 private:
     std::map<uint32_t, std::function<ErrCode(MessageParcel &, MessageParcel &)>> interfaces_;
@@ -52,7 +52,7 @@ private:
     ErrCode HandleOnCanceled(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleOnCanceledMap(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleOnUpdated(MessageParcel &data, MessageParcel &reply);
-    ErrCode HandleOnDisturbModeChanged(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleOnDoNotDisturbDateChange(MessageParcel &data, MessageParcel &reply);
 };
 }  // namespace Notification
 }  // namespace OHOS

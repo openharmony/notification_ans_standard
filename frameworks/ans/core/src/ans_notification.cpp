@@ -737,24 +737,6 @@ ErrCode AnsNotification::GetShowBadgeEnabled(bool &enabled)
     return ansManagerProxy_->GetShowBadgeEnabled(enabled);
 }
 
-ErrCode AnsNotification::SetDisturbMode(NotificationConstant::DisturbMode mode)
-{
-    if (!GetAnsManagerProxy()) {
-        ANS_LOGE("GetAnsManagerProxy fail.");
-        return ERR_ANS_SERVICE_NOT_CONNECTED;
-    }
-    return ansManagerProxy_->SetDisturbMode(mode);
-}
-
-ErrCode AnsNotification::GetDisturbMode(NotificationConstant::DisturbMode &disturbMode)
-{
-    if (!GetAnsManagerProxy()) {
-        ANS_LOGE("GetAnsManagerProxy fail.");
-        return ERR_ANS_SERVICE_NOT_CONNECTED;
-    }
-    return ansManagerProxy_->GetDisturbMode(disturbMode);
-}
-
 ErrCode AnsNotification::CancelGroup(const std::string &groupName)
 {
     if (groupName.empty()) {
@@ -785,6 +767,56 @@ ErrCode AnsNotification::RemoveGroupByBundle(
 
     sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
     return ansManagerProxy_->RemoveGroupByBundle(bo, groupName);
+}
+
+ErrCode AnsNotification::SetDoNotDisturbDate(const NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    auto dndDatePtr = new (std::nothrow) NotificationDoNotDisturbDate(doNotDisturbDate);
+    if (dndDatePtr == nullptr) {
+        ANS_LOGE("create DoNotDisturbDate failed.");
+        return ERR_ANS_NO_MEMORY;
+    }
+
+    sptr<NotificationDoNotDisturbDate> dndDate(dndDatePtr);
+    return ansManagerProxy_->SetDoNotDisturbDate(dndDate);
+}
+
+ErrCode AnsNotification::GetDoNotDisturbDate(NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationDoNotDisturbDate> dndDate;
+    auto ret = ansManagerProxy_->GetDoNotDisturbDate(dndDate);
+    if (ret != ERR_OK) {
+        ANS_LOGE("Get DoNotDisturbDate failed.");
+        return ret;
+    }
+
+    if (!dndDate) {
+        ANS_LOGE("Invalid DoNotDisturbDate.");
+        return ERR_ANS_NO_MEMORY;
+    }
+
+    doNotDisturbDate = *dndDate;
+    return ret;
+}
+
+ErrCode AnsNotification::DoesSupportDoNotDisturbMode(bool &doesSupport)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->DoesSupportDoNotDisturbMode(doesSupport);
 }
 
 void AnsNotification::ResetAnsManagerProxy()

@@ -39,7 +39,7 @@ public:
     bool PutPrivateNotificationsAllowed(const std::string &bundleKey, const bool &allow);
     bool PutNotificationsEnabledForBundle(const std::string &bundleKey, const bool &enabled);
     bool PutNotificationsEnabled(const bool &enabled);
-    bool PutDisturbMode(const NotificationConstant::DisturbMode &mode);
+    bool PutDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date);
 
     bool ParseFromDisturbeDB(NotificationPreferencesInfo &info);
 
@@ -87,6 +87,7 @@ private:
     std::string VectorToString(const std::vector<int64_t> &data) const;
     void StringToVector(const std::string &str, std::vector<int64_t> &data) const;
     int StringToInt(const std::string &str) const;
+    int64_t StringToInt64(const std::string &str) const;
     bool IsSlotKey(const std::string &bundleKey, const std::string &key) const;
     bool IsGroupKey(const std::string &bundleKey, const std::string &key) const;
     std::string GenerateSlotKey(
@@ -102,7 +103,9 @@ private:
         const OHOS::DistributedKv::Entry &entry);
     void ParseBundlePropertyFromDisturbeDB(NotificationPreferencesInfo::BundleInfo &bundleInfo,
         const std::string &bundleKey, const OHOS::DistributedKv::Entry &entry);
-    void ParseDisturbeMode(NotificationPreferencesInfo &info);
+    void ParseDoNotDisturbType(NotificationPreferencesInfo &info);
+    void ParseDoNotDisturbBeginDate(NotificationPreferencesInfo &info);
+    void ParseDoNotDisturbEndDate(NotificationPreferencesInfo &info);
     void ParseEnableAllNotification(NotificationPreferencesInfo &info);
     void ParseGroupDescription(
         const std::string &bundleKey, sptr<NotificationSlotGroup> &group, const OHOS::DistributedKv::Entry &entry);
@@ -121,7 +124,7 @@ private:
     void ParseSlotShowBadge(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotEnableLight(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotEnableVrbration(sptr<NotificationSlot> &slot, const std::string &value) const;
-    void ParseSlotLedLightColor(sptr<NotificationSlot> &slot, const std::string &kevaluey) const;
+    void ParseSlotLedLightColor(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotLockscreenVisibleness(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotSound(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotVibrationSytle(sptr<NotificationSlot> &slot, const std::string &value) const;

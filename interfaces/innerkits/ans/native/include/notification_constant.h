@@ -22,16 +22,6 @@ namespace OHOS {
 namespace Notification {
 class NotificationConstant {
 public:
-    enum DisturbMode {
-        ALLOW_ALARMS,   // Indicates that only notifications of the NotificationRequest::CLASSIFICATION_ALARM
-                        // category are allowed to interrupt the user in Do Not Disturb mode.
-        ALLOW_ALL,      // Indicates that all notifications are allowed to interrupt the user in Do Not Disturb mode.
-        ALLOW_NONE,     // Indicates that no notifications are allowed to interrupt the user in Do Not Disturb mode.
-        ALLOW_PRIORITY, // Indicates that only notifications meeting the specified priority criteria are allowed
-                        // to interrupt the user in Do Not Disturb mode.
-        ALLOW_UNKNOWN,  // Indicates the value returned if the Do Not Disturb mode type cannot be obtained.
-    };
-
     enum InputEditType {
         EDIT_AUTO,      // Indicates that the system determines whether to allow the user to edit the options before they
                         // are sent to the application.
@@ -92,6 +82,13 @@ public:
          * notifications are not displayed on the lock screen.
          */
         SECRET
+    };
+
+    enum class DoNotDisturbType {
+        NONE    = 0,
+        ONCE    = 1,    // only once
+        DAILY   = 2,    // every day
+        CLEARLY = 3,    // time period
     };
 
     /**

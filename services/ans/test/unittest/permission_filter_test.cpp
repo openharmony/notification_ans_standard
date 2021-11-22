@@ -47,7 +47,7 @@ void PermissionFilterTest::TearDown()
 
 /**
  * @tc.number    : PermissionFilterTest_00100
- * @tc.name      : AMS_ANS_OnStop_0100
+ * @tc.name      : ANS_OnStop_0100
  * @tc.desc      : Test OnStart function
  */
 HWTEST_F(PermissionFilterTest, PermissionFilterTest_00100, Function | SmallTest | Level1)
@@ -58,7 +58,7 @@ HWTEST_F(PermissionFilterTest, PermissionFilterTest_00100, Function | SmallTest 
 
 /**
  * @tc.number    : PermissionFilterTest_00200
- * @tc.name      : AMS_ANS_OnStop_0100
+ * @tc.name      : ANS_OnStop_0100
  * @tc.desc      : Test OnStop function
  */
 HWTEST_F(PermissionFilterTest, PermissionFilterTest_00200, Function | SmallTest | Level1)

@@ -28,12 +28,14 @@ const std::string CONNECTED = "onConnect";
 const std::string DIS_CONNECTED = "onDisconnect";
 const std::string DIE = "onDestroy";
 const std::string DISTURB_MODE_CHANGE = "onDisturbModeChange";
+const std::string DISTURB_DATE_CHANGE = "onDoNotDisturbDateChange";
 
 struct NotificationReceiveDataWorker {
     napi_env env = nullptr;
     napi_ref ref = nullptr;
     std::shared_ptr<OHOS::Notification::Notification> request;
     std::shared_ptr<NotificationSortingMap> sortingMap;
+    NotificationDoNotDisturbDate date;
     int deleteReason = 0;
     int result = 0;
     int disturbMode = 0;
@@ -292,8 +294,8 @@ void SubscriberInstance::OnConsumed(const std::shared_ptr<OHOS::Notification::No
         ANS_LOGE("sortingMap is null");
         return;
     }
-    ANS_LOGI("OnConsumed NotificationId = %{public}d", request->GetNotificationRequest().GetNotificationId());
-    ANS_LOGI("OnConsumed sortingMap size = %{public}zu", sortingMap->GetKey().size());
+    ANS_LOGI("OnConsumed Notification key = %{public}s, sortingMap size = %{public}zu",
+        request->GetKey().c_str(), sortingMap->GetKey().size());
 
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(consumeCallbackInfo_.env, &loop);
@@ -624,8 +626,87 @@ void SubscriberInstance::OnDied()
     }
 }
 
-void SubscriberInstance::OnDisturbModeChanged(int disturbMode)
-{}
+void UvQueueWorkOnDoNotDisturbDateChange(uv_work_t *work, int status)
+{
+    ANS_LOGI("OnDoNotDisturbDateChange uv_work_t start");
+
+    if (work == nullptr) {
+        ANS_LOGE("work is null");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorkerData = (NotificationReceiveDataWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        ANS_LOGE("dataWorkerData is null");
+        delete work;
+        work = nullptr;
+        return;
+    }
+
+    napi_value result = nullptr;
+    napi_create_object(dataWorkerData->env, &result);
+
+    if (!Common::SetDoNotDisturbDate(dataWorkerData->env, dataWorkerData->date, result)) {
+        result = Common::NapiGetNull(dataWorkerData->env);
+    }
+
+    Common::SetCallback(dataWorkerData->env, dataWorkerData->ref, result);
+
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+void SubscriberInstance::OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGI("enter");
+
+    if (disturbDateCallbackInfo_.ref == nullptr) {
+        ANS_LOGI("disturbDateCallbackInfo_ callback unset");
+        return;
+    }
+
+    if (date == nullptr) {
+        ANS_LOGE("date is null");
+        return;
+    }
+
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(disturbDateCallbackInfo_.env, &loop);
+    if (loop == nullptr) {
+        ANS_LOGE("loop instance is nullptr");
+        return;
+    }
+
+    NotificationReceiveDataWorker *dataWorker = new (std::nothrow) NotificationReceiveDataWorker();
+    if (dataWorker == nullptr) {
+        ANS_LOGE("new dataWorker failed");
+        return;
+    }
+
+    dataWorker->date = *date;
+    dataWorker->env = disturbDateCallbackInfo_.env;
+    dataWorker->ref = disturbDateCallbackInfo_.ref;
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        ANS_LOGE("new work failed");
+        delete dataWorker;
+        dataWorker = nullptr;
+        return;
+    }
+
+    work->data = (void *)dataWorker;
+
+    int ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkOnDoNotDisturbDateChange);
+    if (ret != 0) {
+        delete dataWorker;
+        dataWorker = nullptr;
+        delete work;
+        work = nullptr;
+    }
+}
 
 void SubscriberInstance::SetCancelCallbackInfo(const napi_env &env, const napi_ref &ref)
 {
@@ -669,6 +750,12 @@ void SubscriberInstance::SetDisturbModeCallbackInfo(const napi_env &env, const n
     disturbModeCallbackInfo_.ref = ref;
 }
 
+void SubscriberInstance::SetDisturbDateCallbackInfo(const napi_env &env, const napi_ref &ref)
+{
+    disturbDateCallbackInfo_.env = env;
+    disturbDateCallbackInfo_.ref = ref;
+}
+
 void SubscriberInstance::SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref)
 {
     if (type == CONSUME) {
@@ -685,6 +772,8 @@ void SubscriberInstance::SetCallbackInfo(const napi_env &env, const std::string 
         SetDieCallbackInfo(env, ref);
     } else if (type == DISTURB_MODE_CHANGE) {
         SetDisturbModeCallbackInfo(env, ref);
+    } else if (type == DISTURB_DATE_CHANGE) {
+        SetDisturbDateCallbackInfo(env, ref);
     } else {
         ANS_LOGW("type is error");
     }
@@ -799,6 +888,17 @@ napi_value GetNotificationSubscriber(
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         napi_create_reference(env, nOnDisturbModeChanged, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, DISTURB_MODE_CHANGE, result);
+    }
+
+    // onDoNotDisturbDateChange?:(mode: notification.DoNotDisturbDate) => void
+    NAPI_CALL(env, napi_has_named_property(env, value, "onDoNotDisturbDateChange", &hasProperty));
+    if (hasProperty) {
+        napi_value nOnDisturbDateChanged = nullptr;
+        napi_get_named_property(env, value, "onDoNotDisturbDateChange", &nOnDisturbDateChanged);
+        NAPI_CALL(env, napi_typeof(env, nOnDisturbDateChanged, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        napi_create_reference(env, nOnDisturbDateChanged, 1, &result);
+        subscriberInfo.subscriber->SetCallbackInfo(env, DISTURB_DATE_CHANGE, result);
     }
 
     return Common::NapiGetNull(env);

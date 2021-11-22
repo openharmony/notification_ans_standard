@@ -42,8 +42,9 @@ AnsSubscriberStub::AnsSubscriberStub()
         std::bind(&AnsSubscriberStub::HandleOnCanceledMap, this, std::placeholders::_1, std::placeholders::_2));
     interfaces_.emplace(
         ON_UPDATED, std::bind(&AnsSubscriberStub::HandleOnUpdated, this, std::placeholders::_1, std::placeholders::_2));
-    interfaces_.emplace(ON_DISTURB_MODE_CHANGED,
-        std::bind(&AnsSubscriberStub::HandleOnDisturbModeChanged, this, std::placeholders::_1, std::placeholders::_2));
+    interfaces_.emplace(ON_DND_DATE_CHANGED,
+        std::bind(
+            &AnsSubscriberStub::HandleOnDoNotDisturbDateChange, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 AnsSubscriberStub::~AnsSubscriberStub()
@@ -183,10 +184,10 @@ ErrCode AnsSubscriberStub::HandleOnUpdated(MessageParcel &data, MessageParcel &r
     return ERR_OK;
 }
 
-ErrCode AnsSubscriberStub::HandleOnDisturbModeChanged(MessageParcel &data, MessageParcel &reply)
+ErrCode AnsSubscriberStub::HandleOnDoNotDisturbDateChange(MessageParcel &data, MessageParcel &reply)
 {
-    NotificationConstant::DisturbMode mode = static_cast<NotificationConstant::DisturbMode>(data.ReadUint32());
-    OnDisturbModeChanged(mode);
+    sptr<NotificationDoNotDisturbDate> date = data.ReadParcelable<NotificationDoNotDisturbDate>();
+    OnDoNotDisturbDateChange(date);
     return ERR_OK;
 }
 
@@ -213,7 +214,7 @@ void AnsSubscriberStub::OnCanceled(
 void AnsSubscriberStub::OnUpdated(const sptr<NotificationSortingMap> &notificationMap)
 {}
 
-void AnsSubscriberStub::OnDisturbModeChanged(NotificationConstant::DisturbMode mode)
+void AnsSubscriberStub::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date)
 {}
 
 }  // namespace Notification
