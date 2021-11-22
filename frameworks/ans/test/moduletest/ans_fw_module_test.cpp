@@ -26,7 +26,6 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_manager_proxy.h"
-#include "ans_mt_constant.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "notification_content.h"
@@ -40,6 +39,20 @@ using namespace OHOS::Media;
 
 namespace OHOS {
 namespace Notification {
+namespace {
+const std::string APP_NAME = "bundleName";
+const std::string NOTIFICATION_LABEL_0 = "Label0";
+const std::string NOTIFICATION_LABEL_1 = "Label1";
+const std::string NOTIFICATION_LABEL_2 = "Label2";
+const std::string AN_NOT_EXIST_KEY = "AN_NOT_EXIST_KEY";
+const std::string KEY_SPLITER = "_";
+
+constexpr int UID = 1;
+constexpr int CANCEL_REASON_DELETE = 2;
+constexpr int APP_CANCEL_REASON_DELETE = 8;
+constexpr int APP_CANCEL_ALL_REASON_DELETE = 9;
+}  // namespace
+
 enum class SubscriberEventType {
     ON_SUBSCRIBERESULT,
     ON_UNSUBSCRIBERESULT,
