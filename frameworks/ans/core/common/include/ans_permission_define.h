@@ -13,29 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_TEST_MODULETEST_ANS_MT_CONSTANT_H
-#define BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_TEST_MODULETEST_ANS_MT_CONSTANT_H
+#ifndef BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_PERMISSION_DEFINE_H
+#define BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_PERMISSION_DEFINE_H
 
 #include <string>
 
 namespace OHOS {
 namespace Notification {
-
-namespace {
-const std::string APP_NAME = "bundleName";
-const std::string NOTIFICATION_LABEL_0 = "Label0";
-const std::string NOTIFICATION_LABEL_1 = "Label1";
-const std::string NOTIFICATION_LABEL_2 = "Label2";
-const std::string AN_NOT_EXIST_KEY = "AN_NOT_EXIST_KEY";
-const std::string KEY_SPLITER = "_";
-
-constexpr int UID = 1;
-constexpr int CANCEL_REASON_DELETE = 2;
-constexpr int APP_CANCEL_REASON_DELETE = 8;
-constexpr int APP_CANCEL_ALL_REASON_DELETE = 9;
-}  // namespace
-
+// Permission
+const std::string ANS_PERMISSION_CONTROLLER = "ohos.permission.NOTIFICATION_CONTROLLER";
 }  // namespace Notification
 }  // namespace OHOS
 
-#endif
+#endif  // BASE_NOTIFICATION_ANS_STANDARD_INNERKITS_BASE_INCLUDE_ANS_PERMISSION_DEFINE_H

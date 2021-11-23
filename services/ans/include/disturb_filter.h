@@ -30,6 +30,9 @@ public:
     void OnStop() override;
 
     ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) override;
+
+private:
+    void GetTimeInterval(int64_t &beginDate, int64_t &endDate);
 };
 
 }  // namespace Notification

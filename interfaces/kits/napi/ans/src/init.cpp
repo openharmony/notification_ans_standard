@@ -62,7 +62,9 @@ napi_value NotificationInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("isNotificationEnabled", IsNotificationEnabled),
         DECLARE_NAPI_FUNCTION("displayBadge", DisplayBadge),
         DECLARE_NAPI_FUNCTION("isBadgeDisplayed", IsBadgeDisplayed),
-        DECLARE_NAPI_FUNCTION("setDoNotDisturbMode", SetDoNotDisturbMode),
+        DECLARE_NAPI_FUNCTION("setDoNotDisturbDate", SetDoNotDisturbDate),
+        DECLARE_NAPI_FUNCTION("getDoNotDisturbDate", GetDoNotDisturbDate),
+        DECLARE_NAPI_FUNCTION("supportDoNotDisturbMode", SupportDoNotDisturbMode),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

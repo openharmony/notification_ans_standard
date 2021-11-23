@@ -83,8 +83,8 @@
         "SetShowBadgeEnabledForBundle": [],
         "GetShowBadgeEnabledForBundle": [],
         "GetShowBadgeEnabled": [],
-        "SetDisturbMode": [],
-        "GetDisturbMode": []
+        "SetDoNotDisturbDate": [],
+        "GetDoNotDisturbDate": []
     },
     "WantAgentHelper": {
         "GetWantAgentOHOSAppExecFwkContextWantAgentInfo": [],

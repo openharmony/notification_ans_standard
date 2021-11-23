@@ -240,8 +240,8 @@ public:
      * @note If an empty array or null is passed to this method, the system then calls
      *       SetEnableVibration(bool) with the input parameter set to false.
      *       If a valid value is passed to this method, the system calls SetEnableVibration(bool) with the input
-     * parameter set to true. This method takes effect only before
-     * NotificationHelper::AddNotificationSlot(NotificationSlot) is called.
+     *       parameter set to true. This method takes effect only before
+     *       NotificationHelper::AddNotificationSlot(NotificationSlot) is called.
      *
      * @param vibration Indicates the vibration style to set.
      */

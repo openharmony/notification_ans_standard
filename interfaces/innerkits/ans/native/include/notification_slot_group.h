@@ -30,7 +30,7 @@ public:
      *
      * @param id Indicates the ID of the NotificationSlotGroup.
      *           The ID must be unique and its length must not exceed 1000 characters (the excess part is automatically
-     * truncated).
+     *           truncated).
      * @param name Indicates the name of the NotificationSlotGroup.
      *             Its length must not exceed 1000 characters (the excess part is automatically truncated).
      */

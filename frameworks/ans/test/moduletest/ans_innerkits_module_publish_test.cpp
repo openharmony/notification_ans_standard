@@ -53,9 +53,6 @@ const int32_t CASE_TEN = 10;
 const int32_t CASE_ELEVEN = 11;
 const int32_t CASE_TWELVE = 12;
 const int32_t CASE_THIRTEEN = 13;
-const int32_t CASE_FOURTEEN = 14;
-const int32_t CASE_FIFTEEN = 15;
-const int32_t CASE_SIXTEEN = 16;
 const int32_t CALLING_UID = 9999;
 
 const int32_t PIXEL_MAP_TEST_WIDTH = 32;
@@ -90,7 +87,7 @@ public:
     virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {}
 
-    virtual void OnDisturbModeChanged(int disturbMode) override
+    virtual void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {}
 
     virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
@@ -108,7 +105,6 @@ public:
         OnConsumedReceived = true;
         g_consumed_mtx.unlock();
         NotificationRequest notificationRequest = request->GetNotificationRequest();
-        NotificationConstant::DisturbMode disturbMode;
         if (CASE_ONE == notificationRequest.GetNotificationId()) {
             CheckCaseOneResult(notificationRequest);
         } else if (CASE_TWO == notificationRequest.GetNotificationId()) {
@@ -134,15 +130,6 @@ public:
         } else if (CASE_TWELVE == notificationRequest.GetNotificationId()) {
             EXPECT_EQ(NotificationConstant::CUSTOM, notificationRequest.GetSlotType());
         } else if (CASE_THIRTEEN == notificationRequest.GetNotificationId()) {
-            EXPECT_EQ(0, NotificationHelper::GetDisturbMode(disturbMode));
-            EXPECT_EQ(NotificationConstant::ALLOW_ALARMS, disturbMode);
-        } else if (CASE_FOURTEEN == notificationRequest.GetNotificationId()) {
-            EXPECT_EQ(0, NotificationHelper::GetDisturbMode(disturbMode));
-            EXPECT_EQ(NotificationConstant::ALLOW_ALL, disturbMode);
-        } else if (CASE_FIFTEEN == notificationRequest.GetNotificationId()) {
-            EXPECT_EQ(0, NotificationHelper::GetDisturbMode(disturbMode));
-            EXPECT_EQ(NotificationConstant::ALLOW_NONE, disturbMode);
-        } else if (CASE_SIXTEEN == notificationRequest.GetNotificationId()) {
             EXPECT_EQ(NotificationRequest::GroupAlertType::ALL, notificationRequest.GetGroupAlertType());
             EXPECT_EQ(true, notificationRequest.IsGroupOverview());
         } else {
@@ -1008,111 +995,6 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_03000, Function
 }
 
 /**
- * @tc.number    : ANS_Interface_MT_Publish_04000
- * @tc.name      : Publish_04000
- * @tc.desc      : Add notification slot(type is SOCIAL_COMMUNICATION), make a subscriber and publish a notification in
- *                 disturbed mode (mode is ALLOW_ALARMS)
- * @tc.expected  : Add notification slot success, make a subscriber and a publish notification in undisturbed mode
- *                 success.
- */
-HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_04000, Function | MediumTest | Level1)
-{
-    NotificationSlot slot(NotificationConstant::SOCIAL_COMMUNICATION);
-    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
-    auto subscriber = TestAnsSubscriber();
-    g_subscribe_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber));
-    WaitOnSubscribeResult();
-    EXPECT_EQ(0, NotificationHelper::SetDisturbMode(NotificationConstant::ALLOW_ALARMS));
-    MessageUser messageUser;
-    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
-    EXPECT_NE(normalContent, nullptr);
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
-    EXPECT_NE(content, nullptr);
-    NotificationRequest req;
-    req.SetContent(content);
-    req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
-    req.SetClassification(CLASSIFICATION_ALARM);
-    req.SetNotificationId(CASE_THIRTEEN);
-    g_consumed_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    WaitOnConsumed();
-    g_unsubscribe_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-    WaitOnUnsubscribeResult();
-}
-
-/**
- * @tc.number    : ANS_Interface_MT_Publish_05000
- * @tc.name      : Publish_05000
- * @tc.desc      : Add notification slot(type is SOCIAL_COMMUNICATION), make a subscriber and publish a notification
- *                 in disturbed mode (mode is ALLOW_ALL)
- * @tc.expected  : Add notification slot success, make a subscriber and pulish a notification in undisturbed mode
- *                 success.
- */
-HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_05000, Function | MediumTest | Level1)
-{
-    NotificationSlot slot(NotificationConstant::SOCIAL_COMMUNICATION);
-    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
-    auto subscriber = TestAnsSubscriber();
-    g_subscribe_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber));
-    WaitOnSubscribeResult();
-    EXPECT_EQ(0, NotificationHelper::SetDisturbMode(NotificationConstant::ALLOW_ALL));
-    MessageUser messageUser;
-    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
-    EXPECT_NE(normalContent, nullptr);
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
-    EXPECT_NE(content, nullptr);
-    NotificationRequest req;
-    req.SetContent(content);
-    req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
-    req.SetNotificationId(CASE_FOURTEEN);
-    g_consumed_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    WaitOnConsumed();
-    // Wait OnUnsubscribeResult
-    g_unsubscribe_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-    WaitOnUnsubscribeResult();
-}
-
-/**
- * @tc.number    : ANS_Interface_MT_Publish_06000
- * @tc.name      : Publish_06000
- * @tc.desc      : Add notification slot(type is SOCIAL_COMMUNICATION), make a subscriber and publish a notification
- *                 in disturbed mode (mode is ALLOW_NONE)
- * @tc.expected  : Add notification slot success, make a subscriber and pulush a notification in undisturbed mode
- *                 success.
- */
-HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_06000, Function | MediumTest | Level1)
-{
-    NotificationSlot slot(NotificationConstant::SOCIAL_COMMUNICATION);
-    slot.EnableBypassDnd(true);
-    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
-    auto subscriber = TestAnsSubscriber();
-    g_subscribe_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber));
-    WaitOnSubscribeResult();
-    EXPECT_EQ(0, NotificationHelper::SetDisturbMode(NotificationConstant::ALLOW_NONE));
-    MessageUser messageUser;
-    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
-    EXPECT_NE(normalContent, nullptr);
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
-    EXPECT_NE(content, nullptr);
-    NotificationRequest req;
-    req.SetContent(content);
-    req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
-    req.SetNotificationId(CASE_FIFTEEN);
-    g_consumed_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
-    WaitOnConsumed();
-    g_unsubscribe_mtx.lock();
-    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber));
-    WaitOnUnsubscribeResult();
-}
-
-/**
  * @tc.number    : ANS_Interface_MT_Publish_07000
  * @tc.name      : Publish_07000
  * @tc.desc      : Add notification slot(type is SOCIAL_COMMUNICATION), make a subscriber and publish a local group
@@ -1138,7 +1020,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_07000, Function
     req.SetSlotType(NotificationConstant::SOCIAL_COMMUNICATION);
     req.SetGroupName("groupnotifcation");
     req.SetGroupOverview(true);
-    req.SetNotificationId(CASE_SIXTEEN);
+    req.SetNotificationId(CASE_THIRTEEN);
     req.SetGroupAlertType(NotificationRequest::GroupAlertType::ALL);
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));

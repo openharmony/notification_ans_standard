@@ -238,14 +238,14 @@ bool NotificationPreferencesInfo::GetEnabledAllNotification() const
     return isEnabledAllNotification_;
 }
 
-void NotificationPreferencesInfo::SetDisturbMode(const NotificationConstant::DisturbMode &mode)
+void NotificationPreferencesInfo::SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date)
 {
-    disturbMode_ = mode;
+    doNotDisturbDate_ = date;
 }
 
-NotificationConstant::DisturbMode NotificationPreferencesInfo::GetDisturbMode() const
+sptr<NotificationDoNotDisturbDate> NotificationPreferencesInfo::GetDoNotDisturbDate() const
 {
-    return disturbMode_;
+    return doNotDisturbDate_;
 }
 
 void NotificationPreferencesInfo::SetBundleInfo(const BundleInfo &info)

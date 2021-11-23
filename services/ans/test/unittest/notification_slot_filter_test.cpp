@@ -32,7 +32,7 @@ public:
 
 /**
  * @tc.number    : NotificationSlotFilterTest_00100
- * @tc.name      : AMS_ANS_OnStart_0100
+ * @tc.name      : ANS_OnStart_0100
  * @tc.desc      : Test OnStart function
  */
 HWTEST_F(NotificationSlotFilterTest, NotificationSlotFilterTest_00100, Function | SmallTest | Level1)
@@ -43,7 +43,7 @@ HWTEST_F(NotificationSlotFilterTest, NotificationSlotFilterTest_00100, Function 
 
 /**
  * @tc.number    : NotificationSlotFilterTest_00200
- * @tc.name      : AMS_ANS_OnStop_0100
+ * @tc.name      : ANS_OnStop_0100
  * @tc.desc      : Test OnStop function
  */
 HWTEST_F(NotificationSlotFilterTest, NotificationSlotFilterTest_00200, Function | SmallTest | Level1)
@@ -54,7 +54,7 @@ HWTEST_F(NotificationSlotFilterTest, NotificationSlotFilterTest_00200, Function 
 
 /**
  * @tc.number    : NotificationSlotFilterTest_00300
- * @tc.name      : AMS_ANS_OnPublish_0100
+ * @tc.name      : ANS_OnPublish_0100
  * @tc.desc      : Test OnPublish function
  */
 HWTEST_F(NotificationSlotFilterTest, NotificationSlotFilterTest_00300, Function | SmallTest | Level1)

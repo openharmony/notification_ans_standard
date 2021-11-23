@@ -20,7 +20,6 @@
 
 #include "ans_manager_interface.h"
 #include "ans_subscriber_stub.h"
-#include "notification_constant.h"
 #include "notification_request.h"
 #include "notification_sorting.h"
 #include "notification_sorting_map.h"
@@ -98,11 +97,11 @@ public:
     virtual void OnDied() = 0;
 
     /**
-     * @brief Called when the Do Not Disturb mode type changes.
+     * @brief Called when the Do Not Disturb date changes.
      *
-     * @param disturbMode Indicates the current Do Not Disturb mode type.
+     * @param date Indicates the current Do Not Disturb date.
      **/
-    virtual void OnDisturbModeChanged(int disturbMode) = 0;
+    virtual void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) = 0;
 
 private:
     class SubscriberImpl final : public AnsSubscriberStub {
@@ -139,7 +138,7 @@ private:
 
         void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) override;
 
-        void OnDisturbModeChanged(NotificationConstant::DisturbMode mode) override;
+        void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) override;
 
         bool GetAnsManagerProxy();
 

@@ -26,12 +26,10 @@ struct AsyncCallbackInfoPublish {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
     NotificationRequest request;
-    std::string lable;
     CallbackPromiseInfo info;
 };
 
 struct ParametersInfoPublish {
-    std::string lable;
     NotificationRequest request;
     napi_ref callback = nullptr;
 };
@@ -92,7 +90,7 @@ napi_value Publish(napi_env env, napi_callback_info info)
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }
-    asynccallbackinfo->lable = params.lable;
+
     asynccallbackinfo->request = params.request;
     Common::PaddingCallbackPromiseInfo(env, params.callback, asynccallbackinfo->info, promise);
 
@@ -111,7 +109,7 @@ napi_value Publish(napi_env env, napi_callback_info info)
                 asynccallbackinfo->request.GetContent()->GetContentType());
 
             asynccallbackinfo->info.errorCode =
-                NotificationHelper::PublishNotification(asynccallbackinfo->lable, asynccallbackinfo->request);
+                NotificationHelper::PublishNotification(asynccallbackinfo->request);
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Publish napi_create_async_work complete start");

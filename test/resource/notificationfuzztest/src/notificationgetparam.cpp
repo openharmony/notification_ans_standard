@@ -1091,29 +1091,6 @@ std::shared_ptr<OHOS::Notification::NotificationSubscribeInfo> GetParamNotificat
     return std::make_shared<OHOS::Notification::NotificationSubscribeInfo>();
 }
 
-OHOS::Notification::NotificationConstant::DisturbMode GetParamDisturbMode()
-{
-    switch (GetIntParam() % INDEX_FIVE) {
-        case INDEX_ZERO:
-            return OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALARMS;
-            break;
-        case INDEX_ONE:
-            return OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALL;
-            break;
-        case INDEX_TWO:
-            return OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_NONE;
-            break;
-        case INDEX_THREE:
-            return OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_PRIORITY;
-            break;
-        case INDEX_FOUR:
-            return OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_UNKNOWN;
-            break;
-        default:
-            return OHOS::Notification::NotificationConstant::DisturbMode::ALLOW_ALARMS;
-            break;
-    }
-}
 std::shared_ptr<OHOS::Notification::WantAgent::WantAgentInfo> GetParamWantAgentInfo()
 {
     switch (GetIntParam() % INDEX_THREE) {
@@ -1444,6 +1421,37 @@ std::shared_ptr<OHOS::AAFwk::IAbilityManager> GetParamIAbilityManager()
     std::shared_ptr<OHOS::AAFwk::IAbilityManager> param =
         DelayedSingleton<OHOS::AAFwk::AbilityManagerService>::GetInstance();
     return param;
+}
+
+std::shared_ptr<OHOS::Notification::NotificationDoNotDisturbDate> GetParamNotificationDoNotDisturbDate()
+{
+    if (GetBoolParam()) {
+        return std::make_shared<OHOS::Notification::NotificationDoNotDisturbDate>();
+    } else {
+        return std::make_shared<OHOS::Notification::NotificationDoNotDisturbDate>(
+            GetParamDoNotDisturbType(), GetS64Param(), GetS64Param());
+    }
+}
+
+OHOS::Notification::NotificationConstant::DoNotDisturbType GetParamDoNotDisturbType()
+{
+    switch (GetIntParam() % INDEX_FOUR) {
+        case INDEX_ZERO:
+            return OHOS::Notification::NotificationConstant::DoNotDisturbType::NONE;
+            break;
+        case INDEX_ONE:
+            return OHOS::Notification::NotificationConstant::DoNotDisturbType::ONCE;
+            break;
+        case INDEX_TWO:
+            return OHOS::Notification::NotificationConstant::DoNotDisturbType::DAILY;
+            break;
+        case INDEX_THREE:
+            return OHOS::Notification::NotificationConstant::DoNotDisturbType::CLEARLY;
+            break;
+        default:
+            return OHOS::Notification::NotificationConstant::DoNotDisturbType::NONE;
+            break;
+    }
 }
 }  // namespace Notification
 }  // namespace OHOS

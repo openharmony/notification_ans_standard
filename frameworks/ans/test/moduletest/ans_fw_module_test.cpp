@@ -26,7 +26,6 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_manager_proxy.h"
-#include "ans_mt_constant.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "notification_content.h"
@@ -40,13 +39,26 @@ using namespace OHOS::Media;
 
 namespace OHOS {
 namespace Notification {
+namespace {
+const std::string APP_NAME = "bundleName";
+const std::string NOTIFICATION_LABEL_0 = "Label0";
+const std::string NOTIFICATION_LABEL_1 = "Label1";
+const std::string NOTIFICATION_LABEL_2 = "Label2";
+const std::string AN_NOT_EXIST_KEY = "AN_NOT_EXIST_KEY";
+const std::string KEY_SPLITER = "_";
+
+constexpr int UID = 1;
+constexpr int CANCEL_REASON_DELETE = 2;
+constexpr int APP_CANCEL_REASON_DELETE = 8;
+constexpr int APP_CANCEL_ALL_REASON_DELETE = 9;
+}  // namespace
 
 enum class SubscriberEventType {
     ON_SUBSCRIBERESULT,
     ON_UNSUBSCRIBERESULT,
     ON_DIED,
     ON_UPDATE,
-    ON_DISTURBMODECHANGED,
+    ON_DND_CHANGED,
     ON_CANCELED,
     ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON,
     ON_CONSUMED,
@@ -117,22 +129,23 @@ private:
     std::shared_ptr<NotificationSortingMap> sortingMap_;
 };
 
-class OnDisturbModeChangedEvent : public SubscriberEvent {
+class OnDoNotDisturbDateChangedEvent : public SubscriberEvent {
 public:
-    OnDisturbModeChangedEvent(int disturbMode)
-        : SubscriberEvent(SubscriberEventType::ON_DISTURBMODECHANGED), disturbMode_(disturbMode)
+    explicit OnDoNotDisturbDateChangedEvent(
+        const std::shared_ptr<NotificationDoNotDisturbDate> &date)
+        : SubscriberEvent(SubscriberEventType::ON_DND_CHANGED), date_(date)
     {}
 
-    ~OnDisturbModeChangedEvent() override
+    ~OnDoNotDisturbDateChangedEvent() override
     {}
 
-    int GetDisturbModeChanged()
+    const std::shared_ptr<NotificationDoNotDisturbDate> &GetDoNotDisturbDate() const
     {
-        return disturbMode_;
+        return date_;
     }
 
 private:
-    int disturbMode_;
+    std::shared_ptr<NotificationDoNotDisturbDate> date_;
 };
 
 class OnOnCanceledEvent : public SubscriberEvent {
@@ -252,9 +265,9 @@ public:
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
-    void OnDisturbModeChanged(int disturbMode) override
+    void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {
-        std::shared_ptr<OnDisturbModeChangedEvent> event = std::make_shared<OnDisturbModeChangedEvent>(disturbMode);
+        std::shared_ptr<OnDoNotDisturbDateChangedEvent> event = std::make_shared<OnDoNotDisturbDateChangedEvent>(date);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
@@ -826,6 +839,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_Subscriber_00100, Function | MediumTest | Le
     }
     EXPECT_TRUE(waitOnSubscriber);
     subscriber.ClearEvents();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
     SleepForFC();
 }
 
@@ -1193,5 +1207,345 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishNotificationWithPixelMap_00300, Funct
     EXPECT_EQ(NotificationHelper::PublishNotification(req), (int)ERR_ANS_ICON_OVER_SIZE);
 }
 
+/**
+ *
+ * @tc.number    : ANS_FW_MT_OnDoNotDisturbDateChange_00100
+ * @tc.name      :
+ * @tc.desc      : OnDoNotDisturbDateChange callback.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_OnDoNotDisturbDateChange_00100, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    NotificationDoNotDisturbDate date(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(date), ERR_OK);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_DND_CHANGED) {
+            std::shared_ptr<OnDoNotDisturbDateChangedEvent> ev =
+                std::static_pointer_cast<OnDoNotDisturbDateChangedEvent>(event);
+            auto date = ev->GetDoNotDisturbDate();
+            ASSERT_NE(date, nullptr);
+            EXPECT_EQ(date->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::NONE);
+        }
+    }
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_OnDoNotDisturbDateChange_00200
+ * @tc.name      :
+ * @tc.desc      : OnDoNotDisturbDateChange callback.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_OnDoNotDisturbDateChange_00200, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    NotificationDoNotDisturbDate date(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(date), ERR_OK);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_DND_CHANGED) {
+            std::shared_ptr<OnDoNotDisturbDateChangedEvent> ev =
+                std::static_pointer_cast<OnDoNotDisturbDateChangedEvent>(event);
+            auto date = ev->GetDoNotDisturbDate();
+            ASSERT_NE(date, nullptr);
+            EXPECT_EQ(date->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::ONCE);
+        }
+    }
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_OnDoNotDisturbDateChange_00300
+ * @tc.name      :
+ * @tc.desc      : OnDoNotDisturbDateChange callback.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_OnDoNotDisturbDateChange_00300, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    NotificationDoNotDisturbDate date(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(date), ERR_OK);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_DND_CHANGED) {
+            std::shared_ptr<OnDoNotDisturbDateChangedEvent> ev =
+                std::static_pointer_cast<OnDoNotDisturbDateChangedEvent>(event);
+            auto date = ev->GetDoNotDisturbDate();
+            ASSERT_NE(date, nullptr);
+            EXPECT_EQ(date->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::DAILY);
+        }
+    }
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_OnDoNotDisturbDateChange_00400
+ * @tc.name      :
+ * @tc.desc      : OnDoNotDisturbDateChange callback.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_OnDoNotDisturbDateChange_00400, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    NotificationDoNotDisturbDate date(NotificationConstant::DoNotDisturbType::CLEARLY, beginDate, endDate);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(date), ERR_OK);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    for (auto event : events) {
+        if (event->GetType() == SubscriberEventType::ON_DND_CHANGED) {
+            std::shared_ptr<OnDoNotDisturbDateChangedEvent> ev =
+                std::static_pointer_cast<OnDoNotDisturbDateChangedEvent>(event);
+            auto date = ev->GetDoNotDisturbDate();
+            ASSERT_NE(date, nullptr);
+            EXPECT_EQ(date->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::CLEARLY);
+        }
+    }
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+}
+
+static NotificationDoNotDisturbDate GetDoNotDisturbDateInstance(
+    NotificationConstant::DoNotDisturbType type, int64_t intervalHours)
+{
+    std::chrono::time_point<std::chrono::system_clock> beginTp = std::chrono::system_clock::now();
+
+    auto beginDur = std::chrono::duration_cast<std::chrono::milliseconds>(beginTp.time_since_epoch());
+    auto beginMs  = beginDur.count();
+
+    auto endDur = beginDur + std::chrono::hours(intervalHours);
+    auto endMs  = endDur.count();
+
+    return {type, beginMs, endMs};
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_GetDoNotDisturbDate_00100
+ * @tc.name      :
+ * @tc.desc      : GetDoNotDisturbDate.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_GetDoNotDisturbDate_00100, Function | MediumTest | Level1)
+{
+    NotificationDoNotDisturbDate setDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(setDate), ERR_OK);
+
+    NotificationDoNotDisturbDate getDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(getDate), ERR_OK);
+    EXPECT_EQ(getDate.GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::NONE);
+    EXPECT_EQ(getDate.GetBeginDate(), 0);
+    EXPECT_EQ(getDate.GetEndDate(), 0);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DoesSupportDoNotDisturbMode_00100
+ * @tc.name      :
+ * @tc.desc      : DoesSupportDoNotDisturbMode.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_DoesSupportDoNotDisturbMode_00100, Function | MediumTest | Level1)
+{
+    bool isSupport = false;
+    EXPECT_EQ(NotificationHelper::DoesSupportDoNotDisturbMode(isSupport), ERR_OK);
+    EXPECT_EQ(isSupport, SUPPORT_DO_NOT_DISTRUB);
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_DoNotDisturb_01000
+ * @tc.name      : DoNotDisturb_01000
+ * @tc.desc      : Set and get DoNotDisturbDate. E.g. 01:40 ~ 02:40
+ * @tc.expected  : Set and get DoNotDisturbDate successfully.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_DoNotDisturb_01000, Function | MediumTest | Level1)
+{
+    auto srcDate = GetDoNotDisturbDateInstance(NotificationConstant::DoNotDisturbType::ONCE, 1);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(srcDate), ERR_OK);
+
+    NotificationDoNotDisturbDate disDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(disDate), ERR_OK);
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_01000:: srcDate : beginMs : " << srcDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_01000:: srcDate : endMs   : " << srcDate.GetEndDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_01000:: disDate : beginMs : " << disDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_01000:: disDate : endMs   : " << disDate.GetEndDate();
+
+    EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_DoNotDisturb_02000
+ * @tc.name      : DoNotDisturb_02000
+ * @tc.desc      : Set and get DoNotDisturbDate. E.g. 1970-01-01 01:40 ~ 1970-01-02 01:40
+ * @tc.expected  : Set and get DoNotDisturbDate successfully.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_02000, Function | MediumTest | Level1)
+{
+    auto srcDate = GetDoNotDisturbDateInstance(NotificationConstant::DoNotDisturbType::ONCE, 24);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(srcDate), ERR_OK);
+
+    NotificationDoNotDisturbDate disDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(disDate), ERR_OK);
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_02000:: srcDate : beginMs : " << srcDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_02000:: srcDate : endMs   : " << srcDate.GetEndDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_02000:: disDate : beginMs : " << disDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_02000:: disDate : endMs   : " << disDate.GetEndDate();
+
+    EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+
+    EXPECT_NE(disDate.GetBeginDate(), disDate.GetEndDate());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_DoNotDisturb_03000
+ * @tc.name      : DoNotDisturb_03000
+ * @tc.desc      : Set and get DoNotDisturbDate. E.g. 1970-01-01 01:40 ~ 1970-01-02 02:40
+ * @tc.expected  : Set and get DoNotDisturbDate successfully.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_03000, Function | MediumTest | Level1)
+{
+    auto srcDate = GetDoNotDisturbDateInstance(NotificationConstant::DoNotDisturbType::ONCE, 25);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(srcDate), ERR_OK);
+
+    NotificationDoNotDisturbDate disDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(disDate), ERR_OK);
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_03000:: srcDate : beginMs : " << srcDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_03000:: srcDate : endMs   : " << srcDate.GetEndDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_03000:: disDate : beginMs : " << disDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_03000:: disDate : endMs   : " << disDate.GetEndDate();
+
+    EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_DoNotDisturb_04000
+ * @tc.name      : DoNotDisturb_04000
+ * @tc.desc      : Set and get DoNotDisturbDate.  E.g. 01:40 ~ 07:40
+ * @tc.expected  : Set and get DoNotDisturbDate successfully.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_04000, Function | MediumTest | Level1)
+{
+    auto srcDate = GetDoNotDisturbDateInstance(NotificationConstant::DoNotDisturbType::DAILY, 6);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(srcDate), ERR_OK);
+
+    NotificationDoNotDisturbDate disDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(disDate), ERR_OK);
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_04000:: srcDate : beginMs : " << srcDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_04000:: srcDate : endMs   : " << srcDate.GetEndDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_04000:: disDate : beginMs : " << disDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_04000:: disDate : endMs   : " << disDate.GetEndDate();
+
+    EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_DoNotDisturb_05000
+ * @tc.name      : DoNotDisturb_05000
+ * @tc.desc      : Set and get DoNotDisturbDate.  E.g. 1970-01-01 01:40 ~ 1970-01-02 01:40
+ * @tc.expected  : Set and get DoNotDisturbDate successfully.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_05000, Function | MediumTest | Level1)
+{
+    auto srcDate = GetDoNotDisturbDateInstance(NotificationConstant::DoNotDisturbType::DAILY, 24);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(srcDate), ERR_OK);
+
+    NotificationDoNotDisturbDate disDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(disDate), ERR_OK);
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_05000:: srcDate : beginMs : " << srcDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_05000:: srcDate : endMs   : " << srcDate.GetEndDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_05000:: disDate : beginMs : " << disDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_05000:: disDate : endMs   : " << disDate.GetEndDate();
+
+    EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+
+    EXPECT_NE(disDate.GetBeginDate(), disDate.GetEndDate());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_DoNotDisturb_06000
+ * @tc.name      : DoNotDisturb_06000
+ * @tc.desc      : Set and get DoNotDisturbDate.  E.g. 1970-01-01 01:40 ~ 1970-01-02 02:40
+ * @tc.expected  : Set and get DoNotDisturbDate successfully.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_06000, Function | MediumTest | Level1)
+{
+    auto srcDate = GetDoNotDisturbDateInstance(NotificationConstant::DoNotDisturbType::DAILY, 25);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(srcDate), ERR_OK);
+
+    NotificationDoNotDisturbDate disDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(disDate), ERR_OK);
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_06000:: srcDate : beginMs : " << srcDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_06000:: srcDate : endMs   : " << srcDate.GetEndDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_06000:: disDate : beginMs : " << disDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_06000:: disDate : endMs   : " << disDate.GetEndDate();
+
+    EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_DoNotDisturb_07000
+ * @tc.name      : DoNotDisturb_07000
+ * @tc.desc      : Set and get DoNotDisturbDate.  E.g. 1970-01-01 01:40 ~ 1970-01-03 01:40
+ * @tc.expected  : Set and get DoNotDisturbDate successfully.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_07000, Function | MediumTest | Level1)
+{
+    auto srcDate = GetDoNotDisturbDateInstance(NotificationConstant::DoNotDisturbType::CLEARLY, 48);
+    EXPECT_EQ(NotificationHelper::SetDoNotDisturbDate(srcDate), ERR_OK);
+
+    NotificationDoNotDisturbDate disDate;
+    EXPECT_EQ(NotificationHelper::GetDoNotDisturbDate(disDate), ERR_OK);
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_07000:: srcDate : beginMs : " << srcDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_07000:: srcDate : endMs   : " << srcDate.GetEndDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_07000:: disDate : beginMs : " << disDate.GetBeginDate();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_07000:: disDate : endMs   : " << disDate.GetEndDate();
+
+    EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+}
 }  // namespace Notification
 }  // namespace OHOS

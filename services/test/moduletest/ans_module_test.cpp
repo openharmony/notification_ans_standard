@@ -33,8 +33,6 @@ sptr<AdvancedNotificationService> g_advancedNotificationService;
 bool passed = false;
 class TestAnsSubscriber : public NotificationSubscriber {
 public:
-    ~TestAnsSubscriber(){};
-
     void OnConnected() override
     {
         if (subscriberCb_ != nullptr) {
@@ -51,7 +49,7 @@ public:
     {}
     void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override
     {}
-    void OnDisturbModeChanged(int disturbMode) override
+    void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {}
     void OnCanceled(const std::shared_ptr<Notification> &request) override
     {}
@@ -124,7 +122,7 @@ void TestAddSlots()
 
 /**
  * @tc.number    : AnsModuleTest_001
- * @tc.name      : AMS_ANS_Subscribe_Publish_0100
+ * @tc.name      : ANS_Subscribe_Publish_0100
  * @tc.desc      : Test the functions of subscribing, publishing, and canceling
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_001, Function | SmallTest | Level1)
@@ -152,7 +150,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_001, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_002
- * @tc.name      : AMS_ANS_GetActiveNotifications_0200
+ * @tc.name      : ANS_Module_Test_0200
  * @tc.desc      : Test the function of getting notifications and getting all notifications
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_002, Function | SmallTest | Level1)
@@ -184,7 +182,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_002, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_003
- * @tc.name      : AMS_ANS_GetActiveNotifications_0300
+ * @tc.name      : ANS_Module_Test_0300
  * @tc.desc      : Test publish notifications when slot are not allowed publish.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_003, Function | SmallTest | Level1)
@@ -217,43 +215,9 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_003, Function | SmallTest | Level1)
 }
 
 /**
- * @tc.number    : AnsModuleTest_004
- * @tc.name      : AMS_ANS_GetActiveNotifications_0400
- * @tc.desc      : Test publish notifications when Disturb are not allowed publish.
- */
-HWTEST_F(AnsModuleTest, AnsModuleTest_004, Function | SmallTest | Level1)
-{
-    // subscriber
-    auto subscriber = new TestAnsSubscriber();
-    sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
-    g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
-        passed = true;
-    };
-
-    // add slot
-    std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
-    slots.push_back(slot0);
-    g_advancedNotificationService->AddSlots(slots);
-
-    // create request
-    std::string label = "testLabel";
-    sptr<NotificationRequest> req = new NotificationRequest(0);
-    req->SetLabel(label);
-    req->SetStatusBarText("text");
-
-    g_advancedNotificationService->SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_NONE);
-
-    g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(false, passed);
-    g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
-}
-
-/**
  * @tc.number    : AnsModuleTest_005
- * @tc.name      : AMS_ANS_GetActiveNotifications_0500
- * @tc.desc      : Test publish notifications when Disturb are not allowed publish.
+ * @tc.name      : ANS_Module_Test_0500
+ * @tc.desc      : Test publish notification when slot type is SERVICE_REMINDER.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_005, Function | SmallTest | Level1)
 {
@@ -299,7 +263,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_005, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_006
- * @tc.name      : AMS_ANS_GetActiveNotifications_0600
+ * @tc.name      : ANS_Module_Test_0600
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_006, Function | SmallTest | Level1)
@@ -332,8 +296,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_006, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_007
- * @tc.name      : AMS_ANS_GetActiveNotifications_0700
- * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
+ * @tc.name      : ANS_Module_Test_0700
+ * @tc.desc      : Test publish notification when slot type is OTHER.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_007, Function | SmallTest | Level1)
 {
@@ -379,8 +343,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_007, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0013
- * @tc.name      : AMS_ANS_GetActiveNotifications_01300
- * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
+ * @tc.name      : ANS_Module_Test_01300
+ * @tc.desc      : Test publish notification when slot type is SOCIAL_COMMUNICATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0013, Function | SmallTest | Level1)
 {
@@ -412,8 +376,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0013, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0014
- * @tc.name      : AMS_ANS_GetActiveNotifications_01400
- * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
+ * @tc.name      : ANS_Module_Test_01400
+ * @tc.desc      : Test publish notification when slot type is SOCIAL_COMMUNICATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0014, Function | SmallTest | Level1)
 {
@@ -450,8 +414,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0014, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0015
- * @tc.name      : AMS_ANS_GetActiveNotifications_01500
- * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
+ * @tc.name      : ANS_Module_Test_01500
+ * @tc.desc      : Test publish notification when slot type is SOCIAL_COMMUNICATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0015, Function | SmallTest | Level1)
 {
@@ -488,8 +452,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0015, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0017
- * @tc.name      : AMS_ANS_GetActiveNotifications_01700
- * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
+ * @tc.name      : ANS_Module_Test_01700
+ * @tc.desc      : Test publish notification when slot type is SOCIAL_COMMUNICATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0017, Function | SmallTest | Level1)
 {
@@ -526,7 +490,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0017, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0019
- * @tc.name      : AMS_ANS_GetActiveNotifications_01900
+ * @tc.name      : ANS_Module_Test_01900
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0019, Function | SmallTest | Level1)
@@ -564,7 +528,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0019, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0021
- * @tc.name      : AMS_ANS_GetActiveNotifications_02100
+ * @tc.name      : ANS_Module_Test_02100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0021, Function | SmallTest | Level1)
@@ -617,7 +581,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0021, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0023
- * @tc.name      : AMS_ANS_GetActiveNotifications_02300
+ * @tc.name      : ANS_Module_Test_02300
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0023, Function | SmallTest | Level1)
@@ -655,7 +619,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0023, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0031
- * @tc.name      : AMS_ANS_GetActiveNotifications_03100
+ * @tc.name      : ANS_Module_Test_03100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0031, Function | SmallTest | Level1)
@@ -708,7 +672,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0031, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0033
- * @tc.name      : AMS_ANS_GetActiveNotifications_03300
+ * @tc.name      : ANS_Module_Test_03300
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0033, Function | SmallTest | Level1)
@@ -752,7 +716,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0033, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0034
- * @tc.name      : AMS_ANS_GetActiveNotifications_03400
+ * @tc.name      : ANS_Module_Test_03400
  * @tc.desc      : Test publish notification when slot type is SOCIAL_COMMUNICATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0034, Function | SmallTest | Level1)
@@ -796,7 +760,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0034, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0035
- * @tc.name      : AMS_ANS_GetActiveNotifications_03500
+ * @tc.name      : ANS_Module_Test_03500
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0035, Function | SmallTest | Level1)
@@ -836,7 +800,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0035, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0036
- * @tc.name      : AMS_ANS_GetActiveNotifications_03600
+ * @tc.name      : ANS_Module_Test_03600
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0036, Function | SmallTest | Level1)
@@ -876,7 +840,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0036, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0039
- * @tc.name      : AMS_ANS_GetActiveNotifications_03900
+ * @tc.name      : ANS_Module_Test_03900
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0039, Function | SmallTest | Level1)
@@ -930,7 +894,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0039, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0040
- * @tc.name      : AMS_ANS_GetActiveNotifications_04000
+ * @tc.name      : ANS_Module_Test_04000
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0040, Function | SmallTest | Level1)
@@ -968,7 +932,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0040, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0041
- * @tc.name      : AMS_ANS_GetActiveNotifications_04100
+ * @tc.name      : ANS_Module_Test_04100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0041, Function | SmallTest | Level1)
@@ -1006,7 +970,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0041, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0042
- * @tc.name      : AMS_ANS_GetActiveNotifications_04200
+ * @tc.name      : ANS_Module_Test_04200
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0042, Function | SmallTest | Level1)
@@ -1044,7 +1008,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0042, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0043
- * @tc.name      : AMS_ANS_GetActiveNotifications_04300
+ * @tc.name      : ANS_Module_Test_04300
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0043, Function | SmallTest | Level1)
@@ -1082,7 +1046,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0043, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0049
- * @tc.name      : AMS_ANS_GetActiveNotifications_04900
+ * @tc.name      : ANS_Module_Test_04900
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0049, Function | SmallTest | Level1)
@@ -1103,7 +1067,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0049, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0051
- * @tc.name      : AMS_ANS_GetActiveNotifications_05100
+ * @tc.name      : ANS_Module_Test_05100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0051, Function | SmallTest | Level1)
@@ -1129,7 +1093,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0051, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0052
- * @tc.name      : AMS_ANS_GetActiveNotifications_05200
+ * @tc.name      : ANS_Module_Test_05200
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0052, Function | SmallTest | Level1)
@@ -1154,7 +1118,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0052, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0054
- * @tc.name      : AMS_ANS_GetActiveNotifications_05400
+ * @tc.name      : ANS_Module_Test_05400
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0054, Function | SmallTest | Level1)
@@ -1186,7 +1150,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0054, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0055
- * @tc.name      : AMS_ANS_GetActiveNotifications_05500
+ * @tc.name      : ANS_Module_Test_05500
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0055, Function | SmallTest | Level1)
@@ -1204,7 +1168,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0055, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0056
- * @tc.name      : AMS_ANS_GetActiveNotifications_05600
+ * @tc.name      : ANS_Module_Test_05600
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0056, Function | SmallTest | Level1)
@@ -1228,7 +1192,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0056, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0058
- * @tc.name      : AMS_ANS_GetActiveNotifications_05800
+ * @tc.name      : ANS_Module_Test_05800
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0058, Function | SmallTest | Level1)
@@ -1269,7 +1233,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0058, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0060
- * @tc.name      : AMS_ANS_GetActiveNotifications_06000
+ * @tc.name      : ANS_Module_Test_06000
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0060, Function | SmallTest | Level1)
@@ -1316,7 +1280,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0060, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0061
- * @tc.name      : AMS_ANS_GetActiveNotifications_06100
+ * @tc.name      : ANS_Module_Test_06100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0061, Function | SmallTest | Level1)
@@ -1363,7 +1327,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0061, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_062
- * @tc.name      : AMS_ANS_GetActiveNotifications_06200
+ * @tc.name      : ANS_Module_Test_06200
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0062, Function | SmallTest | Level1)
@@ -1410,7 +1374,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0062, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_063
- * @tc.name      : AMS_ANS_GetActiveNotifications_06300
+ * @tc.name      : ANS_Module_Test_06300
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0063, Function | SmallTest | Level1)
@@ -1455,7 +1419,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0063, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_064
- * @tc.name      : AMS_ANS_GetActiveNotifications_06400
+ * @tc.name      : ANS_Module_Test_06400
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0064, Function | SmallTest | Level1)
@@ -1472,7 +1436,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0064, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_065
- * @tc.name      : AMS_ANS_GetActiveNotifications_06500
+ * @tc.name      : ANS_Module_Test_06500
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0065, Function | SmallTest | Level1)
@@ -1487,7 +1451,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0065, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_066
- * @tc.name      : AMS_ANS_GetActiveNotifications_06600
+ * @tc.name      : ANS_Module_Test_06600
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0066, Function | SmallTest | Level1)
@@ -1515,7 +1479,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0066, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_100
- * @tc.name      : AMS_ANS_GetActiveNotifications_10000
+ * @tc.name      : ANS_Module_Test_10000
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0100, Function | SmallTest | Level1)
@@ -1558,7 +1522,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0100, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_101
- * @tc.name      : AMS_ANS_GetActiveNotifications_10100
+ * @tc.name      : ANS_Module_Test_10100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0101, Function | SmallTest | Level1)
@@ -1589,7 +1553,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0101, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_102
- * @tc.name      : AMS_ANS_GetActiveNotifications_10200
+ * @tc.name      : ANS_Module_Test_10200
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0102, Function | SmallTest | Level1)
@@ -1620,7 +1584,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0102, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_103
- * @tc.name      : AMS_ANS_GetActiveNotifications_10300
+ * @tc.name      : ANS_Module_Test_10300
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0103, Function | SmallTest | Level1)
@@ -1650,43 +1614,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0103, Function | SmallTest | Level1)
 }
 
 /**
- * @tc.number    : AnsModuleTest_104
- * @tc.name      : AMS_ANS_GetActiveNotifications_10400
- * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
- */
-HWTEST_F(AnsModuleTest, AnsModuleTest_0104, Function | SmallTest | Level1)
-{
-    // subscriber
-    auto subscriber = new TestAnsSubscriber();
-    sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
-    g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
-        passed = true;
-    };
-
-    // add slot
-    std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
-    slots.push_back(slot0);
-    g_advancedNotificationService->AddSlots(slots);
-
-    // create request
-    std::string label = "testLabel";
-    sptr<NotificationRequest> req = new NotificationRequest(0);
-    req->SetLabel(label);
-    req->SetStatusBarText("text");
-    req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
-
-    g_advancedNotificationService->SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_NONE);
-
-    g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(false, passed);
-    g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
-}
-
-/**
  * @tc.number    : AnsModuleTest_105
- * @tc.name      : AMS_ANS_GetActiveNotifications_10500
+ * @tc.name      : ANS_Module_Test_10500
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0105, Function | SmallTest | Level1)
@@ -1711,7 +1640,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0105, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_106
- * @tc.name      : AMS_ANS_GetActiveNotifications_10600
+ * @tc.name      : ANS_Module_Test_10600
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0106, Function | SmallTest | Level1)
@@ -1746,7 +1675,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0106, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_107
- * @tc.name      : AMS_ANS_GetActiveNotifications_10700
+ * @tc.name      : ANS_Module_Test_10700
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0107, Function | SmallTest | Level1)
@@ -1793,7 +1722,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0107, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_108
- * @tc.name      : AMS_ANS_GetActiveNotifications_10800
+ * @tc.name      : ANS_Module_Test_10800
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0108, Function | SmallTest | Level1)
@@ -1839,7 +1768,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0108, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_110
- * @tc.name      : AMS_ANS_GetActiveNotifications_11000
+ * @tc.name      : ANS_Module_Test_11000
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0110, Function | SmallTest | Level1)
@@ -1858,7 +1787,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0110, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_111
- * @tc.name      : AMS_ANS_GetActiveNotifications_11100
+ * @tc.name      : ANS_Module_Test_11100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0111, Function | SmallTest | Level1)
@@ -1875,7 +1804,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0111, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_112
- * @tc.name      : AMS_ANS_GetActiveNotifications_11200
+ * @tc.name      : ANS_Module_Test_11200
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0112, Function | SmallTest | Level1)
@@ -1932,7 +1861,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0112, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_113
- * @tc.name      : AMS_ANS_GetActiveNotifications_11300
+ * @tc.name      : ANS_Module_Test_11300
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0113, Function | SmallTest | Level1)
@@ -1991,7 +1920,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0113, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_114
- * @tc.name      : AMS_ANS_GetActiveNotifications_11400
+ * @tc.name      : ANS_Module_Test_11400
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0114, Function | SmallTest | Level1)
@@ -2050,7 +1979,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0114, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_116
- * @tc.name      : AMS_ANS_GetActiveNotifications_11600
+ * @tc.name      : ANS_Module_Test_11600
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0116, Function | SmallTest | Level1)
@@ -2110,7 +2039,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0116, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_117
- * @tc.name      : AMS_ANS_GetActiveNotifications_11700
+ * @tc.name      : ANS_Module_Test_11700
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0117, Function | SmallTest | Level1)
@@ -2169,47 +2098,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0117, Function | SmallTest | Level1)
 }
 
 /**
- * @tc.number    : AnsModuleTest_118
- * @tc.name      : AMS_ANS_GetActiveNotifications_11800
- * @tc.desc      : Test publish notifications when Disturb are not allowed publish.
- */
-HWTEST_F(AnsModuleTest, AnsModuleTest_0118, Function | SmallTest | Level1)
-{
-    // subscriber
-    auto subscriber = new TestAnsSubscriber();
-    sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
-    g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
-        passed = true;
-    };
-
-    // add slot
-    std::vector<sptr<NotificationSlot>> slots;
-    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
-    slots.push_back(slot0);
-    g_advancedNotificationService->AddSlots(slots);
-
-    // create request
-    std::string label = "testLabel";
-    sptr<NotificationRequest> req = new NotificationRequest(0);
-    req->SetLabel(label);
-    req->SetStatusBarText("text");
-    std::shared_ptr<NotificationNormalContent> contentImpl = std::make_shared<NotificationNormalContent>();
-    contentImpl->SetText("1");
-    contentImpl->SetTitle("1");
-    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(contentImpl);
-    req->SetContent(content);
-
-    g_advancedNotificationService->SetDisturbMode(NotificationConstant::DisturbMode::ALLOW_NONE);
-
-    g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(false, passed);
-    g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
-}
-
-/**
  * @tc.number    : AnsModuleTest_120
- * @tc.name      : AMS_ANS_GetActiveNotifications_12000
+ * @tc.name      : ANS_Module_Test_12000
  * @tc.desc      : Test publish notifications when Disturb are not allowed publish.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0120, Function | SmallTest | Level1)
@@ -2249,7 +2139,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0120, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0121
- * @tc.name      : AMS_ANS_GetActiveNotifications_12100
+ * @tc.name      : ANS_Module_Test_12100
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0121, Function | SmallTest | Level1)
@@ -2278,7 +2168,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0121, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0122
- * @tc.name      : AMS_ANS_GetActiveNotifications_12200
+ * @tc.name      : ANS_Module_Test_12200
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0122, Function | SmallTest | Level1)
@@ -2327,7 +2217,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0122, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0123
- * @tc.name      : AMS_ANS_GetActiveNotifications_12300
+ * @tc.name      : ANS_Module_Test_12300
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0123, Function | SmallTest | Level1)
@@ -2382,7 +2272,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0123, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0124
- * @tc.name      : AMS_ANS_GetActiveNotifications_12400
+ * @tc.name      : ANS_Module_Test_12400
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0124, Function | SmallTest | Level1)
@@ -2420,7 +2310,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0124, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0125
- * @tc.name      : AMS_ANS_GetActiveNotifications_12500
+ * @tc.name      : ANS_Module_Test_12500
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0125, Function | SmallTest | Level1)
@@ -2453,7 +2343,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0125, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0126
- * @tc.name      : AMS_ANS_GetActiveNotifications_12600
+ * @tc.name      : ANS_Module_Test_12600
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0126, Function | SmallTest | Level1)
@@ -2491,11 +2381,13 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0126, Function | SmallTest | Level1)
 
 /**
  * @tc.number    : AnsModuleTest_0127
- * @tc.name      : AMS_ANS_GetActiveNotifications_12700
+ * @tc.name      : ANS_Module_Test_12700
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0127, Function | SmallTest | Level1)
 {
+    const int EXPECT_REQUST_NUM = 2;
+
     int ret = 0;
     // subscriber
     auto subscriber = new TestAnsSubscriber();
@@ -2542,17 +2434,21 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0127, Function | SmallTest | Level1)
     req1->SetSlotType(NotificationConstant::SlotType::SERVICE_REMINDER);
 
     // publish
-    EXPECT_EQ(0, ret);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req1), ERR_OK);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
+    EXPECT_EQ(ret, EXPECT_REQUST_NUM);
 }
 
 /**
  * @tc.number    : AnsModuleTest_0128
- * @tc.name      : AMS_ANS_GetActiveNotifications_12800
+ * @tc.name      : ANS_Module_Test_12800
  * @tc.desc      : Test publish notification when slot type is CONTENT_INFORMATION.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0128, Function | SmallTest | Level1)
 {
+    const int EXPECT_REQUST_NUM = 2;
+
     int ret = 0;
     // subscriber
     auto subscriber = new TestAnsSubscriber();
@@ -2599,13 +2495,15 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0128, Function | SmallTest | Level1)
     req1->SetSlotType(NotificationConstant::SlotType::OTHER);
 
     // publish
-    EXPECT_EQ(0, ret);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req1), ERR_OK);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
+    EXPECT_EQ(ret, EXPECT_REQUST_NUM);
 }
 
 /**
  * @tc.number    : AnsModuleTest_0130
- * @tc.name      : AMS_ANS_GetActiveNotifications_13000
+ * @tc.name      : ANS_Module_Test_13000
  * @tc.desc      : Test publish notification when slot type is OTHER.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0130, Function | SmallTest | Level1)
@@ -2615,8 +2513,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0130, Function | SmallTest | Level1)
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
-            EXPECT_EQ(false, notification->EnableVibrate());
-            EXPECT_EQ(NotificationConstant::VisiblenessType::PUBLIC, notification->GetLockscreenVisibleness());
+            EXPECT_FALSE(notification->EnableVibrate());
+            EXPECT_FALSE(notification->EnableSound());
         };
 
     // add slot
@@ -2632,13 +2530,13 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0130, Function | SmallTest | Level1)
     req->SetSlotType(NotificationConstant::SlotType::OTHER);
     req->SetLabel(label);
     // publish
-
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
 }
 
 /**
  * @tc.number    : AnsModuleTest_0131
- * @tc.name      : AMS_ANS_GetActiveNotifications_13100
+ * @tc.name      : ANS_Module_Test_13100
  * @tc.desc      : Test publish notification when cancel a  notification.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0131, Function | SmallTest | Level1)
@@ -2649,10 +2547,170 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0131, Function | SmallTest | Level1)
     subscriber->canceledCb_ = [](const std::shared_ptr<Notification> &request,
                                   const std::shared_ptr<NotificationSortingMap> &sortingMap,
                                   int deleteReason) { passed = true; };
-    //
     g_advancedNotificationService->Cancel(1, "1");
+    g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
     EXPECT_EQ(false, passed);
 }
 
+/**
+ * @tc.number    : AnsModuleTest_0132
+ * @tc.name      : ANS_Module_Test_13200
+ * @tc.desc      : Test publish notifications when Dnd type is NONE.
+ */
+HWTEST_F(AnsModuleTest, AnsModuleTest_0132, Function | SmallTest | Level1)
+{
+    // subscriber
+    auto subscriber = new TestAnsSubscriber();
+    EXPECT_EQ(g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr), ERR_OK);
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
+        passed = true;
+    };
+
+    // add slot
+    std::vector<sptr<NotificationSlot>> slots;
+    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    slots.push_back(slot0);
+    g_advancedNotificationService->AddSlots(slots);
+
+    // create request
+    std::string label = "testLabel";
+    sptr<NotificationRequest> req = new NotificationRequest(0);
+    req->SetLabel(label);
+    req->SetStatusBarText("text");
+
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);
+    EXPECT_TRUE(passed);
+}
+
+/**
+ * @tc.number    : AnsModuleTest_0133
+ * @tc.name      : ANS_Module_Test_13300
+ * @tc.desc      : Test publish notifications when Dnd type is ONCE.
+ */
+HWTEST_F(AnsModuleTest, AnsModuleTest_0133, Function | SmallTest | Level1)
+{
+    // subscriber
+    auto subscriber = new TestAnsSubscriber();
+    EXPECT_EQ(g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr), ERR_OK);
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
+        passed = true;
+    };
+
+    // add slot
+    std::vector<sptr<NotificationSlot>> slots;
+    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    slots.push_back(slot0);
+    g_advancedNotificationService->AddSlots(slots);
+
+    // create request
+    std::string label = "testLabel";
+    sptr<NotificationRequest> req = new NotificationRequest(0);
+    req->SetLabel(label);
+    req->SetStatusBarText("text");
+    req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);
+    EXPECT_TRUE(passed);
+}
+
+/**
+ * @tc.number    : AnsModuleTest_0134
+ * @tc.name      : ANS_Module_Test_13400
+ * @tc.desc      : Test publish notifications when Dnd type is DAILY.
+ */
+HWTEST_F(AnsModuleTest, AnsModuleTest_0134, Function | SmallTest | Level1)
+{
+    // subscriber
+    auto subscriber = new TestAnsSubscriber();
+    g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
+        passed = true;
+    };
+
+    // add slot
+    std::vector<sptr<NotificationSlot>> slots;
+    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    slots.push_back(slot0);
+    g_advancedNotificationService->AddSlots(slots);
+
+    // create request
+    std::string label = "testLabel";
+    sptr<NotificationRequest> req = new NotificationRequest(0);
+    req->SetLabel(label);
+    req->SetStatusBarText("text");
+    req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);
+    EXPECT_TRUE(passed);
+}
+
+/**
+ * @tc.number    : AnsModuleTest_0135
+ * @tc.name      : ANS_Module_Test_13500
+ * @tc.desc      : Test publish notifications when Dnd type is CLEARLY.
+ */
+HWTEST_F(AnsModuleTest, AnsModuleTest_0135, Function | SmallTest | Level1)
+{
+    // subscriber
+    auto subscriber = new TestAnsSubscriber();
+    g_advancedNotificationService->Subscribe(subscriber->GetImpl(), nullptr);
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
+        passed = true;
+    };
+
+    // add slot
+    std::vector<sptr<NotificationSlot>> slots;
+    sptr<NotificationSlot> slot0 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+    slots.push_back(slot0);
+    g_advancedNotificationService->AddSlots(slots);
+
+    // create request
+    std::string label = "testLabel";
+    sptr<NotificationRequest> req = new NotificationRequest(0);
+    req->SetLabel(label);
+    req->SetStatusBarText("text");
+    req->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
+
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::CLEARLY, beginDate, endDate);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+
+    EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);
+    EXPECT_TRUE(passed);
+}
 }  // namespace Notification
 }  // namespace OHOS

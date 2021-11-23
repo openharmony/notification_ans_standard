@@ -87,9 +87,9 @@ void NotificationSubscriber::SubscriberImpl::OnUpdated(const sptr<NotificationSo
     subscriber_.OnUpdate(std::make_shared<NotificationSortingMap>(*notificationMap));
 }
 
-void NotificationSubscriber::SubscriberImpl::OnDisturbModeChanged(NotificationConstant::DisturbMode mode)
+void NotificationSubscriber::SubscriberImpl::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date)
 {
-    subscriber_.OnDisturbModeChanged(mode);
+    subscriber_.OnDoNotDisturbDateChange(std::make_shared<NotificationDoNotDisturbDate>(*date));
 }
 
 bool NotificationSubscriber::SubscriberImpl::GetAnsManagerProxy()

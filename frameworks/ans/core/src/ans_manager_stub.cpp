@@ -101,12 +101,6 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::GET_BUNDLE_IMPORTANCE,
             std::bind(&AnsManagerStub::HandleGetBundleImportance, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
-        {AnsManagerStub::SET_DISTURB_MODE,
-            std::bind(&AnsManagerStub::HandleSetDisturbMode, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
-        {AnsManagerStub::GET_DISTURB_MODE,
-            std::bind(&AnsManagerStub::HandleGetDisturbMode, std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3)},
         {AnsManagerStub::IS_NOTIFICATION_POLICY_ACCESS_GRANTED,
             std::bind(&AnsManagerStub::HandleIsNotificationPolicyAccessGranted, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
@@ -175,6 +169,15 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
                 std::placeholders::_3)},
         {AnsManagerStub::IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
             std::bind(&AnsManagerStub::HandleIsSpecialBundleAllowedNotify, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::SET_DO_NOT_DISTURB_DATE,
+            std::bind(&AnsManagerStub::HandleSetDoNotDisturbDate, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::GET_DO_NOT_DISTURB_DATE,
+            std::bind(&AnsManagerStub::HandleGetDoNotDisturbDate, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::DOES_SUPPORT_DO_NOT_DISTURB_MODE,
+            std::bind(&AnsManagerStub::HandleDoesSupportDoNotDisturbMode, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
         {AnsManagerStub::CANCEL_GROUP,
             std::bind(&AnsManagerStub::HandleCancelGroup, std::placeholders::_1, std::placeholders::_2,
@@ -653,31 +656,61 @@ ErrCode AnsManagerStub::HandleGetBundleImportance(MessageParcel &data, MessagePa
     return ERR_OK;
 }
 
-ErrCode AnsManagerStub::HandleSetDisturbMode(MessageParcel &data, MessageParcel &reply)
+ErrCode AnsManagerStub::HandleSetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply)
 {
-    NotificationConstant::DisturbMode mode = static_cast<NotificationConstant::DisturbMode>(data.ReadInt32());
-    ErrCode result = SetDisturbMode(mode);
-    if (!reply.WriteInt32(result)) {
-        ANS_LOGW("[HandleSetDisturbMode] fail: write result failed, ErrCode=%{public}d", result);
+    sptr<NotificationDoNotDisturbDate> date = data.ReadParcelable<NotificationDoNotDisturbDate>();
+    if (date == nullptr) {
+        ANS_LOGW("[HandleSetDoNotDisturbDate] fail: read date failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
+
+    ErrCode result = SetDoNotDisturbDate(date);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleSetDoNotDisturbDate] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
     return ERR_OK;
 }
 
-ErrCode AnsManagerStub::HandleGetDisturbMode(MessageParcel &data, MessageParcel &reply)
+ErrCode AnsManagerStub::HandleGetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply)
 {
-    NotificationConstant::DisturbMode mode;
-    ErrCode result = GetDisturbMode(mode);
+    sptr<NotificationDoNotDisturbDate> date = nullptr;
+
+    ErrCode result = GetDoNotDisturbDate(date);
 
     if (!reply.WriteInt32(result)) {
-        ANS_LOGW("[HandleGetDisturbMode] fail: write result failed, ErrCode=%{public}d", result);
+        ANS_LOGW("[HandleSetDoNotDisturbDate] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!reply.WriteInt32(mode)) {
-        ANS_LOGW("[HandleGetDisturbMode] fail: write mode failed.");
+    if (result == ERR_OK) {
+        if (!reply.WriteParcelable(date)) {
+            ANS_LOGW("[HandleSetDoNotDisturbDate] fail: write date failed.");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleDoesSupportDoNotDisturbMode(MessageParcel &data, MessageParcel &reply)
+{
+    bool support = false;
+
+    ErrCode result = DoesSupportDoNotDisturbMode(support);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleDoesSupportDoNotDisturbMode] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
     }
+
+    if (!reply.WriteBool(support)) {
+        ANS_LOGW("[HandleDoesSupportDoNotDisturbMode] fail: write doesSupport failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
     return ERR_OK;
 }
 
@@ -1405,18 +1438,6 @@ ErrCode AnsManagerStub::GetBundleImportance(int &importance)
     return ERR_INVALID_OPERATION;
 }
 
-ErrCode AnsManagerStub::SetDisturbMode(NotificationConstant::DisturbMode mode)
-{
-    ANS_LOGW("AnsManagerStub::SetDisturbMode called!");
-    return ERR_INVALID_OPERATION;
-}
-
-ErrCode AnsManagerStub::GetDisturbMode(NotificationConstant::DisturbMode &mode)
-{
-    ANS_LOGW("AnsManagerStub::GetDisturbMode called!");
-    return ERR_INVALID_OPERATION;
-}
-
 ErrCode AnsManagerStub::HasNotificationPolicyAccessPermission(bool &granted)
 {
     ANS_LOGW("AnsManagerStub::HasNotificationPolicyAccessPermission called!");
@@ -1570,6 +1591,24 @@ ErrCode AnsManagerStub::RemoveGroupByBundle(
     const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName)
 {
     ANS_LOGW("AnsManagerStub::RemoveGroupByBundle called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGW("AnsManagerStub::SetDoNotDisturbDate called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGW("AnsManagerStub::GetDoNotDisturbDate called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::DoesSupportDoNotDisturbMode(bool &doesSupport)
+{
+    ANS_LOGW("AnsManagerStub::DoesSupportDoNotDisturbMode called!");
     return ERR_INVALID_OPERATION;
 }
 

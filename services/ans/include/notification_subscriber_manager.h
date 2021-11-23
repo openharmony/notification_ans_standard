@@ -45,7 +45,7 @@ public:
     void NotifyCanceled(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
     void NotifyUpdated(const sptr<NotificationSortingMap> &notificationMap);
-    void NotifyDisturbModeChanged(const NotificationConstant::DisturbMode &mode);
+    void NotifyDoNotDisturbDateChanged(const sptr<NotificationDoNotDisturbDate> &date);
     void OnRemoteDied(const wptr<IRemoteObject> &object);
 
 private:
@@ -67,7 +67,7 @@ private:
     void NotifyCanceledInner(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
     void NotifyUpdatedInner(const sptr<NotificationSortingMap> &notificationMap);
-    void NotifyDisturbModeChangedInner(const NotificationConstant::DisturbMode &mode);
+    void NotifyDoNotDisturbDateChangedInner(const sptr<NotificationDoNotDisturbDate> &date);
 
 private:
     std::list<std::shared_ptr<SubscriberRecord>> subscriberRecordList_ {};

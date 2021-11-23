@@ -20,6 +20,7 @@
 
 #include "notification.h"
 #include "notification_constant.h"
+#include "notification_do_not_disturb_date.h"
 #include "notification_request.h"
 #include "notification_sorting.h"
 #include "notification_sorting_map.h"
@@ -43,7 +44,7 @@ public:
     virtual void OnCanceled(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap,
         int deleteReason) = 0;
     virtual void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) = 0;
-    virtual void OnDisturbModeChanged(NotificationConstant::DisturbMode mode) = 0;
+    virtual void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -54,7 +55,7 @@ protected:
         ON_CANCELED,
         ON_CANCELED_MAP,
         ON_UPDATED,
-        ON_DISTURB_MODE_CHANGED,
+        ON_DND_DATE_CHANGED,
     };
 };
 }  // namespace Notification

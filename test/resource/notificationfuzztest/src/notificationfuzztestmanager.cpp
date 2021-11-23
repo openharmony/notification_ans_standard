@@ -364,12 +364,12 @@ void NotificationFuzzTestManager::RegisterNotificationHelper()
         OHOS::Notification::NotificationHelper::GetShowBadgeEnabled(param);
     });
 
-    callFunctionMap_.emplace("NotificationHelperSetDisturbMode",
-        []() { OHOS::Notification::NotificationHelper::SetDisturbMode(GetParamDisturbMode()); });
+    callFunctionMap_.emplace("NotificationHelperSetDoNotDisturbDate",
+        []() { OHOS::Notification::NotificationHelper::SetDoNotDisturbDate(*GetParamNotificationDoNotDisturbDate()); });
 
-    callFunctionMap_.emplace("NotificationHelperGetDisturbMode", []() {
-        OHOS::Notification::NotificationConstant::DisturbMode param = GetParamDisturbMode();
-        OHOS::Notification::NotificationHelper::GetDisturbMode(param);
+    callFunctionMap_.emplace("NotificationHelperGetDoNotDisturbDate", []() {
+        OHOS::Notification::NotificationDoNotDisturbDate doNotDisturbDate;
+        OHOS::Notification::NotificationHelper::GetDoNotDisturbDate(doNotDisturbDate);
     });
 }
 
@@ -506,8 +506,7 @@ void NotificationFuzzTestManager::RegisterNotificationSubscriber()
 
     callFunctionMap_.emplace("NotificationSubscriberOnDisturbModeChanged", []() {
         std::shared_ptr<OHOS::Notification::NotificationSubscriber> temp = GetParamNotificationSubscriber();
-        int disturbMode = GetIntParam();
-        temp->OnDisturbModeChanged(disturbMode);
+        temp->OnDoNotDisturbDateChange(GetParamNotificationDoNotDisturbDate());
     });
 }
 

@@ -45,7 +45,7 @@ public:
 
     virtual void OnDied() override;
 
-    virtual void OnDisturbModeChanged(int disturbMode) override;
+    virtual void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override;
 
     void SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref);
 
@@ -64,6 +64,8 @@ private:
 
     void SetDisturbModeCallbackInfo(const napi_env &env, const napi_ref &ref);
 
+    void SetDisturbDateCallbackInfo(const napi_env &env, const napi_ref &ref);
+
 private:
     struct CallbackInfo {
         napi_env env = nullptr;
@@ -77,6 +79,8 @@ private:
     CallbackInfo unsubscribeCallbackInfo_;
     CallbackInfo dieCallbackInfo_;
     CallbackInfo disturbModeCallbackInfo_;
+    CallbackInfo disturbDateCallbackInfo_;
+
 };
 
 struct SubscriberInstancesInfo {

@@ -21,6 +21,7 @@
 #include "ans_manager_death_recipient.h"
 #include "ans_manager_interface.h"
 #include "notification_bundle_option.h"
+#include "notification_do_not_disturb_date.h"
 #include "notification_request.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
@@ -575,25 +576,6 @@ public:
     ErrCode GetShowBadgeEnabled(bool &enabled);
 
     /**
-     * Sets the type of the Do Not Disturb mode. The Do Not Disturb mode type specifies the type of notifications
-     * that are allowed to interrupt users.
-     * @note Your application must have system signature to call this method.
-     *
-     * @param mode Indicates the Do Not Disturb mode to set. The value must be
-     *             {NotificationConstant.DisturbMode.ALLOW_ALL}, {NotificationConstant.DisturbMode.ALLOW_PRIORITY},
-     *             {NotificationConstant.DisturbMode.ALLOW_NONE}, or {NotificationConstant.DisturbMode.ALLOW_ALARMS}.
-     * @return Returns set disturb mode result.
-     */
-    ErrCode SetDisturbMode(NotificationConstant::DisturbMode mode);
-
-    /**
-     * Obtains the Disturb Mode.
-     * @param disturbMode The current type of the Do Not Disturb mode.
-     * @return Returns get disturb mode result.
-     */
-    ErrCode GetDisturbMode(NotificationConstant::DisturbMode &disturbMode);
-
-    /**
      * Cancel the notification of the specified group of this application.
      *
      * @param groupName the specified group name.
@@ -609,6 +591,32 @@ public:
      * @return Returns remove group by bundle result.
      */
     ErrCode RemoveGroupByBundle(const NotificationBundleOption &bundleOption, const std::string &groupName);
+
+    /**
+     * Sets the do not disturb time.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param doNotDisturbDate Indicates the do not disturb time to set.
+     * @return Returns set do not disturb time result.
+     */
+    ErrCode SetDoNotDisturbDate(const NotificationDoNotDisturbDate & doNotDisturbDate);
+
+    /**
+     * Obtains the do not disturb time.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param doNotDisturbDate Indicates the do not disturb time to get.
+     * @return Returns set do not disturb time result.
+     */
+    ErrCode GetDoNotDisturbDate(NotificationDoNotDisturbDate & doNotDisturbDate);
+
+    /**
+     * Obtains the flag that whether to support do not disturb mode.
+     *
+     * @param doesSupport Specifies whether to support do not disturb mode.
+     * @return Returns check result.
+     */
+    ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport);
 
     /**
      * Reset ans manager proxy when OnRemoteDied called.

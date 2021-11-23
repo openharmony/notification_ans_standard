@@ -152,6 +152,7 @@ std::shared_ptr<WantAgent> WantAgentHelper::GetWantAgent(const WantAgentInfo &pa
     wantSenderInfo.allWants.push_back(wantsInfo);
     wantSenderInfo.bundleName = want->GetOperation().GetBundleName();
     wantSenderInfo.flags = FlagsTransformer(paramsInfo.GetFlags());
+    wantSenderInfo.type =  (int32_t)paramsInfo.GetOperationType();
 
     sptr<IWantSender> target = AbilityManagerClient::GetInstance()->GetWantSender(wantSenderInfo, nullptr);
     if (target == nullptr) {

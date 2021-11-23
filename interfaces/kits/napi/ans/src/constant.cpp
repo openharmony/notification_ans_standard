@@ -208,6 +208,26 @@ napi_value ContentTypeInit(napi_env env, napi_value exports)
     return exports;
 }
 
+napi_value DoNotDisturbTypeInit(napi_env env, napi_value exports)
+{
+    ANS_LOGI("%{public}s, called", __func__);
+
+    napi_value obj = nullptr;
+    napi_create_object(env, &obj);
+
+    SetNamedPropertyByInteger(env, obj, DoNotDisturbType::TYPE_NONE, "TYPE_NONE");
+    SetNamedPropertyByInteger(env, obj, DoNotDisturbType::TYPE_ONCE, "TYPE_ONCE");
+    SetNamedPropertyByInteger(env, obj, DoNotDisturbType::TYPE_DAILY, "TYPE_DAILY");
+    SetNamedPropertyByInteger(env, obj, DoNotDisturbType::TYPE_CLEARLY, "TYPE_CLEARLY");
+
+    napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("DoNotDisturbType", obj),
+    };
+
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    return exports;
+}
+
 napi_value ConstantInit(napi_env env, napi_value exports)
 {
     NotificationReasonInit(env, exports);
@@ -218,6 +238,7 @@ napi_value ConstantInit(napi_env env, napi_value exports)
     DoNotDisturbMode(env, exports);
     InputEditTypeInit(env, exports);
     ContentTypeInit(env, exports);
+    DoNotDisturbTypeInit(env, exports);
     return exports;
 }
 

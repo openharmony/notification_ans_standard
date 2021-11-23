@@ -52,7 +52,7 @@ public:
 
     /**
      * Sets the title to be displayed for the conversation.
-     * The title set in this method will overwrite the one set by calling setTitle(std::tring).
+     * The title set in this method will overwrite the one set by calling setTitle(std::string).
      * @param conversationTitle Indicates the title to be displayed for the conversation.
      */
     void SetConversationTitle(const std::string &conversationTitle);

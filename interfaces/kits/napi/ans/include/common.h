@@ -87,6 +87,8 @@ enum DisturbMode { ALLOW_UNKNOWN, ALLOW_ALL, ALLOW_PRIORITY, ALLOW_NONE, ALLOW_A
 
 enum InputEditType { EDIT_AUTO, EDIT_DISABLED, EDIT_ENABLED };
 
+enum DoNotDisturbType { TYPE_NONE, TYPE_ONCE, TYPE_DAILY, TYPE_CLEARLY };
+
 struct NotificationSubscribeInfo {
     std::vector<std::string> bundleNames;
     int userId = 0;
@@ -140,6 +142,8 @@ public:
 
     static napi_value JSParaError(const napi_env &env, const napi_ref &callback);
 
+    static napi_value ParseParaOnlyCallback(const napi_env &env, const napi_callback_info &info, napi_ref &callback);
+
     static napi_value SetNotification(
         const napi_env &env, OHOS::Notification::Notification *notification, napi_value &result);
 
@@ -180,6 +184,9 @@ public:
     static napi_value SetNotificationActionButton(
         const napi_env &env, const std::shared_ptr<NotificationActionButton> &actionButton, napi_value &result);
 
+    static napi_value SetDoNotDisturbDate(
+        const napi_env &env, const NotificationDoNotDisturbDate &date, napi_value &result);
+
     static napi_value GetNotificationSubscriberInfo(
         const napi_env &env, const napi_value &value, NotificationSubscribeInfo &result);
 
@@ -212,7 +219,9 @@ public:
 
     static bool ReasonCToJS(const int &inType, int &outType);
 
-    static bool DisturbModeJSToC(const enum DisturbMode &inType, enum NotificationConstant::DisturbMode &outType);
+    static bool DoNotDisturbTypeJSToC(const DoNotDisturbType &inType, NotificationConstant::DoNotDisturbType &outType);
+
+    static bool DoNotDisturbTypeCToJS(const NotificationConstant::DoNotDisturbType &inType, DoNotDisturbType &outType);
 
     static napi_value CreateWantAgentByJS(const napi_env &env, const std::shared_ptr<WantAgent::WantAgent> &agent);
 
@@ -221,6 +230,8 @@ private:
     static const int ARGS_TWO = 2;
     static const int PARAM0 = 0;
     static const int PARAM1 = 1;
+    static const int ONLY_CALLBACK_MAX_PARA = 1;
+    static const int ONLY_CALLBACK_MIN_PARA = 0;
     static std::set<std::shared_ptr<WantAgent::WantAgent>> wantAgent_;
 };
 

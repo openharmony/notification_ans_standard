@@ -296,16 +296,6 @@ ErrCode NotificationHelper::GetShowBadgeEnabled(bool &enabled)
     return DelayedSingleton<AnsNotification>::GetInstance()->GetShowBadgeEnabled(enabled);
 }
 
-ErrCode NotificationHelper::SetDisturbMode(NotificationConstant::DisturbMode mode)
-{
-    return DelayedSingleton<AnsNotification>::GetInstance()->SetDisturbMode(mode);
-}
-
-ErrCode NotificationHelper::GetDisturbMode(NotificationConstant::DisturbMode &disturbMode)
-{
-    return DelayedSingleton<AnsNotification>::GetInstance()->GetDisturbMode(disturbMode);
-}
-
 ErrCode NotificationHelper::CancelGroup(const std::string &groupName)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->CancelGroup(groupName);
@@ -315,6 +305,21 @@ ErrCode NotificationHelper::RemoveGroupByBundle(
     const NotificationBundleOption &bundleOption, const std::string &groupName)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->RemoveGroupByBundle(bundleOption, groupName);
+}
+
+ErrCode NotificationHelper::SetDoNotDisturbDate(const NotificationDoNotDisturbDate & doNotDisturbDate)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetDoNotDisturbDate(doNotDisturbDate);
+}
+
+ErrCode NotificationHelper::GetDoNotDisturbDate(NotificationDoNotDisturbDate & doNotDisturbDate)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetDoNotDisturbDate(doNotDisturbDate);
+}
+
+ErrCode NotificationHelper::DoesSupportDoNotDisturbMode(bool &doesSupport)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->DoesSupportDoNotDisturbMode(doesSupport);
 }
 }  // namespace Notification
 }  // namespace OHOS

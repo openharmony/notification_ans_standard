@@ -36,7 +36,7 @@ public:
 
 /**
  * @tc.number    : BundleManagerHelperTest_00100
- * @tc.name      : AMS_ANS_GetBundleNameByUid_0100
+ * @tc.name      : ANS_GetBundleNameByUid_0100
  * @tc.desc      : Test GetBundleNameByUid function
  */
 HWTEST_F(BundleManagerHelperTest, BundleManagerHelperTest_00100, Function | SmallTest | Level1)
@@ -48,7 +48,7 @@ HWTEST_F(BundleManagerHelperTest, BundleManagerHelperTest_00100, Function | Smal
 
 /**
  * @tc.number    : BundleManagerHelperTest_00200
- * @tc.name      : AMS_ANS_IsSystemApp_0100
+ * @tc.name      : ANS_IsSystemApp_0100
  * @tc.desc      : Test IsSystemApp function
  */
 HWTEST_F(BundleManagerHelperTest, BundleManagerHelperTest_00200, Function | SmallTest | Level1)

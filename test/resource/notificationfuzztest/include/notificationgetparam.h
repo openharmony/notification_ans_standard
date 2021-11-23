@@ -188,7 +188,6 @@ sptr<OHOS::Notification::NotificationSortingMap> GetParamNotificationSortingMapS
 OHOS::Notification::NotificationSlot::NotificationLevel GetParamNotificationLevel();
 std::shared_ptr<OHOS::Notification::NotificationSubscriber> GetParamNotificationSubscriber();
 std::shared_ptr<OHOS::Notification::NotificationSubscribeInfo> GetParamNotificationSubscribeInfo();
-OHOS::Notification::NotificationConstant::DisturbMode GetParamDisturbMode();
 
 std::shared_ptr<OHOS::Notification::WantAgent::WantAgentInfo> GetParamWantAgentInfo();
 OHOS::Notification::WantAgent::WantAgentConstant::OperationType GetParamOperationType();
@@ -223,6 +222,8 @@ OHOS::Notification::NotificationConstant::SubscribeResult GetParamSubscribeResul
 OHOS::AppExecFwk::MissionInformation GetParamMissionInformation();
 std::shared_ptr<OHOS::AppExecFwk::AbilityLifecycleCallbacks> GetParamAbilityLifecycleCallbacks();
 std::shared_ptr<OHOS::AAFwk::IAbilityManager> GetParamIAbilityManager();
+std::shared_ptr<OHOS::Notification::NotificationDoNotDisturbDate> GetParamNotificationDoNotDisturbDate();
+OHOS::Notification::NotificationConstant::DoNotDisturbType GetParamDoNotDisturbType();
 class TestRemoteObject : public IRemoteObject {
 public:
     TestRemoteObject();
@@ -380,7 +381,7 @@ public:
     {}
     void OnUpdate(const std::shared_ptr<OHOS::Notification::NotificationSortingMap> &sortingMap) override
     {}
-    void OnDisturbModeChanged(int disturbMode) override
+    void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {}
     void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request) override
     {}

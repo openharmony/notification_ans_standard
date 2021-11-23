@@ -200,6 +200,27 @@ napi_value Common::JSParaError(const napi_env &env, const napi_ref &callback)
     }
 }
 
+napi_value Common::ParseParaOnlyCallback(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
+{
+    ANS_LOGI("enter");
+
+    size_t argc = ONLY_CALLBACK_MAX_PARA;
+    napi_value argv[ONLY_CALLBACK_MAX_PARA] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    NAPI_ASSERT(env, argc >= ONLY_CALLBACK_MIN_PARA, "Wrong number of arguments");
+
+    // argv[0]:callback
+    napi_valuetype valuetype = napi_undefined;
+    if (argc >= ONLY_CALLBACK_MAX_PARA) {
+        NAPI_CALL(env, napi_typeof(env, argv[ONLY_CALLBACK_MIN_PARA], &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        napi_create_reference(env, argv[ONLY_CALLBACK_MIN_PARA], 1, &callback);
+    }
+
+    return Common::NapiGetNull(env);
+}
+
 napi_value Common::SetNotification(
     const napi_env &env, OHOS::Notification::Notification *notification, napi_value &result)
 {
@@ -983,6 +1004,34 @@ napi_value Common::SetNotificationActionButton(
         } else {
             napi_set_named_property(env, result, "icon", iconResult);
         }
+    }
+    return NapiGetboolean(env, true);
+}
+
+napi_value Common::SetDoNotDisturbDate(
+    const napi_env &env, const NotificationDoNotDisturbDate &date, napi_value &result)
+{
+    ANS_LOGI("enter");
+    enum DoNotDisturbType outType = DoNotDisturbType::TYPE_NONE;
+    if (DoNotDisturbTypeCToJS(date.GetDoNotDisturbType(), outType)) {
+        // type:DoNotDisturbType
+        napi_value typeNapi = nullptr;
+        napi_create_int32(env, outType, &typeNapi);
+        napi_set_named_property(env, result, "type", typeNapi);
+
+        // begin:Date
+        double begind = double(date.GetBeginDate());
+        napi_value beginNapi = nullptr;
+        napi_create_date(env, begind, &beginNapi);
+        napi_set_named_property(env, result, "begin", beginNapi);
+
+        // end:Date
+        double endd = double(date.GetEndDate());
+        napi_value endNapi = nullptr;
+        napi_create_date(env, endd, &endNapi);
+        napi_set_named_property(env, result, "end", endNapi);
+    } else {
+        return NapiGetboolean(env, false);
     }
     return NapiGetboolean(env, true);
 }
@@ -2733,18 +2782,6 @@ napi_value Common::GetNotificationSlot(const napi_env &env, const napi_value &va
         slot.SetLockscreenVisibleness(NotificationConstant::VisiblenessType(lockscreenVisibility));
     }
 
-    // vibrationEnabled?: boolean
-    NAPI_CALL(env, napi_has_named_property(env, value, "vibrationEnabled", &hasProperty));
-    if (hasProperty) {
-        bool vibrationEnabled = false;
-        napi_get_named_property(env, value, "vibrationEnabled", &nobj);
-        NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
-        napi_get_value_bool(env, nobj, &vibrationEnabled);
-        ANS_LOGI("vibrationEnabled is: %{public}d", vibrationEnabled);
-        slot.SetEnableVibration(vibrationEnabled);
-    }
-
     // sound?: string
     NAPI_CALL(env, napi_has_named_property(env, value, "sound", &hasProperty));
     if (hasProperty) {
@@ -2805,6 +2842,19 @@ napi_value Common::GetNotificationSlot(const napi_env &env, const napi_value &va
         }
         slot.SetVibrationStyle(vibrationValues);
     }
+
+    // vibrationEnabled?: boolean
+    NAPI_CALL(env, napi_has_named_property(env, value, "vibrationEnabled", &hasProperty));
+    if (hasProperty) {
+        bool vibrationEnabled = false;
+        napi_get_named_property(env, value, "vibrationEnabled", &nobj);
+        NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
+        napi_get_value_bool(env, nobj, &vibrationEnabled);
+        ANS_LOGI("vibrationEnabled is: %{public}d", vibrationEnabled);
+        slot.SetEnableVibration(vibrationEnabled);
+    }
+
     return NapiGetNull(env);
 }
 
@@ -3050,26 +3100,45 @@ bool Common::ReasonCToJS(const int &inType, int &outType)
     return true;
 }
 
-bool Common::DisturbModeJSToC(const enum DisturbMode &inType, enum NotificationConstant::DisturbMode &outType)
+bool Common::DoNotDisturbTypeJSToC(const DoNotDisturbType &inType, NotificationConstant::DoNotDisturbType &outType)
 {
     switch (inType) {
-        case DisturbMode::ALLOW_UNKNOWN:
-            outType = NotificationConstant::DisturbMode::ALLOW_UNKNOWN;
+        case DoNotDisturbType::TYPE_NONE:
+            outType = NotificationConstant::DoNotDisturbType::NONE;
             break;
-        case DisturbMode::ALLOW_ALL:
-            outType = NotificationConstant::DisturbMode::ALLOW_ALL;
+        case DoNotDisturbType::TYPE_ONCE:
+            outType = NotificationConstant::DoNotDisturbType::ONCE;
             break;
-        case DisturbMode::ALLOW_PRIORITY:
-            outType = NotificationConstant::DisturbMode::ALLOW_PRIORITY;
+        case DoNotDisturbType::TYPE_DAILY:
+            outType = NotificationConstant::DoNotDisturbType::DAILY;
             break;
-        case DisturbMode::ALLOW_NONE:
-            outType = NotificationConstant::DisturbMode::ALLOW_NONE;
-            break;
-        case DisturbMode::ALLOW_ALARMS:
-            outType = NotificationConstant::DisturbMode::ALLOW_ALARMS;
+        case DoNotDisturbType::TYPE_CLEARLY:
+            outType = NotificationConstant::DoNotDisturbType::CLEARLY;
             break;
         default:
-            ANS_LOGE("DisturbMode %{public}d is an invalid value", inType);
+            ANS_LOGE("DoNotDisturbType %{public}d is an invalid value", inType);
+            return false;
+    }
+    return true;
+}
+
+bool Common::DoNotDisturbTypeCToJS(const NotificationConstant::DoNotDisturbType &inType, DoNotDisturbType &outType)
+{
+    switch (inType) {
+        case NotificationConstant::DoNotDisturbType::NONE:
+            outType = DoNotDisturbType::TYPE_NONE;
+            break;
+        case NotificationConstant::DoNotDisturbType::ONCE:
+            outType = DoNotDisturbType::TYPE_ONCE;
+            break;
+        case NotificationConstant::DoNotDisturbType::DAILY:
+            outType = DoNotDisturbType::TYPE_DAILY;
+            break;
+        case NotificationConstant::DoNotDisturbType::CLEARLY:
+            outType = DoNotDisturbType::TYPE_CLEARLY;
+            break;
+        default:
+            ANS_LOGE("DoNotDisturbType %{public}d is an invalid value", inType);
             return false;
     }
     return true;

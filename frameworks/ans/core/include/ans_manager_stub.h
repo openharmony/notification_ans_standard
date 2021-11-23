@@ -62,8 +62,6 @@ public:
         const sptr<NotificationRequest> notification, const std::string &representativeBundle) override;
     virtual ErrCode SetNotificationBadgeNum(int num) override;
     virtual ErrCode GetBundleImportance(int &importance) override;
-    virtual ErrCode SetDisturbMode(NotificationConstant::DisturbMode mode) override;
-    virtual ErrCode GetDisturbMode(NotificationConstant::DisturbMode &mode) override;
     virtual ErrCode HasNotificationPolicyAccessPermission(bool &granted) override;
     virtual ErrCode SetPrivateNotificationsAllowed(bool allow) override;
     virtual ErrCode GetPrivateNotificationsAllowed(bool &allow) override;
@@ -98,6 +96,9 @@ public:
     virtual ErrCode IsSpecialBundleAllowedNotify(
         const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
+    virtual ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) override;
+    virtual ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date) override;
+    virtual ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport) override;
     virtual ErrCode CancelGroup(const std::string &groupName) override;
     virtual ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
@@ -133,8 +134,6 @@ private:
     ErrCode HandlePublishAsBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetNotificationBadgeNum(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetBundleImportance(MessageParcel &data, MessageParcel &reply);
-    ErrCode HandleSetDisturbMode(MessageParcel &data, MessageParcel &reply);
-    ErrCode HandleGetDisturbMode(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsNotificationPolicyAccessGranted(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetPrivateNotificationsAllowed(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetPrivateNotificationsAllowed(MessageParcel &data, MessageParcel &reply);
@@ -161,6 +160,9 @@ private:
     ErrCode HandleShellDump(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelGroup(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleRemoveGroupByBundle(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleSetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleDoesSupportDoNotDisturbMode(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

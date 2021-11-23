@@ -48,6 +48,7 @@ ohos_shared_library("ans_innerkits") {
     "src/notification_content.cpp",
     "src/notification_conversational_content.cpp",
     "src/notification_conversational_message.cpp",
+    "src/notification_do_not_disturb_date.cpp",
     "src/notification_helper.cpp",
     "src/notification_long_text_content.cpp",
     "src/notification_media_content.cpp",

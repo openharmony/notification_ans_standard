@@ -17,6 +17,7 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_HELPER_H
 
 #include "notification_bundle_option.h"
+#include "notification_do_not_disturb_date.h"
 #include "notification_request.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
@@ -96,7 +97,7 @@ public:
      * calling NotificationSlot::SetSlotGroup(string).
      * @note  A NotificationSlotGroup instance cannot be used directly after being initialized.
      *        Instead, you have to call this method to create a notification slot group so that you can bind
-     * NotificationSlot objects to it.
+     *        NotificationSlot objects to it.
      *
      * @param slotGroup Indicates the notification slot group to be created, which is set by NotificationSlotGroup.
      *                  This parameter must be specified. the notification slot to be created, which is set by
@@ -334,9 +335,9 @@ public:
      * @note  To subscribe to a notification, inherit the {NotificationSubscriber} class, override its
      *        callback methods and create a subscriber. The subscriber will be used as a parameter of this method.
      *        After the notification is published, subscribers that meet the filter criteria can receive the
-     * notification. To subscribe to notifications published only by specified sources, for example, notifications from
-     *        certain applications, call the {SubscribeNotification(NotificationSubscriber, NotificationSubscribeInfo)}
-     * method.
+     *        notification. To subscribe to notifications published only by specified sources, for example,
+     *        notifications from certain applications,
+     *        call the {SubscribeNotification(NotificationSubscriber, NotificationSubscribeInfo)} method.
      *
      * @param subscriber Indicates the {NotificationSubscriber} to receive notifications.
      *                   This parameter must be specified.
@@ -352,8 +353,8 @@ public:
      *        To subscribe to a notification, inherit the {NotificationSubscriber} class, override its
      *        callback methods and create a subscriber. The subscriber will be used as a parameter of this method.
      *        After the notification is published, subscribers that meet the filter criteria can receive the
-     * notification. To subscribe to and receive all notifications, call the
-     * {SubscribeNotification(NotificationSubscriber)} method.
+     *        notification. To subscribe to and receive all notifications, call the
+     *        {SubscribeNotification(NotificationSubscriber)} method.
      *
      * @param subscriber Indicates the subscribers to receive notifications. This parameter must be specified.
      *                   For details, see {NotificationSubscriber}.
@@ -509,8 +510,8 @@ public:
      * @param deviceId Indicates the ID of the device running the application. At present, this parameter can only
      *                 be null or an empty string, indicating the current device.
      * @param enabled Specifies whether to allow all applications to publish notifications. The value true
-     *                indicates that notifications are allowed, and the value false indicates that notifications are not
-     *                allowed.
+     *                indicates that notifications are allowed, and the value false indicates that notifications
+     *                are not allowed.
      * @return Returns set notifications enabled for all bundles result.
      */
     static ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled);
@@ -570,25 +571,6 @@ public:
     static ErrCode GetShowBadgeEnabled(bool &enabled);
 
     /**
-     * Sets the type of the Do Not Disturb mode. The Do Not Disturb mode type specifies the type of notifications
-     * that are allowed to interrupt users.
-     * @note Your application must have system signature to call this method.
-     *
-     * @param mode Indicates the Do Not Disturb mode to set. The value must be
-     *             {NotificationConstant.DisturbMode.ALLOW_ALL}, {NotificationConstant.DisturbMode.ALLOW_PRIORITY},
-     *             {NotificationConstant.DisturbMode.ALLOW_NONE}, or {NotificationConstant.DisturbMode.ALLOW_ALARMS}.
-     * @return Returns set disturb mode result.
-     */
-    static ErrCode SetDisturbMode(NotificationConstant::DisturbMode mode);
-
-    /**
-     * Obtains the Disturb Mode.
-     * @param disturbMode The current type of the Do Not Disturb mode.
-     * @return Returns get disturb mode result.
-     */
-    static ErrCode GetDisturbMode(NotificationConstant::DisturbMode &disturbMode);
-
-    /**
      * Cancel the notification of the specified group of this application.
      *
      * @param groupName the specified group name.
@@ -604,6 +586,32 @@ public:
      * @return Returns remove group by bundle result.
      */
     static ErrCode RemoveGroupByBundle(const NotificationBundleOption &bundleOption, const std::string &groupName);
+
+    /**
+     * Sets the do not disturb time.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param doNotDisturbDate Indicates the do not disturb time to set.
+     * @return Returns set do not disturb time result.
+     */
+    static ErrCode SetDoNotDisturbDate(const NotificationDoNotDisturbDate & doNotDisturbDate);
+
+    /**
+     * Obtains the do not disturb time.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param doNotDisturbDate Indicates the do not disturb time to get.
+     * @return Returns set do not disturb time result.
+     */
+    static ErrCode GetDoNotDisturbDate(NotificationDoNotDisturbDate & doNotDisturbDate);
+
+    /**
+     * Obtains the flag that whether to support do not disturb mode.
+     *
+     * @param doesSupport Specifies whether to support do not disturb mode.
+     * @return Returns check result.
+     */
+    static ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport);
 };
 }  // namespace Notification
 }  // namespace OHOS

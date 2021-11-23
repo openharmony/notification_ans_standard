@@ -512,18 +512,18 @@ ErrCode NotificationPreferences::SetNotificationsEnabled(const bool &enabled)
     return result;
 }
 
-ErrCode NotificationPreferences::GetDisturbMode(NotificationConstant::DisturbMode &mode)
+ErrCode NotificationPreferences::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date)
 {
-    mode = preferencesInfo_.GetDisturbMode();
+    date = preferencesInfo_.GetDoNotDisturbDate();
     return ERR_OK;
 }
 
-ErrCode NotificationPreferences::SetDisturbMode(const NotificationConstant::DisturbMode &mode)
+ErrCode NotificationPreferences::SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> date)
 {
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    preferencesInfo.SetDisturbMode(mode);
+    preferencesInfo.SetDoNotDisturbDate(date);
     ErrCode result = ERR_OK;
-    if (!preferncesDB_->PutDisturbMode(mode)) {
+    if (!preferncesDB_->PutDoNotDisturbDate(date)) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 

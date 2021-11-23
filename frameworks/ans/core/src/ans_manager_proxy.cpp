@@ -845,67 +845,6 @@ ErrCode AnsManagerProxy::GetBundleImportance(int &importance)
     return result;
 }
 
-ErrCode AnsManagerProxy::SetDisturbMode(NotificationConstant::DisturbMode mode)
-{
-    if ((mode < NotificationConstant::DisturbMode::ALLOW_ALARMS) ||
-        (mode > NotificationConstant::DisturbMode::ALLOW_UNKNOWN)) {
-        ANS_LOGW("[SetDisturbMode] fail: input mode is not in DisturbMode.");
-        return ERR_ANS_PARCELABLE_FAILED;
-    }
-
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
-        ANS_LOGW("[SetDisturbMode] fail: write interface token failed.");
-        return ERR_ANS_PARCELABLE_FAILED;
-    }
-
-    if (!data.WriteInt32(mode)) {
-        ANS_LOGW("[SetDisturbMode] fail: write mode failed");
-        return ERR_ANS_PARCELABLE_FAILED;
-    }
-
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(SET_DISTURB_MODE, option, data, reply);
-    if (result != ERR_OK) {
-        ANS_LOGW("[SetDisturbMode] fail: transact ErrCode=%{public}d", result);
-        return ERR_ANS_TRANSACT_FAILED;
-    }
-
-    if (!reply.ReadInt32(result)) {
-        ANS_LOGW("[SetDisturbMode] fail: read result failed.");
-        return ERR_ANS_PARCELABLE_FAILED;
-    }
-
-    return result;
-}
-
-ErrCode AnsManagerProxy::GetDisturbMode(NotificationConstant::DisturbMode &mode)
-{
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
-        ANS_LOGW("[GetDisturbMode] fail: write interface token failed.");
-        return ERR_ANS_PARCELABLE_FAILED;
-    }
-
-    MessageParcel reply;
-    MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(GET_DISTURB_MODE, option, data, reply);
-    if (result != ERR_OK) {
-        ANS_LOGW("[GetDisturbMode] fail: transact ErrCode=%{public}d", result);
-        return ERR_ANS_TRANSACT_FAILED;
-    }
-
-    if (!reply.ReadInt32(result)) {
-        ANS_LOGW("[GetDisturbMode] fail: read result failed.");
-        return ERR_ANS_PARCELABLE_FAILED;
-    }
-
-    mode = static_cast<NotificationConstant::DisturbMode>(reply.ReadInt32());
-
-    return result;
-}
-
 ErrCode AnsManagerProxy::HasNotificationPolicyAccessPermission(bool &granted)
 {
     MessageParcel data;
@@ -1770,7 +1709,7 @@ ErrCode AnsManagerProxy::CancelGroup(const std::string &groupName)
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    return ERR_OK;
+    return result;
 }
 
 ErrCode AnsManagerProxy::RemoveGroupByBundle(
@@ -1805,7 +1744,102 @@ ErrCode AnsManagerProxy::RemoveGroupByBundle(
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    return ERR_OK;
+    return result;
+}
+
+ErrCode AnsManagerProxy::SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date)
+{
+    if (date == nullptr) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: date is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteParcelable(date)) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: write date failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(SET_DO_NOT_DISTURB_DATE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[GetDoNotDisturbDate] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(GET_DO_NOT_DISTURB_DATE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[GetDoNotDisturbDate] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[GetDoNotDisturbDate] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (result == ERR_OK) {
+        date = reply.ReadParcelable<NotificationDoNotDisturbDate>();
+        if (date == nullptr) {
+            ANS_LOGW("[GetDoNotDisturbDate] fail: read date failed.");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::DoesSupportDoNotDisturbMode(bool &doesSupport)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[DoesSupportDoNotDisturbMode] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(DOES_SUPPORT_DO_NOT_DISTURB_MODE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[DoesSupportDoNotDisturbMode] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[DoesSupportDoNotDisturbMode] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(doesSupport)) {
+        ANS_LOGW("[DoesSupportDoNotDisturbMode] fail: read doesSupport failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
 }
 
 ErrCode AnsManagerProxy::ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo)
