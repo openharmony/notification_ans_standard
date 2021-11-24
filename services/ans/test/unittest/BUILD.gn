@@ -58,7 +58,6 @@ ohos_unittest("ans_unit_test") {
     "mock/mock_event_handler.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
-    "mock/permission_kit.cpp",
     "notification_preferences_database_test.cpp",
     "notification_preferences_test.cpp",
     "notification_slot_filter_test.cpp",
@@ -86,7 +85,6 @@ ohos_unittest("ans_unit_test") {
     "ces_standard:cesfwk_innerkits",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "permission_standard:libpermissionsdk_standard",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

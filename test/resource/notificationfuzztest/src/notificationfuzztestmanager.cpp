@@ -12,21 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define private public
-#define protected public
 
 #include "datetime_ex.h"
 #include "../include/notificationfuzzconfigparser.h"
 #include "../include/notificationfuzztestmanager.h"
 #include "../include/notificationgetparam.h"
 
-#undef private
-#undef protected
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Notification {
-std::shared_ptr<NotificationFuzzTestManager> NotificationFuzzTestManager::instance_ = nullptr;
+std::shared_ptr<NotificationFuzzTestManager> NotificationFuzzTestManager::instance = nullptr;
 // RegisterNotificationHelper
 void NotificationFuzzTestManager::RegisterNotificationHelper()
 {
@@ -163,37 +159,37 @@ void NotificationFuzzTestManager::RegisterNotificationHelper()
     });
 
     callFunctionMap_.emplace("NotificationHelperSubscribeNotificationNotificationSubscriber", []() {
-        TestAnsSubscriber::mutex_.lock();
+        TestAnsSubscriber::mutex.lock();
         std::shared_ptr<OHOS::Notification::NotificationSubscriber> subscriber = GetParamNotificationSubscriber();
         struct tm start = {0};
         OHOS::GetSystemCurrentTime(&start);
         OHOS::Notification::NotificationHelper::SubscribeNotification(*subscriber);
         struct tm end = {0};
         int64_t timeout = 0;
-        while (!TestAnsSubscriber::mutex_.try_lock()) {
+        while (!TestAnsSubscriber::mutex.try_lock()) {
             OHOS::GetSystemCurrentTime(&end);
             timeout = OHOS::GetSecondsBetween(start, end);
             if (timeout >= 5L) {
                 break;
             }
         }
-        TestAnsSubscriber::mutex_.unlock();
-        TestAnsSubscriber::mutex_.lock();
+        TestAnsSubscriber::mutex.unlock();
+        TestAnsSubscriber::mutex.lock();
         OHOS::GetSystemCurrentTime(&start);
         OHOS::Notification::NotificationHelper::UnSubscribeNotification(*subscriber);
-        while (!TestAnsSubscriber::mutex_.try_lock()) {
+        while (!TestAnsSubscriber::mutex.try_lock()) {
             OHOS::GetSystemCurrentTime(&end);
             timeout = OHOS::GetSecondsBetween(start, end);
             if (timeout >= 5L) {
                 break;
             }
         }
-        TestAnsSubscriber::mutex_.unlock();
+        TestAnsSubscriber::mutex.unlock();
     });
 
     callFunctionMap_.emplace(
         "NotificationHelperSubscribeNotificationNotificationSubscriberNotificationSubscribeInfo", []() {
-            TestAnsSubscriber::mutex_.lock();
+            TestAnsSubscriber::mutex.lock();
             std::shared_ptr<OHOS::Notification::NotificationSubscriber> subscriber = GetParamNotificationSubscriber();
             std::shared_ptr<OHOS::Notification::NotificationSubscribeInfo> subscribeInfo =
                 GetParamNotificationSubscribeInfo();
@@ -202,59 +198,59 @@ void NotificationFuzzTestManager::RegisterNotificationHelper()
             OHOS::Notification::NotificationHelper::SubscribeNotification(*subscriber, *subscribeInfo);
             struct tm end = {0};
             int64_t timeout = 0;
-            while (!TestAnsSubscriber::mutex_.try_lock()) {
+            while (!TestAnsSubscriber::mutex.try_lock()) {
                 OHOS::GetSystemCurrentTime(&end);
                 timeout = OHOS::GetSecondsBetween(start, end);
                 if (timeout >= 5L) {
                     break;
                 }
             }
-            TestAnsSubscriber::mutex_.unlock();
-            TestAnsSubscriber::mutex_.lock();
+            TestAnsSubscriber::mutex.unlock();
+            TestAnsSubscriber::mutex.lock();
             OHOS::GetSystemCurrentTime(&start);
             OHOS::Notification::NotificationHelper::UnSubscribeNotification(*subscriber, *subscribeInfo);
-            while (!TestAnsSubscriber::mutex_.try_lock()) {
+            while (!TestAnsSubscriber::mutex.try_lock()) {
                 OHOS::GetSystemCurrentTime(&end);
                 timeout = OHOS::GetSecondsBetween(start, end);
                 if (timeout >= 5L) {
                     break;
                 }
             }
-            TestAnsSubscriber::mutex_.unlock();
+            TestAnsSubscriber::mutex.unlock();
         });
 
     callFunctionMap_.emplace("NotificationHelperUnSubscribeNotificationNotificationSubscriber", []() {
-        TestAnsSubscriber::mutex_.lock();
+        TestAnsSubscriber::mutex.lock();
         std::shared_ptr<OHOS::Notification::NotificationSubscriber> subscriber = GetParamNotificationSubscriber();
         struct tm start = {0};
         OHOS::GetSystemCurrentTime(&start);
         OHOS::Notification::NotificationHelper::SubscribeNotification(*subscriber);
         struct tm end = {0};
         int64_t timeout = 0;
-        while (!TestAnsSubscriber::mutex_.try_lock()) {
+        while (!TestAnsSubscriber::mutex.try_lock()) {
             OHOS::GetSystemCurrentTime(&end);
             timeout = OHOS::GetSecondsBetween(start, end);
             if (timeout >= 5L) {
                 break;
             }
         }
-        TestAnsSubscriber::mutex_.unlock();
-        TestAnsSubscriber::mutex_.lock();
+        TestAnsSubscriber::mutex.unlock();
+        TestAnsSubscriber::mutex.lock();
         OHOS::GetSystemCurrentTime(&start);
         OHOS::Notification::NotificationHelper::UnSubscribeNotification(*subscriber);
-        while (!TestAnsSubscriber::mutex_.try_lock()) {
+        while (!TestAnsSubscriber::mutex.try_lock()) {
             OHOS::GetSystemCurrentTime(&end);
             timeout = OHOS::GetSecondsBetween(start, end);
             if (timeout >= 5L) {
                 break;
             }
         }
-        TestAnsSubscriber::mutex_.unlock();
+        TestAnsSubscriber::mutex.unlock();
     });
 
     callFunctionMap_.emplace(
         "NotificationHelperUnSubscribeNotificationNotificationSubscriberNotificationSubscribeInfo", []() {
-            TestAnsSubscriber::mutex_.lock();
+            TestAnsSubscriber::mutex.lock();
             std::shared_ptr<OHOS::Notification::NotificationSubscriber> subscriber = GetParamNotificationSubscriber();
             std::shared_ptr<OHOS::Notification::NotificationSubscribeInfo> subscribeInfo =
                 GetParamNotificationSubscribeInfo();
@@ -263,25 +259,25 @@ void NotificationFuzzTestManager::RegisterNotificationHelper()
             OHOS::Notification::NotificationHelper::SubscribeNotification(*subscriber, *subscribeInfo);
             struct tm end = {0};
             int64_t timeout = 0;
-            while (!TestAnsSubscriber::mutex_.try_lock()) {
+            while (!TestAnsSubscriber::mutex.try_lock()) {
                 OHOS::GetSystemCurrentTime(&end);
                 timeout = OHOS::GetSecondsBetween(start, end);
                 if (timeout >= 5L) {
                     break;
                 }
             }
-            TestAnsSubscriber::mutex_.unlock();
-            TestAnsSubscriber::mutex_.lock();
+            TestAnsSubscriber::mutex.unlock();
+            TestAnsSubscriber::mutex.lock();
             OHOS::GetSystemCurrentTime(&start);
             OHOS::Notification::NotificationHelper::UnSubscribeNotification(*subscriber, *subscribeInfo);
-            while (!TestAnsSubscriber::mutex_.try_lock()) {
+            while (!TestAnsSubscriber::mutex.try_lock()) {
                 OHOS::GetSystemCurrentTime(&end);
                 timeout = OHOS::GetSecondsBetween(start, end);
                 if (timeout >= 5L) {
                     break;
                 }
             }
-            TestAnsSubscriber::mutex_.unlock();
+            TestAnsSubscriber::mutex.unlock();
         });
 
     callFunctionMap_.emplace("NotificationHelperRemoveNotificationstring",
@@ -666,8 +662,8 @@ void NotificationFuzzTestManager::RegisterIAbilityContinuation()
     });
 }
 
-// RegisterAbility_
-void NotificationFuzzTestManager::RegisterAbility_()
+// RegisterAbility
+void NotificationFuzzTestManager::RegisterAbility()
 {
     callFunctionMap_.emplace("AbilityOnRequestPermissionsFromUserResult", []() {
         std::shared_ptr<OHOS::AppExecFwk::Ability> temp = GetParamAbility();
@@ -684,8 +680,8 @@ void NotificationFuzzTestManager::RegisterAbility_()
     });
 }
 
-// RegisterAbilityContext_
-void NotificationFuzzTestManager::RegisterAbilityContext_()
+// RegisterAbilityContext
+void NotificationFuzzTestManager::RegisterAbilityContext()
 {
     callFunctionMap_.emplace("AbilityStartAbility", []() {
         std::shared_ptr<OHOS::AppExecFwk::Ability> temp = GetParamAbility();
@@ -841,8 +837,8 @@ NotificationFuzzTestManager::NotificationFuzzTestManager()
     RegisterWantAgentHelper();
     RegisterLauncherService();
     RegisterIAbilityContinuation();
-    RegisterAbility_();
-    RegisterAbilityContext_();
+    RegisterAbility();
+    RegisterAbilityContext();
     RegisterContext();
     RegisterAbilityLifecycleCallbacks();
     RegisterIAbilityManager();
@@ -866,15 +862,10 @@ int GetRandomInt(int minNum, int maxNum)
     return GetU16Param() % (maxNum - minNum + 1) + minNum;
 }
 
-void action(int a)
-{
-    std::cout << "Interrupt signal (" << a << ") received.\n";
-}
-
 void NotificationFuzzTestManager::StartFuzzTest()
 {
     std::cout << __func__ << std::endl;
-    OHOS::FuzzConfigParser jsonParser;
+    OHOS::NotificationFuzzConfigParser jsonParser;
     OHOS::FuzzTestData tempData;
 
     std::cout << "parseFromFile start" << std::endl;

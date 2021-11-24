@@ -28,6 +28,7 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::EventFwk;
 using Uri = OHOS::Uri;
 
+namespace {
 static const int INDEX_ZERO = 0;
 static const int INDEX_ONE = 1;
 static const int INDEX_TWO = 2;
@@ -39,13 +40,14 @@ static const int INDEX_SEVEN = 7;
 static const int INDEX_EIGHT = 8;
 static const int INDEX_NINE = 9;
 static const int INDEX_TEN = 10;
-static const int MESSAGE_INDEX = 36;
 static const int CHAR_MINCOUNT = -128;
 static const int CHAR_MAXCOUNT = 127;
+static const int MAX_LENGTH = 255;
+}  // namespace
 
 namespace OHOS {
 namespace Notification {
-std::mutex TestAnsSubscriber::mutex_ = std::mutex();
+std::mutex TestAnsSubscriber::mutex = std::mutex();
 bool GetBoolParam()
 {
     bool param;
@@ -238,7 +240,7 @@ string GetStringParam()
 {
     string param = "";
     char ch = GetCharParam();
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         ch = GetCharParam();
         param += ch;
@@ -250,7 +252,7 @@ template <class T>
 vector<T> GetUnsignVectorParam()
 {
     vector<T> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         T t = GetUnsignParam<T>();
         param.push_back(t);
@@ -268,7 +270,7 @@ T GetClassParam()
 std::vector<bool> GetBoolVectorParam()
 {
     vector<bool> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         int t = GetBoolParam();
         param.push_back(t);
@@ -279,7 +281,7 @@ std::vector<bool> GetBoolVectorParam()
 std::vector<short> GetShortVectorParam()
 {
     vector<short> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         short t = GetShortParam();
         param.push_back(t);
@@ -290,7 +292,7 @@ std::vector<short> GetShortVectorParam()
 std::vector<long> GetLongVectorParam()
 {
     vector<long> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         long t = GetLongParam();
         param.push_back(t);
@@ -301,7 +303,7 @@ std::vector<long> GetLongVectorParam()
 vector<int> GetIntVectorParam()
 {
     vector<int> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         int t = GetIntParam();
         param.push_back(t);
@@ -312,7 +314,7 @@ vector<int> GetIntVectorParam()
 std::vector<float> GetFloatVectorParam()
 {
     vector<float> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         float t = GetIntParam();
         param.push_back(t);
@@ -323,7 +325,7 @@ std::vector<float> GetFloatVectorParam()
 std::vector<double> GetDoubleVectorParam()
 {
     vector<double> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         double t = GetIntParam();
         param.push_back(t);
@@ -334,7 +336,7 @@ std::vector<double> GetDoubleVectorParam()
 vector<char> GetCharVectorParam()
 {
     vector<char> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         char t = GetCharParam();
         param.push_back(t);
@@ -345,7 +347,7 @@ vector<char> GetCharVectorParam()
 vector<char32_t> GetChar32VectorParam()
 {
     vector<char32_t> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         char32_t t = GetChar32Param();
         param.push_back(t);
@@ -356,7 +358,7 @@ vector<char32_t> GetChar32VectorParam()
 vector<string> GetStringVectorParam()
 {
     vector<string> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         string t = GetStringParam();
         param.push_back(t);
@@ -367,7 +369,7 @@ vector<string> GetStringVectorParam()
 vector<int8_t> GetS8VectorParam()
 {
     vector<int8_t> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         int8_t temp = GetS8Param();
         param.push_back(temp);
@@ -378,7 +380,7 @@ vector<int8_t> GetS8VectorParam()
 vector<int16_t> GetS16VectorParam()
 {
     vector<int16_t> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         int16_t temp = GetS16Param();
         param.push_back(temp);
@@ -389,7 +391,7 @@ vector<int16_t> GetS16VectorParam()
 vector<int32_t> GetS32VectorParam()
 {
     vector<int32_t> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         int32_t temp = GetS32Param();
         param.push_back(temp);
@@ -400,7 +402,7 @@ vector<int32_t> GetS32VectorParam()
 vector<int64_t> GetS64VectorParam()
 {
     vector<int64_t> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         int64_t temp = GetS64Param();
         param.push_back(temp);
@@ -420,7 +422,7 @@ std::shared_ptr<Want> GetParamWant()
 std::vector<std::shared_ptr<Want>> GetParamWantVector()
 {
     vector<std::shared_ptr<Want>> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         std::shared_ptr<Want> t = GetParamWant();
         param.push_back(t);
@@ -433,47 +435,6 @@ OHOS::AAFwk::Operation GetParamOperation()
     return OHOS::AAFwk::Operation();
 }
 
-std::shared_ptr<AsyncCommonEventResult> GetParamAsyncCommonEventResult()
-{
-    return make_shared<AsyncCommonEventResult>(
-        GetIntParam(), GetStringParam(), GetBoolParam(), GetBoolParam(), GetParamSptrRemote());
-}
-
-std::shared_ptr<CommonEventData> GetParamCommonEventData()
-{
-    return make_shared<CommonEventData>();
-}
-
-std::shared_ptr<CommonEventManager> GetParamCommonEventManager()
-{
-    return make_shared<CommonEventManager>();
-}
-
-std::shared_ptr<CommonEventPublishInfo> GetParamCommonEventPublishInfo()
-{
-    return make_shared<CommonEventPublishInfo>();
-}
-
-std::shared_ptr<CommonEventSubscribeInfo> GetParamCommonEventSubscribeInfo()
-{
-    return make_shared<CommonEventSubscribeInfo>();
-}
-
-std::shared_ptr<CommonEventSubscriber> GetParamCommonEventSubscriber()
-{
-    return make_shared<TestCommonEventSubscriber>();
-}
-
-std::shared_ptr<CommonEventSupport> GetParamCommonEventSupport()
-{
-    return make_shared<CommonEventSupport>();
-}
-
-std::shared_ptr<MatchingSkills> GetParamMatchingSkills()
-{
-    return make_shared<MatchingSkills>();
-}
-
 sptr<IRemoteObject> GetParamSptrRemote()
 {
     return sptr<TestRemoteObject>();
@@ -483,197 +444,9 @@ std::shared_ptr<EventRunner> GetParamEventRunner()
 {
     return EventRunner::Create(GetCharArryParam());
 }
-
-std::shared_ptr<EventHandler> GetParamEventHandler()
-{
-    return make_shared<EventHandler>(GetParamEventRunner());
-}
-
-std::shared_ptr<OHOS::AppExecFwk::EventQueue> GetParamEventQueue()
-{
-    return make_shared<OHOS::AppExecFwk::EventQueue>();
-}
-
-std::shared_ptr<EventRunnerNativeImplement> GetParamEventRunnerNativeImplement()
-{
-    return make_shared<EventRunnerNativeImplement>(GetBoolParam());
-}
-
-std::shared_ptr<OHOS::AppExecFwk::FileDescriptorListener> GetParamFileDescriptorListener()
-{
-    return make_shared<TestFileDescriptorListener>();
-}
-
-TestDumper GetParamDumper()
-{
-    return GetClassParam<TestDumper>();
-}
-
-InnerEvent::Pointer GetParamInnerEvent()
-{
-    return InnerEvent::Get(GetU32Param(), GetS64Param());
-}
-
-CommonEventSubscribeInfo::ThreadMode GetParamThreadMode()
-{
-    switch (GetIntParam() % INDEX_FOUR) {
-        case INDEX_ZERO:
-            return CommonEventSubscribeInfo::ThreadMode::HANDLER;
-            break;
-        case INDEX_ONE:
-            return CommonEventSubscribeInfo::ThreadMode::POST;
-            break;
-        case INDEX_TWO:
-            return CommonEventSubscribeInfo::ThreadMode::ASYNC;
-            break;
-        case INDEX_THREE:
-            return CommonEventSubscribeInfo::ThreadMode::BACKGROUND;
-            break;
-        default:
-            return CommonEventSubscribeInfo::ThreadMode::HANDLER;
-            break;
-    }
-}
-
-EventQueue::Priority GetParamPriority()
-{
-    switch (GetIntParam() % INDEX_FOUR) {
-        case INDEX_ZERO:
-            return EventQueue::Priority::IMMEDIATE;
-            break;
-        case INDEX_ONE:
-            return EventQueue::Priority::HIGH;
-            break;
-        case INDEX_TWO:
-            return EventQueue::Priority::LOW;
-            break;
-        case INDEX_THREE:
-            return EventQueue::Priority::IDLE;
-            break;
-        default:
-            return EventQueue::Priority::LOW;
-            break;
-    }
-}
-
-std::shared_ptr<Logger> GetParamLogger()
-{
-    return make_shared<TestLogger>();
-}
-
-InnerEvent::Callback GetParamCallback()
-{
-    auto callback = []() { printf("Fuzz Test Inner Event Callback."); };
-    return callback;
-}
-
-OHOS::AppExecFwk::InnerEvent::TimePoint GetParamTimePoint()
-{
-    std::chrono::steady_clock::time_point param = std::chrono::steady_clock::now();
-    return param;
-}
-
-std::shared_ptr<AbilityStartSetting> GetParamAbilityStartSetting()
-{
-    return AbilityStartSetting::GetEmptySetting();
-}
-
-sptr<OHOS::AAFwk::IAbilityConnection> GetParamIAbilityConnection()
-{
-    return sptr<OHOS::AAFwk::IAbilityConnection>();
-}
-
-std::shared_ptr<OHOS::AppExecFwk::AbilityContext> GetParamAbilityContext()
-{
-    return make_shared<OHOS::AppExecFwk::AbilityContext>();
-}
-std::shared_ptr<OHOS::AppExecFwk::IAbilityEvent> GetParamIAbilityEvent()
-{
-    return make_shared<TestAbilityEvent>();
-}
-
-sptr<OHOS::AppExecFwk::AbilityThread> GetParamAbilityThread()
-{
-    return sptr<OHOS::AppExecFwk::AbilityThread>();
-}
-
-std::shared_ptr<OHOS::AppExecFwk::AbilityHandler> GetParamAbilityHandler()
-{
-    return make_shared<OHOS::AppExecFwk::AbilityHandler>(GetParamEventRunner(), GetParamAbilityThread());
-}
-
 std::shared_ptr<OHOS::AppExecFwk::Ability> GetParamAbility()
 {
     return make_shared<OHOS::AppExecFwk::Ability>();
-}
-
-std::shared_ptr<OHOS::AppExecFwk::ComponentContainer> GetParamComponentContainer()
-{
-    return make_shared<OHOS::AppExecFwk::ComponentContainer>();
-}
-
-std::shared_ptr<OHOS::AppExecFwk::OHOSApplication> GetParamOHOSApplication()
-{
-    return make_shared<OHOS::AppExecFwk::OHOSApplication>();
-}
-
-std::shared_ptr<OHOS::KeyEvent> GetParamKeyEvent()
-{
-    return make_shared<OHOS::KeyEvent>();
-}
-
-OHOS::Uri GetParamUri()
-{
-    return OHOS::Uri(GetStringParam());
-}
-
-NativeRdb::ValuesBucket GetParamValuesBucket()
-{
-    if (GetBoolParam()) {
-        NativeRdb::ValuesBucket val;
-        val.PutNull(GetStringParam());
-        return val;
-    } else {
-        return NativeRdb::ValuesBucket();
-    }
-}
-
-OHOS::AppExecFwk::Configuration GetParamConfiguration()
-{
-    if (GetBoolParam()) {
-        return OHOS::AppExecFwk::Configuration(GetStringParam());
-    } else {
-        return OHOS::AppExecFwk::Configuration();
-    }
-}
-
-NativeRdb::DataAbilityPredicates GetParamDataAbilityPredicates()
-{
-    if (GetBoolParam()) {
-        return NativeRdb::DataAbilityPredicates(GetStringParam());
-    } else {
-        return NativeRdb::DataAbilityPredicates();
-    }
-}
-
-OHOS::AppExecFwk::PacMap GetParamPacMap()
-{
-    return OHOS::AppExecFwk::PacMap();
-}
-
-std::shared_ptr<OHOS::AppExecFwk::ProcessInfo> GetParamProcessInfo()
-{
-    pid_t id = GetIntParam();
-    if (GetBoolParam()) {
-        return make_shared<OHOS::AppExecFwk::ProcessInfo>(GetStringParam(), id);
-    } else {
-        return make_shared<OHOS::AppExecFwk::ProcessInfo>();
-    }
-}
-
-std::shared_ptr<OHOS::AppExecFwk::DataUriUtils> GetParamDataUriUtils()
-{
-    return make_shared<OHOS::AppExecFwk::DataUriUtils>();
 }
 
 std::shared_ptr<OHOS::AppExecFwk::Context> GetParamContext()
@@ -681,89 +454,9 @@ std::shared_ptr<OHOS::AppExecFwk::Context> GetParamContext()
     return make_shared<OHOS::AppExecFwk::Ability>();
 }
 
-std::shared_ptr<OHOS::AppExecFwk::LifeCycle> GetParamLifeCycle()
-{
-    return make_shared<OHOS::AppExecFwk::LifeCycle>();
-}
-
-OHOS::AppExecFwk::LifeCycle::Event GetParamLifeCycleEvent()
-{
-    switch (GetIntParam() % INDEX_SEVEN) {
-        case INDEX_ZERO:
-            return OHOS::AppExecFwk::LifeCycle::Event::ON_ACTIVE;
-            break;
-        case INDEX_ONE:
-            return OHOS::AppExecFwk::LifeCycle::Event::ON_BACKGROUND;
-            break;
-        case INDEX_TWO:
-            return OHOS::AppExecFwk::LifeCycle::Event::ON_FOREGROUND;
-            break;
-        case INDEX_THREE:
-            return OHOS::AppExecFwk::LifeCycle::Event::ON_INACTIVE;
-            break;
-        case INDEX_FOUR:
-            return OHOS::AppExecFwk::LifeCycle::Event::ON_START;
-            break;
-        case INDEX_FIVE:
-            return OHOS::AppExecFwk::LifeCycle::Event::ON_STOP;
-            break;
-        case INDEX_SIX:
-            return OHOS::AppExecFwk::LifeCycle::Event::UNDEFINED;
-            break;
-        default:
-            return OHOS::AppExecFwk::LifeCycle::Event::ON_ACTIVE;
-            break;
-    }
-}
-
-std::shared_ptr<OHOS::AppExecFwk::ElementName> GetParamElementName()
-{
-    if (GetBoolParam()) {
-        return make_shared<OHOS::AppExecFwk::ElementName>(GetStringParam(), GetStringParam(), GetStringParam());
-    } else {
-        return make_shared<OHOS::AppExecFwk::ElementName>();
-    }
-}
-
 std::shared_ptr<OHOS::AAFwk::WantParams> GetParamWantParams()
 {
     return make_shared<OHOS::AAFwk::WantParams>();
-}
-
-std::shared_ptr<OHOS::AppExecFwk::AbilityManager> GetParamAbilityManager()
-{
-    return make_shared<OHOS::AppExecFwk::AbilityManager>();
-}
-
-OHOS::AAFwk::PatternsMatcher GetParamPatternsMatcher()
-{
-    return OHOS::AAFwk::PatternsMatcher();
-}
-
-OHOS::AAFwk::MatchType GetParamMatchType()
-{
-    switch (GetIntParam() % INDEX_FOUR) {
-        case INDEX_ZERO:
-            return OHOS::AAFwk::MatchType::DEFAULT;
-            break;
-        case INDEX_ONE:
-            return OHOS::AAFwk::MatchType::PREFIX;
-            break;
-        case INDEX_TWO:
-            return OHOS::AAFwk::MatchType::PATTERN;
-            break;
-        case INDEX_THREE:
-            return OHOS::AAFwk::MatchType::GLOBAL;
-            break;
-        default:
-            return OHOS::AAFwk::MatchType::DEFAULT;
-            break;
-    }
-}
-
-std::shared_ptr<OHOS::AppExecFwk::BundleMgrProxy> GetParamBundleMgrProxy()
-{
-    return make_shared<OHOS::AppExecFwk::BundleMgrProxy>(GetParamSptrRemote());
 }
 
 OHOS::AppExecFwk::ApplicationFlag GetParamApplicationFlag()
@@ -779,99 +472,14 @@ OHOS::AppExecFwk::ApplicationInfo GetParamApplicationInfo()
 {
     return OHOS::AppExecFwk::ApplicationInfo();
 }
-
-std::vector<OHOS::AppExecFwk::ApplicationInfo> GetParamApplicationInfoVector()
-{
-    vector<OHOS::AppExecFwk::ApplicationInfo> param;
-    size_t len = GenRandom(0, 255);
-    while (len--) {
-        OHOS::AppExecFwk::ApplicationInfo t = GetParamApplicationInfo();
-        param.push_back(t);
-    }
-    return param;
-}
-
-OHOS::AppExecFwk::BundleFlag GetParamBundleFlag()
-{
-    if (GetBoolParam()) {
-        return OHOS::AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT;
-    } else {
-        return OHOS::AppExecFwk::BundleFlag::GET_BUNDLE_WITH_ABILITIES;
-    }
-}
-
-OHOS::AppExecFwk::BundleInfo GetParamBundleInfo()
-{
-    return OHOS::AppExecFwk::BundleInfo();
-}
-
 OHOS::AppExecFwk::AbilityInfo GetParamAbilityInfo()
 {
     return OHOS::AppExecFwk::AbilityInfo();
 }
 
-OHOS::AppExecFwk::HapModuleInfo GetParamHapModuleInfo()
-{
-    return OHOS::AppExecFwk::HapModuleInfo();
-}
-
-OHOS::AppExecFwk::PermissionDef GetParamPermissionDef()
-{
-    return OHOS::AppExecFwk::PermissionDef();
-}
-
-std::vector<OHOS::AppExecFwk::PermissionDef> GetParamPermissionDefVector()
-{
-    vector<OHOS::AppExecFwk::PermissionDef> param;
-    size_t len = GenRandom(0, 255);
-    while (len--) {
-        OHOS::AppExecFwk::PermissionDef t = GetParamPermissionDef();
-        param.push_back(t);
-    }
-    return param;
-}
-
-OHOS::AppExecFwk::IBundleMgr::Message GetParamIBundleMgrMessage()
-{
-    return (OHOS::AppExecFwk::IBundleMgr::Message)(GetIntParam() % MESSAGE_INDEX);
-}
-
-OHOS::MessageParcel GetParamMessageParcel()
-{
-    return OHOS::MessageParcel();
-}
-
-OHOS::AppExecFwk::DumpFlag GetParamDumpFlag()
-{
-    switch (GetIntParam() % INDEX_THREE) {
-        case INDEX_ZERO:
-            return OHOS::AppExecFwk::DumpFlag::DUMP_BUNDLE_LIST;
-            break;
-        case INDEX_ONE:
-            return OHOS::AppExecFwk::DumpFlag::DUMP_ALL_BUNDLE_INFO;
-            break;
-        case INDEX_TWO:
-            return OHOS::AppExecFwk::DumpFlag::DUMP_BUNDLE_INFO;
-            break;
-        default:
-            return OHOS::AppExecFwk::DumpFlag::DUMP_BUNDLE_LIST;
-            break;
-    }
-}
-
-sptr<OHOS::AppExecFwk::ICleanCacheCallback> GetParamICleanCacheCallback()
-{
-    return sptr<TestICleanCacheCallback>();
-}
-
 sptr<OHOS::AppExecFwk::IBundleStatusCallback> GetParamIBundleStatusCallback()
 {
     return sptr<TestIBundleStatusCallback>();
-}
-
-std::shared_ptr<OHOS::AppExecFwk::DataAbilityHelper> GetParamDataAbilityHelper()
-{
-    return OHOS::AppExecFwk::DataAbilityHelper::Creator(std::make_shared<OHOS::AppExecFwk::Ability>());
 }
 
 std::shared_ptr<NotificationSorting> GetParamNotificationSorting()
@@ -882,7 +490,7 @@ std::shared_ptr<NotificationSorting> GetParamNotificationSorting()
 std::vector<NotificationSorting> GetParamNotificationSortingVector()
 {
     vector<NotificationSorting> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         NotificationSorting t;
         param.push_back(t);
@@ -907,8 +515,7 @@ std::shared_ptr<OHOS::Notification::NotificationSlot> GetParamNotificationSlot()
 
 sptr<OHOS::Notification::NotificationSlot> GetParamNotificationSlotSptr()
 {
-    sptr<OHOS::Notification::NotificationSlot> param =
-        new OHOS::Notification::NotificationSlot(GetParamSlotType());
+    sptr<OHOS::Notification::NotificationSlot> param = new OHOS::Notification::NotificationSlot(GetParamSlotType());
     return param;
 }
 
@@ -938,7 +545,7 @@ OHOS::Notification::NotificationConstant::SlotType GetParamSlotType()
 std::vector<sptr<OHOS::Notification::NotificationSlot>> GetParamNotificationSlotSptrVector()
 {
     vector<sptr<NotificationSlot>> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         sptr<NotificationSlot> t = GetParamNotificationSlotSptr();
         param.push_back(t);
@@ -949,7 +556,7 @@ std::vector<sptr<OHOS::Notification::NotificationSlot>> GetParamNotificationSlot
 std::vector<OHOS::Notification::NotificationSlot> GetParamNotificationSlotVector()
 {
     vector<NotificationSlot> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         NotificationSlot t = *GetParamNotificationSlot();
         param.push_back(t);
@@ -960,7 +567,7 @@ std::vector<OHOS::Notification::NotificationSlot> GetParamNotificationSlotVector
 std::vector<OHOS::Notification::NotificationSlotGroup> GetParamNotificationSlotGroupVector()
 {
     vector<OHOS::Notification::NotificationSlotGroup> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         OHOS::Notification::NotificationSlotGroup t = *GetParamNotificationSlotGroup();
         param.push_back(t);
@@ -976,7 +583,7 @@ sptr<OHOS::Notification::NotificationSlotGroup> GetParamNotificationSlotGroup()
 std::vector<sptr<OHOS::Notification::NotificationSlotGroup>> GetParamNotificationSlotGroupSptrVector()
 {
     vector<sptr<OHOS::Notification::NotificationSlotGroup>> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         sptr<OHOS::Notification::NotificationSlotGroup> t = GetParamNotificationSlotGroup();
         param.push_back(t);
@@ -1036,7 +643,7 @@ sptr<OHOS::Notification::NotificationRequest> GetParamNotificationRequestSptr()
 std::vector<sptr<OHOS::Notification::NotificationRequest>> GetParamNotificationRequestVector()
 {
     vector<sptr<OHOS::Notification::NotificationRequest>> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         sptr<OHOS::Notification::NotificationRequest> t = GetParamNotificationRequestSptr();
         param.push_back(t);
@@ -1180,7 +787,7 @@ OHOS::Notification::WantAgent::WantAgentConstant::Flags GetParamFlags()
 std::vector<OHOS::Notification::WantAgent::WantAgentConstant::Flags> GetParamFlagsVector()
 {
     vector<OHOS::Notification::WantAgent::WantAgentConstant::Flags> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         OHOS::Notification::WantAgent::WantAgentConstant::Flags t = GetParamFlags();
         param.push_back(t);
@@ -1204,7 +811,7 @@ sptr<OHOS::Notification::Notification> GetParamNotificationSptr()
 std::vector<sptr<OHOS::Notification::Notification>> GetParamNotificationSptrVector()
 {
     std::vector<sptr<OHOS::Notification::Notification>> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         sptr<OHOS::Notification::Notification> t = GetParamNotificationSptr();
         param.push_back(t);
@@ -1254,7 +861,7 @@ std::shared_ptr<OHOS::AppExecFwk::LauncherService> GetParamLauncherService()
 std::vector<OHOS::AppExecFwk::LauncherAbilityInfo> GetParamLauncherAbilityInfoVector()
 {
     std::vector<OHOS::AppExecFwk::LauncherAbilityInfo> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         OHOS::AppExecFwk::LauncherAbilityInfo t;
         param.push_back(t);
@@ -1268,7 +875,7 @@ std::shared_ptr<OHOS::AppExecFwk::LauncherAbilityInfo> GetParamLauncherAbilityIn
 std::vector<OHOS::AppExecFwk::LauncherShortcutInfo> GetParamLauncherShortcutInfoVector()
 {
     std::vector<OHOS::AppExecFwk::LauncherShortcutInfo> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         OHOS::AppExecFwk::LauncherShortcutInfo t;
         param.push_back(t);
@@ -1278,7 +885,7 @@ std::vector<OHOS::AppExecFwk::LauncherShortcutInfo> GetParamLauncherShortcutInfo
 std::vector<OHOS::AppExecFwk::FormInfo> GetParamFormInfoVector()
 {
     std::vector<OHOS::AppExecFwk::FormInfo> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         OHOS::AppExecFwk::FormInfo t;
         param.push_back(t);
@@ -1288,7 +895,7 @@ std::vector<OHOS::AppExecFwk::FormInfo> GetParamFormInfoVector()
 std::vector<OHOS::AppExecFwk::ShortcutInfo> GetParamShortcutInfoVector()
 {
     std::vector<OHOS::AppExecFwk::ShortcutInfo> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         OHOS::AppExecFwk::ShortcutInfo t;
         param.push_back(t);
@@ -1298,7 +905,7 @@ std::vector<OHOS::AppExecFwk::ShortcutInfo> GetParamShortcutInfoVector()
 std::vector<OHOS::AppExecFwk::ModuleUsageRecord> GetParamModuleUsageRecordVector()
 {
     std::vector<OHOS::AppExecFwk::ModuleUsageRecord> param;
-    size_t len = GenRandom(0, 255);
+    size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
         OHOS::AppExecFwk::ModuleUsageRecord t;
         param.push_back(t);

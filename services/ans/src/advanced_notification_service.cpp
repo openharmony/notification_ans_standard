@@ -22,7 +22,6 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
-#include "ans_permission_define.h"
 #include "bundle_manager_helper.h"
 #include "ipc_skeleton.h"
 #include "notification_constant.h"
@@ -31,7 +30,6 @@
 #include "notification_slot.h"
 #include "notification_slot_filter.h"
 #include "notification_subscriber_manager.h"
-#include "permission/permission_kit.h"
 #include "permission_filter.h"
 
 namespace OHOS {
@@ -828,6 +826,10 @@ ErrCode AdvancedNotificationService::GetSlotsByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
     sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
     if (bundle == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
@@ -851,6 +853,10 @@ ErrCode AdvancedNotificationService::UpdateSlots(
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
     }
 
     sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
@@ -1012,6 +1018,10 @@ ErrCode AdvancedNotificationService::Subscribe(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
     return NotificationSubscriberManager::GetInstance()->AddSubscriber(subscriber, info);
 }
 
@@ -1022,6 +1032,10 @@ ErrCode AdvancedNotificationService::Unsubscribe(
 
     if (subscriber == nullptr) {
         return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
     }
 
     if (!IsSystemApp()) {
@@ -1077,6 +1091,10 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
     }
 
     ErrCode result = ERR_OK;
@@ -1152,6 +1170,10 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForSpecialBundle(
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
     }
 
     sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
@@ -1513,6 +1535,10 @@ ErrCode AdvancedNotificationService::RemoveNotification(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
     sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
     if (bundle == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
@@ -1555,6 +1581,10 @@ ErrCode AdvancedNotificationService::RemoveAllNotifications(const sptr<Notificat
 
     if (!IsSystemApp()) {
         return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
     }
 
     sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
@@ -1792,12 +1822,21 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
     int64_t beginDate = ResetSeconds(date->GetBeginDate());
     int64_t endDate = ResetSeconds(date->GetEndDate());
 
-    if (date->GetDoNotDisturbType() == NotificationConstant::DoNotDisturbType::NONE) {
-        beginDate = 0;
-        endDate = 0;
-    }
-    if (date->GetDoNotDisturbType() == NotificationConstant::DoNotDisturbType::ONCE) {
-        AdjustDateForDndTypeOnce(beginDate, endDate);
+    switch (date->GetDoNotDisturbType()) {
+        case NotificationConstant::DoNotDisturbType::NONE:
+            beginDate = 0;
+            endDate = 0;
+            break;
+        case NotificationConstant::DoNotDisturbType::ONCE:
+            AdjustDateForDndTypeOnce(beginDate, endDate);
+            break;
+        case NotificationConstant::DoNotDisturbType::CLEARLY:
+            if (beginDate >= endDate) {
+                return ERR_ANS_INVALID_PARAM;
+            }
+            break;
+        default:
+            break;
     }
 
     const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
@@ -1857,18 +1896,12 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
 bool AdvancedNotificationService::CheckPermission(const std::string &bundleName)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    bool isGranted = false;
     if (bundleName.empty()) {
         ANS_LOGE("Bundle name is empty.");
-        return isGranted;
+        return false;
     }
-    int result = Security::Permission::PermissionKit::VerifyPermission(bundleName, ANS_PERMISSION_CONTROLLER, 0);
-    if (Security::Permission::TypePermissionState::PERMISSION_GRANTED == result) {
-        isGranted = true;
-    } else {
-        ANS_LOGE("Permission granted failed.");
-    }
-    return isGranted;
+    // Add permission check in future
+    return true;
 }
 }  // namespace Notification
 }  // namespace OHOS
