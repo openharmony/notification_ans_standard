@@ -352,7 +352,7 @@ public:
     ~EventParser()
     {}
 
-    void parse(std::list<std::shared_ptr<SubscriberEvent>> events)
+    void Parse(std::list<std::shared_ptr<SubscriberEvent>> events)
     {
         for (auto event : events) {
             if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
@@ -384,87 +384,87 @@ public:
         }
     }
 
-    void setWaitOnConsumed(bool bl)
+    void SetWaitOnConsumed(bool bl)
     {
         waitOnConsumed_ = bl;
     }
 
-    void setWaitOnCanceled(bool bl)
+    void SetWaitOnCanceled(bool bl)
     {
         waitOnCanceled_ = bl;
     }
 
-    void setWaitOnCanceledWithSortingMapAndDeleteReason(bool bl)
+    void SetWaitOnCanceledWithSortingMapAndDeleteReason(bool bl)
     {
         waitOnCanceledWithSortingMapAndDeleteReason_ = bl;
     }
 
-    void setWaitOnUnSubscriber()
+    void SetWaitOnUnSubscriber()
     {
         waitOnUnSubscriber_ = NotificationConstant::SubscribeResult::RESOURCES_FAIL;
     }
 
-    bool getWaitOnSubscriber()
+    bool GetWaitOnSubscriber() const
     {
         return waitOnSubscriber_;
     }
 
-    bool getWaitOnUnSubscriber()
+    bool GetWaitOnUnSubscriber() const
     {
         return waitOnUnSubscriber_;
     }
 
-    bool getwaitOnConsumed()
+    bool GetWaitOnConsumed() const
     {
         return waitOnConsumed_;
     }
 
-    std::vector<std::shared_ptr<Notification>> getOnConsumedReq()
+    std::vector<std::shared_ptr<Notification>> GetOnConsumedReq() const
     {
         return onConsumedReq_;
     }
 
-    std::vector<std::shared_ptr<Notification>> getOnConsumedWithSortingMapReq()
+    std::vector<std::shared_ptr<Notification>> GetOnConsumedWithSortingMapReq() const
     {
         return onConsumedWithSortingMapReq_;
     }
 
-    std::vector<std::shared_ptr<NotificationSortingMap>> getOnConsumedWithSortingMapSor()
+    std::vector<std::shared_ptr<NotificationSortingMap>> GetOnConsumedWithSortingMapSor() const
     {
         return onConsumedWithSortingMapSor_;
     }
 
-    bool getWaitOnConsumedWithSortingMap()
+    bool GetWaitOnConsumedWithSortingMap() const
     {
         return waitOnConsumedWithSortingMap_;
     }
 
-    bool getWaitOnCanceled()
+    bool GetWaitOnCanceled() const
     {
         return waitOnCanceled_;
     }
 
-    bool getWaitOnCanceledWithSortingMapAndDeleteReason()
+    bool GetWaitOnCanceledWithSortingMapAndDeleteReason() const
     {
         return waitOnCanceledWithSortingMapAndDeleteReason_;
     }
 
-    std::vector<std::shared_ptr<Notification>> getOnCanceledReq()
+    std::vector<std::shared_ptr<Notification>> GetOnCanceledReq() const
     {
         return onCanceledReq_;
     }
 
-    std::vector<std::shared_ptr<Notification>> getOnCanceledWithSortingMapReq()
+    std::vector<std::shared_ptr<Notification>> GetOnCanceledWithSortingMapReq() const
     {
         return onCanceledWithSortingMapReq_;
     }
 
-    std::vector<std::shared_ptr<NotificationSortingMap>> getOnCanceledWithSortingMapSor()
+    std::vector<std::shared_ptr<NotificationSortingMap>> GetOnCanceledWithSortingMapSor() const
     {
         return onCanceledWithSortingMapSor_;
     }
 
-    std::vector<int> getOnCanceledWithSortingMapDelRea()
+    std::vector<int> GetOnCanceledWithSortingMapDelRea()
     {
         return onCanceledWithSortingMapDelRea_;
     }
@@ -545,7 +545,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | L
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
     EventParser eventParser;
-    eventParser.parse(events);
+    eventParser.Parse(events);
     for (uint32_t i = 0; i <= MAX_ACTIVE_NUM_PERSECOND; i++) {
         std::string notificationLabel = std::to_string(i);
         std::string notificationIdStr = std::to_string(i);
@@ -555,21 +555,21 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | L
             stream << UID << KEY_SPLITER << notificationLabel << KEY_SPLITER << notificationIdInt;
             std::string notificationKey = stream.str();
             NotificationSorting sorting;
-            EXPECT_EQ(eventParser.getOnConsumedReq()[i]->GetLabel().c_str(), notificationLabel);
-            EXPECT_EQ(eventParser.getOnConsumedReq()[i]->GetId(), notificationIdInt);
-            EXPECT_EQ(eventParser.getOnConsumedReq()[i]->GetKey(), notificationKey);
-            EXPECT_EQ(eventParser.getOnConsumedWithSortingMapReq()[i]->GetLabel().c_str(), notificationLabel);
-            EXPECT_EQ(eventParser.getOnConsumedWithSortingMapReq()[i]->GetId(), notificationIdInt);
-            EXPECT_EQ(eventParser.getOnConsumedWithSortingMapReq()[i]->GetKey(), notificationKey);
+            EXPECT_EQ(eventParser.GetOnConsumedReq()[i]->GetLabel().c_str(), notificationLabel);
+            EXPECT_EQ(eventParser.GetOnConsumedReq()[i]->GetId(), notificationIdInt);
+            EXPECT_EQ(eventParser.GetOnConsumedReq()[i]->GetKey(), notificationKey);
+            EXPECT_EQ(eventParser.GetOnConsumedWithSortingMapReq()[i]->GetLabel().c_str(), notificationLabel);
+            EXPECT_EQ(eventParser.GetOnConsumedWithSortingMapReq()[i]->GetId(), notificationIdInt);
+            EXPECT_EQ(eventParser.GetOnConsumedWithSortingMapReq()[i]->GetKey(), notificationKey);
             EXPECT_TRUE(
-                eventParser.getOnConsumedWithSortingMapSor()[i]->GetNotificationSorting(notificationKey, sorting));
+                eventParser.GetOnConsumedWithSortingMapSor()[i]->GetNotificationSorting(notificationKey, sorting));
             EXPECT_EQ(sorting.GetKey().c_str(), notificationKey);
         }
     }
-    EXPECT_EQ((uint32_t)eventParser.getOnConsumedReq().size(), MAX_ACTIVE_NUM_PERSECOND);
-    EXPECT_EQ((uint32_t)eventParser.getOnConsumedWithSortingMapReq().size(), MAX_ACTIVE_NUM_PERSECOND);
-    EXPECT_TRUE(eventParser.getWaitOnSubscriber());
-    EXPECT_TRUE(eventParser.getWaitOnUnSubscriber());
+    EXPECT_EQ((uint32_t)eventParser.GetOnConsumedReq().size(), MAX_ACTIVE_NUM_PERSECOND);
+    EXPECT_EQ((uint32_t)eventParser.GetOnConsumedWithSortingMapReq().size(), MAX_ACTIVE_NUM_PERSECOND);
+    EXPECT_TRUE(eventParser.GetWaitOnSubscriber());
+    EXPECT_TRUE(eventParser.GetWaitOnUnSubscriber());
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -601,21 +601,21 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00100, Function | M
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
     EventParser eventParser;
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
-    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
-    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
-    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetId(), 0);
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
     std::stringstream stream;
     stream << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
     std::string notificationKey = stream.str();
     NotificationSorting sorting;
-    EXPECT_EQ(eventParser.getOnCanceledReq()[0]->GetKey(), notificationKey);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey);
-    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey, sorting));
+    EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey);
+    EXPECT_TRUE(eventParser.GetOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey, sorting));
     EXPECT_EQ(sorting.GetKey().c_str(), notificationKey);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[0], CANCEL_REASON_DELETE);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapDelRea()[0], CANCEL_REASON_DELETE);
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -646,19 +646,19 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00200, Function | M
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
     EventParser eventParser;
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
-    eventParser.setWaitOnCanceled(false);
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    eventParser.SetWaitOnCanceled(false);
     EXPECT_EQ(NotificationHelper::RemoveNotification(key), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
     events = subscriber.GetEvents();
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
     SleepForFC();
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
     SleepForFC();
     events = subscriber.GetEvents();
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -685,9 +685,9 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00100, Function | Medium
     SleepForFC();
     EventParser eventParser;
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
-    eventParser.setWaitOnConsumed(false);
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    eventParser.SetWaitOnConsumed(false);
 
     NotificationRequest req1(1);
     req1.SetLabel(NOTIFICATION_LABEL_0);
@@ -695,8 +695,8 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00100, Function | Medium
     events = subscriber.GetEvents();
     EXPECT_EQ(NotificationHelper::PublishNotification(req1), ERR_OK);
     SleepForFC();
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
     SleepForFC();
     EXPECT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
     std::vector<sptr<Notification>> notifications;
@@ -706,9 +706,9 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00100, Function | Medium
     SleepForFC();
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
     events = subscriber.GetEvents();
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
-    EXPECT_TRUE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -730,11 +730,11 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00200, Function | Medium
     SleepForFC();
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
-    eventParser.parse(events);
-    EXPECT_FALSE(eventParser.getwaitOnConsumed());
-    EXPECT_FALSE(eventParser.getWaitOnConsumedWithSortingMap());
-    EXPECT_FALSE(eventParser.getWaitOnCanceled());
-    EXPECT_FALSE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    eventParser.Parse(events);
+    EXPECT_FALSE(eventParser.GetWaitOnConsumed());
+    EXPECT_FALSE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_FALSE(eventParser.GetWaitOnCanceled());
+    EXPECT_FALSE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -874,21 +874,21 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelNotificationById_00100, Function | Med
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
 
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
-    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
-    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
-    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetId(), 1);
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 1);
     std::stringstream stream;
     stream << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 1;
     std::string notificationKey = stream.str();
     NotificationSorting sorting;
-    EXPECT_EQ(eventParser.getOnCanceledReq()[0]->GetKey(), notificationKey);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey);
-    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey, sorting));
+    EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey);
+    EXPECT_TRUE(eventParser.GetOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey, sorting));
     EXPECT_EQ(sorting.GetKey().c_str(), notificationKey);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[0], APP_CANCEL_REASON_DELETE);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapDelRea()[0], APP_CANCEL_REASON_DELETE);
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -919,19 +919,19 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelNotificationById_00200, Function | Med
     int32_t id = 0;
     SleepForFC();
 
-    eventParser.setWaitOnCanceled(false);
-    eventParser.setWaitOnCanceledWithSortingMapAndDeleteReason(false);
+    eventParser.SetWaitOnCanceled(false);
+    eventParser.SetWaitOnCanceledWithSortingMapAndDeleteReason(false);
     EXPECT_EQ(NotificationHelper::CancelNotification(NOTIFICATION_LABEL_0, id), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
     SleepForFC();
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
 
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
-    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
-    EXPECT_FALSE(eventParser.getWaitOnCanceled());
-    EXPECT_FALSE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_FALSE(eventParser.GetWaitOnCanceled());
+    EXPECT_FALSE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -969,33 +969,33 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelAllNotifications_00100, Function | Med
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
 
     EventParser eventParser;
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
-    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
-    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
-    EXPECT_EQ(eventParser.getOnConsumedReq()[0]->GetId(), 0);
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
     std::stringstream stream0;
     stream0 << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
     std::string notificationKey0 = stream0.str();
     NotificationSorting sorting0;
-    EXPECT_EQ(eventParser.getOnCanceledReq()[0]->GetKey(), notificationKey0);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey0);
-    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey0, sorting0));
+    EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey0);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapReq()[0]->GetKey(), notificationKey0);
+    EXPECT_TRUE(eventParser.GetOnConsumedWithSortingMapSor()[0]->GetNotificationSorting(notificationKey0, sorting0));
     EXPECT_EQ(sorting0.GetKey().c_str(), notificationKey0);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[0], APP_CANCEL_ALL_REASON_DELETE);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapDelRea()[0], APP_CANCEL_ALL_REASON_DELETE);
 
-    EXPECT_EQ(eventParser.getOnConsumedReq()[1]->GetLabel().c_str(), NOTIFICATION_LABEL_1);
-    EXPECT_EQ(eventParser.getOnConsumedReq()[1]->GetId(), 1);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[1]->GetLabel().c_str(), NOTIFICATION_LABEL_1);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[1]->GetId(), 1);
     std::stringstream stream1;
     stream1 << UID << KEY_SPLITER << NOTIFICATION_LABEL_1 << KEY_SPLITER << 1;
     std::string notificationKey1 = stream1.str();
     NotificationSorting sorting1;
-    EXPECT_EQ(eventParser.getOnCanceledReq()[1]->GetKey(), notificationKey1);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapReq()[1]->GetKey(), notificationKey1);
-    EXPECT_TRUE(eventParser.getOnConsumedWithSortingMapSor()[1]->GetNotificationSorting(notificationKey1, sorting1));
+    EXPECT_EQ(eventParser.GetOnCanceledReq()[1]->GetKey(), notificationKey1);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapReq()[1]->GetKey(), notificationKey1);
+    EXPECT_TRUE(eventParser.GetOnConsumedWithSortingMapSor()[1]->GetNotificationSorting(notificationKey1, sorting1));
     EXPECT_EQ(sorting1.GetKey().c_str(), notificationKey1);
-    EXPECT_EQ(eventParser.getOnCanceledWithSortingMapDelRea()[1], APP_CANCEL_ALL_REASON_DELETE);
+    EXPECT_EQ(eventParser.GetOnCanceledWithSortingMapDelRea()[1], APP_CANCEL_ALL_REASON_DELETE);
 
     subscriber.ClearEvents();
     SleepForFC();
@@ -1036,11 +1036,11 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishSoundNotification_00100, Function | M
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
 
     EventParser eventParser;
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
-    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
-    EXPECT_TRUE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
     subscriber.ClearEvents();
     SleepForFC();
 }
@@ -1079,11 +1079,11 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_PublishVibrationNotification_00100, Function
     SleepForFC();
     std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
     EventParser eventParser;
-    eventParser.parse(events);
-    EXPECT_TRUE(eventParser.getwaitOnConsumed());
-    EXPECT_TRUE(eventParser.getWaitOnConsumedWithSortingMap());
-    EXPECT_TRUE(eventParser.getWaitOnCanceled());
-    EXPECT_TRUE(eventParser.getWaitOnCanceledWithSortingMapAndDeleteReason());
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
     subscriber.ClearEvents();
     SleepForFC();
 }

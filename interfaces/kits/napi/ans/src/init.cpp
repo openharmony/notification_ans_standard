@@ -20,6 +20,7 @@
 #include "disturb_mode.h"
 #include "enable_notification.h"
 #include "get_active.h"
+#include "pixel_map_napi.h"
 #include "publish.h"
 #include "remove.h"
 #include "slot.h"
@@ -82,6 +83,8 @@ static napi_value Init(napi_env env, napi_value exports)
      */
     NotificationInit(env, exports);
     ConstantInit(env, exports);
+    OHOS::Media::PixelMapNapi::Init(env, exports);
+
     return exports;
 }
 

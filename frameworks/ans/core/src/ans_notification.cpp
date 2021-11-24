@@ -907,61 +907,92 @@ bool AnsNotification::CanPublishMediaContent(const NotificationRequest &request)
     return true;
 }
 
+bool AnsNotification::CheckImageOverSizeForPixelMap(const std::shared_ptr<Media::PixelMap> &pixelMap, uint32_t maxSize)
+{
+    if (!pixelMap) {
+        return false;
+    }
+
+    uint32_t size = static_cast<uint32_t>(pixelMap->GetByteCount());
+    if (size > maxSize) {
+        return true;
+    }
+    return false;
+}
+
+ErrCode AnsNotification::CheckImageSizeForContent(const NotificationRequest &request)
+{
+    auto content = request.GetContent();
+    if (!content) {
+        ANS_LOGW("Invalid content in NotificationRequest");
+        return ERR_OK;
+    }
+
+    auto basicContent = request.GetContent()->GetNotificationContent();
+    if (!basicContent) {
+        ANS_LOGW("Invalid content in NotificationRequest");
+        return ERR_OK;
+    }
+
+    auto contentType = request.GetNotificationType();
+    switch (contentType) {
+        case NotificationContent::Type::CONVERSATION: {
+            auto conversationalContent = std::static_pointer_cast<NotificationConversationalContent>(basicContent);
+
+            auto picture = conversationalContent->GetMessageUser().GetPixelMap();
+            if (CheckImageOverSizeForPixelMap(picture, MAX_ICON_SIZE)) {
+                ANS_LOGE("The size of picture in ConversationalContent's message user exceeds limit");
+                return ERR_ANS_ICON_OVER_SIZE;
+            }
+
+            auto messages = conversationalContent->GetAllConversationalMessages();
+            for (auto &msg : messages) {
+                if (!msg) {
+                    continue;
+                }
+
+                auto img = msg->GetSender().GetPixelMap();
+                if (CheckImageOverSizeForPixelMap(img, MAX_ICON_SIZE)) {
+                    ANS_LOGE("The size of picture in ConversationalContent's message exceeds limit");
+                    return ERR_ANS_ICON_OVER_SIZE;
+                }
+            }
+            break;
+        }
+        case NotificationContent::Type::PICTURE: {
+            auto pictureContent = std::static_pointer_cast<NotificationPictureContent>(basicContent);
+
+            auto bigPicture = pictureContent->GetBigPicture();
+            if (CheckImageOverSizeForPixelMap(bigPicture, MAX_PICTURE_SIZE)) {
+                ANS_LOGE("The size of big picture in PictureContent exceeds limit");
+                return ERR_ANS_PICTURE_OVER_SIZE;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    return ERR_OK;
+}
+
 ErrCode AnsNotification::CheckImageSize(const NotificationRequest &request)
 {
     auto littleIcon = request.GetLittleIcon();
-    if (littleIcon && (static_cast<uint32_t>(littleIcon->GetByteCount()) > MAX_ICON_SIZE)) {
+    if (CheckImageOverSizeForPixelMap(littleIcon, MAX_ICON_SIZE)) {
         ANS_LOGE("The size of little icon exceeds limit");
         return ERR_ANS_ICON_OVER_SIZE;
     }
 
     auto bigIcon = request.GetBigIcon();
-    if (bigIcon && (static_cast<uint32_t>(bigIcon->GetByteCount()) > MAX_ICON_SIZE)) {
+    if (CheckImageOverSizeForPixelMap(bigIcon, MAX_ICON_SIZE)) {
         ANS_LOGE("The size of big icon exceeds limit");
         return ERR_ANS_ICON_OVER_SIZE;
     }
 
-    auto content = request.GetContent();
-    if (content) {
-        auto basicContent = request.GetContent()->GetNotificationContent();
-        if (basicContent) {
-            auto contentType = request.GetNotificationType();
-            switch (contentType) {
-                case NotificationContent::Type::CONVERSATION: {
-                    auto conversationalContent = std::static_pointer_cast<NotificationConversationalContent>(basicContent);
-
-                    auto picture = conversationalContent->GetMessageUser().GetPixelMap();
-                    if (picture && (static_cast<uint32_t>(picture->GetByteCount()) > MAX_ICON_SIZE)) {
-                        ANS_LOGE("The size of picture in conversationalContent exceeds limit");
-                        return ERR_ANS_ICON_OVER_SIZE;
-                    }
-
-                    auto messages = conversationalContent->GetAllConversationalMessages();
-                    for (auto &msg : messages) {
-                        if (!msg) {
-                            continue;
-                        }
-
-                        auto img = msg->GetSender().GetPixelMap();
-                        if (img && (static_cast<uint32_t>(img->GetByteCount()) > MAX_ICON_SIZE)) {
-                            ANS_LOGE("The size of picture in conversationalMessage exceeds limit");
-                            return ERR_ANS_ICON_OVER_SIZE;
-                        }
-                    }
-                } break;
-                case NotificationContent::Type::PICTURE: {
-                    auto pictureContent = std::static_pointer_cast<NotificationPictureContent>(basicContent);
-
-                    auto bigPicture = pictureContent->GetBigPicture();
-                    if (bigPicture && (static_cast<uint32_t>(bigPicture->GetByteCount()) > MAX_PICTURE_SIZE)) {
-                        ANS_LOGE("The size of big picture exceeds limit");
-                        return ERR_ANS_PICTURE_OVER_SIZE;
-                    }
-                } break;
-                default:
-                break;
-            }
-        }
+    ErrCode err = CheckImageSizeForContent(request);
+    if (err != ERR_OK) {
+        return err;
     }
 
     auto buttons = request.GetActionButtons();
@@ -969,10 +1000,9 @@ ErrCode AnsNotification::CheckImageSize(const NotificationRequest &request)
         if (!btn) {
             continue;
         }
-
         auto icon = btn->GetIcon();
-        if (icon && (static_cast<uint32_t>(icon->GetByteCount()) > MAX_ICON_SIZE)) {
-            ANS_LOGE("The size of icon in actionButton exceeds limit");
+        if (CheckImageOverSizeForPixelMap(icon, MAX_ICON_SIZE)) {
+            ANS_LOGE("The size of icon in ActionButton exceeds limit");
             return ERR_ANS_ICON_OVER_SIZE;
         }
     }
@@ -982,10 +1012,9 @@ ErrCode AnsNotification::CheckImageSize(const NotificationRequest &request)
         if (!user) {
             continue;
         }
-
         auto icon = user->GetPixelMap();
-        if (icon && (static_cast<uint32_t>(icon->GetByteCount()) > MAX_ICON_SIZE)) {
-            ANS_LOGE("The size of picture in messageUser exceeds limit");
+        if (CheckImageOverSizeForPixelMap(icon, MAX_ICON_SIZE)) {
+            ANS_LOGE("The size of picture in MessageUser exceeds limit");
             return ERR_ANS_ICON_OVER_SIZE;
         }
     }

@@ -644,6 +644,21 @@ private:
     bool CanPublishMediaContent(const NotificationRequest &request) const;
 
     /**
+     * Check whether the picture size exceeds the limit in PixelMap
+     *
+     * @return Returns true if the limit size is exceeded; returns false otherwise.
+     */
+    bool CheckImageOverSizeForPixelMap(
+        const std::shared_ptr<Media::PixelMap> &pixelMap, uint32_t maxSize);
+
+    /**
+     * Check whether the picture size exceeds the limit in NotificationRequest's content
+     *
+     * @return the ErrCode.
+     */
+    ErrCode CheckImageSizeForContent(const NotificationRequest &request);
+
+    /**
      * Check whether the picture size exceeds the limit
      *
      * @return the ErrCode.
@@ -655,7 +670,6 @@ private:
     sptr<IAnsManager> ansManagerProxy_;
     sptr<AnsManagerDeathRecipient> recipient_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

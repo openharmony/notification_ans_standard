@@ -1190,7 +1190,6 @@ ErrCode AnsManagerStub::HandleCancelGroup(MessageParcel &data, MessageParcel &re
         ANS_LOGW("[HandleCancelGroup] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
     }
-
     return ERR_OK;
 }
 
@@ -1214,7 +1213,6 @@ ErrCode AnsManagerStub::HandleRemoveGroupByBundle(MessageParcel &data, MessagePa
         ANS_LOGW("[HandleRemoveGroupByBundle] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
     }
-
     return ERR_OK;
 }
 
