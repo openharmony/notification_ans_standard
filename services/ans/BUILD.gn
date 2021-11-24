@@ -56,7 +56,6 @@ ohos_shared_library("libans") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//base/security/permission/interfaces/innerkits/permission_standard/permissionsdk:libpermissionsdk_standard",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",

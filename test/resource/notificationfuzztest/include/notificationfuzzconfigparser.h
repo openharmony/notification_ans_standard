@@ -15,8 +15,8 @@
 #ifndef NOTIFICATION_FUZZ_CONFIG_PARSER_H
 #define NOTIFICATION_FUZZ_CONFIG_PARSER_H
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -31,9 +31,9 @@ struct FuzzTestData {
     std::vector<std::string> methodVec {};
 };
 
-class FuzzConfigParser {
+class NotificationFuzzConfigParser {
 public:
-    void ParseFromFile4FuzzTest(const std::string &path, FuzzTestData &ftd)
+    void ParseFromFile4FuzzTest(const std::string &path, FuzzTestData &ftd) const
     {
         std::cout << __func__ << std::endl;
         if (path.empty()) {

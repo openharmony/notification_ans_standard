@@ -28,11 +28,11 @@ public:
     {}
     static Ptr GetInstance()
     {
-        if (instance_ == nullptr) {
-            auto pObj = new NotificationFuzzTestManager();
-            instance_ = std::shared_ptr<NotificationFuzzTestManager>(pObj);
+        if (instance == nullptr) {
+            NotificationFuzzTestManager* pObj = new NotificationFuzzTestManager();
+            instance = std::shared_ptr<NotificationFuzzTestManager>(pObj);
         }
-        return instance_;
+        return instance;
     }
 
     void StartFuzzTest();
@@ -41,47 +41,16 @@ private:
     void SetJsonFunction(std::string functionName);
     void SetCycle(uint16_t cycle);
     NotificationFuzzTestManager();
-    NotificationFuzzTestManager(NotificationFuzzTestManager &) = delete;
+    NotificationFuzzTestManager(const NotificationFuzzTestManager &) = delete;
     NotificationFuzzTestManager &operator=(const NotificationFuzzTestManager &) = delete;
-    static Ptr instance_;
-    uint16_t cycle_;
+    static Ptr instance;
+    uint16_t cycle_ = 0;
     std::unordered_map<std::string, int> remainderMap_ {};
     std::unordered_map<std::string, std::function<void()>> callFunctionMap_ {};
 
     const int COLOR_R = 100;
     const int COLOR_G = 100;
     const int COLOR_B = 100;
-
-    void RegisterAsyncCommonEventResult();
-    void RegisterCommonEventData();
-    void RegisterCommonEventManager();
-    void RegisterCommonEventPublishInfo();
-    void RegisterCommonEventSubscribeInfo();
-    void RegisterCommonEventSubscriber();
-    void RegisterCommonEventSupport();
-    void RegisterMatchingSkills();
-    void RegisterDumper();
-    void RegisterEventHandler();
-    void RegisterEventQueue();
-    void RegisterEventRunner();
-    void RegisterFileDescriptorListener();
-    void RegisterInnerEvent();
-    void RegisterEventRunnerNativeImplement();
-    void RegisterAbilityManager();
-    void RegisterWantParams();
-    void RegisterWant();
-    void RegisterElementName();
-    void RegisterBundleMgrProxy();
-
-    void RegisterOHOSApplication();
-    void RegisterAbility();
-    void RegisterDataAbilityHelper();
-    void RegisterDataUriUtils();
-    void RegisterLifeCycle();
-
-    void RegisterAbilityContext();
-    void RegisterProcessInfo();
-    
     void RegisterNotificationHelper();
     void RegisterNotificationSorting();
     void RegisterNotificationSortingMap();
@@ -93,8 +62,8 @@ private:
     void RegisterIAbilityContinuation();
     void RegisterRevocable();
     void RegisterTaskDispatcher();
-    void RegisterAbility_();
-    void RegisterAbilityContext_();
+    void RegisterAbility();
+    void RegisterAbilityContext();
     void RegisterContext();
     void RegisterAbilityLifecycleCallbacks();
     void RegisterIAbilityManager();

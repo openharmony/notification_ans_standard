@@ -14,54 +14,40 @@
  */
 #ifndef NOTIFICATION_GET_PARAM_H
 #define NOTIFICATION_GET_PARAM_H
+#include <memory>
 #include <mutex>
+#include <stdint.h>
+#include <vector>
+
 #include "ability.h"
 #include "ability_handler.h"
 #include "ability_manager.h"
 #include "ability_manager_interface.h"
-#include "async_common_event_result.h"
-#include "bundle_info.h"
-#include "common_event_manager.h"
-#include "common_event_data.h"
-#include "common_event_publish_info.h"
-#include "common_event_subscribe_info.h"
-#include "common_event_subscriber.h"
-#include "common_event_support.h"
+#include "ability_manager_service.h"
+#include "base_task_dispatcher.h"
 #include "data_uri_utils.h"
 #include "element_name.h"
-#include "event_handler.h"
 #include "event_runner.h"
-#include "inner_event.h"
-#include "key_event.h"
-#include "logger.h"
-#include "matching_skills.h"
-#include "module_info.h"
-#include "native_implement_eventhandler.h"
-#include "pac_map.h"
-#include "parcel.h"
-#include "patterns_matcher.h"
+#include "launcher_ability_info.h"
+#include "launcher_service.h"
+#include "spec_task_dispatcher.h"
+#include "task_dispatcher.h"
+#include "task_dispatcher_context.h"
 #include "uri.h"
 #include "want.h"
-#include "bundle_mgr_proxy.h"
-#include "notification_sorting_map.h"
-#include "notification_helper.h"
-#include "want_agent_helper.h"
-#include "notification.h"
+
 #ifdef PRINT_LOG
 #undef PRINT_LOG
 #endif
-#include "launcher_service.h"
-#include "launcher_ability_info.h"
-#include "task_dispatcher.h"
-#include "base_task_dispatcher.h"
-#include "spec_task_dispatcher.h"
-#include "task_dispatcher_context.h"
-#include "ability_manager_service.h"
+
+#include "notification.h"
+#include "notification_helper.h"
+#include "notification_sorting_map.h"
+#include "want_agent_helper.h"
 
 using Want = OHOS::AAFwk::Want;
 namespace OHOS {
 namespace Notification {
-class TestDumper;
 bool GetBoolParam();
 uint8_t GetU8Param();
 unsigned int GetUIntParam();
@@ -97,79 +83,16 @@ std::vector<int8_t> GetS8VectorParam();
 std::vector<int16_t> GetS16VectorParam();
 std::vector<int32_t> GetS32VectorParam();
 std::vector<int64_t> GetS64VectorParam();
-
-std::shared_ptr<Parcel> GetParamParcel();
 std::shared_ptr<Want> GetParamWant();
-std::vector<std::shared_ptr<Want>> GetParamWantVector();
-OHOS::AAFwk::Operation GetParamOperation();
-std::shared_ptr<OHOS::EventFwk::AsyncCommonEventResult> GetParamAsyncCommonEventResult();
-std::shared_ptr<OHOS::EventFwk::CommonEventData> GetParamCommonEventData();
-std::shared_ptr<OHOS::EventFwk::CommonEventManager> GetParamCommonEventManager();
-std::shared_ptr<OHOS::EventFwk::CommonEventPublishInfo> GetParamCommonEventPublishInfo();
-std::shared_ptr<OHOS::EventFwk::CommonEventSubscribeInfo> GetParamCommonEventSubscribeInfo();
-std::shared_ptr<OHOS::EventFwk::CommonEventSubscriber> GetParamCommonEventSubscriber();
-std::shared_ptr<OHOS::EventFwk::CommonEventSupport> GetParamCommonEventSupport();
-std::shared_ptr<OHOS::EventFwk::MatchingSkills> GetParamMatchingSkills();
 sptr<IRemoteObject> GetParamSptrRemote();
 std::shared_ptr<OHOS::AppExecFwk::EventRunner> GetParamEventRunner();
-std::shared_ptr<OHOS::AppExecFwk::EventHandler> GetParamEventHandler();
-std::shared_ptr<OHOS::AppExecFwk::EventQueue> GetParamEventQueue();
-std::shared_ptr<EventRunnerNativeImplement> GetParamEventRunnerNativeImplement();
-std::shared_ptr<OHOS::AppExecFwk::FileDescriptorListener> GetParamFileDescriptorListener();
-std::shared_ptr<OHOS::AppExecFwk::Logger> GetParamLogger();
-OHOS::AppExecFwk::EventQueue::Priority GetParamPriority();
-TestDumper GetParamDumper();
-OHOS::AppExecFwk::InnerEvent::Pointer GetParamInnerEvent();
-OHOS::AppExecFwk::InnerEvent::Callback GetParamCallback();
-OHOS::AppExecFwk::InnerEvent::TimePoint GetParamTimePoint();
-OHOS::EventFwk::CommonEventSubscribeInfo::ThreadMode GetParamThreadMode();
-
-std::shared_ptr<OHOS::AppExecFwk::AbilityContext> GetParamAbilityContext();
-std::shared_ptr<OHOS::AppExecFwk::IAbilityEvent> GetParamIAbilityEvent();
-sptr<OHOS::AppExecFwk::AbilityThread> GetParamAbilityThread();
-std::shared_ptr<OHOS::AppExecFwk::AbilityHandler> GetParamAbilityHandler();
-std::shared_ptr<OHOS::AppExecFwk::AbilityStartSetting> GetParamAbilityStartSetting();
 std::shared_ptr<OHOS::AppExecFwk::Ability> GetParamAbility();
-std::shared_ptr<OHOS::AppExecFwk::OHOSApplication> GetParamOHOSApplication();
-std::shared_ptr<OHOS::KeyEvent> GetParamKeyEvent();
-OHOS::Uri GetParamUri();
-
-NativeRdb::ValuesBucket GetParamValuesBucket();
-OHOS::AppExecFwk::Configuration GetParamConfiguration();
-NativeRdb::DataAbilityPredicates GetParamDataAbilityPredicates();
-OHOS::AppExecFwk::PacMap GetParamPacMap();
-std::shared_ptr<OHOS::AppExecFwk::ComponentContainer> GetParamComponentContainer();
-sptr<OHOS::AAFwk::IAbilityConnection> GetParamIAbilityConnection();
-
-std::shared_ptr<OHOS::AppExecFwk::ProcessInfo> GetParamProcessInfo();
-std::shared_ptr<OHOS::AppExecFwk::DataUriUtils> GetParamDataUriUtils();
-std::shared_ptr<OHOS::AppExecFwk::DataAbilityHelper> GetParamDataAbilityHelper();
-std::shared_ptr<OHOS::AppExecFwk::LifeCycle> GetParamLifeCycle();
-OHOS::AppExecFwk::LifeCycle::Event GetParamLifeCycleEvent();
-std::shared_ptr<OHOS::AppExecFwk::ElementName> GetParamElementName();
 std::shared_ptr<OHOS::AAFwk::WantParams> GetParamWantParams();
-std::shared_ptr<OHOS::AppExecFwk::AbilityManager> GetParamAbilityManager();
-OHOS::AAFwk::PatternsMatcher GetParamPatternsMatcher();
-OHOS::AAFwk::MatchType GetParamMatchType();
 std::shared_ptr<OHOS::AppExecFwk::Context> GetParamContext();
-
-std::shared_ptr<OHOS::AppExecFwk::BundleMgrProxy> GetParamBundleMgrProxy();
 OHOS::AppExecFwk::ApplicationFlag GetParamApplicationFlag();
 OHOS::AppExecFwk::ApplicationInfo GetParamApplicationInfo();
-std::vector<OHOS::AppExecFwk::ApplicationInfo> GetParamApplicationInfoVector();
-OHOS::AppExecFwk::BundleFlag GetParamBundleFlag();
-OHOS::AppExecFwk::BundleInfo GetParamBundleInfo();
 OHOS::AppExecFwk::AbilityInfo GetParamAbilityInfo();
-std::vector<OHOS::AppExecFwk::BundleInfo> GetParamBundleInfoVector();
-OHOS::AppExecFwk::HapModuleInfo GetParamHapModuleInfo();
-OHOS::AppExecFwk::PermissionDef GetParamPermissionDef();
-std::vector<OHOS::AppExecFwk::PermissionDef> GetParamPermissionDefVector();
-OHOS::AppExecFwk::IBundleMgr::Message GetParamIBundleMgrMessage();
-OHOS::MessageParcel GetParamMessageParcel();
-OHOS::AppExecFwk::DumpFlag GetParamDumpFlag();
-sptr<OHOS::AppExecFwk::ICleanCacheCallback> GetParamICleanCacheCallback();
 sptr<OHOS::AppExecFwk::IBundleStatusCallback> GetParamIBundleStatusCallback();
-
 std::shared_ptr<OHOS::Notification::NotificationSorting> GetParamNotificationSorting();
 std::vector<OHOS::Notification::NotificationSorting> GetParamNotificationSortingVector();
 std::shared_ptr<OHOS::Notification::NotificationSortingMap> GetParamNotificationSortingMap();
@@ -281,74 +204,7 @@ public:
     }
 };
 
-class TestCommonEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
-public:
-    TestCommonEventSubscriber()
-    {}
-    ~TestCommonEventSubscriber()
-    {}
-    virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data)
-    {
-        printf("Fuzz Test Reveive Event\n");
-    }
-};
 
-class TestDumper : public OHOS::AppExecFwk::Dumper {
-public:
-    void Dump(const std::string &message)
-    {
-        return;
-    }
-    std::string GetTag()
-    {
-        return GetStringParam();
-    }
-};
-
-class TestFileDescriptorListener : public OHOS::AppExecFwk::FileDescriptorListener {
-public:
-    TestFileDescriptorListener()
-    {}
-    ~TestFileDescriptorListener()
-    {}
-};
-
-class TestIAbilityConnection : public OHOS::AAFwk::IAbilityConnection {
-public:
-    void OnAbilityConnectDone(
-        const OHOS::AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override
-    {}
-    void OnAbilityDisconnectDone(const OHOS::AppExecFwk::ElementName &element, int resultCode) override
-    {}
-    virtual ~TestIAbilityConnection()
-    {}
-};
-
-class TestAbilityEvent : public OHOS::AppExecFwk::IAbilityEvent {
-public:
-    virtual void OnBackPressed()
-    {
-        printf("Fuzz Test Back Pressed.");
-    }
-};
-
-class TestLogger : public OHOS::AppExecFwk::Logger {
-public:
-    void Log(const std::string &line)
-    {}
-    virtual ~TestLogger()
-    {}
-};
-
-class TestICleanCacheCallback : public OHOS::AppExecFwk::ICleanCacheCallback {
-public:
-    TestICleanCacheCallback()
-    {}
-    void OnCleanCacheFinished(bool succeeded) override
-    {}
-    virtual ~TestICleanCacheCallback()
-    {}
-};
 
 class TestIBundleStatusCallback : public OHOS::AppExecFwk::IBundleStatusCallback {
 public:
@@ -370,12 +226,12 @@ public:
     void OnConnected() override
     {
         std::cout << "TestAnsSubscriber OnConnected" << std::endl;
-        mutex_.unlock();
+        mutex.unlock();
     }
     void OnDisconnected() override
     {
         std::cout << "TestAnsSubscriber OnDisconnected" << std::endl;
-        mutex_.unlock();
+        mutex.unlock();
     }
     void OnDied() override
     {}
@@ -394,8 +250,8 @@ public:
         const std::shared_ptr<OHOS::Notification::NotificationSortingMap> &sortingMap) override
     {}
 
-private:
-    static std::mutex mutex_;
+public:
+    static std::mutex mutex;
 };
 
 class TestCompletedCallback : public OHOS::Notification::WantAgent::CompletedCallback {
