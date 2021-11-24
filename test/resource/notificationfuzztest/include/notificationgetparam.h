@@ -16,7 +16,7 @@
 #define NOTIFICATION_GET_PARAM_H
 #include <memory>
 #include <mutex>
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 #include "ability.h"
@@ -203,8 +203,6 @@ public:
         return descriptor;
     }
 };
-
-
 
 class TestIBundleStatusCallback : public OHOS::AppExecFwk::IBundleStatusCallback {
 public:
