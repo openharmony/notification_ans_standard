@@ -464,7 +464,7 @@ public:
         return onCanceledWithSortingMapSor_;
     }
 
-    std::vector<int> GetOnCanceledWithSortingMapDelRea()
+    std::vector<int> GetOnCanceledWithSortingMapDelRea() const
     {
         return onCanceledWithSortingMapDelRea_;
     }

@@ -15,15 +15,15 @@
 #include <gtest/gtest.h>
 #include <functional>
 
+#include "advanced_notification_service.h"
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_manager_proxy.h"
-#include "advanced_notification_service.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
-#include "notification_helper.h"
 #include "mock_bundle_manager.h"
 #include "mock_ipc_skeleton.h"
+#include "notification_helper.h"
 #include "system_ability_definition.h"
 
 using namespace testing::ext;
@@ -363,7 +363,7 @@ HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00800, Fu
     EXPECT_EQ(NotificationConstant::VisiblenessType::SECRET, slot.GetLockScreenVisibleness());
     EXPECT_EQ("", slot.GetSound().ToString());
     EXPECT_FALSE(slot.CanVibrate());
-    EXPECT_EQ(0, slot.GetVibrationStyle().size());
+    EXPECT_EQ(0U, slot.GetVibrationStyle().size());
     EXPECT_EQ(NotificationSlot::NotificationLevel::LEVEL_LOW, slot.GetLevel());
 }
 
@@ -380,7 +380,7 @@ HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlot_00900, Fu
     EXPECT_EQ(NotificationConstant::VisiblenessType::SECRET, slot.GetLockScreenVisibleness());
     EXPECT_EQ("", slot.GetSound().ToString());
     EXPECT_FALSE(slot.CanVibrate());
-    EXPECT_EQ(0, slot.GetVibrationStyle().size());
+    EXPECT_EQ(0U, slot.GetVibrationStyle().size());
     EXPECT_EQ(NotificationSlot::NotificationLevel::LEVEL_MIN, slot.GetLevel());
 }
 

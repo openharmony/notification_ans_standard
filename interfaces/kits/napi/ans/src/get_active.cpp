@@ -17,9 +17,6 @@
 
 namespace OHOS {
 namespace NotificationNapi {
-const int ALL_ACTIVE_MAX_PARA = 1;
-const int ACTIVE_OR_NUMS_MAX_PARA = 1;
-
 struct AsyncCallbackInfoActive {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
@@ -28,46 +25,6 @@ struct AsyncCallbackInfoActive {
     std::vector<sptr<OHOS::Notification::NotificationRequest>> requests;
     int32_t num = 0;
 };
-
-napi_value ParseParametersByAllActive(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
-{
-    ANS_LOGI("enter");
-
-    size_t argc = ALL_ACTIVE_MAX_PARA;
-    napi_value argv[ALL_ACTIVE_MAX_PARA] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    if (argc >= ALL_ACTIVE_MAX_PARA) {
-        napi_valuetype valuetype = napi_undefined;
-        // argv[0]:callback
-        NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[0], 1, &callback);
-    }
-
-    return Common::NapiGetNull(env);
-}
-
-napi_value ParseParametersByGetActive(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
-{
-    ANS_LOGI("enter");
-
-    size_t argc = ACTIVE_OR_NUMS_MAX_PARA;
-    napi_value argv[ACTIVE_OR_NUMS_MAX_PARA] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    if (argc >= ACTIVE_OR_NUMS_MAX_PARA) {
-        napi_valuetype valuetype = napi_undefined;
-        // argv[0]:callback
-        NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[0], 1, &callback);
-    }
-
-    return Common::NapiGetNull(env);
-}
 
 void AsyncCompleteCallbackGetAllActiveNotifications(napi_env env, napi_status status, void *data)
 {
@@ -78,7 +35,7 @@ void AsyncCompleteCallbackGetAllActiveNotifications(napi_env env, napi_status st
         return;
     }
 
-    AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+    auto asynccallbackinfo = (AsyncCallbackInfoActive *)data;
     napi_value result = nullptr;
     if (asynccallbackinfo->info.errorCode != ERR_OK) {
         result = Common::NapiGetNull(env);
@@ -126,7 +83,7 @@ napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
-    if (ParseParametersByAllActive(env, info, callback) == nullptr) {
+    if (Common::ParseParaOnlyCallback(env, info, callback) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
 
@@ -147,7 +104,7 @@ napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("GetAllActiveNotifications napi_create_async_work start");
-            AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+            auto asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
             asynccallbackinfo->info.errorCode =
                 NotificationHelper::GetAllActiveNotifications(asynccallbackinfo->notifications);
@@ -174,7 +131,7 @@ void AsyncCompleteCallbackGetActiveNotifications(napi_env env, napi_status statu
         return;
     }
 
-    AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+    auto asynccallbackinfo = (AsyncCallbackInfoActive *)data;
     napi_value result = nullptr;
     if (asynccallbackinfo->info.errorCode != ERR_OK) {
         result = Common::NapiGetNull(env);
@@ -221,7 +178,7 @@ napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
-    if (ParseParametersByGetActive(env, info, callback) == nullptr) {
+    if (Common::ParseParaOnlyCallback(env, info, callback) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
 
@@ -242,7 +199,7 @@ napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("GetActiveNotifications napi_create_async_work start");
-            AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+            auto asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
             asynccallbackinfo->info.errorCode =
                 NotificationHelper::GetActiveNotifications(asynccallbackinfo->requests);
@@ -269,7 +226,7 @@ void AsyncCompleteCallbackGetActiveNotificationCount(napi_env env, napi_status s
         return;
     }
 
-    AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+    auto asynccallbackinfo = (AsyncCallbackInfoActive *)data;
     napi_value result = nullptr;
     if (asynccallbackinfo->info.errorCode != ERR_OK) {
         result = Common::NapiGetNull(env);
@@ -295,7 +252,7 @@ napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
-    if (ParseParametersByGetActive(env, info, callback) == nullptr) {
+    if (Common::ParseParaOnlyCallback(env, info, callback) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
 
@@ -316,7 +273,7 @@ napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("GetActiveNotificationCount napi_create_async_work start");
-            AsyncCallbackInfoActive *asynccallbackinfo = (AsyncCallbackInfoActive *)data;
+            auto asynccallbackinfo = (AsyncCallbackInfoActive *)data;
 
             asynccallbackinfo->info.errorCode = NotificationHelper::GetActiveNotificationNums(asynccallbackinfo->num);
             ANS_LOGI("GetActiveNotificationCount count = %{public}d", asynccallbackinfo->num);

@@ -14,8 +14,8 @@
  */
 
 #include "notification_slot.h"
-#include "ans_log_wrapper.h"
 #include "ans_const_define.h"
+#include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
