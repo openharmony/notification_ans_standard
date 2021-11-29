@@ -17,9 +17,7 @@
 
 namespace OHOS {
 namespace NotificationNapi {
-
 const int CANCEL_MAX_PARA = 3;
-const int CANCEL_ALL_MAX_PARA = 1;
 const int CANCEL_GROUP_MAX_PARA = 2;
 const int CANCEL_GROUP_MIN_PARA = 1;
 
@@ -88,25 +86,6 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
         napi_create_reference(env, argv[CANCEL_MAX_PARA - 1], 1, &paras.callback);
     }
 
-    return Common::NapiGetNull(env);
-}
-
-napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
-{
-    ANS_LOGI("enter");
-
-    size_t argc = CANCEL_ALL_MAX_PARA;
-    napi_value argv[CANCEL_ALL_MAX_PARA] = {nullptr};
-    napi_value thisVar = nullptr;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    if (argc >= CANCEL_ALL_MAX_PARA) {
-        napi_valuetype valuetype = napi_undefined;
-        // argv[0]:callback
-        NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[0], 1, &callback);
-    }
     return Common::NapiGetNull(env);
 }
 
@@ -202,7 +181,7 @@ napi_value CancelAll(napi_env env, napi_callback_info info)
     ANS_LOGI("enter");
 
     napi_ref callback = nullptr;
-    if (ParseParameters(env, info, callback) == nullptr) {
+    if (Common::ParseParaOnlyCallback(env, info, callback) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
 
@@ -257,7 +236,7 @@ napi_value CancelGroup(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    ParametersInfoCancelGroup params;
+    ParametersInfoCancelGroup params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
