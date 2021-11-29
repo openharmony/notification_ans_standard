@@ -197,7 +197,7 @@ napi_value WantAgentFlagsInit(napi_env env, napi_value exports)
     SetNamedPropertyByInteger(env, obj, NUMBER_OF_PARAMETERS_NINE, "REPLACE_BUNDLE");
 
     napi_property_descriptor exportFuncs[] = {
-        DECLARE_NAPI_PROPERTY("Flags", obj),
+        DECLARE_NAPI_PROPERTY("WantAgentFlags", obj),
     };
 
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
