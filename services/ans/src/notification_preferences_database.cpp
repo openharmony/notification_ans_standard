@@ -140,35 +140,24 @@ void NotificationPreferencesDatabase::TryTwice(const std::function<OHOS::Distrib
 
 OHOS::DistributedKv::Status NotificationPreferencesDatabase::GetKvStore()
 {
-    OHOS::DistributedKv::Status status;
     OHOS::DistributedKv::Options options = {
         .createIfMissing = true,
         .encrypt = false,
         .autoSync = true,
         .kvStoreType = OHOS::DistributedKv::KvStoreType::SINGLE_VERSION,
     };
-    dataManager_.GetSingleKvStore(options,
-        appId_,
-        storeId_,
-        [this, &status](OHOS::DistributedKv::Status paramStatus,
-            std::unique_ptr<OHOS::DistributedKv::SingleKvStore>
-                singleKvStore) {
-            status = paramStatus;
-            if (status != OHOS::DistributedKv::Status::SUCCESS) {
-                ANS_LOGE("Return error: %{public}d.", status);
-                return;
-            }
-            {
-                kvStorePtr_ = std::move(singleKvStore);
-            }
-            ANS_LOGD("Get kvStore success.");
-        });
+    auto status = dataManager_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
+    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+        ANS_LOGE("Return error: %{public}d.", status);
+    } else {
+        ANS_LOGD("Get kvStore success.");
+    }
     return status;
 }
 
 void NotificationPreferencesDatabase::CloseKvStore()
 {
-    dataManager_.CloseKvStore(appId_, std::move(kvStorePtr_));
+    dataManager_.CloseKvStore(appId_, kvStorePtr_);
 }
 
 bool NotificationPreferencesDatabase::CheckKvStore()

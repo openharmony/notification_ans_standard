@@ -139,7 +139,7 @@ private:
 
     const DistributedKv::AppId appId_ {APP_ID};
     const DistributedKv::StoreId storeId_ {STORE_ID};
-    std::unique_ptr<DistributedKv::SingleKvStore> kvStorePtr_ = nullptr;
+    std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_ = nullptr;
     DistributedKv::DistributedKvDataManager dataManager_;
 };
 
