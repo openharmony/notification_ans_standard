@@ -38,16 +38,15 @@ public:
 
     virtual Status GetEntriesWithQuery(const DataQuery &query, std::vector<Entry> &entries) const override;
 
-    virtual void GetResultSet(
-        const Key &prefixKey, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const override;
+    virtual Status GetResultSet(const Key &prefixKey, std::shared_ptr<KvStoreResultSet> &resultSet) const override;
 
-    virtual void GetResultSetWithQuery(const std::string &query,
-        std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const override;
+    virtual Status GetResultSetWithQuery(const std::string &query,
+                                         std::shared_ptr<KvStoreResultSet> &resultSet) const override;
 
-    virtual void GetResultSetWithQuery(
-        const DataQuery &query, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const override;
+    virtual Status GetResultSetWithQuery(const DataQuery &query,
+                                         std::shared_ptr<KvStoreResultSet> &resultSet) const override;
 
-    virtual Status CloseResultSet(std::unique_ptr<KvStoreResultSet> resultSet) override;
+    virtual Status CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet) override;
 
     virtual Status GetCountWithQuery(const std::string &query, int &result) const override;
 
@@ -95,8 +94,14 @@ public:
 
     virtual Status GetSecurityLevel(SecurityLevel &securityLevel) const override;
 
+    Status GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
+                              std::shared_ptr<KvStoreSnapshot> &snapshot) const override;
+
+    Status ReleaseKvStoreSnapshot(std::shared_ptr<KvStoreSnapshot> &snapshot) override;
+
+    Status Clear() override;
 protected:
-    KVSTORE_API virtual Status Control(KvControlCmd cmd, const KvParam &inputParam, sptr<KvParam> &output) override;
+    KVSTORE_API virtual Status Control(KvControlCmd cmd, const KvParam &inputParam, KvParam &output) override;
 };
 }  // namespace DistributedKv
 }  // namespace OHOS
