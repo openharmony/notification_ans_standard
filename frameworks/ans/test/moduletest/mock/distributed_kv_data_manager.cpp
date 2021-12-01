@@ -32,7 +32,7 @@ Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const 
                                                   std::shared_ptr<SingleKvStore> &kvStore)
 {
     std::string storeIdTmp = Constant::TrimCopy<std::string>(storeId.storeId);
-    kvStore = std::make_share<AnsTestSingleKvStore>();
+    kvStore = std::make_shared<AnsTestSingleKvStore>();
     return Status::SUCCESS;
 }
 
