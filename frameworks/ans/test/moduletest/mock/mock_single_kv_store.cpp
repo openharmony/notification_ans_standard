@@ -170,7 +170,7 @@ Status AnsTestSingleKvStore::GetSecurityLevel(SecurityLevel &securityLevel) cons
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam, sptr<KvParam> &output)
+Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam, KvParam &output)
 {
     return Status::SUCCESS;
 }
