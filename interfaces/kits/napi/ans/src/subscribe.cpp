@@ -49,12 +49,12 @@ napi_value SetSubscribeCallbackData(const napi_env &env,
     ANS_LOGI("enter");
     if (request == nullptr) {
         ANS_LOGE("request is null");
-        return Common::NapiGetboolean(env, false);
+        return Common::NapiGetBoolean(env, false);
     }
 
     if (sortingMap == nullptr) {
         ANS_LOGE("sortingMap is null");
-        return Common::NapiGetboolean(env, false);
+        return Common::NapiGetBoolean(env, false);
     }
 
     // request: NotificationRequest
@@ -62,7 +62,7 @@ napi_value SetSubscribeCallbackData(const napi_env &env,
     napi_create_object(env, &requestResult);
     if (!Common::SetNotification(env, request.get(), requestResult)) {
         ANS_LOGE("SetNotification call failed");
-        return Common::NapiGetboolean(env, false);
+        return Common::NapiGetBoolean(env, false);
     }
     napi_set_named_property(env, result, "request", requestResult);
 
@@ -71,7 +71,7 @@ napi_value SetSubscribeCallbackData(const napi_env &env,
     napi_create_object(env, &sortingMapResult);
     if (!Common::SetNotificationSortingMap(env, sortingMap, sortingMapResult)) {
         ANS_LOGE("SetNotificationSortingMap call failed");
-        return Common::NapiGetboolean(env, false);
+        return Common::NapiGetBoolean(env, false);
     }
     napi_set_named_property(env, result, "sortingMap", sortingMapResult);
 
@@ -80,7 +80,7 @@ napi_value SetSubscribeCallbackData(const napi_env &env,
         napi_value value = nullptr;
         int outReason = 0;
         if (!Common::ReasonCToJS(deleteReason, outReason)) {
-            return Common::NapiGetboolean(env, false);
+            return Common::NapiGetBoolean(env, false);
         }
         napi_create_int32(env, outReason, &value);
         napi_set_named_property(env, result, "reason", value);
@@ -109,7 +109,7 @@ napi_value SetSubscribeCallbackData(const napi_env &env,
     }
     napi_set_named_property(env, result, "vibrationValues", arr);
 
-    return Common::NapiGetboolean(env, true);
+    return Common::NapiGetBoolean(env, true);
 }
 
 SubscriberInstance::SubscriberInstance()

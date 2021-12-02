@@ -28,6 +28,7 @@
 #include "ans_manager_proxy.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "mock_ipc_skeleton.h"
 #include "notification_content.h"
 #include "notification_helper.h"
 #include "notification_long_text_content.h"
@@ -1546,6 +1547,184 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_07000, Function | Medium
     GTEST_LOG_(INFO) << "ANS_Interface_MT_DoNotDisturb_07000:: disDate : endMs   : " << disDate.GetEndDate();
 
     EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07100, Function | MediumTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
+    SleepForFC();
+    EventParser eventParser;
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    eventParser.SetWaitOnConsumed(false);
+
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_NE((int)notifications.size(), (int)0);
+    int32_t id = notifications[0]->GetId();
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    EXPECT_EQ(NotificationHelper::CancelContinuousTaskNotification(NOTIFICATION_LABEL_0, id), ERR_OK);
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_EQ((int)notifications.size(), (int)0);
+    SleepForFC();
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+    IPCSkeleton::SetCallingUid(1);
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07200, Function | MediumTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
+    SleepForFC();
+    EventParser eventParser;
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    eventParser.SetWaitOnConsumed(false);
+
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_NE((int)notifications.size(), (int)0);
+    std::string key = notifications[0]->GetKey().c_str();
+    EXPECT_EQ(NotificationHelper::RemoveNotification(key), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
+    int32_t id = notifications[0]->GetId();
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    EXPECT_EQ(NotificationHelper::CancelContinuousTaskNotification(NOTIFICATION_LABEL_0, id), ERR_OK);
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_EQ((int)notifications.size(), (int)0);
+    SleepForFC();
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+    IPCSkeleton::SetCallingUid(1);
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07300, Function | MediumTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
+    SleepForFC();
+    EventParser eventParser;
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    eventParser.SetWaitOnConsumed(false);
+
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_NE((int)notifications.size(), (int)0);
+    int32_t id = notifications[0]->GetId();
+    EXPECT_EQ(NotificationHelper::CancelNotification(id), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    EXPECT_EQ(NotificationHelper::CancelContinuousTaskNotification(NOTIFICATION_LABEL_0, id), ERR_OK);
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_EQ((int)notifications.size(), (int)0);
+    SleepForFC();
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+    IPCSkeleton::SetCallingUid(1);
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07400, Function | MediumTest | Level1)
+{
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07500, Function | MediumTest | Level1)
+{
+    TestAnsSubscriber subscriber;
+    NotificationSubscribeInfo info;
+    info.AddAppName("bundleName");
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber, info), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
+    NotificationRequest req0(0);
+    req0.SetLabel(NOTIFICATION_LABEL_0);
+    req0.SetContent(content);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req0), ERR_OK);
+
+    NotificationRequest req1(1);
+    req1.SetLabel(NOTIFICATION_LABEL_1);
+    req1.SetContent(content);
+    EXPECT_EQ(NotificationHelper::PublishNotification(req1), ERR_OK);
+    EXPECT_EQ(
+        NotificationHelper::CancelContinuousTaskNotification(NOTIFICATION_LABEL_1, 1), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
+    EXPECT_EQ(NotificationHelper::CancelAllNotifications(), ERR_OK);
+    SleepForFC();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber, info), ERR_OK);
+    SleepForFC();
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+
+    EventParser eventParser;
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    EXPECT_TRUE(eventParser.GetWaitOnConsumedWithSortingMap());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07600, Function | MediumTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
+
+    SleepForFC();
+    EventParser eventParser;
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->IsRemoveAllowed(), false);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetSourceType(), NotificationConstant::SourceType::TYPE_CONTINUOUS);
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+    subscriber.ClearEvents();
+    IPCSkeleton::SetCallingUid(1);
 }
 }  // namespace Notification
 }  // namespace OHOS

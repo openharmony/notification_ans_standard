@@ -34,6 +34,7 @@ import { NotificationRequest } from './notification/notificationRequest';
  * @since 7
  * @sysCap SystemCapability.Notification.ANS
  * @devices phone, tablet, tv, wearable, car
+ * @import import notification from '@ohos.notification';
  * @permission N/A
  */
 declare namespace notification {
@@ -43,39 +44,29 @@ declare namespace notification {
    * <p>If a notification with the same ID has been published by the current application and has not been deleted,
    * this method will update the notification.
    *
-   * @param request Indicates the {@link NotificationRequest} object for setting the notification content.
-   * This parameter must be specified.
-   *
-   * @since 7
+   * @param Publishes a notification.
    */
   function publish(request: NotificationRequest, callback: AsyncCallback<void>): void;
   function publish(request: NotificationRequest): Promise<void>;
 
   /**
-   * Cancels a published notification.
+   * Cancels a notification with the specified ID.
    *
-   * @param id Indicates the unique notification ID in the application. The value must be the ID
-   * of a published notification. Otherwise, this method does not take effect.
-   *
-   * @since 7
+   * @param ID of the notification to cancel, which must be unique in the application.
    */
   function cancel(id: number, callback: AsyncCallback<void>): void;
 
   /**
-   * Cancels a published notification matching the specified {@code label} and {@code notificationId}.
+   * Cancels a notification with the specified label and ID.
    *
-   * @param label Indicates the label of the notification to cancel.
-   * @param id Indicates the ID of the notification to cancel.
-   *
-   * @since 7
+   * @param ID of the notification to cancel, which must be unique in the application.
+   * @param Label of the notification to cancel.
    */
   function cancel(id: number, label: string, callback: AsyncCallback<void>): void;
   function cancel(id: number, label?: string): Promise<void>;
 
   /**
-   * Cancels all the published notifications.
-   *
-   * @since 7
+   * Cancels all notifications of the current application.
    */
   function cancelAll(callback: AsyncCallback<void>): void;
   function cancelAll(): Promise<void>;
@@ -87,18 +78,23 @@ declare namespace notification {
    * This parameter must be specified.
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function addSlot(slot: NotificationSlot, callback: AsyncCallback<void>): void;
-  function addSlot(slot: NotificationSlot): Promise<void>;
 
   /**
    * Creates a notification slot.
    *
-   * @param slot Indicates the notification slot to be created, which is set by {@link SlotType}.
+   * @param slot Indicates the notification slot to be created, which is set by {@link NotificationSlot}.
    * This parameter must be specified.
    *
-   * @since 7
+   * @systemapi Hide this for inner system use.
+   */
+  function addSlot(slot: NotificationSlot): Promise<void>;
+
+  /**
+   * Adds a slot type.
+   *
+   * @param Slot type to add.
    */
   function addSlot(type: SlotType, callback: AsyncCallback<void>): void;
   function addSlot(type: SlotType): Promise<void>;
@@ -110,66 +106,83 @@ declare namespace notification {
    * This parameter must be specified.
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function addSlots(slots: Array<NotificationSlot>, callback: AsyncCallback<void>): void;
+
+  /**
+   * Creates a notification slot.
+   *
+   * @param slots Indicates the notification slots to be created, which is set by {@link NotificationSlot}.
+   * This parameter must be specified.
+   *
+   * @systemapi Hide this for inner system use.
+   */
   function addSlots(slots: Array<NotificationSlot>): Promise<void>;
 
   /**
-   * Queries a created notification slot.
+   * Obtains a notification slot of the specified slot type.
    *
-   * @param slotType Indicates the type of the slot, which is created by
+   * @param Type of the notification slot to obtain.
    *
    * @return Returns the created {@link NotificationSlot}.
-   *
-   * @since 7
    */
   function getSlot(slotType: SlotType, callback: AsyncCallback<NotificationSlot>): void;
   function getSlot(slotType: SlotType): Promise<NotificationSlot>;
 
   /**
-   * Obtains all notification slots of this application.
+   * Obtains all NotificationSlot objects created by the current application.
    *
    * @return Returns all notification slots of this application.
-   *
-   * @since 7
    */
   function getSlots(callback: AsyncCallback<Array<NotificationSlot>>): void;
   function getSlots(): Promise<Array<NotificationSlot>>;
 
   /**
-   * Deletes a created notification slot based on the slot type.
+   * Removes a NotificationSlot of the specified SlotType created by the current application.
    *
-   * @param slotType Indicates the type of the slot.
-   *
-   * @since 7
+   * @param Type of the NotificationSlot to remove.
    */
   function removeSlot(slotType: SlotType, callback: AsyncCallback<void>): void;
   function removeSlot(slotType: SlotType): Promise<void>;
 
   /**
-   * Deletes all notification slots.
-   *
-   * @since 7
+   * Removes all NotificationSlot objects created by the current application.
    */
   function removeAllSlots(callback: AsyncCallback<void>): void;
   function removeAllSlots(): Promise<void>;
 
   /**
-   * Indicates the type of the slot
-   *
-   * @since 7
+   * Describes NotificationSlot types.
    */
   export enum SlotType {
+    /**
+    * NotificationSlot of an unknown type.
+    */
     UNKNOWN_TYPE = 0,
+
+    /**
+    * NotificationSlot for social communication.
+    */
     SOCIAL_COMMUNICATION = 1,
+
+    /**
+    * NotificationSlot for service information.
+    */
     SERVICE_INFORMATION = 2,
+
+    /**
+    * NotificationSlot for service information.
+    */
     CONTENT_INFORMATION = 3,
+
+    /**
+    * NotificationSlot for other purposes.
+    */
     OTHER_TYPES = 0xFFFF,
   }
 
   /**
-   * Indicates the type of the content
+   * Describes notification content types.
    *
    * @name ContentType
    * @since 7
@@ -178,23 +191,63 @@ declare namespace notification {
    * @permission N/A
    */
   export enum ContentType {
+    /**
+    * Normal text notification.
+    */
     NOTIFICATION_CONTENT_BASIC_TEXT,
+
+    /**
+    * Long text notification.
+    */
     NOTIFICATION_CONTENT_LONG_TEXT,
+
+    /**
+    * Picture-attached notification.
+    */
     NOTIFICATION_CONTENT_PICTURE,
+
+    /**
+    * Conversation notification.
+    */
     NOTIFICATION_CONTENT_CONVERSATION,
+
+    /**
+    * Multi-line text notification.
+    */
     NOTIFICATION_CONTENT_MULTILINE,
   }
 
   /**
    * Indicates the level of the slot
-   *
-   * @since 7
    */
   export enum SlotLevel {
+    /**
+    * Indicates that the notification function is disabled.
+    */
     LEVEL_NONE = 0,
+
+    /**
+    * Indicates that the notification function is enabled but notification
+    * icons are not displayed in the status bar, with no banner or prompt tone.
+    */
     LEVEL_MIN = 1,
+
+    /**
+    * Indicates that the notification function is enabled and notification
+    * icons are displayed in the status bar, with no banner or prompt tone.
+    */
     LEVEL_LOW = 2,
+
+    /**
+    * Indicates that the notification function is enabled and notification
+    * icons are displayed in the status bar, with no banner but with a prompt tone.
+    */
     LEVEL_DEFAULT = 3,
+
+    /**
+    * Indicates that the notification function is enabled and notification
+    * icons are displayed in the status bar, with a banner and a prompt tone.
+    */
     LEVEL_HIGH = 4,
   }
 
@@ -202,119 +255,214 @@ declare namespace notification {
    * subscribe
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function subscribe(subscriber: NotificationSubscriber, callback: AsyncCallback<void>): void;
+
+  /**
+   * subscribe
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function subscribe(subscriber: NotificationSubscriber, info: NotificationSubscribeInfo, callback: AsyncCallback<void>): void;
+
+  /**
+   * subscribe
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function subscribe(subscriber: NotificationSubscriber, info?: NotificationSubscribeInfo): Promise<void>;
 
   /**
    * unsubscribe
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function unsubscribe(subscriber: NotificationSubscriber, callback: AsyncCallback<void>): void;
+
+  /**
+   * unsubscribe
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function unsubscribe(subscriber: NotificationSubscriber): Promise<void>;
 
   /**
    * enableNotification
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function enableNotification(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
+
+  /**
+   * enableNotification
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function enableNotification(bundle: BundleOption, enable: boolean): Promise<void>;
 
   /**
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function isNotificationEnabled(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * isNotificationEnabled
+   *
+   * @systemapi Hide this for inner system use.
+   */
   function isNotificationEnabled(bundle: BundleOption): Promise<boolean>;
 
   /**
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function isNotificationEnabled(callback: AsyncCallback<boolean>): void;
+
+  /**
+   * isNotificationEnabled
+   *
+   * @systemapi Hide this for inner system use.
+   */
   function isNotificationEnabled(): Promise<boolean>;
 
   /**
    * displayBadge
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function displayBadge(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
+
+  /**
+   * displayBadge
+   *
+   * @systemapi Hide this for inner system use.
+   */
   function displayBadge(bundle: BundleOption, enable: boolean): Promise<void>;
 
   /**
    * isBadgeDisplayed
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function isBadgeDisplayed(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * isBadgeDisplayed
+   *
+   * @systemapi Hide this for inner system use.
+   */
   function isBadgeDisplayed(bundle: BundleOption): Promise<boolean>;
 
   /**
    * setSlotByBundle
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function setSlotByBundle(bundle: BundleOption, slot: NotificationSlot, callback: AsyncCallback<void>): void;
+
+  /**
+   * setSlotByBundle
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function setSlotByBundle(bundle: BundleOption, slot: NotificationSlot): Promise<void>;
 
   /**
    * getSlotsByBundle
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getSlotsByBundle(bundle: BundleOption, callback: AsyncCallback<Array<NotificationSlot>>): void;
+
+  /**
+   * getSlotsByBundle
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function getSlotsByBundle(bundle: BundleOption): Promise<Array<NotificationSlot>>;
 
   /**
    * getSlotNumByBundle
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function getSlotNumByBundle(bundle: BundleOption, callback: AsyncCallback<number>): void;
+
+  /**
+   * getSlotNumByBundle
+   *
+   * @systemapi Hide this for inner system use.
+   */
   function getSlotNumByBundle(bundle: BundleOption): Promise<number>;
 
   /**
    * remove
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function remove(bundle: BundleOption, notificationKey: NotificationKey, callback: AsyncCallback<void>): void;
+
+  /**
+   * remove
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function remove(bundle: BundleOption, notificationKey: NotificationKey): Promise<void>;
 
   /**
    * remove
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function remove(hashCode: string, callback: AsyncCallback<void>): void;
+
+  /**
+   * remove
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function remove(hashCode: string): Promise<void>;
 
   /**
    * removeAll
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function removeAll(bundle: BundleOption, callback: AsyncCallback<void>): void;
+
+  /**
+   * removeAll
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function removeAll(callback: AsyncCallback<void>): void;
+
+  /**
+   * removeAll
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function removeAll(bundle?: BundleOption): Promise<void>;
 
   /**
@@ -322,31 +470,33 @@ declare namespace notification {
    * call this method.
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getAllActiveNotifications(callback: AsyncCallback<Array<NotificationRequest>>): void;
+
+  /**
+   * Obtains all active notifications in the current system. The caller must have system permissions to
+   * call this method.
+   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
   function getAllActiveNotifications(): Promise<Array<NotificationRequest>>;
 
   /**
-   * Obtains the number of active notifications of the current application in the system.
-   *
-   * @since 7
+   * Obtains the number of all active notifications.
    */
   function getActiveNotificationCount(callback: AsyncCallback<number>): void;
   function getActiveNotificationCount(): Promise<number>;
 
   /**
-   * Obtains active notifications of the current application in the system.
-   *
-   * @since 7
+   * Obtains an array of active notifications.
    */
   function getActiveNotifications(callback: AsyncCallback<Array<NotificationRequest>>): void;
   function getActiveNotifications(): Promise<Array<NotificationRequest>>;
 
   /**
-   * BundleOption
-   *
-   * @since 7
+   * Describes a BundleOption.
    */
   export interface BundleOption {
     bundle: string;
@@ -354,9 +504,7 @@ declare namespace notification {
   }
 
   /**
-   * NotificationKey
-   *
-   * @since 7
+   * Describes a NotificationKey, which can be used to identify a notification.
    */
   export interface NotificationKey {
     id: number;
@@ -367,7 +515,6 @@ declare namespace notification {
    * DisturbMode
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   export enum DoNotDisturbMode {
     ALLOW_UNKNOWN,

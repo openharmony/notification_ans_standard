@@ -107,6 +107,8 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
 
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
+    ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
+    ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
 
     // SystemEvent
     void OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption);
@@ -146,9 +148,10 @@ private:
     void UpdateRecentNotification(sptr<Notification> &notification, bool isDelete, int reason);
 
     void AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate);
+    bool CheckPermission(const std::string &bundleName);
+    ErrCode PrepereLongTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
 
 private:
-    bool CheckPermission(const std::string &bundleName);
     static sptr<AdvancedNotificationService> instance_;
     static std::mutex instanceMutex_;
 

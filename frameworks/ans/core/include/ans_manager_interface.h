@@ -22,8 +22,8 @@
 #include "ans_subscriber_interface.h"
 #include "iremote_broker.h"
 #include "notification_bundle_option.h"
-#include "notification_do_not_disturb_date.h"
 #include "notification_constant.h"
+#include "notification_do_not_disturb_date.h"
 #include "notification_request.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
@@ -103,14 +103,16 @@ public:
     virtual ErrCode IsAllowedNotify(bool &allowed) = 0;
     virtual ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) = 0;
 
-    virtual ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> & date) = 0;
-    virtual ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> & date) = 0;
+    virtual ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) = 0;
+    virtual ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date) = 0;
     virtual ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport) = 0;
     virtual ErrCode CancelGroup(const std::string &groupName) = 0;
     virtual ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) = 0;
 
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) = 0;
+    virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) = 0;
+    virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -168,6 +170,8 @@ protected:
         CANCEL_GROUP,
         REMOVE_GROUP_BY_BUNDLE,
         SHELL_DUMP,
+        PUBLISH_LONG_TASK_NOTIFICATION,
+        CANCEL_LONG_TASK_NOTIFICATION,
     };
 };
 }  // namespace Notification

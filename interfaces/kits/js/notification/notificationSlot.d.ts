@@ -16,89 +16,67 @@
 import notification from '../@ohos.notification';
 
 /**
- * A constructor used to initialize the type, desc, and level of a {@code NotificationSlot} object.
+ * Describes a NotificationSlot instance.
  *
  * @name NotificationSlot
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
  * @devices phone, tablet, tv, wearable, car
  * @permission N/A
+ * @sysCap SystemCapability.Notification.ANS
  */
 export interface NotificationSlot {
   /**
    * Obtains the type of a notification slot.
-   *
-   * @since 7
    */
   type: notification.SlotType;
 
   /**
    * Obtains the level of a notification slot
-   *
-   * @since 7
    */
   level?: notification.SlotLevel;
 
   /**
    * Obtains the description of a notification slot.
-   *
-   * @since 7
    */
   desc?: string;
 
   /**
    * Obtains the application icon badge status of a notification slot.
-   *
-   * @since 7
    */
   badgeFlag?: boolean;
 
   /**
    * Obtains whether DND mode is bypassed for a notification slot.
-   *
-   * @since 7
    */
   bypassDnd?: boolean;
 
   /**
    * Whether and how to display notifications on the lock screen.
-   *
-   * @since 7
    */
   lockscreenVisibility?: number;
 
   /**
    * Obtains the vibration status of the notification slot.
-   *
-   * @since 7
    */
   vibrationEnabled?: boolean;
 
   /**
    * Obtains the prompt tone of the notification slot.
-   *
-   * @since 7
    */
   sound?: string;
 
   /**
    * Obtains whether the notification light is enabled in a notification slot.
-   *
-   * @since 7
    */
   lightEnabled?: boolean;
 
   /**
    * Obtains the color of the notification light in a notification slot.
-   *
-   * @since 7
    */
   lightColor?: number;
 
   /**
    * Obtains the vibration style of notifications in this notification slot.
-   *
-   * @since 7
    */
   vibrationValues?: Array<number>;
 }

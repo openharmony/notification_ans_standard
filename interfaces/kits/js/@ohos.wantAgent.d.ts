@@ -25,26 +25,24 @@ import { TriggerInfo } from './wantAgent/triggerInfo';
  * @name wantAgent
  * @since 7
  * @devices phone, tablet, tv, wearable, car
- * @import wantAgent from '@ohos.wantAgent';
+ * @import import wantAgent from '@ohos.wantAgent';
  * @permission N/A
  */
 declare namespace wantAgent {
   /**
-   * Obtains the bundle name of an {@link WantAgent}.
+   * Obtains the bundle name of a WantAgent.
    *
-   * @param agent Indicates the {@link WantAgent} whose bundle name is to be obtained.
+   * @param WantAgent whose bundle name to obtain.
    * @return Returns the bundle name of the {@link WantAgent} if any.
-   * @since 7
    */
   function getBundleName(agent: WantAgent, callback: AsyncCallback<string>): void;
   function getBundleName(agent: WantAgent): Promise<string>;
 
   /**
-   * Obtains the bundle name of an {@link WantAgent}.
+   * Obtains the UID of a WantAgent.
    *
-   * @param agent Indicates the {@link WantAgent} whose UID is to be obtained.
+   * @param WantAgent whose UID to obtain.
    * @return Returns the UID of the {@link WantAgent} if any; returns {@code -1} otherwise.
-   * @since 7
    */
   function getUid(agent: WantAgent, callback: AsyncCallback<number>): void;
   function getUid(agent: WantAgent): Promise<number>;
@@ -55,98 +53,177 @@ declare namespace wantAgent {
    * @param agent Indicates the {@link WantAgent} whose UID is to be obtained.
    * @return Returns the {@link Want} of the {@link WantAgent}.
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   function getWant(agent: WantAgent, callback: AsyncCallback<Want>): void;
+
+  /**
+   * Obtains the {@link Want} of an {@link WantAgent}.
+   *
+   * @param agent Indicates the {@link WantAgent} whose UID is to be obtained.
+   * @return Returns the {@link Want} of the {@link WantAgent}.
+   * @systemapi Hide this for inner system use.
+   */
   function getWant(agent: WantAgent): Promise<Want>;
 
   /**
-   * Cancels an {@link WantAgent}. Only the application that creates the {@link IntentAgent} can cancel it.
+   * Cancels a WantAgent. Only the application that creates the WantAgent can cancel it.
    *
-   * @param agent Indicates the {@link WantAgent} to cancel.
-   * @since 7
+   * @param WantAgent to cancel.
    */
   function cancel(agent: WantAgent, callback: AsyncCallback<void>): void;
   function cancel(agent: WantAgent): Promise<void>;
 
   /**
-   * Obtains the bundle name of an {@link WantAgent}.
+   * Triggers a WantAgent.
    *
-   * @param agent Indicates the {@link WantAgent} whose bundle name is to be obtained.
-   * @param triggerInfo Indicates the {@link TriggerInfo} object that contains triggering parameters.
+   * @param WantAgent to trigger.
+   * @param Trigger parameters.
    * @param callback Indicates the callback method to be called after the {@link WantAgent} is triggered.
-   * @since 7
    */
   function trigger(agent: WantAgent, triggerInfo: TriggerInfo, callback?: Callback<CompleteData>): void;
 
   /**
-   * Checks whether two {@link WantAgent} objects are the same.
+   * Checks whether two WantAgent objects are equal.
    *
-   * @param agent Indicates one of the {@link WantAgent} object to compare.
-   * @param otherAgent Indicates the other {@link WantAgent} object to compare.
+   * @param WantAgent to compare.
+   * @param WantAgent to compare.
    * @return Returns {@code true} If the two objects are the same; returns {@code false} otherwise.
-   * @since 7
    */
   function equal(agent: WantAgent, otherAgent: WantAgent, callback: AsyncCallback<boolean>): void;
   function equal(agent: WantAgent, otherAgent: WantAgent): Promise<boolean>;
 
   /**
-   * Obtains an {@link WantAgent} object.
+   * Obtains a WantAgent object.
    *
-   * @param info Indicates the {@link WantAgentInfo} object that contains parameters of the
-   * {@link WantAgent} object to create.
+   * @param Information about the WantAgent object to obtain.
    * @return Returns the created {@link WantAgent} object.
-   * @since 7
    */
   function getWantAgent(info: WantAgentInfo, callback: AsyncCallback<WantAgent>): void;
   function getWantAgent(info: WantAgentInfo): Promise<WantAgent>;
 
   /**
-   * Enumerates flags for using an {@link WantAgent}.
-   *
-   * @since 7
+   * Enumerates flags for using a WantAgent.
    */
   export enum WantAgentFlags {
+    /**
+     * Indicates that the WantAgent can be used only once.
+     * This flag is valid only when OperationType is set to START_ABILITY, START_SERVICE, or SEND_COMMON_EVENT.
+     */
     ONE_TIME_FLAG = 0,
+
+    /**
+     * Indicates that null is returned if the WantAgent does not exist.
+     * This flag is valid only when OperationType is set to START_ABILITY, START_SERVICE, or SEND_COMMON_EVENT.
+     */
     NO_BUILD_FLAG,
+
+    /**
+     * Indicates that the existing WantAgent should be canceled before a new object is generated.
+     * This flag is valid only when OperationType is set to START_ABILITY, START_SERVICE, or SEND_COMMON_EVENT.
+     */
     CANCEL_PRESENT_FLAG,
+
+    /**
+     * Indicates that the system only replaces the extra data of the existing WantAgent with that of the new object.
+     * This flag is valid only when OperationType is set to START_ABILITY, START_SERVICE, or SEND_COMMON_EVENT.
+     */
     UPDATE_PRESENT_FLAG,
+
+    /**
+     * Indicates that the created WantAgent should be immutable.
+     */
     CONSTANT_FLAG,
+
+    /**
+     * Indicates that the current value of element can be replaced when the WantAgent is triggered.
+     */
     REPLACE_ELEMENT,
+
+    /**
+     * Indicates that the current value of action can be replaced when the WantAgent is triggered.
+     */
     REPLACE_ACTION,
+
+    /**
+     * Indicates that the current value of uri can be replaced when the WantAgent is triggered.
+     */
     REPLACE_URI,
+
+    /**
+     * Indicates that the current value of entities can be replaced when the WantAgent is triggered.
+     */
     REPLACE_ENTITIES,
+
+    /**
+     * Indicates that the current value of packageName can be replaced when the WantAgent is triggered.
+     */
     REPLACE_BUNDLE
   }
 
   /**
-   * Identifies the operation for using an {@link WantAgent}, such as starting an ability or sending a common event.
-   *
-   * @since 7
+   * Identifies the operation for using a WantAgent, such as starting an ability or sending a common event.
    */
   export enum OperationType {
+    /**
+     * Unknown operation.
+     */
     UNKNOWN_TYPE = 0,
+
+    /**
+     * Starts an ability with a UI.
+     */
     START_ABILITY,
+
+    /**
+     * Starts multiple abilities with a UI.
+     */
     START_ABILITIES,
+
+    /**
+     * Starts an ability without a UI.
+     */
     START_SERVICE,
+
+    /**
+     * Sends a common event.
+     */
     SEND_COMMON_EVENT
   }
 
   /**
-   * A callback for the {@link trigger()} method. After the method execution is complete,
-   * the callback process will start.
-   *
-   * @since 7
+   * Describes the data returned by after wantAgent.trigger is called.
    */
   export interface CompleteData {
+    /**
+     * Triggered WantAgent.
+     */
     info: WantAgent;
+
+    /**
+     * Existing Want that is triggered.
+     */
     want: Want;
+
+    /**
+     * Request code used to trigger the WantAgent.
+     */
     finalCode: number;
+
+    /**
+     * Final data collected by the common event.
+     */
     finalData: string;
+
+    /**
+     * Extra data collected by the common event.
+     */
     extraInfo?: {[key: string]: any};
   }
 }
 
+/**
+ * WantAgent object.
+ */
 export type WantAgent = object;
 
 export default wantAgent;

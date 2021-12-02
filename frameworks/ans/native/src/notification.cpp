@@ -41,6 +41,8 @@ Notification::Notification(const Notification &other)
     postTime_ = other.postTime_;
     sound_ = other.sound_;
     vibrationStyle_ = other.vibrationStyle_;
+    isRemoveAllowed_ = other.isRemoveAllowed_;
+    sourceType_ = other.sourceType_;
 }
 
 Notification::~Notification()
@@ -171,7 +173,17 @@ bool Notification::IsFloatingIcon() const
     return request_->IsFloatingIcon();
 }
 
-bool Notification::Marshalling(Parcel &parcel) const
+bool Notification::IsRemoveAllowed() const
+{
+    return isRemoveAllowed_;
+}
+
+NotificationConstant::SourceType Notification::GetSourceType() const
+{
+    return sourceType_;
+}
+
+bool Notification::MarshallingBool(Parcel &parcel) const
 {
     if (!parcel.WriteBool(enableLight_)) {
         ANS_LOGE("Can't write enableLight_");
@@ -188,27 +200,18 @@ bool Notification::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    if (!parcel.WriteBool(isRemoveAllowed_)) {
+        ANS_LOGE("Can't write isRemoveAllowed");
+        return false;
+    }
+
+    return true;
+}
+
+bool Notification::MarshallingString(Parcel &parcel) const
+{
     if (!parcel.WriteString(key_)) {
         ANS_LOGE("Can't wirte key");
-        return false;
-    }
-    if (!parcel.WriteInt32(ledLightColor_)) {
-        ANS_LOGE("Can't write ledLigthColor");
-        return false;
-    }
-
-    if (!parcel.WriteInt32(static_cast<int32_t>(lockscreenVisibleness_))) {
-        ANS_LOGE("Can't write visbleness");
-        return false;
-    }
-
-    if (!parcel.WriteStrongParcelable(request_)) {
-        ANS_LOGE("Can't write request");
-        return false;
-    }
-
-    if (!parcel.WriteInt64(postTime_)) {
-        ANS_LOGE("Can't write postTime");
         return false;
     }
 
@@ -219,6 +222,36 @@ bool Notification::Marshalling(Parcel &parcel) const
         }
     }
 
+    return true;
+}
+
+bool Notification::MarshallingInt32(Parcel &parcel) const
+{
+    if (!parcel.WriteInt32(ledLightColor_)) {
+        ANS_LOGE("Can't write ledLigthColor");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(lockscreenVisibleness_))) {
+        ANS_LOGE("Can't write visbleness");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(sourceType_))) {
+        ANS_LOGE("Can't write sourceType");
+        return false;
+    }
+
+    return true;
+}
+
+bool Notification::MarshallingInt64(Parcel &parcel) const
+{
+    if (!parcel.WriteInt64(postTime_)) {
+        ANS_LOGE("Can't write postTime");
+        return false;
+    }
+
     if (!parcel.WriteInt64Vector(vibrationStyle_)) {
         ANS_LOGE("Can't write vibrationStyle");
         return false;
@@ -227,7 +260,38 @@ bool Notification::Marshalling(Parcel &parcel) const
     return true;
 }
 
-bool Notification::ReadFromParcel(Parcel &parcel)
+bool Notification::MarshallingParcelable(Parcel &parcel) const
+{
+    if (!parcel.WriteStrongParcelable(request_)) {
+        ANS_LOGE("Can't write request");
+        return false;
+    }
+
+    return true;
+}
+
+bool Notification::Marshalling(Parcel &parcel) const
+{
+    if (!MarshallingBool(parcel)) {
+        return false;
+    }
+    if (!MarshallingString(parcel)) {
+        return false;
+    }
+    if (!MarshallingInt32(parcel)) {
+        return false;
+    }
+    if (!MarshallingInt64(parcel)) {
+        return false;
+    }
+    if (!MarshallingParcelable(parcel)) {
+        return false;
+    }
+
+    return true;
+}
+
+void Notification::ReadFromParcelBool(Parcel &parcel)
 {
     // Read enableLight_
     enableLight_ = parcel.ReadBool();
@@ -238,28 +302,55 @@ bool Notification::ReadFromParcel(Parcel &parcel)
     // Read enableViration_
     enableViration_ = parcel.ReadBool();
 
+    // Read isRemoveAllowed_
+    isRemoveAllowed_ = parcel.ReadBool();
+}
+
+void Notification::ReadFromParcelString(Parcel &parcel)
+{
     // Read key_
     key_ = parcel.ReadString();
+    
+    // Read sound_
+    if (enableSound_) {
+        sound_ = std::make_shared<Uri>(parcel.ReadString());
+    }
+}
 
+void Notification::ReadFromParcelInt32(Parcel &parcel)
+{
     // Read ledLightColor_
     ledLightColor_ = parcel.ReadInt32();
 
     // Read lockscreenVisibleness_
     lockscreenVisibleness_ = static_cast<NotificationConstant::VisiblenessType>(parcel.ReadInt32());
 
-    // Read request_
-    request_ = parcel.ReadStrongParcelable<NotificationRequest>();
+    // Read sourceType_
+    sourceType_ = static_cast<NotificationConstant::SourceType>(parcel.ReadInt32());
+}
 
+void Notification::ReadFromParcelInt64(Parcel &parcel)
+{
     // Read postTime_
     postTime_ = parcel.ReadInt64();
 
-    // Read sound_
-    if (enableSound_) {
-        sound_ = std::make_shared<Uri>(parcel.ReadString());
-    }
-
     // Read vibrationStyle_
     parcel.ReadInt64Vector(&vibrationStyle_);
+}
+
+void Notification::ReadFromParcelParcelable(Parcel &parcel)
+{
+    // Read request_
+    request_ = parcel.ReadStrongParcelable<NotificationRequest>();
+}
+
+bool Notification::ReadFromParcel(Parcel &parcel)
+{
+    ReadFromParcelBool(parcel);
+    ReadFromParcelString(parcel);
+    ReadFromParcelInt32(parcel);
+    ReadFromParcelInt64(parcel);
+    ReadFromParcelParcelable(parcel);
 
     return true;
 }
@@ -325,10 +416,22 @@ std::string Notification::GenerateNotificationKey(int32_t uid, const std::string
     return stream.str();
 }
 
+void Notification::SetRemoveAllowed(bool removeAllowed)
+{
+    isRemoveAllowed_ = removeAllowed;
+}
+
+void Notification::SetSourceType(NotificationConstant::SourceType sourceType)
+{
+    sourceType_ = sourceType;
+}
+
 std::string Notification::Dump() const
 {
     std::string dump = "Notification{ key = " + key_ + ", ledLightColor = " + std::to_string(ledLightColor_) +
                        ", lockscreenVisbleness = " + std::to_string(static_cast<int32_t>(lockscreenVisibleness_)) +
+                       ", isRemoveAllowed = " + (isRemoveAllowed_ ? "true" : "false") +
+                       ", sourceType = " + std::to_string(static_cast<int32_t>(sourceType_)) +
                        ",request = ";
     if (request_ == nullptr) {
         dump += "nullptr";

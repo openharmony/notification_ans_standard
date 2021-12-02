@@ -15,9 +15,8 @@
 
 import notification from '../@ohos.notification';
 import image from './@ohos.multimedia.image';
-
 /**
- * Constructs basic notifications.
+ * Describes a normal text notification.
  *
  * @name NotificationBasicContent
  * @since 7
@@ -26,13 +25,24 @@ import image from './@ohos.multimedia.image';
  * @permission N/A
  */
 export interface NotificationBasicContent {
+  /**
+   * Title of the normal text notification.
+   */
   title: string;
+
+  /**
+   * Content of the normal text notification.
+   */
   text: string;
+
+  /**
+   * Additional information of the normal text notification.
+   */
   additionalText?: string;
 }
 
 /**
- * Constructs notifications that include long text. The long text contains a maximum of 1024 characters.
+ * Describes a long text notification.
  *
  * @name NotificationLongTextContent
  * @since 7
@@ -41,13 +51,24 @@ export interface NotificationBasicContent {
  * @permission N/A
  */
 export interface NotificationLongTextContent extends NotificationBasicContent {
+  /**
+   * Long text content of the notification.
+   */
   longText: string;
+
+  /**
+   * Brief text of the long text notification.
+   */
   briefText: string;
+
+  /**
+   * Title that will be displayed for the long text notification when it is expanded.
+   */
   expandedTitle: string;
 }
 
 /**
- * Constructs a notification that includes multiple lines of text.
+ * Describes a multi-line text notification.
  *
  * @name NotificationMultiLineContent
  * @since 7
@@ -56,13 +77,24 @@ export interface NotificationLongTextContent extends NotificationBasicContent {
  * @permission N/A
  */
 export interface NotificationMultiLineContent extends NotificationBasicContent {
+  /**
+   * Brief text of the multi-line text notification.
+   */
   briefText: string;
+
+  /**
+   * Brief text of the multi-line text notification.
+   */
   longTitle: string;
+
+  /**
+   * Multi-line content of the multi-line text notification.
+   */
   lines: Array<string>;
 }
 
 /**
- * Constructs a notification that includes a picture.
+ * Describes a picture-attached notification.
  *
  * @name NotificationPictureContent
  * @since 7
@@ -71,13 +103,24 @@ export interface NotificationMultiLineContent extends NotificationBasicContent {
  * @permission N/A
  */
 export interface NotificationPictureContent extends NotificationBasicContent {
+  /**
+   * Multi-line content of the multi-line text notification.
+   */
   briefText: string;
+
+  /**
+   * Title that will be displayed for the picture-attached notification when it is expanded.
+   */
   expandedTitle: string;
+
+  /**
+   * Picture to be included in a notification.
+   */
   picture: image.PixelMap;
 }
 
 /**
- * Constructs a notification.
+ * Describes notification types.
  *
  * @name NotificationContent
  * @since 7
@@ -86,9 +129,28 @@ export interface NotificationPictureContent extends NotificationBasicContent {
  * @permission N/A
  */
 export interface NotificationContent {
+  /**
+   * Notification content type.
+   */
   contentType: notification.ContentType;
+
+  /**
+   * Normal text notification.
+   */
   normal?: NotificationBasicContent;
+
+  /**
+   * Long text notification.
+   */
   longText?: NotificationLongTextContent;
+
+  /**
+   * Multi-line text notification.
+   */
   multiLine?: NotificationMultiLineContent;
+
+  /**
+   * Picture-attached notification.
+   */
   picture?: NotificationPictureContent;
 }
