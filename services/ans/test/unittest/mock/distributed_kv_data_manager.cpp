@@ -28,22 +28,20 @@ DistributedKvDataManager::DistributedKvDataManager()
 DistributedKvDataManager::~DistributedKvDataManager()
 {}
 
-void DistributedKvDataManager::GetSingleKvStore(const Options &options, const AppId &appId, const StoreId &storeId,
-    std::function<void(Status, std::unique_ptr<SingleKvStore>)> callback)
+Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const AppId &appId, const StoreId &storeId,
+                                                  std::shared_ptr<SingleKvStore> &kvStore)
 {
     std::string storeIdTmp = Constant::TrimCopy<std::string>(storeId.storeId);
-    Status status = Status::SUCCESS;
-    std::unique_ptr<SingleKvStore> proxyTmp = std::make_unique<AnsTestSingleKvStore>();
-    callback(status, std::move(proxyTmp));
+    kvStore = std::make_shared<AnsTestSingleKvStore>();
+    return Status::SUCCESS;
 }
 
-Status DistributedKvDataManager::CloseKvStore(
-    const AppId &appId, const StoreId &storeId, std::unique_ptr<KvStore> kvStorePtr)
+Status DistributedKvDataManager::CloseKvStore(const AppId &appId, const StoreId &storeId)
 {
     return Status::SUCCESS;
 }
 
-Status DistributedKvDataManager::CloseKvStore(const AppId &appId, std::unique_ptr<SingleKvStore> kvStorePtr)
+Status DistributedKvDataManager::CloseKvStore(const AppId &appId, std::shared_ptr<SingleKvStore> &kvStorePtr)
 {
     return Status::SUCCESS;
 }
