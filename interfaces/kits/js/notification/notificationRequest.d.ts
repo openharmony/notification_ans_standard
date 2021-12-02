@@ -20,7 +20,7 @@ import { NotificationContent } from './notificationContent';
 import { NotificationActionButton } from './notificationActionButton';
 
 /**
- * Carries notifications.
+ * Defines a NotificationRequest instance.
  *
  * @name NotificationRequest
  * @since 7
@@ -29,44 +29,140 @@ import { NotificationActionButton } from './notificationActionButton';
  * @permission N/A
  */
 export interface NotificationRequest {
+  /**
+   * Notification content.
+   */
   content: NotificationContent;
+
+  /**
+   * Notification ID.
+   */
   id?: number;
+
+  /**
+   * Notification slot type.
+   */
   slotType?: notification.SlotType;
+
+  /**
+   * Whether the notification is an ongoing notification.
+   */
   isOngoing?: boolean;
+
+  /**
+   * Whether the notification can be removed.
+   */
   isUnremovable?: boolean;
+
+  /**
+   * Time when the notification is sent.
+   */
   deliveryTime?: number;
+
+  /**
+   * Whether the notification is automatically cleared.
+   */
   tapDismissed?: boolean;
+
+  /**
+   * Time when the notification is automatically cleared.
+   */
   autoDeletedTime?: number;
+
+  /**
+   * WantAgent instance to which the notification will be redirected after being clicked.
+   */
   wantAgent?: WantAgent;
+
+  /**
+   * Extended parameter.
+   */
   extraInfo?: {[key: string]: any};
+
+  /**
+   * Background color of the notification.
+   */
   color?: number;
+
+  /**
+   * Whether the notification background color can be enabled.
+   */
   colorEnabled?: boolean;
+
+  /**
+   * Whether the notification triggers an alert only once.
+   */
   isAlertOnce?: boolean;
+
+  /**
+   * Whether to display the stopwatch.
+   */
   isStopwatch?: boolean;
+
+  /**
+   * Whether to display the countdown time.
+   */
   isCountDown?: boolean;
+
+  /**
+   * Whether the notification is displayed as a floating icon.
+   */
   isFloatingIcon?: boolean;
+
+  /**
+   * Notification label.
+   */
   label?: string;
+
+  /**
+   * Notification badge type.
+   */
   badgeIconStyle?: number;
+
+  /**
+   * Whether to display the time when the notification is delivered.
+   */
   showDeliveryTime?: boolean;
+
+  /**
+   * Buttons in the notification. Up to two buttons are allowed.
+   */
   actionButtons?: Array<NotificationActionButton>;
+
+  /**
+   * Small notification icon.
+   */
   smallIcon?: image.PixelMap;
+
+  /**
+   * Large notification icon.
+   */
   largeIcon?: image.PixelMap;
+
+  /**
+   * Read-only name of the package for which a notification is created.
+   */
   readonly creatorBundleName?: string;
+
+  /**
+   * Read-only UID of the notification creator.
+   */
   readonly creatorUid?: number;
+
+  /**
+   * Read-only PID of the notification creator.
+   */
   readonly creatorPid?: number;
 
   /**
    * Obtains the classification of this notification.
    *
    * @systemapi Hide this for inner system use.
-   * @since 7
    */
   classification?: string;
 
   /**
    * Obtains the unique hash code of a notification in the current application.
-   *
-   * @since 7
    */
   readonly hashCode?: string;
 }

@@ -104,6 +104,8 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
 
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
+    virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
+    virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
 
 private:
     static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
@@ -163,6 +165,8 @@ private:
     ErrCode HandleSetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleDoesSupportDoNotDisturbMode(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandlePublishContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleCancelContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

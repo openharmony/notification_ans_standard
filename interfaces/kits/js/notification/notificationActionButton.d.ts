@@ -16,15 +16,26 @@
 import { WantAgent } from '../@ohos.wantAgent';
 
 /**
- * The action button of notification
+ * Describes an action button displayed in a notification.
  * @name NotificationActionButton
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
  * @devices phone, tablet, tv, wearable, car
  * @permission N/A
+ * @sysCap SystemCapability.Notification.ANS
  */
 export interface NotificationActionButton {
+  /**
+   * Button title.
+   */
   title: string;
+
+  /**
+   * WantAgent of the button.
+   */
   wantAgent: WantAgent;
+
+  /**
+   * Extra information of the button.
+   */
   extras?: {[key: string]: any};
 }

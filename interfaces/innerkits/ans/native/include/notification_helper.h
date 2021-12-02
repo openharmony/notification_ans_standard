@@ -612,6 +612,23 @@ public:
      * @return Returns check result.
      */
     static ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport);
+
+    /**
+     * Publishes a long task notification.
+     * @param request Indicates the NotificationRequest object for setting the notification content.
+     *                This parameter must be specified.
+     * @return Returns publish long task notification result.
+     */
+    static ErrCode PublishContinuousTaskNotification(const NotificationRequest &request);
+
+    /**
+     * Cancels a published long task notification matching the specified label and notificationId.
+     *
+     * @param label Indicates the label of the long task notification to cancel.
+     * @param notificationId Indicates the ID of the long task notification to cancel.
+     * @return Returns cancel long task notification result.
+     */
+    static ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId);
 };
 }  // namespace Notification
 }  // namespace OHOS

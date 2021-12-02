@@ -1876,6 +1876,73 @@ ErrCode AnsManagerProxy::ShellDump(const std::string &dumpOption, std::vector<st
     return result;
 }
 
+ErrCode AnsManagerProxy::PublishContinuousTaskNotification(const sptr<NotificationRequest> &request)
+{
+    if (request == nullptr) {
+        ANS_LOGW("[PublishContinuousTaskNotification] fail: notification request is null ptr.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[PublishContinuousTaskNotification] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteParcelable(request)) {
+        ANS_LOGW("[PublishContinuousTaskNotification] fail: write request failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(PUBLISH_LONG_TASK_NOTIFICATION, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[PublishContinuousTaskNotification] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[PublishContinuousTaskNotification] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[CancelContinuousTaskNotification] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(label)) {
+        ANS_LOGW("[CancelContinuousTaskNotification] fail: write label failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(notificationId)) {
+        ANS_LOGW("[CancelContinuousTaskNotification] fail: write notificationId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(CANCEL_LONG_TASK_NOTIFICATION, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[CancelContinuousTaskNotification] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[CancelContinuousTaskNotification] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
 {
     auto remote = Remote();

@@ -454,7 +454,7 @@ public:
      * Checks whether background color is enabled for this notification.
      * @return true if background color is enabled; returns false otherwise.
      */
-    bool IsColorEnabled();
+    bool IsColorEnabled() const;
 
     /**
      * Sets whether to enable background color for this notification.

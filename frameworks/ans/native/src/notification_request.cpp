@@ -387,7 +387,7 @@ uint32_t NotificationRequest::GetColor() const
     return color_;
 }
 
-bool NotificationRequest::IsColorEnabled()
+bool NotificationRequest::IsColorEnabled() const
 {
     if (!colorEnabled_) {
         return false;

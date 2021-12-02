@@ -17,7 +17,7 @@ import { Want } from '../ability/want';
 import wantAgent from '../@ohos.wantAgent'
 
 /**
- * the info of WantAgent
+ * Provides the information required for triggering a WantAgent.
  *
  * @name WantAgentInfo
  * @since 7
@@ -25,9 +25,29 @@ import wantAgent from '../@ohos.wantAgent'
  * @permission N/A
  */
 export interface WantAgentInfo {
+  /**
+   * An array of all Wants for starting abilities or sending common events. Only Wants can be displayed.
+   */
   wants: Array<Want>;
+
+  /**
+   * Type of the action specified in a Want.
+   */
   operationType: wantAgent.OperationType;
+
+  /**
+   * Request code defined by the user.
+   */
   requestCode: number;
+
+  /**
+   * An array of flags for using the WantAgent.
+   */
   wantAgentFlags?: Array<wantAgent.WantAgentFlags>;
+
+  /**
+   * Extra information about how the Want starts an ability.
+   * If there is no extra information to set, this constant can be left empty.
+   */
   extraInfo?: {[key: string]: any};
 }

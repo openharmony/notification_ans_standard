@@ -22,6 +22,7 @@
 #define private public
 
 #include "advanced_notification_service.h"
+#include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
 #include "ans_ut_constant.h"
@@ -1556,6 +1557,75 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10900,
     EXPECT_EQ(result->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::CLEARLY);
     EXPECT_EQ(result->GetBeginDate(), beginDate);
     EXPECT_EQ(result->GetEndDate(), endDate);
+}
+
+/**
+ * @tc.number    : ANS_Publish_01500
+ * @tc.name      : ANSPublish01500
+ * @tc.desc      : publish a long task notification
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11000, Function | SmallTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    sptr<NotificationRequest> req = new NotificationRequest();
+    EXPECT_NE(req, nullptr);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("req's label");
+    EXPECT_EQ(advancedNotificationService_->PublishContinuousTaskNotification(req), (int)ERR_OK);
+    SleepForFC();
+}
+
+/**
+ * @tc.number    : ANS_Publish_01600
+ * @tc.name      : ANSPublish01600
+ * @tc.desc      : publish a long task notification
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11100, Function | SmallTest | Level1)
+{
+    sptr<NotificationRequest> req = new NotificationRequest();
+    EXPECT_NE(req, nullptr);
+    req->SetSlotType(NotificationConstant::SlotType::OTHER);
+    req->SetLabel("req's label");
+    EXPECT_EQ(advancedNotificationService_->PublishContinuousTaskNotification(req), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
+    SleepForFC();
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_11200
+ * @tc.name      : ANS_Cancel_0300
+ * @tc.desc      : public two notification to cancel one of them
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11200, Function | SmallTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    std::string label = "testLabel";
+    {
+        sptr<NotificationRequest> req = new NotificationRequest(1);
+        req->SetSlotType(NotificationConstant::OTHER);
+        req->SetLabel(label);
+        EXPECT_EQ(advancedNotificationService_->PublishContinuousTaskNotification(req), (int)ERR_OK);
+    }
+    EXPECT_EQ(advancedNotificationService_->CancelContinuousTaskNotification(label, 1), (int)ERR_OK);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_11300
+ * @tc.name      : ANS_Cancel_0400
+ * @tc.desc      : public two notification to cancel one of them
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11300, Function | SmallTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    std::string label = "testLabel";
+    {
+        sptr<NotificationRequest> req = new NotificationRequest(1);
+        req->SetSlotType(NotificationConstant::OTHER);
+        req->SetLabel(label);
+        EXPECT_EQ(advancedNotificationService_->PublishContinuousTaskNotification(req), (int)ERR_OK);
+    }
+    IPCSkeleton::SetCallingUid(SYSTEM_APP_UID);
+    EXPECT_EQ(
+        advancedNotificationService_->CancelContinuousTaskNotification(label, 1), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
 }
 }  // namespace Notification
 }  // namespace OHOS

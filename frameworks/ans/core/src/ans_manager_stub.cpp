@@ -188,6 +188,12 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::SHELL_DUMP,
             std::bind(
                 &AnsManagerStub::HandleShellDump, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
+        {AnsManagerStub::PUBLISH_LONG_TASK_NOTIFICATION,
+            std::bind(&AnsManagerStub::HandlePublishContinuousTaskNotification, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::CANCEL_LONG_TASK_NOTIFICATION,
+            std::bind(&AnsManagerStub::HandleCancelContinuousTaskNotification, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
 };
 
 AnsManagerStub::AnsManagerStub()
@@ -711,6 +717,46 @@ ErrCode AnsManagerStub::HandleDoesSupportDoNotDisturbMode(MessageParcel &data, M
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandlePublishContinuousTaskNotification(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<NotificationRequest> request = data.ReadParcelable<NotificationRequest>();
+    if (!request) {
+        ANS_LOGW("[HandlePublishContinuousTaskNotification] fail: notification ReadParcelable failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = PublishContinuousTaskNotification(request);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandlePublishContinuousTaskNotification] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleCancelContinuousTaskNotification(MessageParcel &data, MessageParcel &reply)
+{
+    std::string label;
+    if (!data.ReadString(label)) {
+        ANS_LOGW("[HandleCancelContinuousTaskNotification] fail: read label failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    int notificationId = 0;
+    if (!data.ReadInt32(notificationId)) {
+        ANS_LOGW("[HandleCancelContinuousTaskNotification] fail: read notificationId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = CancelContinuousTaskNotification(label, notificationId);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleCancelContinuousTaskNotification] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
     return ERR_OK;
 }
 
@@ -1616,5 +1662,16 @@ ErrCode AnsManagerStub::ShellDump(const std::string &dumpOption, std::vector<std
     return ERR_INVALID_OPERATION;
 }
 
+ErrCode AnsManagerStub::PublishContinuousTaskNotification(const sptr<NotificationRequest> &request)
+{
+    ANS_LOGW("AnsManagerStub::PublishContinuousTaskNotification called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
+{
+    ANS_LOGW("AnsManagerStub::CancelContinuousTaskNotification called!");
+    return ERR_INVALID_OPERATION;
+}
 }  // namespace Notification
 }  // namespace OHOS

@@ -819,6 +819,33 @@ ErrCode AnsNotification::DoesSupportDoNotDisturbMode(bool &doesSupport)
     return ansManagerProxy_->DoesSupportDoNotDisturbMode(doesSupport);
 }
 
+ErrCode AnsNotification::PublishContinuousTaskNotification(const NotificationRequest &request)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    auto pReq = new (std::nothrow) NotificationRequest(request);
+    if (pReq == nullptr) {
+        ANS_LOGE("create NotificationRequest failed.");
+        return ERR_ANS_NO_MEMORY;
+    }
+
+    sptr<NotificationRequest> sptrReq(pReq);
+    return ansManagerProxy_->PublishContinuousTaskNotification(sptrReq);
+}
+
+ErrCode AnsNotification::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->CancelContinuousTaskNotification(label, notificationId);
+}
+
 void AnsNotification::ResetAnsManagerProxy()
 {
     ANS_LOGI("enter");

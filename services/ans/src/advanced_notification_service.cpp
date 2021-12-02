@@ -379,7 +379,6 @@ void AdvancedNotificationService::StopFilters()
 ErrCode AdvancedNotificationService::Cancel(int notificationId, const std::string &label)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
@@ -972,6 +971,9 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(const sptr<Notif
     const std::string &label, int notificationId, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
+        if (!record->notification->IsRemoveAllowed()) {
+            continue;
+        }
         if (((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
                 (record->bundleOption->GetUid() == bundleOption->GetUid())) &&
             (record->notification->GetLabel() == label) && (record->notification->GetId() == notificationId)) {
@@ -991,6 +993,9 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(
     const std::string &key, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
+        if (!record->notification->IsRemoveAllowed()) {
+            continue;
+        }
         if (record->notification->GetKey() == key) {
             if (!isCancel && record->request->IsUnremovable()) {
                 return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
@@ -1273,6 +1278,85 @@ ErrCode AdvancedNotificationService::ShellDump(const std::string &dumpOption, st
     return result;
 }
 
+ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const sptr<NotificationRequest> &request)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    int uid = IPCSkeleton::GetCallingUid();
+    if (uid != SYSTEM_SERVICE_UID) {
+        return ERR_ANS_NOT_SYSTEM_SERVICE;
+    }
+
+    sptr<NotificationBundleOption> bundleOption = nullptr;
+    bundleOption = new NotificationBundleOption(std::string(), uid);
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = PrepereLongTaskNotificationRequest(request, uid);
+    if (result != ERR_OK) {
+        return result;
+    }
+
+    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
+    record->request = request;
+    record->bundleOption = bundleOption;
+    record->notification = new Notification(request);
+    if (record->notification != nullptr) {
+        record->notification->SetSourceType(NotificationConstant::SourceType::TYPE_CONTINUOUS);
+        record->notification->SetRemoveAllowed(false);
+    }
+
+    handler_->PostSyncTask(std::bind([&]() {
+        if (!IsNotificationExists(record->notification->GetKey())) {
+            AddToNotificationList(record);
+        } else {
+            if (record->request->IsAlertOneTime()) {
+                record->notification->SetEnableLight(false);
+                record->notification->SetEnableSound(false);
+                record->notification->SetEnableViration(false);
+            }
+            UpdateInNotificationList(record);
+        }
+
+        UpdateRecentNotification(record->notification, false, 0);
+        sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+        NotificationSubscriberManager::GetInstance()->NotifyConsumed(record->notification, sortingMap);
+    }));
+
+    return result;
+}
+
+ErrCode AdvancedNotificationService::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    int uid = IPCSkeleton::GetCallingUid();
+    if (uid != SYSTEM_SERVICE_UID) {
+        return ERR_ANS_NOT_SYSTEM_SERVICE;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<Notification> notification = nullptr;
+        for (auto record : notificationList_) {
+            if ((record->bundleOption->GetBundleName().empty()) && (record->bundleOption->GetUid() == uid) &&
+                (record->notification->GetId() == notificationId) && (record->notification->GetLabel() == label)) {
+                notification = record->notification;
+                notificationList_.remove(record);
+                result = ERR_OK;
+                break;
+            }
+        }
+        if (notification != nullptr) {
+            int reason = NotificationConstant::CANCEL_REASON_DELETE;
+            UpdateRecentNotification(notification, true, reason);
+            sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+            NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+        }
+    }));
+    return result;
+}
+
 ErrCode AdvancedNotificationService::ActiveNotificationDump(std::vector<std::string> &dumpInfo)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
@@ -1550,6 +1634,9 @@ ErrCode AdvancedNotificationService::RemoveNotification(
         sptr<Notification> notification = nullptr;
 
         for (auto record : notificationList_) {
+            if (!record->notification->IsRemoveAllowed()) {
+                continue;
+            }
             if ((record->bundleOption->GetBundleName() == bundle->GetBundleName()) &&
                 (record->bundleOption->GetUid() == bundleOption->GetUid()) &&
                 (record->notification->GetId() == notificationId) && (record->notification->GetLabel() == label)) {
@@ -1595,6 +1682,10 @@ ErrCode AdvancedNotificationService::RemoveAllNotifications(const sptr<Notificat
     handler_->PostSyncTask(std::bind([&]() {
         std::vector<std::shared_ptr<NotificationRecord>> removeList;
         for (auto record : notificationList_) {
+            if (!record->notification->IsRemoveAllowed()) {
+                continue;
+            }
+
             if ((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
                 (record->bundleOption->GetUid() == bundleOption->GetUid()) && !record->request->IsUnremovable()) {
                 removeList.push_back(record);
@@ -1902,6 +1993,17 @@ bool AdvancedNotificationService::CheckPermission(const std::string &bundleName)
     }
     // Add permission check in future
     return true;
+}
+
+ErrCode AdvancedNotificationService::PrepereLongTaskNotificationRequest(
+    const sptr<NotificationRequest> &request, const int &uid)
+{
+    int pid = IPCSkeleton::GetCallingPid();
+    request->SetCreatorUid(uid);
+    request->SetCreatorPid(pid);
+
+    ErrCode result = CheckPictureSize(request);
+    return result;
 }
 }  // namespace Notification
 }  // namespace OHOS

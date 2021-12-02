@@ -91,6 +91,21 @@ public:
         CLEARLY = 3,    // time period
     };
 
+    enum class SourceType {
+        /**
+         * general notification.
+         */
+        TYPE_NORMAL = 0x00000000,
+        /**
+         * long-term task notification.
+         */
+        TYPE_CONTINUOUS = 0x00000001,
+        /**
+         * timed notification.
+         */
+        TYPE_TIMER = 0x00000002
+    };
+    
     /**
      * Indicates that a notification is deleted because it is clicked.
      */

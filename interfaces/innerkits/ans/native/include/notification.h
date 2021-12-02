@@ -182,6 +182,18 @@ public:
     bool IsFloatingIcon() const;
 
     /**
+     * Whether to support remove allowed.
+     * @return Current remove allowed status.
+     */
+    bool IsRemoveAllowed() const;
+
+    /**
+     * Gets the notification source.
+     * @return the notification slot type.
+     */
+    NotificationConstant::SourceType GetSourceType() const;
+
+    /**
      * @brief Dumps a string representation of the object.
      *
      * @return A string representation of the object.
@@ -216,16 +228,30 @@ private:
     void SetPostTime(const int64_t &time);
     void SetSound(const Uri &sound);
     void SetVibrationStyle(const std::vector<int64_t> &style);
-    bool ReadFromParcel(Parcel &parcel);
+    void SetRemoveAllowed(bool removeAllowed);
+    void SetSourceType(NotificationConstant::SourceType sourceType);
     std::string GenerateNotificationKey(int32_t uid, const std::string &label, int32_t id);
+    bool ReadFromParcel(Parcel &parcel);
+    void ReadFromParcelBool(Parcel &parcel);
+    void ReadFromParcelString(Parcel &parcel);
+    void ReadFromParcelInt32(Parcel &parcel);
+    void ReadFromParcelInt64(Parcel &parcel);
+    void ReadFromParcelParcelable(Parcel &parcel);
+    bool MarshallingBool(Parcel &parcel) const;
+    bool MarshallingString(Parcel &parcel) const;
+    bool MarshallingInt32(Parcel &parcel) const;
+    bool MarshallingInt64(Parcel &parcel) const;
+    bool MarshallingParcelable(Parcel &parcel) const;
 
 private:
     bool enableSound_ {false};
     bool enableLight_ {false};
     bool enableViration_ {false};
+    bool isRemoveAllowed_ {true};
     std::string key_ {""};
     int32_t ledLightColor_ {0};
     NotificationConstant::VisiblenessType lockscreenVisibleness_ {NotificationConstant::VisiblenessType::NO_OVERRIDE};
+    NotificationConstant::SourceType sourceType_ {NotificationConstant::SourceType::TYPE_NORMAL};
     sptr<NotificationRequest> request_ {nullptr};
     int64_t postTime_ {0};
     std::shared_ptr<Uri> sound_ {nullptr};

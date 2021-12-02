@@ -321,5 +321,15 @@ ErrCode NotificationHelper::DoesSupportDoNotDisturbMode(bool &doesSupport)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->DoesSupportDoNotDisturbMode(doesSupport);
 }
+
+ErrCode NotificationHelper::PublishContinuousTaskNotification(const NotificationRequest &request)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->PublishContinuousTaskNotification(request);
+}
+
+ErrCode NotificationHelper::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->CancelContinuousTaskNotification(label, notificationId);
+}
 }  // namespace Notification
 }  // namespace OHOS
