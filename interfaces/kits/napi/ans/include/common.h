@@ -288,7 +288,8 @@ public:
     static napi_value GetNotificationSlotByString(const napi_env &env, const napi_value &value, NotificationSlot &slot);
     static napi_value GetNotificationSlotByBool(const napi_env &env, const napi_value &value, NotificationSlot &slot);
     static napi_value GetNotificationSlotByNumber(const napi_env &env, const napi_value &value, NotificationSlot &slot);
-    static napi_value GetNotificationSlotByVibration(const napi_env &env, const napi_value &value, NotificationSlot &slot);
+    static napi_value GetNotificationSlotByVibration(
+        const napi_env &env, const napi_value &value, NotificationSlot &slot);
 
     static napi_value GetNotificationActionButtons(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
