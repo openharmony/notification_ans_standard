@@ -3180,13 +3180,31 @@ napi_value Common::GetNotificationSlot(const napi_env &env, const napi_value &va
 {
     ANS_LOGI("enter");
 
+    napi_value nobj = nullptr;
+    napi_valuetype valuetype = napi_undefined;
+    bool hasProperty = false;
+
+    // type: notification.SlotType
+    int slotType = 0;
+    NAPI_CALL(env, napi_has_named_property(env, value, "type", &hasProperty));
+    NAPI_ASSERT(env, hasProperty, "Property type expected.");
+    napi_get_named_property(env, value, "type", &nobj);
+    NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+    napi_get_value_int32(env, nobj, &slotType);
+    NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
+    if (!Common::SlotTypeJSToC(SlotType(slotType), outType)) {
+        return nullptr;
+    }
+    slot.SetType(outType);
+
     if (GetNotificationSlotByString(env, value, slot) == nullptr) {
         return nullptr;
     }
     if (GetNotificationSlotByNumber(env, value, slot) == nullptr) {
         return nullptr;
     }
-    if (GetNotificationSlotByCustom(env, value, slot) == nullptr) {
+    if (GetNotificationSlotByVibration(env, value, slot) == nullptr) {
         return nullptr;
     }
     if (GetNotificationSlotByBool(env, value, slot) == nullptr) {
@@ -3278,17 +3296,6 @@ napi_value Common::GetNotificationSlotByBool(const napi_env &env, const napi_val
         slot.SetEnableLight(lightEnabled);
     }
 
-    // vibrationEnabled?: boolean
-    NAPI_CALL(env, napi_has_named_property(env, value, "vibrationEnabled", &hasProperty));
-    if (hasProperty) {
-        bool vibrationEnabled = false;
-        napi_get_named_property(env, value, "vibrationEnabled", &nobj);
-        NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
-        napi_get_value_bool(env, nobj, &vibrationEnabled);
-        ANS_LOGI("vibrationEnabled is: %{public}d", vibrationEnabled);
-        slot.SetEnableVibration(vibrationEnabled);
-    }
     return NapiGetNull(env);
 }
 
@@ -3343,27 +3350,13 @@ napi_value Common::GetNotificationSlotByNumber(const napi_env &env, const napi_v
     return NapiGetNull(env);
 }
 
-napi_value Common::GetNotificationSlotByCustom(const napi_env &env, const napi_value &value, NotificationSlot &slot)
+napi_value Common::GetNotificationSlotByVibration(const napi_env &env, const napi_value &value, NotificationSlot &slot)
 {
     ANS_LOGI("enter");
     napi_value nobj = nullptr;
     napi_valuetype valuetype = napi_undefined;
     bool hasProperty = false;
     uint32_t length = 0;
-
-    // type: notification.SlotType
-    int slotType = 0;
-    NAPI_CALL(env, napi_has_named_property(env, value, "type", &hasProperty));
-    NAPI_ASSERT(env, hasProperty, "Property type expected.");
-    napi_get_named_property(env, value, "type", &nobj);
-    NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-    napi_get_value_int32(env, nobj, &slotType);
-    NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
-    if (!Common::SlotTypeJSToC(SlotType(slotType), outType)) {
-        return nullptr;
-    }
-    slot.SetType(outType);
 
     // vibrationValues?: Array<number>
     NAPI_CALL(env, napi_has_named_property(env, value, "vibrationValues", &hasProperty));
@@ -3386,6 +3379,18 @@ napi_value Common::GetNotificationSlotByCustom(const napi_env &env, const napi_v
             vibrationValues.emplace_back(vibrationValue);
         }
         slot.SetVibrationStyle(vibrationValues);
+    }
+
+    // vibrationEnabled?: boolean
+    NAPI_CALL(env, napi_has_named_property(env, value, "vibrationEnabled", &hasProperty));
+    if (hasProperty) {
+        bool vibrationEnabled = false;
+        napi_get_named_property(env, value, "vibrationEnabled", &nobj);
+        NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
+        napi_get_value_bool(env, nobj, &vibrationEnabled);
+        ANS_LOGI("vibrationEnabled is: %{public}d", vibrationEnabled);
+        slot.SetEnableVibration(vibrationEnabled);
     }
 
     return NapiGetNull(env);
