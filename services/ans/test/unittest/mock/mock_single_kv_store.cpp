@@ -34,19 +34,24 @@ Status AnsTestSingleKvStore::GetEntriesWithQuery(const DataQuery &query, std::ve
     return Status::SUCCESS;
 }
 
-void AnsTestSingleKvStore::GetResultSet(
-    const Key &prefixKey, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
-{}
+Status AnsTestSingleKvStore::GetResultSet(const Key &prefixKey, std::shared_ptr<KvStoreResultSet> &resultSet) const
+{
+    return Status::SUCCESS;
+}
 
-void AnsTestSingleKvStore::GetResultSetWithQuery(
-    const std::string &query, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
-{}
+Status AnsTestSingleKvStore::GetResultSetWithQuery(const std::string &query,
+                                                   std::shared_ptr<KvStoreResultSet> &resultSet) const
+{
+    return Status::SUCCESS;
+}
 
-void AnsTestSingleKvStore::GetResultSetWithQuery(
-    const DataQuery &query, std::function<void(Status, std::unique_ptr<KvStoreResultSet>)> callback) const
-{}
+Status AnsTestSingleKvStore::GetResultSetWithQuery(const DataQuery &query,
+                                                   std::shared_ptr<KvStoreResultSet> &resultSet) const
+{
+    return Status::SUCCESS;
+}
 
-Status AnsTestSingleKvStore::CloseResultSet(std::unique_ptr<KvStoreResultSet> resultSet)
+Status AnsTestSingleKvStore::CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet)
 {
     return Status::SUCCESS;
 }
@@ -165,10 +170,25 @@ Status AnsTestSingleKvStore::GetSecurityLevel(SecurityLevel &securityLevel) cons
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam, sptr<KvParam> &output)
+Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam, KvParam &output)
 {
     return Status::SUCCESS;
 }
 
+Status AnsTestSingleKvStore::GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
+                                                std::shared_ptr<KvStoreSnapshot> &snapshot) const
+{
+    return Status::NOT_SUPPORT;
+}
+
+Status AnsTestSingleKvStore::ReleaseKvStoreSnapshot(std::shared_ptr<KvStoreSnapshot> &snapshot)
+{
+    return Status::NOT_SUPPORT;
+}
+
+Status AnsTestSingleKvStore::Clear()
+{
+    return Status::NOT_SUPPORT;
+}
 }  // namespace DistributedKv
 }  // namespace OHOS
