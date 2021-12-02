@@ -176,7 +176,7 @@ Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam
 }
 
 Status AnsTestSingleKvStore::GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
-                                               std::shared_ptr<KvStoreSnapshot> &snapshot) const
+                                                std::shared_ptr<KvStoreSnapshot> &snapshot) const
 {
     return Status::NOT_SUPPORT;
 }
