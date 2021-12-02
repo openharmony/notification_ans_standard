@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace DistributedKv {
-
 class AnsTestSingleKvStore : public SingleKvStore {
 public:
     virtual Status GetEntries(const Key &prefixKey, std::vector<Entry> &entries) const override;
