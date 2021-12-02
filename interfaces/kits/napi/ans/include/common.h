@@ -193,7 +193,7 @@ public:
 
     static napi_value SetNotificationContent(
         const napi_env &env, const std::shared_ptr<NotificationContent> &content, napi_value &result);
-    static napi_value SetNotificationContentDetailed(const napi_env &env, const enum ContentType &type,
+    static napi_value SetNotificationContentDetailed(const napi_env &env, const ContentType &type,
         const std::shared_ptr<NotificationContent> &content, napi_value &result);
     static napi_value SetNotificationBasicContent(
         const napi_env &env, const NotificationBasicContent *basicContent, napi_value &result);
@@ -374,13 +374,13 @@ public:
 
     static napi_value GetNotificationKey(const napi_env &env, const napi_value &value, NotificationKey &key);
 
-    static bool ContentTypeJSToC(const enum ContentType &inType, enum NotificationContent::Type &outType);
+    static bool ContentTypeJSToC(const ContentType &inType, NotificationContent::Type &outType);
 
-    static bool ContentTypeCToJS(const enum NotificationContent::Type &inType, enum ContentType &outType);
+    static bool ContentTypeCToJS(const NotificationContent::Type &inType, ContentType &outType);
 
-    static bool SlotTypeJSToC(const enum SlotType &inType, enum NotificationConstant::SlotType &outType);
+    static bool SlotTypeJSToC(const SlotType &inType, NotificationConstant::SlotType &outType);
 
-    static bool SlotTypeCToJS(const enum NotificationConstant::SlotType &inType, enum SlotType &outType);
+    static bool SlotTypeCToJS(const NotificationConstant::SlotType &inType, SlotType &outType);
 
     static bool SlotLevelJSToC(const SlotLevel &inLevel, NotificationSlot::NotificationLevel &outLevel);
 

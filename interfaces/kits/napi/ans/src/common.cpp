@@ -208,7 +208,7 @@ napi_value Common::SetNotification(
     napi_set_named_property(env, result, "isRemoveAllowed", value);
 
     // readonly source?: number
-    enum SourceType sourceType = SourceType::TYPE_NORMAL;
+    SourceType sourceType = SourceType::TYPE_NORMAL;
     if (!SourceTypeCToJS(notification->GetSourceType(), sourceType)) {
         return NapiGetBoolean(env, false);
     }
@@ -270,7 +270,7 @@ napi_value Common::SetNotificationRequestByNumber(
     napi_set_named_property(env, result, "id", value);
 
     // slotType?: SlotType
-    enum SlotType outType = SlotType::UNKNOWN_TYPE;
+    SlotType outType = SlotType::UNKNOWN_TYPE;
     if (!SlotTypeCToJS(request->GetSlotType(), outType)) {
         return NapiGetBoolean(env, false);
     }
@@ -620,7 +620,7 @@ napi_value Common::SetNotificationSlot(const napi_env &env, const NotificationSl
 
     napi_value value = nullptr;
     // type: SlotType
-    enum SlotType outType = SlotType::UNKNOWN_TYPE;
+    SlotType outType = SlotType::UNKNOWN_TYPE;
     if (!SlotTypeCToJS(slot.GetType(), outType)) {
         return NapiGetBoolean(env, false);
     }
@@ -628,7 +628,7 @@ napi_value Common::SetNotificationSlot(const napi_env &env, const NotificationSl
     napi_set_named_property(env, result, "type", value);
 
     // level?: number
-    enum SlotLevel outLevel { SlotLevel::LEVEL_NONE };
+    SlotLevel outLevel = SlotLevel::LEVEL_NONE;
     if (!SlotLevelCToJS(slot.GetLevel(), outLevel)) {
         return NapiGetBoolean(env, false);
     }
@@ -682,7 +682,7 @@ napi_value Common::SetNotificationSlot(const napi_env &env, const NotificationSl
     return NapiGetBoolean(env, true);
 }
 
-napi_value Common::SetNotificationContentDetailed(const napi_env &env, const enum ContentType &type,
+napi_value Common::SetNotificationContentDetailed(const napi_env &env, const ContentType &type,
     const std::shared_ptr<NotificationContent> &content, napi_value &result)
 {
     ANS_LOGI("enter");
@@ -1212,7 +1212,7 @@ napi_value Common::SetDoNotDisturbDate(
     const napi_env &env, const NotificationDoNotDisturbDate &date, napi_value &result)
 {
     ANS_LOGI("enter");
-    enum DoNotDisturbType outType = DoNotDisturbType::TYPE_NONE;
+    DoNotDisturbType outType = DoNotDisturbType::TYPE_NONE;
     if (!DoNotDisturbTypeCToJS(date.GetDoNotDisturbType(), outType)) {
         return NapiGetBoolean(env, false);
     }
@@ -1473,7 +1473,7 @@ napi_value Common::GetNotificationSlotType(const napi_env &env, const napi_value
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
         napi_get_value_int32(env, result, &slotType);
 
-        enum NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
+        NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
         if (!SlotTypeJSToC(SlotType(slotType), outType)) {
             return nullptr;
         }
@@ -3359,7 +3359,7 @@ napi_value Common::GetNotificationSlotByCustom(const napi_env &env, const napi_v
     NAPI_CALL(env, napi_typeof(env, nobj, &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
     napi_get_value_int32(env, nobj, &slotType);
-    enum NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
+    NotificationConstant::SlotType outType = NotificationConstant::SlotType::OTHER;
     if (!Common::SlotTypeJSToC(SlotType(slotType), outType)) {
         return nullptr;
     }
@@ -3453,7 +3453,7 @@ napi_value Common::GetNotificationKey(const napi_env &env, const napi_value &val
     return NapiGetNull(env);
 }
 
-bool Common::ContentTypeJSToC(const enum ContentType &inType, enum NotificationContent::Type &outType)
+bool Common::ContentTypeJSToC(const ContentType &inType, NotificationContent::Type &outType)
 {
     switch (inType) {
         case ContentType::NOTIFICATION_CONTENT_BASIC_TEXT:
@@ -3478,7 +3478,7 @@ bool Common::ContentTypeJSToC(const enum ContentType &inType, enum NotificationC
     return true;
 }
 
-bool Common::ContentTypeCToJS(const enum NotificationContent::Type &inType, enum ContentType &outType)
+bool Common::ContentTypeCToJS(const NotificationContent::Type &inType, ContentType &outType)
 {
     switch (inType) {
         case NotificationContent::Type::BASIC_TEXT:
@@ -3503,7 +3503,7 @@ bool Common::ContentTypeCToJS(const enum NotificationContent::Type &inType, enum
     return true;
 }
 
-bool Common::SlotTypeJSToC(const enum SlotType &inType, enum NotificationConstant::SlotType &outType)
+bool Common::SlotTypeJSToC(const SlotType &inType, NotificationConstant::SlotType &outType)
 {
     switch (inType) {
         case SlotType::SOCIAL_COMMUNICATION:
@@ -3526,7 +3526,7 @@ bool Common::SlotTypeJSToC(const enum SlotType &inType, enum NotificationConstan
     return true;
 }
 
-bool Common::SlotTypeCToJS(const enum NotificationConstant::SlotType &inType, enum SlotType &outType)
+bool Common::SlotTypeCToJS(const NotificationConstant::SlotType &inType, SlotType &outType)
 {
     switch (inType) {
         case NotificationConstant::SlotType::CUSTOM:
