@@ -619,19 +619,19 @@ public:
     ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport);
 
     /**
-     * Publishes a long task notification.
+     * Publishes a continuous task notification.
      * @param request Indicates the NotificationRequest object for setting the notification content.
      *                This parameter must be specified.
-     * @return Returns publish long task notification result.
+     * @return Returns publish continuous task notification result.
      */
     ErrCode PublishContinuousTaskNotification(const NotificationRequest &request);
 
     /**
-     * Cancels a published long task notification matching the specified label and notificationId.
+     * Cancels a published continuous task notification matching the specified label and notificationId.
      *
-     * @param label Indicates the label of the long task notification to cancel.
-     * @param notificationId Indicates the ID of the long task notification to cancel.
-     * @return Returns cancel long task notification result.
+     * @param label Indicates the label of the continuous task notification to cancel.
+     * @param notificationId Indicates the ID of the continuous task notification to cancel.
+     * @return Returns cancel continuous task notification result.
      */
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId);
 

@@ -1562,7 +1562,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_10900,
 /**
  * @tc.number    : ANS_Publish_01500
  * @tc.name      : ANSPublish01500
- * @tc.desc      : publish a long task notification
+ * @tc.desc      : publish a continuous task notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11000, Function | SmallTest | Level1)
 {
@@ -1578,7 +1578,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11000,
 /**
  * @tc.number    : ANS_Publish_01600
  * @tc.name      : ANSPublish01600
- * @tc.desc      : publish a long task notification
+ * @tc.desc      : publish a continuous task notification
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11100, Function | SmallTest | Level1)
 {

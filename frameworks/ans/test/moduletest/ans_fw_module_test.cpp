@@ -88,15 +88,13 @@ public:
     ~OnSubscribeResultEvent() override
     {}
 
-    OnSubscribeResultEvent()
-        : SubscriberEvent(SubscriberEventType::ON_SUBSCRIBERESULT)
+    OnSubscribeResultEvent() : SubscriberEvent(SubscriberEventType::ON_SUBSCRIBERESULT)
     {}
 };
 
 class OnUnSubscribeResultEvent : public SubscriberEvent {
 public:
-    OnUnSubscribeResultEvent()
-        : SubscriberEvent(SubscriberEventType::ON_UNSUBSCRIBERESULT)
+    OnUnSubscribeResultEvent() : SubscriberEvent(SubscriberEventType::ON_UNSUBSCRIBERESULT)
     {}
 
     ~OnUnSubscribeResultEvent() override
@@ -132,8 +130,7 @@ private:
 
 class OnDoNotDisturbDateChangedEvent : public SubscriberEvent {
 public:
-    explicit OnDoNotDisturbDateChangedEvent(
-        const std::shared_ptr<NotificationDoNotDisturbDate> &date)
+    explicit OnDoNotDisturbDateChangedEvent(const std::shared_ptr<NotificationDoNotDisturbDate> &date)
         : SubscriberEvent(SubscriberEventType::ON_DND_CHANGED), date_(date)
     {}
 
@@ -1352,10 +1349,10 @@ static NotificationDoNotDisturbDate GetDoNotDisturbDateInstance(
     std::chrono::time_point<std::chrono::system_clock> beginTp = std::chrono::system_clock::now();
 
     auto beginDur = std::chrono::duration_cast<std::chrono::milliseconds>(beginTp.time_since_epoch());
-    auto beginMs  = beginDur.count();
+    auto beginMs = beginDur.count();
 
     auto endDur = beginDur + std::chrono::hours(intervalHours);
-    auto endMs  = endDur.count();
+    auto endMs = endDur.count();
 
     return {type, beginMs, endMs};
 }
@@ -1603,7 +1600,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07200, Function | Med
     EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
     EXPECT_NE((int)notifications.size(), (int)0);
     std::string key = notifications[0]->GetKey().c_str();
-    EXPECT_EQ(NotificationHelper::RemoveNotification(key), (int)ERR_ANS_NOTIFICATION_NOT_EXISTS);
+    EXPECT_EQ(NotificationHelper::RemoveNotification(key), (int)ERR_OK);
     int32_t id = notifications[0]->GetId();
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     EXPECT_EQ(NotificationHelper::CancelContinuousTaskNotification(NOTIFICATION_LABEL_0, id), ERR_OK);
@@ -1724,6 +1721,82 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07600, Function | Med
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
     SleepForFC();
     subscriber.ClearEvents();
+    IPCSkeleton::SetCallingUid(1);
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07700, Function | MediumTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
+    SleepForFC();
+    EventParser eventParser;
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    eventParser.SetWaitOnConsumed(false);
+
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_NE((int)notifications.size(), (int)0);
+    int32_t id = notifications[0]->GetId();
+    EXPECT_EQ(NotificationHelper::CancelAllNotifications(), (int)ERR_OK);
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_NE((int)notifications.size(), (int)0);
+    EXPECT_EQ(NotificationHelper::CancelContinuousTaskNotification(NOTIFICATION_LABEL_0, id), ERR_OK);
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_EQ((int)notifications.size(), (int)0);
+    SleepForFC();
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
+    IPCSkeleton::SetCallingUid(1);
+}
+
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07800, Function | MediumTest | Level1)
+{
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+    NotificationRequest req(0);
+    req.SetLabel(NOTIFICATION_LABEL_0);
+    EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
+    SleepForFC();
+    EventParser eventParser;
+    std::list<std::shared_ptr<SubscriberEvent>> events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnConsumed());
+    eventParser.SetWaitOnConsumed(false);
+
+    std::vector<sptr<Notification>> notifications;
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_NE((int)notifications.size(), (int)0);
+    int32_t id = notifications[0]->GetId();
+    EXPECT_EQ(NotificationHelper::RemoveNotifications(), (int)ERR_OK);
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_NE((int)notifications.size(), (int)0);
+    IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
+    EXPECT_EQ(NotificationHelper::CancelContinuousTaskNotification(NOTIFICATION_LABEL_0, id), ERR_OK);
+    EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
+    EXPECT_EQ((int)notifications.size(), (int)0);
+    SleepForFC();
+
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    events = subscriber.GetEvents();
+    eventParser.Parse(events);
+    EXPECT_TRUE(eventParser.GetWaitOnCanceled());
+    EXPECT_TRUE(eventParser.GetWaitOnCanceledWithSortingMapAndDeleteReason());
+    subscriber.ClearEvents();
+    SleepForFC();
     IPCSkeleton::SetCallingUid(1);
 }
 }  // namespace Notification
