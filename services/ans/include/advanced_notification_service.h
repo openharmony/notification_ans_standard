@@ -129,6 +129,7 @@ private:
     ErrCode RemoveFromNotificationList(const sptr<NotificationBundleOption> &bundleOption, const std::string &label,
         int notificationId, sptr<Notification> &notification, bool isCancel = false);
     ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification, bool isCancel = false);
+    ErrCode RemoveFromNotificationListForDeleteAll(const std::string &key, sptr<Notification> &notification);
     std::vector<std::string> GetNotificationKeys(const sptr<NotificationBundleOption> &bundleOption);
     bool IsNotificationExists(const std::string &key);
     void SortNotificationList();
@@ -149,7 +150,7 @@ private:
 
     void AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate);
     bool CheckPermission(const std::string &bundleName);
-    ErrCode PrepereLongTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
+    ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
 
 private:
     static sptr<AdvancedNotificationService> instance_;

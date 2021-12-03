@@ -781,7 +781,7 @@ ErrCode AdvancedNotificationService::DeleteAll()
         for (auto key : keys) {
             sptr<Notification> notification = nullptr;
 
-            result = RemoveFromNotificationList(key, notification);
+            result = RemoveFromNotificationListForDeleteAll(key, notification);
             if (result != ERR_OK) {
                 continue;
             }
@@ -993,11 +993,31 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(
     const std::string &key, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
-        if (!record->notification->IsRemoveAllowed()) {
+        if (!record->notification->IsRemoveAllowed() && isCancel) {
             continue;
         }
         if (record->notification->GetKey() == key) {
             if (!isCancel && record->request->IsUnremovable()) {
+                return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+            }
+            notification = record->notification;
+            notificationList_.remove(record);
+            return ERR_OK;
+        }
+    }
+
+    return ERR_ANS_NOTIFICATION_NOT_EXISTS;
+}
+
+ErrCode AdvancedNotificationService::RemoveFromNotificationListForDeleteAll(
+    const std::string &key, sptr<Notification> &notification)
+{
+    for (auto record : notificationList_) {
+        if (!record->notification->IsRemoveAllowed()) {
+            continue;
+        }
+        if (record->notification->GetKey() == key) {
+            if (record->request->IsUnremovable()) {
                 return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
             }
             notification = record->notification;
@@ -1293,7 +1313,7 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
         return ERR_ANS_INVALID_BUNDLE;
     }
 
-    ErrCode result = PrepereLongTaskNotificationRequest(request, uid);
+    ErrCode result = PrepereContinuousTaskNotificationRequest(request, uid);
     if (result != ERR_OK) {
         return result;
     }
@@ -1634,9 +1654,6 @@ ErrCode AdvancedNotificationService::RemoveNotification(
         sptr<Notification> notification = nullptr;
 
         for (auto record : notificationList_) {
-            if (!record->notification->IsRemoveAllowed()) {
-                continue;
-            }
             if ((record->bundleOption->GetBundleName() == bundle->GetBundleName()) &&
                 (record->bundleOption->GetUid() == bundleOption->GetUid()) &&
                 (record->notification->GetId() == notificationId) && (record->notification->GetLabel() == label)) {
@@ -1694,7 +1711,6 @@ ErrCode AdvancedNotificationService::RemoveAllNotifications(const sptr<Notificat
 
         for (auto record : removeList) {
             notificationList_.remove(record);
-
             if (record->notification != nullptr) {
                 int reason = NotificationConstant::CANCEL_REASON_DELETE;
                 UpdateRecentNotification(record->notification, true, reason);
@@ -1995,7 +2011,7 @@ bool AdvancedNotificationService::CheckPermission(const std::string &bundleName)
     return true;
 }
 
-ErrCode AdvancedNotificationService::PrepereLongTaskNotificationRequest(
+ErrCode AdvancedNotificationService::PrepereContinuousTaskNotificationRequest(
     const sptr<NotificationRequest> &request, const int &uid)
 {
     int pid = IPCSkeleton::GetCallingPid();
