@@ -27,5 +27,6 @@ group("systemtest") {
   deps = [
     "common\acts:actsnotificationtest",
     "resource\ansSTSlotGroupTest:ansSTSlotGroupTest",
+    "systemtest\acts\ansDump:ansDumpTest",
   ]
 }
