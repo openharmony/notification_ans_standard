@@ -58,7 +58,7 @@ void AnsDumpTest::TearDown()
 /*
  * @tc.number: AnsDumpTest_GetServiceObject_0100
  * @tc.name: Get Service Object
- * @tc.desc: 
+ * @tc.desc:
  */
 HWTEST_F(AnsDumpTest, AnsDumpTest_GetServiceObject_0100, Function | MediumTest | Level0)
 {
@@ -74,7 +74,7 @@ HWTEST_F(AnsDumpTest, AnsDumpTest_GetServiceObject_0100, Function | MediumTest |
 /*
  * @tc.number: AnsDumpTest_ShellDump_0100
  * @tc.name: Shell Dump
- * @tc.desc: 
+ * @tc.desc:
  */
 HWTEST_F(AnsDumpTest, AnsDumpTest_ShellDump_0100, Function | MediumTest | Level0)
 {
