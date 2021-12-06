@@ -36,6 +36,7 @@ export interface NotificationSubscriber {
   onDisconnect?:() => void;
   onDestroy?:() => void;
   onDisturbModeChange?:(mode: notification.DoNotDisturbMode) => void;
+  onDoNotDisturbDateChange?:(mode: notification.DoNotDisturbDate) => void;
 }
 
 /**
