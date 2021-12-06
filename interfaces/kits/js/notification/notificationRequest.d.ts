@@ -140,6 +140,11 @@ export interface NotificationRequest {
   largeIcon?: image.PixelMap;
 
   /**
+   * The group information for this notification.
+   */
+  groupName?: string;
+
+  /**
    * Read-only name of the package for which a notification is created.
    */
   readonly creatorBundleName?: string;
