@@ -165,4 +165,18 @@ export interface NotificationRequest {
    * Obtains the unique hash code of a notification in the current application.
    */
   readonly hashCode?: string;
+
+  /**
+   * Whether the notification can be remove.
+   *
+   * @systemapi Hide this for inner system use.
+   */
+  readonly isRemoveAllowed?: boolean;
+
+  /**
+   * Notification source. enum SourceType
+   *
+   * @systemapi Hide this for inner system use.
+   */
+  readonly source?: number;
 }
