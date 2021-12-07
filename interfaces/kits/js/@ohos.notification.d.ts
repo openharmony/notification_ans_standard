@@ -505,6 +505,7 @@ declare namespace notification {
    * Delete the notification of a specified group for this application.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function removeGroupByBundle(bundle: BundleOption, groupName: string, callback: AsyncCallback<void>): void;
   function removeGroupByBundle(bundle: BundleOption, groupName: string): Promise<void>;
@@ -513,6 +514,7 @@ declare namespace notification {
    * Set the Do Not Disturb date.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function setDoNotDisturbDate(date: DoNotDisturbDate, callback: AsyncCallback<void>): void;
   function setDoNotDisturbDate(date: DoNotDisturbDate): Promise<void>;
@@ -521,6 +523,7 @@ declare namespace notification {
    * Obtains the Do Not Disturb date.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getDoNotDisturbDate(callback: AsyncCallback<DoNotDisturbDate>): void;
   function getDoNotDisturbDate(): Promise<DoNotDisturbDate>;
@@ -529,6 +532,7 @@ declare namespace notification {
    * Obtains whether to support the Do Not Disturb mode.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function supportDoNotDisturbMode(callback: AsyncCallback<boolean>): void;
   function supportDoNotDisturbMode(): Promise<boolean>;
@@ -586,10 +590,25 @@ declare namespace notification {
    * @systemapi Hide this for inner system use.
    */
    export enum DoNotDisturbType {
-    TYPE_NONE = 0,         // 非通知勿扰类型
-    TYPE_ONCE = 1,         // 以设置时间段(只看小时和分钟)一次执行勿扰
-    TYPE_DAILY = 2,        // 以设置时间段(只看小时和分钟)每天执行勿扰
-    TYPE_CLEARLY = 3,      // 以设置时间段(明确年月日时分)执行勿扰
+    /**
+     * Non do not disturb type notification
+     */
+    TYPE_NONE = 0,
+
+    /**
+     * Execute do not disturb once in the set time period (only watch hours and minutes)
+     */
+    TYPE_ONCE = 1,
+
+    /**
+     * Execute do not disturb every day with a set time period (only watch hours and minutes)
+     */
+    TYPE_DAILY = 2,
+
+    /**
+     * Execute in the set time period (specify the time, month, day and hour)
+     */
+    TYPE_CLEARLY = 3,
   }
 
   /**
@@ -620,9 +639,20 @@ declare namespace notification {
    * @systemapi Hide this for inner system use.
    */
   export enum SourceType {
-    TYPE_NORMAL   = 0x00000000,      // 普通通知
-    TYPE_CONTINUOUS = 0x00000001,    // 长时任务通知
-    TYPE_TIMER    = 0x00000002,      // 定时通知
+    /**
+     * General notification
+     */
+    TYPE_NORMAL = 0x00000000,
+
+    /**
+     * Continuous notification
+     */
+    TYPE_CONTINUOUS = 0x00000001,
+
+    /**
+     * Scheduled notification
+     */
+    TYPE_TIMER = 0x00000002,
   }
 }
 
