@@ -180,7 +180,7 @@ bool BundleMgrProxy::CleanBundleCacheFiles(
     return true;
 }
 
-bool BundleMgrProxy::CleanBundleDataFiles(const std::string &bundleName)
+bool BundleMgrProxy::CleanBundleDataFiles(const std::string &bundleName, const int userId)
 {
     return true;
 }

@@ -47,6 +47,7 @@ bool BundleMgrProxy::GetApplicationInfos(
 
 bool BundleMgrProxy::GetBundleInfo(const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo)
 {
+    bundleInfo.uid = 1;
     return true;
 }
 
@@ -183,7 +184,7 @@ bool BundleMgrProxy::CleanBundleCacheFiles(
     return true;
 }
 
-bool BundleMgrProxy::CleanBundleDataFiles(const std::string &bundleName)
+bool BundleMgrProxy::CleanBundleDataFiles(const std::string &bundleName, const int userId)
 {
     return true;
 }
