@@ -26,7 +26,6 @@ napi_value Remove(napi_env env, napi_callback_info info);
 napi_value RemoveAsBundle(napi_env env, napi_callback_info info);
 napi_value RemoveAll(napi_env env, napi_callback_info info);
 napi_value RemoveGroupByBundle(napi_env env, napi_callback_info info);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_REMOVE_H

@@ -46,7 +46,6 @@ napi_module _module = {
     .reserved = {0}
 
 };
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_INIT_H

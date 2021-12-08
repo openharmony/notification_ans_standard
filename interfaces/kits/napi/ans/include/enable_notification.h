@@ -23,7 +23,6 @@ using namespace OHOS::Notification;
 
 napi_value EnableNotification(napi_env env, napi_callback_info info);
 napi_value IsNotificationEnabled(napi_env env, napi_callback_info info);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_ENABLE_NOTIFICATION_H

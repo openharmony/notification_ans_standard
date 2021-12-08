@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
 class AnsSlotGroupSystemTest : public Ability {
 protected:
     virtual void OnStart(const Want &want) override;
@@ -45,7 +44,6 @@ private:
     std::string targetBundle;
     std::string targetAbility;
 };
-
 }  // namespace AppExecFwk
 }  // namespace OHOS
 #endif

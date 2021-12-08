@@ -14,8 +14,8 @@
  */
 
 #include <algorithm>
-#include "notification_multiline_content.h"
 #include "ans_log_wrapper.h"
+#include "notification_multiline_content.h"
 
 namespace OHOS {
 namespace Notification {
@@ -95,7 +95,7 @@ bool NotificationMultiLineContent::Marshalling(Parcel &parcel) const
 NotificationMultiLineContent *NotificationMultiLineContent::Unmarshalling(Parcel &parcel)
 {
     auto pContent = new NotificationMultiLineContent();
-    if ((nullptr != pContent) && !pContent->ReadFromParcel(parcel)) {
+    if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;
     }

@@ -27,7 +27,6 @@ public:
 
     virtual void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

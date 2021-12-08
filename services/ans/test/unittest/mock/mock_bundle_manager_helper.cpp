@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 BundleManagerHelper::BundleManagerHelper()
 {}
 
@@ -46,12 +45,10 @@ bool BundleManagerHelper::IsSystemApp(int uid)
 {
     return (uid == SYSTEM_APP_UID);
 }
-
 void BundleManagerHelper::Connect()
 {}
 
 void BundleManagerHelper::Disconnect()
 {}
-
 }  // namespace Notification
 }  // namespace OHOS

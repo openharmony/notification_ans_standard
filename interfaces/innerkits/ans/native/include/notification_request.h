@@ -137,22 +137,6 @@ public:
      */
     static const uint32_t COLOR_DEFAULT;
 
-private:
-    /**
-     * Indicates the color mask, used for calculation with the ARGB value set by setColor(int32_t).
-     */
-    static const uint32_t COLOR_MASK;
-
-    /**
-     * the maximum number of user input history is 5.
-     */
-    static const std::size_t MAX_USER_INPUT_HISTORY;
-
-    /**
-     * the maximum number of action buttons is 3.
-     */
-    static const std::size_t MAX_ACTION_BUTTONS;
-
 public:
     /**
      * Default constructor used to create a NotificationRequest instance.
@@ -874,6 +858,22 @@ public:
      */
     static NotificationRequest *Unmarshalling(Parcel &parcel);
 
+private:
+    /**
+     * Indicates the color mask, used for calculation with the ARGB value set by setColor(int32_t).
+     */
+    static const uint32_t COLOR_MASK;
+
+    /**
+     * the maximum number of user input history is 5.
+     */
+    static const std::size_t MAX_USER_INPUT_HISTORY;
+
+    /**
+     * the maximum number of action buttons is 3.
+     */
+    static const std::size_t MAX_ACTION_BUTTONS;
+    
 private:
     /**
      * Read a NotificationRequest object from a Parcel.

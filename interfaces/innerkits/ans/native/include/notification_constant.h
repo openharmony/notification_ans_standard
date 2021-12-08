@@ -23,8 +23,8 @@ namespace Notification {
 class NotificationConstant {
 public:
     enum InputEditType {
-        EDIT_AUTO,      // Indicates that the system determines whether to allow the user to edit the options before they
-                        // are sent to the application.
+        EDIT_AUTO,      // Indicates that the system determines whether to allow the user to edit the options before
+                        // they are sent to the application.
         EDIT_DISABLED,  // Indicates that the user is not allowed to edit an option before the option is sent to the
                         // application.
         EDIT_ENABLED,   // Indicates that the user is allowed to edit an option before the option is sent to the

@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class SystemEventSubscriber : public EventFwk::CommonEventSubscriber {
 public:
     SystemEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
@@ -43,7 +42,6 @@ public:
 private:
     std::function<void(const EventFwk::CommonEventData &)> callback_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

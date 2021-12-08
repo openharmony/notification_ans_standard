@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace DistributedKv {
-
 Status AnsTestSingleKvStore::GetEntries(const Key &prefixKey, std::vector<Entry> &entries) const
 {
     return Status::SUCCESS;

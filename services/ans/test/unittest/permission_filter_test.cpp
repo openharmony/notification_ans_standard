@@ -26,11 +26,10 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
-
 class PermissionFilterTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
     void SetUp();
     void TearDown();
 };

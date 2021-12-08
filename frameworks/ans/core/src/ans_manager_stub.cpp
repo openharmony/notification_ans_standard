@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
     AnsManagerStub::interfaces_ = {
         {AnsManagerStub::PUBLISH_NOTIFICATION,
@@ -249,7 +248,6 @@ ErrCode AnsManagerStub::HandlePublish(MessageParcel &data, MessageParcel &reply)
     }
 
     ErrCode result = Publish(label, notification);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandlePublish] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -272,7 +270,6 @@ ErrCode AnsManagerStub::HandlePublishToDevice(MessageParcel &data, MessageParcel
     }
 
     ErrCode result = PublishToDevice(notification, deviceId);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandlePublishToDevice] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -295,7 +292,6 @@ ErrCode AnsManagerStub::HandleCancel(MessageParcel &data, MessageParcel &reply)
     }
 
     ErrCode result = Cancel(notificationId, label);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleCancel] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -306,7 +302,6 @@ ErrCode AnsManagerStub::HandleCancel(MessageParcel &data, MessageParcel &reply)
 ErrCode AnsManagerStub::HandleCancelAll(MessageParcel &data, MessageParcel &reply)
 {
     ErrCode result = CancelAll();
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleCancelAll] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -317,9 +312,7 @@ ErrCode AnsManagerStub::HandleCancelAll(MessageParcel &data, MessageParcel &repl
 ErrCode AnsManagerStub::HandleAddSlotByType(MessageParcel &data, MessageParcel &reply)
 {
     NotificationConstant::SlotType slotType = static_cast<NotificationConstant::SlotType>(data.ReadInt32());
-
     ErrCode result = AddSlotByType(slotType);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleAddSlotByType] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -349,7 +342,6 @@ ErrCode AnsManagerStub::HandleRemoveSlotByType(MessageParcel &data, MessageParce
     NotificationConstant::SlotType slotType = static_cast<NotificationConstant::SlotType>(data.ReadInt32());
 
     ErrCode result = RemoveSlotByType(slotType);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleRemoveSlotByType] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -360,7 +352,6 @@ ErrCode AnsManagerStub::HandleRemoveSlotByType(MessageParcel &data, MessageParce
 ErrCode AnsManagerStub::HandleRemoveAllSlots(MessageParcel &data, MessageParcel &reply)
 {
     ErrCode result = RemoveAllSlots();
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleRemoveAllSlots] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -377,7 +368,6 @@ ErrCode AnsManagerStub::HandleAddSlotGroups(MessageParcel &data, MessageParcel &
     }
 
     ErrCode result = AddSlotGroups(groups);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleAddSlotGroups] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -389,7 +379,6 @@ ErrCode AnsManagerStub::HandleGetSlots(MessageParcel &data, MessageParcel &reply
 {
     std::vector<sptr<NotificationSlot>> slots;
     ErrCode result = GetSlots(slots);
-
     if (!WriteParcelableVector(slots, reply, result)) {
         ANS_LOGW("[HandleGetSlots] fail: write slots failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -404,7 +393,6 @@ ErrCode AnsManagerStub::HandleGetSlotByType(MessageParcel &data, MessageParcel &
 
     sptr<NotificationSlot> slot;
     ErrCode result = GetSlotByType(slotType, slot);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetSlotByType] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -427,7 +415,6 @@ ErrCode AnsManagerStub::HandleGetSlotGroup(MessageParcel &data, MessageParcel &r
 
     sptr<NotificationSlotGroup> group;
     ErrCode result = GetSlotGroup(groupId, group);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetSlotGroup] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -444,7 +431,6 @@ ErrCode AnsManagerStub::HandleGetSlotGroups(MessageParcel &data, MessageParcel &
 {
     std::vector<sptr<NotificationSlotGroup>> groups;
     ErrCode result = GetSlotGroups(groups);
-
     if (!WriteParcelableVector(groups, reply, result)) {
         ANS_LOGW("[HandleGetSlotGroups] fail: write groups failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -484,7 +470,6 @@ ErrCode AnsManagerStub::HandleRemoveSlotGroups(MessageParcel &data, MessageParce
     }
 
     ErrCode result = RemoveSlotGroups(groupIds);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleRemoveSlotGroups] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -496,7 +481,6 @@ ErrCode AnsManagerStub::HandleGetActiveNotifications(MessageParcel &data, Messag
 {
     std::vector<sptr<NotificationRequest>> notifications;
     ErrCode result = GetActiveNotifications(notifications);
-
     if (!WriteParcelableVector(notifications, reply, result)) {
         ANS_LOGW("[HandleGetActiveNotifications] fail: write notifications failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -508,7 +492,6 @@ ErrCode AnsManagerStub::HandleGetActiveNotificationNums(MessageParcel &data, Mes
 {
     int num = 0;
     ErrCode result = GetActiveNotificationNums(num);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetActiveNotificationNums] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -525,7 +508,6 @@ ErrCode AnsManagerStub::HandleGetAllActiveNotifications(MessageParcel &data, Mes
 {
     std::vector<sptr<Notification>> notifications;
     ErrCode result = GetAllActiveNotifications(notifications);
-
     if (!WriteParcelableVector(notifications, reply, result)) {
         ANS_LOGW("[HandleGetAllActiveNotifications] fail: write notifications failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -543,7 +525,6 @@ ErrCode AnsManagerStub::HandleGetSpecialActiveNotifications(MessageParcel &data,
 
     std::vector<sptr<Notification>> notifications;
     ErrCode result = GetSpecialActiveNotifications(key, notifications);
-
     if (!WriteParcelableVector(notifications, reply, result)) {
         ANS_LOGW("[HandleGetSpecialActiveNotifications] fail: write notifications failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -571,7 +552,6 @@ ErrCode AnsManagerStub::HandleGetNotificationAgent(MessageParcel &data, MessageP
 {
     std::string agent;
     ErrCode result = GetNotificationAgent(agent);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetNotificationAgent] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -595,7 +575,6 @@ ErrCode AnsManagerStub::HandleCanPublishAsBundle(MessageParcel &data, MessagePar
 
     bool canPublish = false;
     ErrCode result = CanPublishAsBundle(representativeBundle, canPublish);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleCanPublishAsBundle] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -651,7 +630,6 @@ ErrCode AnsManagerStub::HandleGetBundleImportance(MessageParcel &data, MessagePa
 {
     int importance = 0;
     ErrCode result = GetBundleImportance(importance);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetBundleImportance] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -673,7 +651,6 @@ ErrCode AnsManagerStub::HandleSetDoNotDisturbDate(MessageParcel &data, MessagePa
     }
 
     ErrCode result = SetDoNotDisturbDate(date);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleSetDoNotDisturbDate] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -687,7 +664,6 @@ ErrCode AnsManagerStub::HandleGetDoNotDisturbDate(MessageParcel &data, MessagePa
     sptr<NotificationDoNotDisturbDate> date = nullptr;
 
     ErrCode result = GetDoNotDisturbDate(date);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleSetDoNotDisturbDate] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -708,7 +684,6 @@ ErrCode AnsManagerStub::HandleDoesSupportDoNotDisturbMode(MessageParcel &data, M
     bool support = false;
 
     ErrCode result = DoesSupportDoNotDisturbMode(support);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleDoesSupportDoNotDisturbMode] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -731,7 +706,6 @@ ErrCode AnsManagerStub::HandlePublishContinuousTaskNotification(MessageParcel &d
     }
 
     ErrCode result = PublishContinuousTaskNotification(request);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandlePublishContinuousTaskNotification] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -754,7 +728,6 @@ ErrCode AnsManagerStub::HandleCancelContinuousTaskNotification(MessageParcel &da
     }
 
     ErrCode result = CancelContinuousTaskNotification(label, notificationId);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleCancelContinuousTaskNotification] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -766,7 +739,6 @@ ErrCode AnsManagerStub::HandleIsNotificationPolicyAccessGranted(MessageParcel &d
 {
     bool granted = false;
     ErrCode result = HasNotificationPolicyAccessPermission(granted);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleIsNotificationPolicyAccessGranted] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1058,7 +1030,6 @@ ErrCode AnsManagerStub::HandleGetShowBadgeEnabledForBundle(MessageParcel &data, 
 
     bool enabled = false;
     ErrCode result = GetShowBadgeEnabledForBundle(bundleOption, enabled);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetShowBadgeEnabledForBundle] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1075,7 +1046,6 @@ ErrCode AnsManagerStub::HandleGetShowBadgeEnabled(MessageParcel &data, MessagePa
 {
     bool enabled = false;
     ErrCode result = GetShowBadgeEnabled(enabled);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetShowBadgeEnabled] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1154,7 +1124,6 @@ ErrCode AnsManagerStub::HandleAreNotificationsSuspended(MessageParcel &data, Mes
 {
     bool suspended = false;
     ErrCode result = AreNotificationsSuspended(suspended);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleAreNotificationsSuspended] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1171,7 +1140,6 @@ ErrCode AnsManagerStub::HandleGetCurrentAppSorting(MessageParcel &data, MessageP
 {
     sptr<NotificationSortingMap> sortingMap;
     ErrCode result = GetCurrentAppSorting(sortingMap);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetCurrentAppSorting] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1188,7 +1156,6 @@ ErrCode AnsManagerStub::HandleIsAllowedNotify(MessageParcel &data, MessageParcel
 {
     bool allowed = false;
     ErrCode result = IsAllowedNotify(allowed);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleIsAllowedNotify] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1211,7 +1178,6 @@ ErrCode AnsManagerStub::HandleIsSpecialBundleAllowedNotify(MessageParcel &data, 
 
     bool allowed = false;
     ErrCode result = IsSpecialBundleAllowedNotify(bundleOption, allowed);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1233,7 +1199,6 @@ ErrCode AnsManagerStub::HandleCancelGroup(MessageParcel &data, MessageParcel &re
     }
 
     ErrCode result = CancelGroup(groupName);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleCancelGroup] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1256,7 +1221,6 @@ ErrCode AnsManagerStub::HandleRemoveGroupByBundle(MessageParcel &data, MessagePa
     }
 
     ErrCode result = RemoveGroupByBundle(bundleOption, groupName);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleRemoveGroupByBundle] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
@@ -1274,7 +1238,6 @@ ErrCode AnsManagerStub::HandleShellDump(MessageParcel &data, MessageParcel &repl
 
     std::vector<std::string> notificationsInfo;
     ErrCode result = ShellDump(dumpOption, notificationsInfo);
-
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetRecentNotificationsInfo] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;

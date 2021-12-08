@@ -18,6 +18,5 @@
 namespace OHOS {
 namespace Notification {
 const std::string NotificationConstant::EXTRA_INPUTS_SOURCE {"notification_user_input_source"};
-
 }  // namespace Notification
 }  // namespace OHOS

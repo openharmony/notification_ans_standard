@@ -25,7 +25,6 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
-
 class NotificationSubscriberManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();

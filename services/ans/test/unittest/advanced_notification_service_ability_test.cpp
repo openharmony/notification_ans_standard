@@ -22,13 +22,12 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Notification {
-
 class AdvancedNotificationServiceAbilityTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
-    void SetUp(){};
-    void TearDown(){};
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
 };
 
 /**
@@ -43,6 +42,5 @@ HWTEST_F(
     bool runOnCreate = true;
     AdvancedNotificationServiceAbility(systemAbilityId, runOnCreate);
 }
-
 }  // namespace Notification
 }  // namespace OHOS

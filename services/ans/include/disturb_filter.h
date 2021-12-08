@@ -20,11 +20,10 @@
 
 namespace OHOS {
 namespace Notification {
-
 class DisturbFilter : public INotificationFilter {
 public:
-    DisturbFilter(){};
-    ~DisturbFilter(){};
+    DisturbFilter() {};
+    ~DisturbFilter() {};
 
     void OnStart() override;
     void OnStop() override;
@@ -34,7 +33,6 @@ public:
 private:
     void GetTimeInterval(int64_t &beginDate, int64_t &endDate);
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

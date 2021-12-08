@@ -32,7 +32,7 @@
 namespace OHOS::Notification::WantAgent {
 class PendingWant final : public std::enable_shared_from_this<PendingWant>, public Parcelable {
 public:
-    PendingWant(){};
+    PendingWant() {};
     PendingWant(const sptr<AAFwk::IWantSender> &target);
     PendingWant(const sptr<AAFwk::IWantSender> &target, const sptr<IRemoteObject> whitelistToken);
     virtual ~PendingWant() = default;
@@ -255,9 +255,6 @@ private:
     std::vector<std::shared_ptr<CancelListener>> cancelListeners_;
 
     class CancelReceiver : public AAFwk::WantReceiverStub {
-    private:
-        std::weak_ptr<PendingWant> outerInstance_;
-
     public:
         explicit CancelReceiver(const std::weak_ptr<PendingWant> &outerInstance);
         virtual ~CancelReceiver() = default;
@@ -265,6 +262,9 @@ private:
         void Send(const int32_t resultCode) override;
         void PerformReceive(const AAFwk::Want &want, int resultCode, const std::string &data,
             const AAFwk::WantParams &extras, bool serialized, bool sticky, int sendingUser) override;
+
+    private:
+        std::weak_ptr<PendingWant> outerInstance_;
     };
 
     static std::shared_ptr<PendingWant> BuildServicePendingWant(const std::shared_ptr<AppExecFwk::Context> &context,

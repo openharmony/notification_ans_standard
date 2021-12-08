@@ -23,7 +23,6 @@
 
 namespace OHOS::Notification::WantAgent {
 class CompletedCallback {
-
     /**
      * Called when a Send operation as completed.
      *

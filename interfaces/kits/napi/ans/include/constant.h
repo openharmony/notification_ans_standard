@@ -32,7 +32,6 @@ napi_value InputEditTypeInit(napi_env env, napi_value exports);
 napi_value ContentTypeInit(napi_env env, napi_value exports);
 napi_value DoNotDisturbTypeInit(napi_env env, napi_value exports);
 napi_value ConstantInit(napi_env env, napi_value exports);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 

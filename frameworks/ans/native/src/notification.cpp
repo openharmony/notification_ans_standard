@@ -15,13 +15,12 @@
 
 #include "notification.h"
 
-#include <sstream>
 
 #include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
-Notification::Notification(){};
+Notification::Notification() {};
 
 Notification::Notification(const sptr<NotificationRequest> &request)
 {
@@ -445,6 +444,5 @@ std::string Notification::Dump() const
     }
     return dump;
 }
-
 }  // namespace Notification
 }  // namespace OHOS

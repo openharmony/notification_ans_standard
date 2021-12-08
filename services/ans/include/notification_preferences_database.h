@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class NotificationPreferencesDatabase final {
 public:
     NotificationPreferencesDatabase();
@@ -142,7 +141,6 @@ private:
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_ = nullptr;
     DistributedKv::DistributedKvDataManager dataManager_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_SERVICES_NOTIFICATION_PREFERENCES_DATABASE_H

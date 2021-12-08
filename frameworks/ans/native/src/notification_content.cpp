@@ -136,7 +136,7 @@ bool NotificationContent::Marshalling(Parcel &parcel) const
 NotificationContent *NotificationContent::Unmarshalling(Parcel &parcel)
 {
     auto pContent = new NotificationContent();
-    if ((nullptr != pContent) && !pContent->ReadFromParcel(parcel)) {
+    if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;
     }
@@ -162,7 +162,8 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
                 return false;
             }
             content_ = std::dynamic_pointer_cast<NotificationBasicContent>(normalContent);
-        } break;
+            break;
+        }
         case NotificationContent::Type::CONVERSATION: {
             std::shared_ptr<NotificationConversationalContent> conversationalContent(
                 parcel.ReadParcelable<NotificationConversationalContent>());
@@ -171,7 +172,8 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
                 return false;
             }
             content_ = std::dynamic_pointer_cast<NotificationBasicContent>(conversationalContent);
-        } break;
+            break;
+        }
         case NotificationContent::Type::LONG_TEXT: {
             std::shared_ptr<NotificationLongTextContent> longTextContent(
                 parcel.ReadParcelable<NotificationLongTextContent>());
@@ -180,7 +182,8 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
                 return false;
             }
             content_ = std::dynamic_pointer_cast<NotificationBasicContent>(longTextContent);
-        } break;
+            break;
+        }
         case NotificationContent::Type::MEDIA: {
             std::shared_ptr<NotificationMediaContent> mediaContent(parcel.ReadParcelable<NotificationMediaContent>());
             if (!mediaContent) {
@@ -188,7 +191,8 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
                 return false;
             }
             content_ = std::dynamic_pointer_cast<NotificationBasicContent>(mediaContent);
-        } break;
+            break;
+        }
         case NotificationContent::Type::MULTILINE: {
             std::shared_ptr<NotificationMultiLineContent> multiLineContent(
                 parcel.ReadParcelable<NotificationMultiLineContent>());
@@ -197,7 +201,8 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
                 return false;
             }
             content_ = std::dynamic_pointer_cast<NotificationBasicContent>(multiLineContent);
-        } break;
+            break;
+        }
         case NotificationContent::Type::PICTURE: {
             std::shared_ptr<NotificationPictureContent> pictureContent(
                 parcel.ReadParcelable<NotificationPictureContent>());
@@ -206,10 +211,11 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
                 return false;
             }
             content_ = std::dynamic_pointer_cast<NotificationBasicContent>(pictureContent);
-        } break;
+            break;
+        }
         default: {
             return false;
-        } break;
+        }
     }
 
     return true;

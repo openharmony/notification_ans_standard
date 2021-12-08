@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 NotificationPreferences::NotificationPreferences()
 {
     preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
@@ -39,7 +38,6 @@ NotificationPreferences &NotificationPreferences::GetInstance()
 ErrCode NotificationPreferences::AddNotificationSlots(
     const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots)
 {
-
     ANS_LOGD("%{public}s", __FUNCTION__);
     if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || slots.empty()) {
         return ERR_ANS_INVALID_PARAM;
@@ -119,7 +117,6 @@ ErrCode NotificationPreferences::RemoveNotificationSlot(
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result = ERR_OK;
     result = CheckSlotForRemoveSlot(bundleOption, slotType, preferencesInfo);
-
     if (result == ERR_OK && (!preferncesDB_->RemoveSlotFromDisturbeDB(GenerateBundleKey(bundleOption), slotType))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
@@ -237,7 +234,6 @@ ErrCode NotificationPreferences::UpdateNotificationSlots(
 ErrCode NotificationPreferences::UpdateNotificationSlotGroups(
     const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
-
     ANS_LOGD("%{public}s", __FUNCTION__);
     if (bundleOption == nullptr || bundleOption->GetBundleName().empty() || groups.empty()) {
         return ERR_ANS_INVALID_PARAM;
@@ -484,7 +480,6 @@ ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     ErrCode result =
         SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
-
     if (result == ERR_OK) {
         preferencesInfo_ = preferencesInfo;
     }
@@ -778,6 +773,5 @@ void NotificationPreferences::OnDistributedKvStoreDeathRecipient()
         }
     }
 }
-
 }  // namespace Notification
 }  // namespace OHOS

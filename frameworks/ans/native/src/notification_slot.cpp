@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 const int MAX_TEXT_LENGTH = 1000;
 
 NotificationSlot::NotificationSlot(NotificationConstant::SlotType type) : sound_("")

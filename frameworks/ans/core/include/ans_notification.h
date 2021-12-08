@@ -427,7 +427,7 @@ public:
      * @param bundleOption Indicates the bundle name and uid of the application whose notifications are to be removed.
      * @return Returns remove notification result.
      */
-   ErrCode RemoveAllNotifications(const NotificationBundleOption &bundleOption);
+    ErrCode RemoveAllNotifications(const NotificationBundleOption &bundleOption);
 
     /**
      * Removes all removable notifications of a specified bundle.

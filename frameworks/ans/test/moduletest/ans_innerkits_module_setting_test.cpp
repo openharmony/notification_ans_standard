@@ -28,7 +28,6 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
-
 static sptr<ISystemAbilityManager> systemAbilityManager =
     SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
 const int32_t CALLING_UID = 9998;
@@ -73,7 +72,7 @@ HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_001
     EXPECT_EQ(0, NotificationHelper::SetShowBadgeEnabledForBundle(bundleOption, true));
     bool enabled = false;
     EXPECT_EQ(0, NotificationHelper::GetShowBadgeEnabledForBundle(bundleOption, enabled));
-    EXPECT_EQ(true,enabled);
+    EXPECT_EQ(true, enabled);
     EXPECT_EQ("bundlename", bundleOption.GetBundleName());
     EXPECT_EQ(CALLING_UID, bundleOption.GetUid());
 }
@@ -91,7 +90,7 @@ HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_002
     EXPECT_EQ(0, NotificationHelper::SetShowBadgeEnabledForBundle(bundleOption, false));
     bool enabled = false;
     EXPECT_EQ(0, NotificationHelper::GetShowBadgeEnabledForBundle(bundleOption, enabled));
-    EXPECT_EQ(false,enabled);
+    EXPECT_EQ(false, enabled);
     EXPECT_EQ("bundlename", bundleOption.GetBundleName());
     EXPECT_EQ(CALLING_UID, bundleOption.GetUid());
 }
@@ -111,7 +110,7 @@ HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_003
     EXPECT_EQ(0, NotificationHelper::SetNotificationsEnabledForSpecifiedBundle(bundleOption, deviceId, true));
     bool enabled = false;
     EXPECT_EQ(0, NotificationHelper::IsAllowedNotify(bundleOption, enabled));
-    EXPECT_EQ(true,enabled);
+    EXPECT_EQ(true, enabled);
     EXPECT_EQ("bundlename", bundleOption.GetBundleName());
     EXPECT_EQ(CALLING_UID, bundleOption.GetUid());
 }
@@ -119,8 +118,8 @@ HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_003
 /**
  * @tc.number    : ANS_Interface_MT_NotificationSetting_00400
  * @tc.name      : NotificationSetting_00400
- * @tc.desc      : Set a specified application do not publish notification, get the specified application can not publish
- *                 notification.
+ * @tc.desc      : Set a specified application do not publish notification, get the specified application can not
+ *                 publish notification.
  * @tc.expected  : Set a specified application do not publish notification success, get the specified application can
  *                 not publish notification.
  */
@@ -131,7 +130,7 @@ HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_004
     EXPECT_EQ(0, NotificationHelper::SetNotificationsEnabledForSpecifiedBundle(bundleOption, deviceId, false));
     bool enabled = false;
     EXPECT_EQ(0, NotificationHelper::IsAllowedNotify(bundleOption, enabled));
-    EXPECT_EQ(false,enabled);
+    EXPECT_EQ(false, enabled);
     EXPECT_EQ("bundlename", bundleOption.GetBundleName());
     EXPECT_EQ(CALLING_UID, bundleOption.GetUid());
 }

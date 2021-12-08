@@ -274,6 +274,5 @@ void AnsSubscriberProxy::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDi
         return;
     }
 }
-
 }  // namespace Notification
 }  // namespace OHOS

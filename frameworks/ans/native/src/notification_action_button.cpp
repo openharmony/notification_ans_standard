@@ -15,7 +15,6 @@
 
 #include "notification_action_button.h"
 
-#include <new>
 #include "ans_log_wrapper.h"
 
 namespace OHOS {
@@ -34,7 +33,6 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
     auto realExtras = extras;
     if (!realExtras) {
         realExtras = std::make_shared<AppExecFwk::PacMap>();
-
         if (!realExtras) {
             ANS_LOGE("create PacMap object failed");
             return {};
@@ -289,7 +287,7 @@ bool NotificationActionButton::Marshalling(Parcel &parcel) const
 NotificationActionButton *NotificationActionButton::Unmarshalling(Parcel &parcel)
 {
     auto pButton = new NotificationActionButton();
-    if ((nullptr != pButton) && !pButton->ReadFromParcel(parcel)) {
+    if ((pButton != nullptr) && !pButton->ReadFromParcel(parcel)) {
         delete pButton;
         pButton = nullptr;
     }
@@ -345,7 +343,7 @@ bool NotificationActionButton::ReadFromParcel(Parcel &parcel)
         NotificationUserInput *member {nullptr};
         if (valid) {
             member = parcel.ReadParcelable<NotificationUserInput>();
-            if (nullptr == member) {
+            if (member == nullptr) {
                 ANS_LOGE("Failed to read userInput");
                 return false;
             }

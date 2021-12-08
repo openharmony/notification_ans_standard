@@ -17,7 +17,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 namespace {
 REGISTER_SYSTEM_ABILITY_BY_ID(AdvancedNotificationServiceAbility, ADVANCED_NOTIFICATION_SERVICE_ABILITY_ID, true);
 }
@@ -45,6 +44,5 @@ void AdvancedNotificationServiceAbility::OnStop()
 {
     service_ = nullptr;
 }
-
 }  // namespace Notification
 }  // namespace OHOS

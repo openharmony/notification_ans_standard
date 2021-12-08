@@ -1079,10 +1079,10 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0051, Function | SmallTest | Level1)
     slots.push_back(slot);
     g_advancedNotificationService->AddSlots(slots);
 
-    std::vector<sptr<NotificationSlot>> slotsRef{};
+    std::vector<sptr<NotificationSlot>> slotsRef {};
     g_advancedNotificationService->GetSlots(slotsRef);
     EXPECT_EQ(1, static_cast<int>(slotsRef.size()));
-    std::vector<std::string> slotsId{};
+    std::vector<std::string> slotsId {};
     for (const auto &i : slotsRef) {
         slotsId.push_back(i->GetId());
     }
@@ -1104,9 +1104,9 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0052, Function | SmallTest | Level1)
     slots.push_back(slot);
     g_advancedNotificationService->AddSlots(slots);
 
-    std::vector<sptr<NotificationSlot>> slotsRef{};
+    std::vector<sptr<NotificationSlot>> slotsRef {};
     g_advancedNotificationService->GetSlots(slotsRef);
-    std::vector<std::string> slotsId{};
+    std::vector<std::string> slotsId {};
     for (const auto &i : slotsRef) {
         slotsId.push_back(i->GetId());
     }
@@ -1620,7 +1620,6 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0103, Function | SmallTest | Level1)
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_0105, Function | SmallTest | Level1)
 {
-
     std::vector<sptr<NotificationSlot>> slots;
     sptr<NotificationSlot> socialSlot = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     sptr<NotificationSlot> reminderSlot = new NotificationSlot(NotificationConstant::SlotType::SERVICE_REMINDER);

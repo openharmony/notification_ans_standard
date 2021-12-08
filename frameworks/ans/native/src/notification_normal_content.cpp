@@ -30,7 +30,7 @@ bool NotificationNormalContent::Marshalling(Parcel &parcel) const
 NotificationNormalContent *NotificationNormalContent::Unmarshalling(Parcel &parcel)
 {
     auto pContent = new NotificationNormalContent();
-    if ((nullptr != pContent) && !pContent->ReadFromParcel(parcel)) {
+    if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;
     }

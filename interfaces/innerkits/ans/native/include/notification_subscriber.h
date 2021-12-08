@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class NotificationSubscriber {
 public:
     /**
@@ -120,7 +119,7 @@ private:
 
     public:
         SubscriberImpl(NotificationSubscriber &subscriber);
-        ~SubscriberImpl(){};
+        ~SubscriberImpl() {};
 
         void OnConnected() override;
 

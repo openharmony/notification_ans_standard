@@ -79,7 +79,6 @@ private:
     DECLARE_DELAYED_SINGLETON(NotificationSubscriberManager);
     DISALLOW_COPY_AND_MOVE(NotificationSubscriberManager);
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

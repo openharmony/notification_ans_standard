@@ -406,7 +406,6 @@ private:
     static const int ONLY_CALLBACK_MIN_PARA = 0;
     static std::set<std::shared_ptr<WantAgent::WantAgent>> wantAgent_;
 };
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 

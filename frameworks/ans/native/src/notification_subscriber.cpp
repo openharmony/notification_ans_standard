@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 NotificationSubscriber::NotificationSubscriber()
 {
     impl_ = new SubscriberImpl(*this);
@@ -110,7 +109,7 @@ bool NotificationSubscriber::SubscriberImpl::GetAnsManagerProxy()
             }
 
             proxy_ = iface_cast<IAnsManager>(remoteObject);
-            if ((nullptr == proxy_) || (nullptr == proxy_->AsObject())) {
+            if ((proxy_ == nullptr) || (proxy_->AsObject() == nullptr)) {
                 return false;
             }
         }
@@ -120,15 +119,14 @@ bool NotificationSubscriber::SubscriberImpl::GetAnsManagerProxy()
 }
 
 NotificationSubscriber::SubscriberImpl::DeathRecipient::DeathRecipient(SubscriberImpl &subscriberImpl)
-    : subscriberImpl_(subscriberImpl){};
+    : subscriberImpl_(subscriberImpl) {};
 
-NotificationSubscriber::SubscriberImpl::DeathRecipient::~DeathRecipient(){};
+NotificationSubscriber::SubscriberImpl::DeathRecipient::~DeathRecipient() {};
 
 void NotificationSubscriber::SubscriberImpl::DeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     subscriberImpl_.proxy_ = nullptr;
     subscriberImpl_.subscriber_.OnDied();
 }
-
 }  // namespace Notification
 }  // namespace OHOS

@@ -14,7 +14,6 @@
  */
 
 #include "ans_notification.h"
-#include <memory>
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"

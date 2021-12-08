@@ -20,18 +20,16 @@
 
 namespace OHOS {
 namespace Notification {
-
 class PermissionFilter : public INotificationFilter {
 public:
-    PermissionFilter(){};
-    ~PermissionFilter(){};
+    PermissionFilter() {};
+    ~PermissionFilter() {};
 
     void OnStart() override;
     void OnStop() override;
 
     ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) override;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

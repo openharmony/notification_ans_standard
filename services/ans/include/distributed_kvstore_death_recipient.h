@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class DistributedKvStoreDeathRecipient : public DistributedKv::KvStoreDeathRecipient {
 public:
     DistributedKvStoreDeathRecipient(const std::function<void()> &callback)
@@ -43,7 +42,6 @@ public:
 private:
     std::function<void()> callback_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_DISTRIBUTED_KVSTORE_DEATH_RECIPIENT_H

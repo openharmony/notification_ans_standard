@@ -274,6 +274,5 @@ bool BundleMgrProxy::SendTransactCmd(IBundleMgr::Message code, MessageParcel &da
 {
     return true;
 }
-
 }  // namespace AppExecFwk
 }  // namespace OHOS

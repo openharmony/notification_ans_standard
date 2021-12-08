@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include <chrono>
-#include "notification_request.h"
 #include "ans_log_wrapper.h"
+#include "notification_request.h"
 
 namespace OHOS {
 namespace Notification {
@@ -271,7 +269,7 @@ int64_t NotificationRequest::GetDeliveryTime() const
 
 bool NotificationRequest::IsShowDeliveryTime() const
 {
-    return (0 != deliveryTime_) && showDeliveryTime_;
+    return (deliveryTime_ != 0) && showDeliveryTime_;
 }
 
 void NotificationRequest::SetShowDeliveryTime(bool showDeliveryTime)
@@ -653,7 +651,7 @@ const std::shared_ptr<NotificationRequest> NotificationRequest::GetPublicNotific
 
 std::string NotificationRequest::GetNotificationHashCode() const
 {
-    if (creatorBundleName_.empty() || (0 == creatorUid_) || ownerBundleName_.empty()) {
+    if (creatorBundleName_.empty() || (creatorUid_ == 0) || ownerBundleName_.empty()) {
         return "";
     }
 
@@ -1090,7 +1088,7 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
 NotificationRequest *NotificationRequest::Unmarshalling(Parcel &parcel)
 {
     auto objptr = new NotificationRequest();
-    if ((nullptr != objptr) && !objptr->ReadFromParcel(parcel)) {
+    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
@@ -1254,7 +1252,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     auto vsize = parcel.ReadInt32();
     for (auto it = 0; it < vsize; ++it) {
         auto member = parcel.ReadParcelable<NotificationActionButton>();
-        if (nullptr == member) {
+        if (member == nullptr) {
             ANS_LOGE("Failed to read actionButton");
             return false;
         }
@@ -1265,7 +1263,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     vsize = parcel.ReadInt32();
     for (auto it = 0; it < vsize; ++it) {
         auto member = parcel.ReadParcelable<MessageUser>();
-        if (nullptr == member) {
+        if (member == nullptr) {
             ANS_LOGE("Failed to read messageUser");
             return false;
         }

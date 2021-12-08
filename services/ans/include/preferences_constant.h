@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 const static std::string KEY_DO_NOT_DISTURB_TYPE = "ans_doNotDisturbType";
 const static std::string KEY_DO_NOT_DISTURB_BEGIN_DATE = "ans_doNotDisturbBeginDate";
 const static std::string KEY_DO_NOT_DISTURB_END_DATE = "ans_doNotDisturbEndDate";
@@ -74,7 +73,6 @@ enum class BundleType {
     BUNDLE_PRIVATE_ALLOWED_TYPE,
     BUNDLE_ENABLE_NOTIFICATION_TYPE,
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

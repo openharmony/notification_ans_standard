@@ -23,7 +23,6 @@ using namespace OHOS::Notification;
 
 napi_value DisplayBadge(napi_env env, napi_callback_info info);
 napi_value IsBadgeDisplayed(napi_env env, napi_callback_info info);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_DISPLAY_BADGE_H

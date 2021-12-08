@@ -80,7 +80,6 @@ private:
     CallbackInfo dieCallbackInfo_;
     CallbackInfo disturbModeCallbackInfo_;
     CallbackInfo disturbDateCallbackInfo_;
-
 };
 
 struct SubscriberInstancesInfo {
@@ -96,7 +95,6 @@ bool AddSubscriberInstancesInfo(const napi_env &env, const SubscriberInstancesIn
 bool DelSubscriberInstancesInfo(const napi_env &env, SubscriberInstance *subscriber);
 
 napi_value Subscribe(napi_env env, napi_callback_info info);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_SUBSCRIBE_H
