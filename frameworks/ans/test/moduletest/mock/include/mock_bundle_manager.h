@@ -425,7 +425,7 @@ public:
      * @param bundleName Indicates the bundle name of the application whose data is to be cleared.
      * @return Returns true if the data cleared successfully; returns false otherwise.
      */
-    virtual bool CleanBundleDataFiles(const std::string &bundleName) override
+    virtual bool CleanBundleDataFiles(const std::string &bundleName, const int userId) override
     {
         return true;
     }

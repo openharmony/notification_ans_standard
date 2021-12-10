@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
 BundleMgrProxy::BundleMgrProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBundleMgr>(impl)
 {
 }
@@ -47,6 +46,7 @@ bool BundleMgrProxy::GetApplicationInfos(
 
 bool BundleMgrProxy::GetBundleInfo(const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo)
 {
+    bundleInfo.uid = 1;
     return true;
 }
 
@@ -183,7 +183,7 @@ bool BundleMgrProxy::CleanBundleCacheFiles(
     return true;
 }
 
-bool BundleMgrProxy::CleanBundleDataFiles(const std::string &bundleName)
+bool BundleMgrProxy::CleanBundleDataFiles(const std::string &bundleName, const int userId)
 {
     return true;
 }
@@ -277,6 +277,5 @@ bool BundleMgrProxy::SendTransactCmd(IBundleMgr::Message code, MessageParcel &da
 {
     return true;
 }
-
 }  // namespace AppExecFwk
 }  // namespace OHOS
