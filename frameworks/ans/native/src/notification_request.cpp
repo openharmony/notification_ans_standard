@@ -299,6 +299,11 @@ const std::vector<std::shared_ptr<NotificationActionButton>> NotificationRequest
     return actionButtons_;
 }
 
+void NotificationRequest::ClearActionButtons()
+{
+    actionButtons_.clear();
+}
+
 bool NotificationRequest::IsPermitSystemGeneratedContextualActionButtons() const
 {
     return permitted_;

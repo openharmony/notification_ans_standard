@@ -340,6 +340,11 @@ public:
     const std::vector<std::shared_ptr<NotificationActionButton>> GetActionButtons() const;
 
     /**
+     * Clear the list of all NotificationActionButton objects included in this notification.
+     */
+    void ClearActionButtons();
+
+    /**
      * Checks whether the platform is allowed to generate contextual NotificationActionButton objects for this
      * notification.
      * @return true if the platform is allowed to generate contextual NotificationActionButton objects;
