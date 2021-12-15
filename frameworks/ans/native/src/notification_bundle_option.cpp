@@ -18,7 +18,8 @@
 
 namespace OHOS {
 namespace Notification {
-NotificationBundleOption::NotificationBundleOption(const std::string &bundleName, const int32_t uid) : bundleName_(bundleName), uid_(uid)
+NotificationBundleOption::NotificationBundleOption(const std::string &bundleName, const int32_t uid)
+    : bundleName_(bundleName), uid_(uid)
 {}
 
 NotificationBundleOption::~NotificationBundleOption()

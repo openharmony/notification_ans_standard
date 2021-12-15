@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class AnsSubscriberProxy : public IRemoteProxy<IAnsSubscriber> {
 public:
     AnsSubscriberProxy() = delete;

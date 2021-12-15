@@ -29,7 +29,6 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
-
 static sptr<ISystemAbilityManager> systemAbilityManager =
     SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
 const int32_t CALLING_UID = 9998;

@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class AnsSubscriberStub : public IRemoteStub<IAnsSubscriber> {
 public:
     AnsSubscriberStub();

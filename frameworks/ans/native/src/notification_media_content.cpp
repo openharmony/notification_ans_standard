@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include "notification_media_content.h"
 #include "ans_log_wrapper.h"
+#include "notification_media_content.h"
 
 namespace OHOS {
 namespace Notification {
@@ -68,7 +67,7 @@ bool NotificationMediaContent::Marshalling(Parcel &parcel) const
 NotificationMediaContent *NotificationMediaContent::Unmarshalling(Parcel &parcel)
 {
     auto pContent = new NotificationMediaContent();
-    if ((nullptr != pContent) && !pContent->ReadFromParcel(parcel)) {
+    if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;
     }

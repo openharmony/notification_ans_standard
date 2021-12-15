@@ -102,7 +102,7 @@ bool NotificationConversationalMessage::Marshalling(Parcel &parcel) const
 NotificationConversationalMessage *NotificationConversationalMessage::Unmarshalling(Parcel &parcel)
 {
     auto pMessage = new NotificationConversationalMessage();
-    if ((nullptr != pMessage) && !pMessage->ReadFromParcel(parcel)) {
+    if ((pMessage != nullptr) && !pMessage->ReadFromParcel(parcel)) {
         delete pMessage;
         pMessage = nullptr;
     }

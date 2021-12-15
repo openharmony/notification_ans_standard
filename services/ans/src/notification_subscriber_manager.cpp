@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 struct NotificationSubscriberManager::SubscriberRecord {
     sptr<IAnsSubscriber> subscriber {nullptr};
     std::set<std::string> bundleList_ {};

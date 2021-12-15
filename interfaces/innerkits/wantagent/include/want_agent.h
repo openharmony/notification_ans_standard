@@ -25,16 +25,8 @@
 
 namespace OHOS::Notification::WantAgent {
 class WantAgent final : public std::enable_shared_from_this<WantAgent>, public Parcelable {
-private:
-    std::shared_ptr<PendingWant> pendingWant_;
-
-    /**
-     * Constructor.
-     *
-     * @param obj The proxy object.
-     */
 public:
-    WantAgent(){};
+    WantAgent() {};
     virtual ~WantAgent() = default;
     explicit WantAgent(const std::shared_ptr<PendingWant> &pendingWant);
 
@@ -67,6 +59,15 @@ public:
      * @return Returns true if the unmarshalling is successful; returns false otherwise.
      */
     static WantAgent *Unmarshalling(Parcel &parcel);
+
+private:
+    std::shared_ptr<PendingWant> pendingWant_;
+
+    /**
+     * Constructor.
+     *
+     * @param obj The proxy object.
+     */
 };
 }  // namespace OHOS::Notification::WantAgent
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_WANTAGENT_INCLUDE_WANT_AGENT_H

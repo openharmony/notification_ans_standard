@@ -27,15 +27,6 @@
 namespace OHOS::Notification::WantAgent {
 class PendingWant;
 class CompletedDispatcher : public AAFwk::WantReceiverStub {
-private:
-    const std::shared_ptr<PendingWant> pendingWant_;
-    const std::shared_ptr<CompletedCallback> callback_;
-    const std::shared_ptr<AppExecFwk::EventHandler> handler_;
-    AAFwk::Want want_;
-    int resultCode_ = 0;
-    std::string resultData_;
-    AAFwk::WantParams resultExtras_;
-
 public:
     CompletedDispatcher(const std::shared_ptr<PendingWant> &pendingWant,
         const std::shared_ptr<CompletedCallback> &callback, const std::shared_ptr<AppExecFwk::EventHandler> &handler);
@@ -47,6 +38,15 @@ public:
         const AAFwk::WantParams &extras, bool serialized, bool sticky, int sendingUser) override;
 
     void Run();
+
+private:
+    const std::shared_ptr<PendingWant> pendingWant_;
+    const std::shared_ptr<CompletedCallback> callback_;
+    const std::shared_ptr<AppExecFwk::EventHandler> handler_;
+    AAFwk::Want want_;
+    int resultCode_ = 0;
+    std::string resultData_;
+    AAFwk::WantParams resultExtras_;
 };
 }  // namespace OHOS::Notification::WantAgent
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_WANTAGENT_COMPLETED_DISPATCHER_H

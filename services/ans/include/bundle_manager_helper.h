@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class BundleManagerHelper : public DelayedSingleton<BundleManagerHelper> {
 public:
     std::string GetBundleNameByUid(int uid);
@@ -49,7 +48,6 @@ private:
 
     DECLARE_DELAYED_SINGLETON(BundleManagerHelper)
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

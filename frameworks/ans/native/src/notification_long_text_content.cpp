@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include "notification_long_text_content.h"
 #include "ans_log_wrapper.h"
+#include "notification_long_text_content.h"
 
 namespace OHOS {
 namespace Notification {
@@ -97,7 +96,7 @@ bool NotificationLongTextContent::Marshalling(Parcel &parcel) const
 NotificationLongTextContent *NotificationLongTextContent::Unmarshalling(Parcel &parcel)
 {
     auto pContent = new NotificationLongTextContent();
-    if ((nullptr != pContent) && !pContent->ReadFromParcel(parcel)) {
+    if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;
     }

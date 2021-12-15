@@ -90,7 +90,7 @@ bool NotificationPictureContent::Marshalling(Parcel &parcel) const
 NotificationPictureContent *NotificationPictureContent::Unmarshalling(Parcel &parcel)
 {
     auto pContent = new NotificationPictureContent();
-    if ((nullptr != pContent) && !pContent->ReadFromParcel(parcel)) {
+    if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;
     }

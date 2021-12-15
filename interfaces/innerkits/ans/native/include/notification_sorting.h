@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class NotificationSorting final : public Parcelable {
 public:
     /**

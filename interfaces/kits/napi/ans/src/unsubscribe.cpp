@@ -130,6 +130,5 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
         return promise;
     }
 }
-
 }  // namespace NotificationNapi
 }  // namespace OHOS

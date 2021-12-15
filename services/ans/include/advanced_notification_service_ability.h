@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class AdvancedNotificationServiceAbility final : public SystemAbility {
 public:
     AdvancedNotificationServiceAbility(const int32_t systemAbilityId, bool runOnCreate);
@@ -38,7 +37,6 @@ private:
 private:
     sptr<AdvancedNotificationService> service_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

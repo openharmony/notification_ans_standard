@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 BundleManagerHelper::BundleManagerHelper()
 {
     deathRecipient_ =
@@ -118,6 +117,5 @@ int BundleManagerHelper::GetDefaultUidByBundleName(const std::string& bundle)
 
     return uid;
 }
-
 }  // namespace Notification
 }  // namespace OHOS

@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 void NotificationSlotFilter::OnStart()
 {}
 
@@ -63,6 +62,5 @@ ErrCode NotificationSlotFilter::OnPublish(const std::shared_ptr<NotificationReco
 
     return ERR_OK;
 }
-
 }  // namespace Notification
 }  // namespace OHOS

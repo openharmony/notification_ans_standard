@@ -91,8 +91,8 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::string bundleName_{};
-    int32_t uid_{};
+    std::string bundleName_ {};
+    int32_t uid_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS

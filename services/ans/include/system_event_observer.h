@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class SystemEventObserver {
 public:
     SystemEventObserver(const ISystemEvent& callbacks);
@@ -39,7 +38,6 @@ private:
     std::shared_ptr<SystemEventSubscriber> subscriber_ = nullptr;
     ISystemEvent callbacks_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

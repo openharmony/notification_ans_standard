@@ -30,7 +30,6 @@ napi_value GetSlots(napi_env env, napi_callback_info info);
 napi_value GetSlotsByBundle(napi_env env, napi_callback_info info);
 napi_value RemoveSlot(napi_env env, napi_callback_info info);
 napi_value RemoveAllSlots(napi_env env, napi_callback_info info);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 

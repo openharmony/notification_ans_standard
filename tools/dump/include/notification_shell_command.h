@@ -23,11 +23,10 @@
 
 namespace OHOS {
 namespace Notification {
-
 class NotificationShellCommand : public OHOS::AAFwk::ShellCommand {
 public:
     NotificationShellCommand(int argc, char *argv[]);
-    ~NotificationShellCommand() override{};
+    ~NotificationShellCommand() override {};
 
 private:
     ErrCode CreateCommandMap() override;
@@ -39,7 +38,6 @@ private:
 private:
     std::shared_ptr<AnsNotification> ans_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_TOOLS_DUMP_INCLUDE_NOTIFICATION_SHELL_COMMAND_H

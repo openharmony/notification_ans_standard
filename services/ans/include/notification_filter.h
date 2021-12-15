@@ -24,18 +24,16 @@
 
 namespace OHOS {
 namespace Notification {
-
 class INotificationFilter {
 public:
-    INotificationFilter(){};
-    virtual ~INotificationFilter(){};
+    INotificationFilter() {};
+    virtual ~INotificationFilter() {};
 
     virtual void OnStart() = 0;
     virtual void OnStop() = 0;
 
     virtual ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) = 0;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

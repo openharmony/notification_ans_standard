@@ -25,14 +25,12 @@
 
 namespace OHOS {
 namespace Notification {
-
 struct NotificationRecord {
     sptr<NotificationBundleOption> bundleOption;
     sptr<NotificationRequest> request;
     sptr<Notification> notification;
     sptr<NotificationSlot> slot;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

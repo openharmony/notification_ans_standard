@@ -140,11 +140,11 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    std::string id_{};
-    std::string name_{};
-    std::string description_{};
-    std::vector<NotificationSlot> slots_{};
-    bool isDisabled_{false};
+    std::string id_ {};
+    std::string name_ {};
+    std::string description_ {};
+    std::vector<NotificationSlot> slots_ {};
+    bool isDisabled_ {false};
 };
 }  // namespace Notification
 }  // namespace OHOS

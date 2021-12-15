@@ -16,7 +16,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 NotificationPreferencesInfo::BundleInfo::BundleInfo()
 {}
 NotificationPreferencesInfo::BundleInfo::~BundleInfo()
@@ -291,6 +290,5 @@ void NotificationPreferencesInfo::ClearBundleInfo()
 {
     infos_.clear();
 }
-
 }  // namespace Notification
 }  // namespace OHOS

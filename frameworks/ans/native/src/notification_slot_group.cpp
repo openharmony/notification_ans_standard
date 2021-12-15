@@ -137,7 +137,7 @@ bool NotificationSlotGroup::ReadFromParcel(Parcel &parcel)
     if (size) {
         for (int32_t i = 0; i < size; ++i) {
             auto slot = parcel.ReadParcelable<NotificationSlot>();
-            if (nullptr == slot) {
+            if (slot == nullptr) {
                 ANS_LOGE("Failed to read slot");
                 return false;
             }

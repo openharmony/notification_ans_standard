@@ -100,12 +100,6 @@ public:
      */
 public:
     class Builder final : public std::enable_shared_from_this<Builder> {
-    private:
-        std::string permission_;
-        std::shared_ptr<AAFwk::WantParams> params_;
-        std::shared_ptr<AAFwk::Want> want_;
-        int resultCode_ = 0;
-
         /**
          * Default constructor used to create a {@code Builder} instance.
          *
@@ -161,6 +155,12 @@ public:
          * @return Returns the created {@code TriggerInfo} object.
          */
         std::shared_ptr<TriggerInfo> Build();
+
+    private:
+        std::string permission_;
+        std::shared_ptr<AAFwk::WantParams> params_;
+        std::shared_ptr<AAFwk::Want> want_;
+        int resultCode_ = 0;
     };
 
 private:

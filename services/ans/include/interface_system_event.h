@@ -23,11 +23,9 @@
 
 namespace OHOS {
 namespace Notification {
-
 struct ISystemEvent {
     std::function<void(const sptr<NotificationBundleOption> &)> onBundleRemoved;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 NotificationSubscribeInfo::NotificationSubscribeInfo()
 {}
 
@@ -77,6 +76,5 @@ std::string NotificationSubscribeInfo::Dump()
 {
     return "Dump";
 }
-
 }  // namespace Notification
 }  // namespace OHOS

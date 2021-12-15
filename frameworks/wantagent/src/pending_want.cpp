@@ -408,5 +408,4 @@ PendingWant *PendingWant::Unmarshalling(Parcel &parcel)
 
     return pendingWant;
 }
-
 }  // namespace OHOS::Notification::WantAgent

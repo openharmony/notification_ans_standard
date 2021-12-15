@@ -22,12 +22,11 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
-
 class NotificationPreferencesTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
-    void SetUp(){};
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
     void TearDown();
 
     void TestAddNotificationSlot();
@@ -127,7 +126,6 @@ HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00400, Function | Sma
  */
 HWTEST_F(NotificationPreferencesTest, AddNotificationSlots_00500, Function | SmallTest | Level1)
 {
-
     sptr<NotificationSlot> slot1 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
     sptr<NotificationSlot> slot2 = new NotificationSlot(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
 

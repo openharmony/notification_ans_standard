@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class NotificationSortingMap final : public Parcelable {
 public:
     /**
@@ -96,7 +95,6 @@ private:
     std::vector<std::string> sortedKey_ {};
     std::map<std::string, NotificationSorting> sortings_ {};
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

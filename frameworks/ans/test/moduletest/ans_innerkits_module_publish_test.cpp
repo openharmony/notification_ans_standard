@@ -32,7 +32,6 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
-
 static sptr<ISystemAbilityManager> systemAbilityManager =
     SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
 bool OnConsumedReceived = false;
@@ -67,7 +66,7 @@ std::mutex g_send_finished_mtx;
 AAFwk::Want g_want;
 
 const time_t TIME_OUT_SECONDS_LIMIT = 5;
-const std::string CLASSIFICATION_ALARM{"alarm"};
+const std::string CLASSIFICATION_ALARM {"alarm"};
 
 class TestAnsSubscriber : public NotificationSubscriber {
 public:

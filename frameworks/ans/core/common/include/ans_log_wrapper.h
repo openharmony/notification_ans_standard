@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 #ifndef LOG_DOMAIN
 #define LOG_DOMAIN 0xD001800
 #endif

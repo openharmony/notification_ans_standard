@@ -15,8 +15,8 @@
 
 #include "napi_want_agent.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -330,7 +330,7 @@ napi_value NAPI_GetBundleName(napi_env env, napi_callback_info info)
         NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
-    AsyncGetBundleNameCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetBundleNameCallbackInfo{
+    AsyncGetBundleNameCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetBundleNameCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -454,7 +454,7 @@ napi_value NAPI_GetUid(napi_env env, napi_callback_info info)
         NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
-    AsyncGetUidCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetUidCallbackInfo{
+    AsyncGetUidCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetUidCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -576,7 +576,7 @@ napi_value NAPI_GetWant(napi_env env, napi_callback_info info)
         NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
-    AsyncGetWantCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetWantCallbackInfo{
+    AsyncGetWantCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetWantCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -716,7 +716,7 @@ napi_value NAPI_Cancel(napi_env env, napi_callback_info info)
         NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
-    AsyncCancelCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncCancelCallbackInfo{
+    AsyncCancelCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncCancelCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -862,7 +862,7 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
 
-    AsyncTriggerCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncTriggerCallbackInfo{
+    AsyncTriggerCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncTriggerCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -1002,7 +1002,7 @@ napi_value NAPI_Equal(napi_env env, napi_callback_info info)
         NAPI_ASSERT_RETURN_NULL(env, valuetype == napi_function, "Wrong argument type. Function expected.");
         callBackMode = true;
     }
-    AsyncEqualCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncEqualCallbackInfo{
+    AsyncEqualCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncEqualCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -1254,7 +1254,7 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
         callBackMode = true;
     }
 
-    AsyncGetWantAgentCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetWantAgentCallbackInfo{
+    AsyncGetWantAgentCallbackInfo *asyncCallbackInfo = new (std::nothrow) AsyncGetWantAgentCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,

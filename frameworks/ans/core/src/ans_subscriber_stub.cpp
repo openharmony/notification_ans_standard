@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <functional>
 
 #include "ans_subscriber_stub.h"
 
@@ -216,6 +215,5 @@ void AnsSubscriberStub::OnUpdated(const sptr<NotificationSortingMap> &notificati
 
 void AnsSubscriberStub::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date)
 {}
-
 }  // namespace Notification
 }  // namespace OHOS

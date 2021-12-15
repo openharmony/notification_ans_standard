@@ -14,16 +14,12 @@
  */
 #include "notification_preferences_database.h"
 
-#include <iterator>
-#include <sstream>
-#include <unistd.h>
 
 #include "ans_log_wrapper.h"
 
 #include "uri.h"
 namespace OHOS {
 namespace Notification {
-
 const std::map<std::string,
     std::function<void(NotificationPreferencesDatabase *, sptr<NotificationSlot> &, std::string &)>>
     NotificationPreferencesDatabase::slotMap_ = {

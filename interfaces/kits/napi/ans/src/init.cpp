@@ -96,6 +96,5 @@ __attribute__((constructor)) void RegisterModule(void)
     napi_module_register(&_module);
 }
 EXTERN_C_END
-
 }  // namespace NotificationNapi
 }  // namespace OHOS

@@ -15,11 +15,9 @@
 
 #include "event_handler.h"
 #include "event_handler_utils.h"
-#include <iostream>
 
 namespace OHOS {
 namespace AppExecFwk {
-
 std::shared_ptr<EventHandler> EventHandler::Current()
 {
     const std::weak_ptr<EventHandler> &wp = std::make_shared<EventHandler>(EventRunner::Create(true));

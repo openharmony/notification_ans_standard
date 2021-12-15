@@ -25,7 +25,6 @@ using namespace OHOS::Notification;
 napi_value Cancel(napi_env env, napi_callback_info info);
 napi_value CancelAll(napi_env env, napi_callback_info info);
 napi_value CancelGroup(napi_env env, napi_callback_info info);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 

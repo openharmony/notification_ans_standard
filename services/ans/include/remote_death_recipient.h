@@ -12,18 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_REMOTE_DEATH_RECIPIENT_H
+#define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_REMOTE_DEATH_RECIPIENT_H
 
 #include <functional>
 
 #include "iremote_object.h"
 #include "refbase.h"
 
-#ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_REMOTE_DEATH_RECIPIENT_H
-#define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_REMOTE_DEATH_RECIPIENT_H
-
 namespace OHOS {
 namespace Notification {
-
 class RemoteDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     RemoteDeathRecipient(std::function<void(const wptr<IRemoteObject> &)> callback)
@@ -46,7 +44,6 @@ public:
 private:
     std::function<void(const wptr<IRemoteObject> &)> callback_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

@@ -42,10 +42,6 @@ static const int FLAG_UPDATE_CURRENT = 1 << 27;
 static const int FLAG_IMMUTABLE = 1 << 26;
 
 class WantAgentHelper final : public std::enable_shared_from_this<WantAgentHelper> {
-private:
-    WantAgentHelper();
-    virtual ~WantAgentHelper() = default;
-
 public:
     /**
      * Obtains an WantAgent object.
@@ -166,6 +162,10 @@ public:
      */
     static void UnregisterCancelListener(
         const std::shared_ptr<CancelListener> &cancelListener, const std::shared_ptr<WantAgent> &agent);
+        
+private:
+    WantAgentHelper();
+    virtual ~WantAgentHelper() = default;
 
 private:
     static void Send(const std::shared_ptr<AppExecFwk::Context> &context,

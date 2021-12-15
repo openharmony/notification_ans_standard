@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 void PermissionFilter::OnStart()
 {}
 
@@ -49,6 +48,5 @@ ErrCode PermissionFilter::OnPublish(const std::shared_ptr<NotificationRecord> &r
     }
     return result;
 }
-
 }  // namespace Notification
 }  // namespace OHOS

@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 SystemEventObserver::SystemEventObserver(const ISystemEvent &callbacks) : callbacks_(callbacks)
 {
     EventFwk::MatchingSkills matchingSkills;
@@ -53,6 +52,5 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
         }
     }
 }
-
 }  // namespace Notification
 }  // namespace OHOS

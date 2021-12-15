@@ -32,13 +32,6 @@ namespace OHOS::Notification::WantAgent {
  *
  */
 class WantAgentInfo final : public std::enable_shared_from_this<WantAgentInfo> {
-private:
-    int requestCode_ = 0;
-    WantAgentConstant::OperationType operationType_ = WantAgentConstant::OperationType::UNKNOWN_TYPE;
-    std::vector<WantAgentConstant::Flags> flags_ = std::vector<WantAgentConstant::Flags>();
-    std::vector<std::shared_ptr<AAFwk::Want>> wants_ = std::vector<std::shared_ptr<AAFwk::Want>>();
-    std::shared_ptr<AAFwk::WantParams> extraInfo_;
-
     /**
      * Default constructor used to create an empty WantAgentInfo instance.
      *
@@ -119,6 +112,13 @@ public:
      * @return Returns the extra information of the WantAgent object.
      */
     std::shared_ptr<AAFwk::WantParams> GetExtraInfo() const;
+
+private:
+    int requestCode_ = 0;
+    WantAgentConstant::OperationType operationType_ = WantAgentConstant::OperationType::UNKNOWN_TYPE;
+    std::vector<WantAgentConstant::Flags> flags_ = std::vector<WantAgentConstant::Flags>();
+    std::vector<std::shared_ptr<AAFwk::Want>> wants_ = std::vector<std::shared_ptr<AAFwk::Want>>();
+    std::shared_ptr<AAFwk::WantParams> extraInfo_;
 };
 }  // namespace OHOS::Notification::WantAgent
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_WANTAGENT_INCLUDE_WANT_AGENT_INFO_H

@@ -15,7 +15,6 @@
 
 #include "notification_user_input.h"
 
-#include <new>
 #include "ans_log_wrapper.h"
 
 namespace OHOS {
@@ -281,7 +280,7 @@ bool NotificationUserInput::Marshalling(Parcel &parcel) const
 NotificationUserInput *NotificationUserInput::Unmarshalling(Parcel &parcel)
 {
     auto pUserInput = new NotificationUserInput();
-    if ((nullptr != pUserInput) && !pUserInput->ReadFromParcel(parcel)) {
+    if ((pUserInput != nullptr) && !pUserInput->ReadFromParcel(parcel)) {
         delete pUserInput;
         pUserInput = nullptr;
     }

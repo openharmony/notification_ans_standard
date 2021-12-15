@@ -14,7 +14,6 @@
  */
 
 #include "want_agent_log_wrapper.h"
-#include <iostream>
 
 namespace OHOS::Notification::WantAgent {
 // initial static member object

@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 AnsManagerProxy::AnsManagerProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IAnsManager>(impl)
 {}
 
@@ -1442,7 +1441,6 @@ ErrCode AnsManagerProxy::GetShowBadgeEnabled(bool &enabled)
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
     ErrCode result = InnerTransact(GET_SHOW_BADGE_ENABLED, option, data, reply);
-
     if (result != ERR_OK) {
         ANS_LOGW("[GetShowBadgeEnabled] fail: transact ErrCode=%{public}d", result);
         return ERR_ANS_TRANSACT_FAILED;
@@ -2009,6 +2007,5 @@ bool AnsManagerProxy::ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos
 
     return true;
 }
-
 }  // namespace Notification
 }  // namespace OHOS

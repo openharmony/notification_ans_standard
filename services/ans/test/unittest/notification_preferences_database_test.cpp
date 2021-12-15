@@ -21,13 +21,12 @@
 using namespace testing::ext;
 namespace OHOS {
 namespace Notification {
-
 class NotificationPreferencesDatabaseTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
-    void SetUp(){};
-    void TearDown(){};
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
 
     const std::string bundleName_ = "bundleName";
     std::unique_ptr<NotificationPreferencesDatabase> preferncesDB_ =
@@ -173,7 +172,6 @@ HWTEST_F(NotificationPreferencesDatabaseTest, PutImportance_00200, Function | Sm
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutTotalBadgeNums_00100, Function | SmallTest | Level1)
 {
-
     EXPECT_TRUE(preferncesDB_->PutTotalBadgeNums(bundleName_, 0));
 }
 
@@ -456,7 +454,6 @@ HWTEST_F(NotificationPreferencesDatabaseTest, CheckKvStore_00100, Function | Sma
  */
 HWTEST_F(NotificationPreferencesDatabaseTest, PutBundlePropertyValueToDisturbeDB_00100, Function | SmallTest | Level1)
 {
-
     NotificationPreferencesInfo::BundleInfo info;
     EXPECT_EQ(true, preferncesDB_->PutBundlePropertyValueToDisturbeDB(info));
 }
@@ -494,6 +491,5 @@ HWTEST_F(NotificationPreferencesDatabaseTest, CheckBundle_00100, Function | Smal
 {
     EXPECT_EQ(true, preferncesDB_->CheckBundle(bundleName_));
 }
-
 }  // namespace Notification
 }  // namespace OHOS

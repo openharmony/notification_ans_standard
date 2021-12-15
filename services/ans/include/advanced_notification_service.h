@@ -36,7 +36,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 class AdvancedNotificationService final : public AnsManagerStub {
 public:
     ~AdvancedNotificationService() override;
@@ -165,7 +164,6 @@ private:
     std::shared_ptr<SystemEventObserver> systemEventObserver_ = nullptr;
     DistributedKv::DistributedKvDataManager dataManager_;
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

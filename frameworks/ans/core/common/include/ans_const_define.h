@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 // Max active notification number
 constexpr uint32_t MAX_ACTIVE_NUM = 1000;
 constexpr uint32_t MAX_ACTIVE_NUM_PERAPP = 100;

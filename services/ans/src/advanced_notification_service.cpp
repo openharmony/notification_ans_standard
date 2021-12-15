@@ -34,7 +34,6 @@
 
 namespace OHOS {
 namespace Notification {
-
 namespace {
 static const std::string ACTIVE_NOTIFICATION_OPTION = "active";
 static const std::string RECENT_NOTIFICATION_OPTION = "recent";
