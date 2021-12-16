@@ -187,11 +187,11 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::SHELL_DUMP,
             std::bind(
                 &AnsManagerStub::HandleShellDump, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
-        {AnsManagerStub::PUBLISH_LONG_TASK_NOTIFICATION,
+        {AnsManagerStub::PUBLISH_CONTINUOUS_TASK_NOTIFICATION,
             std::bind(
                 &AnsManagerStub::HandlePublishContinuousTaskNotification, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
-        {AnsManagerStub::CANCEL_LONG_TASK_NOTIFICATION,
+        {AnsManagerStub::CANCEL_CONTINUOUS_TASK_NOTIFICATION,
             std::bind(
                 &AnsManagerStub::HandleCancelContinuousTaskNotification, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
