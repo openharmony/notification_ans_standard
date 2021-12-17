@@ -1894,7 +1894,7 @@ ErrCode AnsManagerProxy::PublishContinuousTaskNotification(const sptr<Notificati
 
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(PUBLISH_LONG_TASK_NOTIFICATION, option, data, reply);
+    ErrCode result = InnerTransact(PUBLISH_CONTINUOUS_TASK_NOTIFICATION, option, data, reply);
     if (result != ERR_OK) {
         ANS_LOGW("[PublishContinuousTaskNotification] fail: transact ErrCode=%{public}d", result);
         return ERR_ANS_TRANSACT_FAILED;
@@ -1927,7 +1927,7 @@ ErrCode AnsManagerProxy::CancelContinuousTaskNotification(const std::string &lab
     }
     MessageParcel reply;
     MessageOption option = {MessageOption::TF_SYNC};
-    ErrCode result = InnerTransact(CANCEL_LONG_TASK_NOTIFICATION, option, data, reply);
+    ErrCode result = InnerTransact(CANCEL_CONTINUOUS_TASK_NOTIFICATION, option, data, reply);
     if (result != ERR_OK) {
         ANS_LOGW("[CancelContinuousTaskNotification] fail: transact ErrCode=%{public}d", result);
         return ERR_ANS_TRANSACT_FAILED;

@@ -1546,7 +1546,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_07000, Function | Medium
     EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07100, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07100, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -1581,7 +1581,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07100, Function | Med
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07200, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07200, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -1618,7 +1618,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07200, Function | Med
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07300, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07300, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -1654,14 +1654,14 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07300, Function | Med
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07400, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07400, Function | MediumTest | Level1)
 {
     NotificationRequest req(0);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07500, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07500, Function | MediumTest | Level1)
 {
     TestAnsSubscriber subscriber;
     NotificationSubscribeInfo info;
@@ -1697,7 +1697,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07500, Function | Med
     SleepForFC();
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07600, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07600, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -1724,7 +1724,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07600, Function | Med
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07700, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07700, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -1762,7 +1762,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07700, Function | Med
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishLongTask_07800, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07800, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;

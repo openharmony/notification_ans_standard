@@ -1367,7 +1367,7 @@ ErrCode AdvancedNotificationService::CancelContinuousTaskNotification(const std:
             }
         }
         if (notification != nullptr) {
-            int reason = NotificationConstant::CANCEL_REASON_DELETE;
+            int reason = NotificationConstant::APP_CANCEL_REASON_DELETE;
             UpdateRecentNotification(notification, true, reason);
             sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
             NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
