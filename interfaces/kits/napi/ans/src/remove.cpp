@@ -379,7 +379,7 @@ napi_value RemoveGroupByBundle(napi_env env, napi_callback_info info)
                 asynccallbackinfo->params.option.GetUid(),
                 asynccallbackinfo->params.groupName.c_str());
             asynccallbackinfo->info.errorCode = NotificationHelper::RemoveGroupByBundle(
-                    asynccallbackinfo->params.option, asynccallbackinfo->params.groupName);
+                asynccallbackinfo->params.option, asynccallbackinfo->params.groupName);
         },
         AsyncCompleteCallbackRemoveGroupByBundle,
         (void *)asynccallbackinfo,

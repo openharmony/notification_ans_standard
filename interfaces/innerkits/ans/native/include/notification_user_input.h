@@ -81,7 +81,8 @@ public:
 public:
     /**
      * A static function used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      * @return the shared_ptr object owns the created NotificationUserInput object otherwise return empty object if
      * inputKey is empty.
      */
@@ -89,7 +90,8 @@ public:
 
     /**
      * A static function used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      * @param tag Indicates the tag to be displayed.
      * @param options Indicates the list of predefined options to be provided for user input.
      * @param permitFreeFormInput Specifies whether to allow arbitrary text values. The default value is true,
@@ -231,13 +233,15 @@ private:
 
     /**
      * A constructor used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      */
     explicit NotificationUserInput(const std::string &inputKey);
 
     /**
      * A constructor used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      * @param tag Indicates the tag to be displayed.
      * @param options Indicates the list of predefined options to be provided for user input.
      * @param permitFreeFormInput Specifies whether to allow arbitrary text values. The default value is true,
