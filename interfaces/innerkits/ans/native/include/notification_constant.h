@@ -105,7 +105,7 @@ public:
          */
         TYPE_TIMER = 0x00000002
     };
-    
+
     /**
      * Indicates that a notification is deleted because it is clicked.
      */

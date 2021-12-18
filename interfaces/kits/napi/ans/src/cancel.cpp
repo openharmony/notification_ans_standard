@@ -59,31 +59,31 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     napi_valuetype valuetype = napi_undefined;
     // argv[0]: id: number
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-    NAPI_CALL(env, napi_get_value_int32(env, argv[0], &paras.id));
+    NAPI_CALL(env, napi_get_value_int32(env, argv[PARAM0], &paras.id));
 
     // argv[1]: label: string / callback
     if (argc >= CANCEL_MAX_PARA - 1) {
-        NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
         NAPI_ASSERT(env,
             (valuetype == napi_string || valuetype == napi_function),
             "Wrong argument type. String or function expected.");
         if (valuetype == napi_string) {
             char str[STR_MAX_SIZE] = {0};
             size_t strLen = 0;
-            NAPI_CALL(env, napi_get_value_string_utf8(env, argv[1], str, STR_MAX_SIZE - 1, &strLen));
+            NAPI_CALL(env, napi_get_value_string_utf8(env, argv[PARAM1], str, STR_MAX_SIZE - 1, &strLen));
             paras.label = str;
         } else {
-            napi_create_reference(env, argv[1], 1, &paras.callback);
+            napi_create_reference(env, argv[PARAM1], 1, &paras.callback);
         }
     }
 
     // argv[2]: callback
     if (argc >= CANCEL_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[CANCEL_MAX_PARA - 1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[CANCEL_MAX_PARA - 1], 1, &paras.callback);
+        napi_create_reference(env, argv[PARAM2], 1, &paras.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -101,18 +101,18 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     napi_valuetype valuetype = napi_undefined;
     // argv[0]: groupName: string
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
-    NAPI_CALL(env, napi_get_value_string_utf8(env, argv[0], str, STR_MAX_SIZE - 1, &strLen));
+    NAPI_CALL(env, napi_get_value_string_utf8(env, argv[PARAM0], str, STR_MAX_SIZE - 1, &strLen));
     paras.groupName = str;
 
     // argv[1]: callback
     if (argc >= CANCEL_GROUP_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[CANCEL_GROUP_MIN_PARA], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[CANCEL_GROUP_MIN_PARA], 1, &paras.callback);
+        napi_create_reference(env, argv[PARAM1], 1, &paras.callback);
     }
 
     return Common::NapiGetNull(env);

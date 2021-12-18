@@ -16,9 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_MEDIA_CONTENT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_MEDIA_CONTENT_H
 
-#include <memory>
-#include <string>
-#include <vector>
 #include "notification_basic_content.h"
 #include "parcel.h"
 

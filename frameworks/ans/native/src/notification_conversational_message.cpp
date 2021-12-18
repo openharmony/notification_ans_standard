@@ -56,9 +56,13 @@ const std::shared_ptr<Uri> NotificationConversationalMessage::GetUri() const
 
 std::string NotificationConversationalMessage::Dump()
 {
-    return "NotificationConversationalMessage[ text = " + text_ + ", arrivedTime = " + std::to_string(arrivedTime_) +
-           ", mimeType = " + mimeType_ + ", uri = " + (uri_ ? uri_->ToString() : "null") +
-           ", sender = " + sender_.Dump() + " ]";
+    return "NotificationConversationalMessage{ "
+            "text = " + text_ +
+            ", arrivedTime = " + std::to_string(arrivedTime_) +
+            ", mimeType = " + mimeType_ +
+            ", uri = " + (uri_ ? uri_->ToString() : "null") +
+            ", sender = " + sender_.Dump() +
+            " }";
 }
 
 bool NotificationConversationalMessage::Marshalling(Parcel &parcel) const
@@ -101,7 +105,7 @@ bool NotificationConversationalMessage::Marshalling(Parcel &parcel) const
 
 NotificationConversationalMessage *NotificationConversationalMessage::Unmarshalling(Parcel &parcel)
 {
-    auto pMessage = new NotificationConversationalMessage();
+    auto pMessage = new (std::nothrow) NotificationConversationalMessage();
     if ((pMessage != nullptr) && !pMessage->ReadFromParcel(parcel)) {
         delete pMessage;
         pMessage = nullptr;

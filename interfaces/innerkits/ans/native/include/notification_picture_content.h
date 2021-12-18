@@ -16,11 +16,9 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_PICTURE_CONTENT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_PICTURE_CONTENT_H
 
-#include <memory>
-#include <string>
 #include "notification_basic_content.h"
-#include "pixel_map.h"
 #include "parcel.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace Notification {

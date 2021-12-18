@@ -28,6 +28,9 @@ const std::int32_t STR_MAX_SIZE = 64;
 const std::int32_t LONG_STR_MAX_SIZE = 1024;
 const int NO_ERROR = 0;
 const int ERROR = -1;
+const int PARAM0 = 0;
+const int PARAM1 = 1;
+const int PARAM2 = 2;
 
 enum class ContentType {
     NOTIFICATION_CONTENT_BASIC_TEXT,
@@ -284,10 +287,14 @@ public:
     static napi_value GetNotificationWantAgent(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
 
-    static napi_value GetNotificationSlot(const napi_env &env, const napi_value &value, NotificationSlot &slot);
-    static napi_value GetNotificationSlotByString(const napi_env &env, const napi_value &value, NotificationSlot &slot);
-    static napi_value GetNotificationSlotByBool(const napi_env &env, const napi_value &value, NotificationSlot &slot);
-    static napi_value GetNotificationSlotByNumber(const napi_env &env, const napi_value &value, NotificationSlot &slot);
+    static napi_value GetNotificationSlot(
+        const napi_env &env, const napi_value &value, NotificationSlot &slot);
+    static napi_value GetNotificationSlotByString(
+        const napi_env &env, const napi_value &value, NotificationSlot &slot);
+    static napi_value GetNotificationSlotByBool(
+        const napi_env &env, const napi_value &value, NotificationSlot &slot);
+    static napi_value GetNotificationSlotByNumber(
+        const napi_env &env, const napi_value &value, NotificationSlot &slot);
     static napi_value GetNotificationSlotByVibration(
         const napi_env &env, const napi_value &value, NotificationSlot &slot);
 
@@ -371,7 +378,7 @@ public:
     static napi_value GetNotificationMultiLineContentLines(const napi_env &env, const napi_value &result,
         std::shared_ptr<OHOS::Notification::NotificationMultiLineContent> &multiLineContent);
 
-    static napi_value GetBundleOption(const napi_env &env, const napi_value &value, BundleOption &option);
+    static napi_value GetBundleOption(const napi_env &env, const napi_value &value, NotificationBundleOption &option);
 
     static napi_value GetNotificationKey(const napi_env &env, const napi_value &value, NotificationKey &key);
 
@@ -400,8 +407,6 @@ public:
 private:
     static const int ARGS_ONE = 1;
     static const int ARGS_TWO = 2;
-    static const int PARAM0 = 0;
-    static const int PARAM1 = 1;
     static const int ONLY_CALLBACK_MAX_PARA = 1;
     static const int ONLY_CALLBACK_MIN_PARA = 0;
     static std::set<std::shared_ptr<WantAgent::WantAgent>> wantAgent_;

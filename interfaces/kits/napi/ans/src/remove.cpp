@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-#include "remove.h"
 #include <optional>
-#include "common.h"
-#include "notification_bundle_option.h"
+#include "remove.h"
 
 namespace OHOS {
 namespace NotificationNapi {
@@ -33,7 +31,7 @@ const int REMOVE_GROUP_BY_BUNDLE_MIN_PARA = 2;
 const int REMOVE_GROUP_BY_BUNDLE_MAX_PARA = 3;
 
 struct BundleAndKeyInfo {
-    BundleOption option;
+    NotificationBundleOption option;
     NotificationKey key;
 };
 
@@ -51,7 +49,7 @@ struct AsyncCallbackInfoRemove {
 };
 
 struct RemoveParamsGroupByBundle {
-    BundleOption option;
+    NotificationBundleOption option;
     std::string groupName = "";
     napi_ref callback = nullptr;
 };
@@ -74,7 +72,7 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     NAPI_ASSERT(env, argc >= REMOVE_MIN_PARA, "Wrong number of arguments");
 
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env,
         (valuetype == napi_string) || (valuetype == napi_object),
         "Wrong argument type. String or object expected.");
@@ -82,28 +80,28 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
         // argv[0]: hashCode
         size_t strLen = 0;
         char str[STR_MAX_SIZE] = {0};
-        NAPI_CALL(env, napi_get_value_string_utf8(env, argv[0], str, STR_MAX_SIZE - 1, &strLen));
+        NAPI_CALL(env, napi_get_value_string_utf8(env, argv[PARAM0], str, STR_MAX_SIZE - 1, &strLen));
         params.hashcode = str;
 
         // argv[1]:callback
         if (argc >= REMOVE_OR_BUNDLE_MAX_PARA) {
-            NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+            NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
             NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-            napi_create_reference(env, argv[1], 1, &params.callback);
+            napi_create_reference(env, argv[PARAM1], 1, &params.callback);
         }
     } else {
         NAPI_ASSERT(env, argc >= REMOVE_BY_BUNDLE_AND_KEY_MIN_PARA, "Wrong number of arguments");
 
         BundleAndKeyInfo info {};
         // argv[0]: BundleOption
-        auto retValue = Common::GetBundleOption(env, argv[0], info.option);
+        auto retValue = Common::GetBundleOption(env, argv[PARAM0], info.option);
         if (retValue == nullptr) {
             ANS_LOGE("GetBundleOption failed.");
             return nullptr;
         }
 
         // argv[1]: NotificationKey
-        retValue = Common::GetNotificationKey(env, argv[1], info.key);
+        retValue = Common::GetNotificationKey(env, argv[PARAM1], info.key);
         if (retValue == nullptr) {
             ANS_LOGE("GetNotificationKey failed.");
             return nullptr;
@@ -113,9 +111,9 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
         // argv[2]:callback
         if (argc >= REMOVE_BY_BUNDLE_AND_KEY_MAX_PARA) {
-            NAPI_CALL(env, napi_typeof(env, argv[REMOVE_BY_BUNDLE_AND_KEY_MAX_PARA - 1], &valuetype));
+            NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
             NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-            napi_create_reference(env, argv[REMOVE_BY_BUNDLE_AND_KEY_MAX_PARA - 1], 1, &params.callback);
+            napi_create_reference(env, argv[PARAM2], 1, &params.callback);
         }
     }
 
@@ -136,25 +134,25 @@ napi_value ParseParametersByRemoveAll(const napi_env &env, const napi_callback_i
     }
 
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env,
         (valuetype == napi_function) || (valuetype == napi_object),
         "Wrong argument type. Function or object expected.");
     if (valuetype == napi_function) {
         // argv[0]: callback
-        napi_create_reference(env, argv[0], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM0], 1, &params.callback);
     } else {
         BundleAndKeyInfo info {};
         // argv[0]: BundleOption
-        auto retValue = Common::GetBundleOption(env, argv[0], info.option);
+        auto retValue = Common::GetBundleOption(env, argv[PARAM0], info.option);
         NAPI_ASSERT(env, retValue != nullptr, "GetBundleOption failed.");
         params.bundleAndKeyInfo = info;
 
         // argv[1]:callback
         if (argc >= REMOVE_ALL_MAX_PARA) {
-            NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+            NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
             NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-            napi_create_reference(env, argv[1], 1, &params.callback);
+            napi_create_reference(env, argv[PARAM1], 1, &params.callback);
         }
     }
 
@@ -174,27 +172,27 @@ napi_value ParseParameters(
     NAPI_ASSERT(env, argc >= REMOVE_GROUP_BY_BUNDLE_MIN_PARA, "Wrong number of arguments");
 
     // argv[0]: bundle
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type.Object expected.");
-    auto retValue = Common::GetBundleOption(env, argv[0], params.option);
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
     if (retValue == nullptr) {
         ANS_LOGE("GetBundleOption failed.");
         return nullptr;
     }
 
     // argv[1]: groupName: string
-    NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
-    NAPI_CALL(env, napi_get_value_string_utf8(env, argv[1], str, STR_MAX_SIZE - 1, &strLen));
+    NAPI_CALL(env, napi_get_value_string_utf8(env, argv[PARAM1], str, STR_MAX_SIZE - 1, &strLen));
     params.groupName = str;
 
     // argv[2]:callback
     if (argc >= REMOVE_GROUP_BY_BUNDLE_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[REMOVE_GROUP_BY_BUNDLE_MIN_PARA], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[REMOVE_GROUP_BY_BUNDLE_MIN_PARA], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM2], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -233,9 +231,8 @@ napi_value Remove(napi_env env, napi_callback_info info)
             } else if (asynccallbackinfo->params.bundleAndKeyInfo.has_value()) {
                 auto &infos = asynccallbackinfo->params.bundleAndKeyInfo.value();
 
-                NotificationBundleOption bundleOption(infos.option.bundle, infos.option.uid);
                 asynccallbackinfo->info.errorCode =
-                    NotificationHelper::RemoveNotification(bundleOption, infos.key.id, infos.key.label);
+                    NotificationHelper::RemoveNotification(infos.option, infos.key.id, infos.key.label);
             }
         },
         [](napi_env env, napi_status status, void *data) {
@@ -296,8 +293,7 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
             if (asynccallbackinfo->params.bundleAndKeyInfo.has_value()) {
                 auto &infos = asynccallbackinfo->params.bundleAndKeyInfo.value();
 
-                NotificationBundleOption bundleOption(infos.option.bundle, infos.option.uid);
-                asynccallbackinfo->info.errorCode = NotificationHelper::RemoveAllNotifications(bundleOption);
+                asynccallbackinfo->info.errorCode = NotificationHelper::RemoveAllNotifications(infos.option);
             } else {
                 asynccallbackinfo->info.errorCode = NotificationHelper::RemoveNotifications();
             }
@@ -330,6 +326,28 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
     }
 }
 
+void AsyncCompleteCallbackRemoveGroupByBundle(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("enter");
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+    AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo = (AsyncCallbackInfoRemoveGroupByBundle *)data;
+
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
+    }
+}
+
 napi_value RemoveGroupByBundle(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
@@ -356,31 +374,14 @@ napi_value RemoveGroupByBundle(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("RemoveGroupByBundle napi_create_async_work start");
             AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo = (AsyncCallbackInfoRemoveGroupByBundle *)data;
-            NotificationBundleOption bundleOption(
-                asynccallbackinfo->params.option.bundle, asynccallbackinfo->params.option.uid);
             ANS_LOGI("option.bundle = %{public}s, option.uid = %{public}d, groupName = %{public}s",
-                asynccallbackinfo->params.option.bundle.c_str(),
-                asynccallbackinfo->params.option.uid,
+                asynccallbackinfo->params.option.GetBundleName().c_str(),
+                asynccallbackinfo->params.option.GetUid(),
                 asynccallbackinfo->params.groupName.c_str());
-            asynccallbackinfo->info.errorCode =
-                NotificationHelper::RemoveGroupByBundle(bundleOption, asynccallbackinfo->params.groupName);
+            asynccallbackinfo->info.errorCode = NotificationHelper::RemoveGroupByBundle(
+                    asynccallbackinfo->params.option, asynccallbackinfo->params.groupName);
         },
-        [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("RemoveGroupByBundle napi_create_async_work end");
-            AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo = (AsyncCallbackInfoRemoveGroupByBundle *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
-        },
+        AsyncCompleteCallbackRemoveGroupByBundle,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 

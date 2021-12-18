@@ -152,7 +152,7 @@ std::shared_ptr<WantAgent> WantAgentHelper::GetWantAgent(const WantAgentInfo &pa
     wantSenderInfo.allWants.push_back(wantsInfo);
     wantSenderInfo.bundleName = want->GetOperation().GetBundleName();
     wantSenderInfo.flags = FlagsTransformer(paramsInfo.GetFlags());
-    wantSenderInfo.type =  (int32_t)paramsInfo.GetOperationType();
+    wantSenderInfo.type = (int32_t)paramsInfo.GetOperationType();
 
     sptr<IWantSender> target = AbilityManagerClient::GetInstance()->GetWantSender(wantSenderInfo, nullptr);
     if (target == nullptr) {
@@ -308,13 +308,13 @@ void WantAgentHelper::RegisterCancelListener(
     const std::shared_ptr<CancelListener> &cancelListener, const std::shared_ptr<WantAgent> &agent)
 {
     if (agent == nullptr) {
-        WANT_AGENT_LOGE("WantAgentHelper::GetWant WantAgent invalid input param.");
+        WANT_AGENT_LOGE("WantAgentHelper::RegisterCancelListener WantAgent invalid input param.");
         return;
     }
 
     std::shared_ptr<PendingWant> pendingWant = agent->GetPendingWant();
     if (pendingWant == nullptr) {
-        WANT_AGENT_LOGE("WantAgentHelper::GetWant PendingWant invalid input param.");
+        WANT_AGENT_LOGE("WantAgentHelper::RegisterCancelListener PendingWant invalid input param.");
         return;
     }
 
@@ -325,13 +325,13 @@ void WantAgentHelper::UnregisterCancelListener(
     const std::shared_ptr<CancelListener> &cancelListener, const std::shared_ptr<WantAgent> &agent)
 {
     if (agent == nullptr) {
-        WANT_AGENT_LOGE("WantAgentHelper::GetWant WantAgent invalid input param.");
+        WANT_AGENT_LOGE("WantAgentHelper::UnregisterCancelListener WantAgent invalid input param.");
         return;
     }
 
     std::shared_ptr<PendingWant> pendingWant = agent->GetPendingWant();
     if (pendingWant == nullptr) {
-        WANT_AGENT_LOGE("WantAgentHelper::GetWant PendingWant invalid input param.");
+        WANT_AGENT_LOGE("WantAgentHelper::UnregisterCancelListener PendingWant invalid input param.");
         return;
     }
 

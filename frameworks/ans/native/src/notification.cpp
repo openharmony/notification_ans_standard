@@ -309,7 +309,7 @@ void Notification::ReadFromParcelString(Parcel &parcel)
 {
     // Read key_
     key_ = parcel.ReadString();
-    
+
     // Read sound_
     if (enableSound_) {
         sound_ = std::make_shared<Uri>(parcel.ReadString());

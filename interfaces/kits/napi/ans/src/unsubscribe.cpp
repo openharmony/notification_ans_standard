@@ -45,11 +45,11 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     napi_valuetype valuetype = napi_undefined;
     // argv[0]:subscriber
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type for arg0. Subscribe object expected.");
 
     SubscriberInstancesInfo subscriberInstancesInfo;
-    if (!HasNotificationSubscriber(env, argv[0], subscriberInstancesInfo)) {
+    if (!HasNotificationSubscriber(env, argv[PARAM0], subscriberInstancesInfo)) {
         ANS_LOGW("Subscriber not found");
     }
 
@@ -58,9 +58,9 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[1]:callback
     if (argc >= UNSUBSCRIBE_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[1], 1, &paras.callback);
+        napi_create_reference(env, argv[PARAM1], 1, &paras.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -84,7 +84,7 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
     Common::PaddingCallbackPromiseInfo(env, paras.callback, asynccallbackinfo->info, promise);
 
     napi_value resourceName = nullptr;
-    napi_create_string_latin1(env, "Unsubscribe", NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_string_latin1(env, "unsubscribe", NAPI_AUTO_LENGTH, &resourceName);
 
     // Asynchronous function call
     napi_create_async_work(env,

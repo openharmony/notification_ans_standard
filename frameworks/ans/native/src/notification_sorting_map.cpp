@@ -93,24 +93,20 @@ NotificationSortingMap *NotificationSortingMap::Unmarshalling(Parcel &parcel)
         }
     }
 
-    NotificationSortingMap *sortingMap = new NotificationSortingMap(sortings);
+    NotificationSortingMap *sortingMap = new (std::nothrow) NotificationSortingMap(sortings);
     return sortingMap;
 }
+
 std::string NotificationSortingMap::Dump() const
 {
-    int keyNum = 0;
-    std::string separator;
-    std::string keys = " sortedkey = ";
-    for (auto item : sortedKey_) {
-        if (keyNum == 0) {
-            separator = "";
-        } else {
-            separator = ", ";
-        }
-        keys = keys + separator + item;
-        keyNum++;
+    std::string keys = "";
+    for (auto key : sortedKey_) {
+        keys += key;
+        keys += ", ";
     }
-    return "NotificationSortingMap[" + keys + "]";
+    return "NotificationSortingMap{ "
+            "sortedkey = [" + keys + "]"
+            " }";
 }
 }  // namespace Notification
 }  // namespace OHOS

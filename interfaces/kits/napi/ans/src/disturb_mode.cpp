@@ -112,17 +112,17 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[0]: date
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
-    if (GetDoNotDisturbDate(env, argv[0], params) == nullptr) {
+    if (GetDoNotDisturbDate(env, argv[PARAM0], params) == nullptr) {
         return nullptr;
     }
 
     // argv[1]:callback
     if (argc >= SET_DISTURB_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[SET_DISTURB_MIN_PARA], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[SET_DISTURB_MIN_PARA], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM1], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);

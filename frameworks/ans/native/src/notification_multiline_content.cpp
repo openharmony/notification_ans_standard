@@ -63,8 +63,11 @@ std::string NotificationMultiLineContent::Dump()
         allLines_.begin(), allLines_.end(), [&lines](const std::string &line) { lines += " " + line + ","; });
     lines.pop_back();
 
-    return "NotificationMultiLineContent[ " + NotificationBasicContent::Dump() + ", briefText = " + briefText_ +
-           ", expandedTitle = " + expandedTitle_ + ", allLines = [" + lines + " ] ]";
+    return "NotificationMultiLineContent{ " + NotificationBasicContent::Dump() +
+            ", briefText = " + briefText_ +
+            ", expandedTitle = " + expandedTitle_ +
+            ", allLines = [" + lines + "]" +
+            " }";
 }
 
 bool NotificationMultiLineContent::Marshalling(Parcel &parcel) const
@@ -94,7 +97,7 @@ bool NotificationMultiLineContent::Marshalling(Parcel &parcel) const
 
 NotificationMultiLineContent *NotificationMultiLineContent::Unmarshalling(Parcel &parcel)
 {
-    auto pContent = new NotificationMultiLineContent();
+    auto pContent = new (std::nothrow) NotificationMultiLineContent();
     if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;

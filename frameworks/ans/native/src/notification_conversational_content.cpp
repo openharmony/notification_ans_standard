@@ -76,10 +76,21 @@ NotificationConversationalContent::MessageVector NotificationConversationalConte
 
 std::string NotificationConversationalContent::Dump()
 {
-    return "NotificationConversationalContent[ " + NotificationBasicContent::Dump() +
-           ", conversationTitle = " + conversationTitle_ + ", isGroup = " + (isGroup_ ? "true" : "false") +
-           ", messageUser = " + messageUser_.Dump() +
-           ", messages = " + (!messages_.empty() ? "not empty" : "empty") + " ]";
+    std::string messages = "";
+    for (auto &message : messages_) {
+        if (!message) {
+            messages += "nullptr, ";
+            continue;
+        }
+        messages += message->Dump();
+        messages += ", ";
+    }
+    return "NotificationConversationalContent{ " + NotificationBasicContent::Dump() +
+            ", conversationTitle = " + conversationTitle_ +
+            ", isGroup = " + (isGroup_ ? "true" : "false") +
+            ", messageUser = " + messageUser_.Dump() +
+            ", messages = " + messages +
+            " }";
 }
 
 bool NotificationConversationalContent::Marshalling(Parcel &parcel) const
@@ -132,7 +143,7 @@ bool NotificationConversationalContent::Marshalling(Parcel &parcel) const
 
 NotificationConversationalContent *NotificationConversationalContent::Unmarshalling(Parcel &parcel)
 {
-    auto pContent = new NotificationConversationalContent();
+    auto pContent = new (std::nothrow) NotificationConversationalContent();
     if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;

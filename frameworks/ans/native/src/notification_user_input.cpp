@@ -32,10 +32,10 @@ NotificationConstant::InputsSource NotificationUserInput::GetInputsSource(const 
 }
 
 void NotificationUserInput::AddInputsToWant(const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs,
-    AAFwk::Want &want, const AppExecFwk::PacMap &pacMap)
+    AAFwk::Want &want, const AAFwk::WantParams &additional)
 {}
 
-std::shared_ptr<AppExecFwk::PacMap> NotificationUserInput::GetInputsFromWant(const AAFwk::Want &want)
+std::shared_ptr<AAFwk::WantParams> NotificationUserInput::GetInputsFromWant(const AAFwk::Want &want)
 {
     return {};
 }
@@ -68,7 +68,7 @@ std::shared_ptr<NotificationUserInput> NotificationUserInput::Create(const std::
 
 std::shared_ptr<NotificationUserInput> NotificationUserInput::Create(const std::string &inputKey,
     const std::string &tag, const std::vector<std::string> &options, bool permitFreeFormInput,
-    const std::set<std::string> &permitMimeTypes, const std::shared_ptr<AppExecFwk::PacMap> &pacMap,
+    const std::set<std::string> &permitMimeTypes, const std::shared_ptr<AAFwk::WantParams> &additional,
     NotificationConstant::InputEditType editType)
 {
     if (inputKey.empty()) {
@@ -88,13 +88,13 @@ std::shared_ptr<NotificationUserInput> NotificationUserInput::Create(const std::
         }
     }
 
-    auto realPacMap = pacMap;
-    if (!realPacMap) {
-        realPacMap = std::make_shared<AppExecFwk::PacMap>();
+    auto realAdditional = additional;
+    if (!realAdditional) {
+        realAdditional = std::make_shared<AAFwk::WantParams>();
     }
 
     auto pUserInput = new (std::nothrow)
-        NotificationUserInput(inputKey, tag, options, permitFreeFormInput, permitMimeTypes, realPacMap, editType);
+        NotificationUserInput(inputKey, tag, options, permitFreeFormInput, permitMimeTypes, realAdditional, editType);
     if (pUserInput == nullptr) {
         ANS_LOGE("create NotificationUserInput object failed");
         return {};
@@ -104,18 +104,18 @@ std::shared_ptr<NotificationUserInput> NotificationUserInput::Create(const std::
 }
 
 NotificationUserInput::NotificationUserInput(const std::string &inputKey)
-    : inputKey_(inputKey), pacMap_(std::make_shared<AppExecFwk::PacMap>())
+    : inputKey_(inputKey), additionalData_(std::make_shared<AAFwk::WantParams>())
 {}
 
 NotificationUserInput::NotificationUserInput(const std::string &inputKey, const std::string &tag,
     const std::vector<std::string> &options, bool permitFreeFormInput, const std::set<std::string> &permitMimeTypes,
-    const std::shared_ptr<AppExecFwk::PacMap> &pacMap, NotificationConstant::InputEditType editType)
+    const std::shared_ptr<AAFwk::WantParams> &additional, NotificationConstant::InputEditType editType)
     : inputKey_(inputKey),
       tag_(tag),
       options_(options),
       permitFreeFormInput_(permitFreeFormInput),
       permitMimeTypes_(permitMimeTypes),
-      pacMap_(pacMap),
+      additionalData_(additional),
       editType_(editType)
 {}
 
@@ -124,14 +124,16 @@ std::string NotificationUserInput::GetInputKey() const
     return inputKey_;
 }
 
-void NotificationUserInput::AddAdditionalData(AppExecFwk::PacMap &pacMap)
+void NotificationUserInput::AddAdditionalData(AAFwk::WantParams &additional)
 {
-    pacMap_->PutAll(pacMap);
+    if (additionalData_) {
+        *additionalData_ = additional;
+    }
 }
 
-const std::shared_ptr<AppExecFwk::PacMap> NotificationUserInput::GetAdditionalData() const
+const std::shared_ptr<AAFwk::WantParams> NotificationUserInput::GetAdditionalData() const
 {
-    return pacMap_;
+    return additionalData_;
 }
 
 void NotificationUserInput::SetEditType(NotificationConstant::InputEditType inputEditType)
@@ -215,11 +217,14 @@ std::string NotificationUserInput::Dump()
     permitMimeTypes.pop_back();
     permitMimeTypes.pop_back();
 
-    return "NotificationUserInput[ inputKey = " + inputKey_ + " tag = " + tag_ +
-           "options = [ " + options + " ]" +
-           " permitFreeFormInput = " + (permitFreeFormInput_ ? "true" : "false") +
-           " permitMimeTypes = [ " + permitMimeTypes + " ]" +
-           " editType = " + std::to_string(static_cast<int32_t>(editType_)) + " ]";
+    return "NotificationUserInput{ "
+            "inputKey = " + inputKey_ +
+            ", tag = " + tag_ +
+            ", options = [" + options + "]" +
+            ", permitFreeFormInput = " + (permitFreeFormInput_ ? "true" : "false") +
+            ", permitMimeTypes = [" + permitMimeTypes + "]" +
+            ", editType = " + std::to_string(static_cast<int32_t>(editType_)) +
+            " }";
 }
 
 bool NotificationUserInput::Marshalling(Parcel &parcel) const
@@ -244,15 +249,15 @@ bool NotificationUserInput::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    auto valid = pacMap_ ? true : false;
+    auto valid = additionalData_ ? true : false;
     if (!parcel.WriteBool(valid)) {
-        ANS_LOGE("Failed to write the flag which indicate whether pacMap is null");
+        ANS_LOGE("Failed to write the flag which indicate whether additionalData is null");
         return false;
     }
 
     if (valid) {
-        if (!parcel.WriteParcelable(pacMap_.get())) {
-            ANS_LOGE("Failed to write pacMap");
+        if (!parcel.WriteParcelable(additionalData_.get())) {
+            ANS_LOGE("Failed to write additionalData");
             return false;
         }
     }
@@ -279,7 +284,7 @@ bool NotificationUserInput::Marshalling(Parcel &parcel) const
 
 NotificationUserInput *NotificationUserInput::Unmarshalling(Parcel &parcel)
 {
-    auto pUserInput = new NotificationUserInput();
+    auto pUserInput = new (std::nothrow) NotificationUserInput();
     if ((pUserInput != nullptr) && !pUserInput->ReadFromParcel(parcel)) {
         delete pUserInput;
         pUserInput = nullptr;
@@ -306,9 +311,9 @@ bool NotificationUserInput::ReadFromParcel(Parcel &parcel)
 
     auto valid = parcel.ReadBool();
     if (valid) {
-        pacMap_ = std::shared_ptr<AppExecFwk::PacMap>(parcel.ReadParcelable<AppExecFwk::PacMap>());
-        if (!pacMap_) {
-            ANS_LOGE("Failed to read pacMap");
+        additionalData_ = std::shared_ptr<AAFwk::WantParams>(parcel.ReadParcelable<AAFwk::WantParams>());
+        if (!additionalData_) {
+            ANS_LOGE("Failed to read additionalData");
             return false;
         }
     }

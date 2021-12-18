@@ -53,18 +53,16 @@ void NotificationSorting::SetGroupKeyOverride(const std::string &groupKeyOverrid
 
 std::string NotificationSorting::Dump() const
 {
-    std::string contents {""};
-    if (slot_ != nullptr) {
-        contents = slot_->Dump();
-    } else {
-        contents = "nullptr";
-    }
-    return "NotificationSorting[key =" + key_ + ", ranking =" + std::to_string(ranking_) +
-           ", importance =" + std::to_string(importance_) +
-           ", visiblenessOverride =" + std::to_string(visiblenessOverride_) +
-           ", isDisplayBadge =" + (isDisplayBadge_ ? "true" : "false") +
-           ", isHiddenNotification =" + (isHiddenNotification_ ? "true" : "false") +
-           ", groupKeyOverride =" + groupKeyOverride_ + ", slot_ =" + contents + "]";
+    return "NotificationSorting{ "
+            "key = " + key_ +
+            ", ranking = " + std::to_string(ranking_) +
+            ", importance = " + std::to_string(importance_) +
+            ", visiblenessOverride = " + std::to_string(visiblenessOverride_) +
+            ", isDisplayBadge = " + (isDisplayBadge_ ? "true" : "false") +
+            ", isHiddenNotification = " + (isHiddenNotification_ ? "true" : "false") +
+            ", groupKeyOverride = " + groupKeyOverride_ +
+            ", slot = " + (slot_ != nullptr ? slot_->Dump() : "nullptr") +
+            " }";
 }
 
 bool NotificationSorting::Marshalling(Parcel &parcel) const
@@ -143,7 +141,7 @@ bool NotificationSorting::ReadFromParcel(Parcel &parcel)
 
 NotificationSorting *NotificationSorting::Unmarshalling(Parcel &parcel)
 {
-    NotificationSorting *sorting = new NotificationSorting();
+    NotificationSorting *sorting = new (std::nothrow) NotificationSorting();
     if (sorting && !sorting->ReadFromParcel(parcel)) {
         delete sorting;
         sorting = nullptr;

@@ -202,19 +202,22 @@ void NotificationSlot::EnableBadge(bool isShowBadge)
 
 std::string NotificationSlot::Dump() const
 {
-    return "NotificationSlot[ id = " + id_ +
-           ", name = " + name_ +
-           ", description = " + description_ +
-           ", type = " + std::to_string(static_cast<int32_t>(type_)) +
-           ", level = " + std::to_string(static_cast<int32_t>(level_)) +
-           ", isBypassDnd = " + (isBypassDnd_ ? "true" : "false") +
-           ", visibleness = " + std::to_string(static_cast<int32_t>(lockScreenVisibleness_)) +
-           ", sound = " + sound_.ToString() +
-           ", isLightEnabled = " + (isLightEnabled_ ? "true" : "false") +
-           ", lightColor = " + std::to_string(lightColor_) +
-           ", isVibrate = " + (isVibrationEnabled_ ? "true" : "false") +
-           ", vibration = " + MergeVectorToString(vibrationValues_) +
-           ", isShowBadge = " + (isShowBadge_ ? "true" : "false") + ", groupId = " + groupId_ + "]";
+    return "NotificationSlot{ "
+            "id = " + id_ +
+            ", name = " + name_ +
+            ", description = " + description_ +
+            ", type = " + std::to_string(static_cast<int32_t>(type_)) +
+            ", level = " + std::to_string(static_cast<int32_t>(level_)) +
+            ", isBypassDnd = " + (isBypassDnd_ ? "true" : "false") +
+            ", visibleness = " + std::to_string(static_cast<int32_t>(lockScreenVisibleness_)) +
+            ", sound = " + sound_.ToString() +
+            ", isLightEnabled = " + (isLightEnabled_ ? "true" : "false") +
+            ", lightColor = " + std::to_string(lightColor_) +
+            ", isVibrate = " + (isVibrationEnabled_ ? "true" : "false") +
+            ", vibration = " + MergeVectorToString(vibrationValues_) +
+            ", isShowBadge = " + (isShowBadge_ ? "true" : "false") +
+            ", groupId = " + groupId_ +
+            " }";
 }
 
 bool NotificationSlot::Marshalling(Parcel &parcel) const
@@ -334,7 +337,7 @@ bool NotificationSlot::ReadFromParcel(Parcel &parcel)
 
 NotificationSlot *NotificationSlot::Unmarshalling(Parcel &parcel)
 {
-    NotificationSlot *notificationSlot = new NotificationSlot(NotificationConstant::SlotType::CUSTOM);
+    NotificationSlot *notificationSlot = new (std::nothrow) NotificationSlot(NotificationConstant::SlotType::CUSTOM);
 
     if (notificationSlot && !notificationSlot->ReadFromParcel(parcel)) {
         delete notificationSlot;

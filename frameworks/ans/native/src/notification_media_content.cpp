@@ -42,11 +42,13 @@ std::string NotificationMediaContent::Dump()
 {
     std::string numbers {};
     std::for_each(sequenceNumbers_.begin(), sequenceNumbers_.end(), [&numbers](int32_t num) {
-        numbers += std::to_string(num) + " ";
+        numbers += std::to_string(num) + ", ";
     });
 
-    return "NotificationMediaContent[ " + NotificationBasicContent::Dump() +
-           ", avToken = " + (avToken_ ? "not null" : "null") + ", sequenceNumbers = " + numbers + " ]";
+    return "NotificationMediaContent{ " + NotificationBasicContent::Dump() +
+            ", avToken = " + (avToken_ ? "not null" : "null") +
+            ", sequenceNumbers = " + numbers +
+            " }";
 }
 
 bool NotificationMediaContent::Marshalling(Parcel &parcel) const
@@ -66,7 +68,7 @@ bool NotificationMediaContent::Marshalling(Parcel &parcel) const
 
 NotificationMediaContent *NotificationMediaContent::Unmarshalling(Parcel &parcel)
 {
-    auto pContent = new NotificationMediaContent();
+    auto pContent = new (std::nothrow) NotificationMediaContent();
     if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;

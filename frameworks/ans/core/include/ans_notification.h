@@ -20,12 +20,6 @@
 
 #include "ans_manager_death_recipient.h"
 #include "ans_manager_interface.h"
-#include "notification_bundle_option.h"
-#include "notification_do_not_disturb_date.h"
-#include "notification_request.h"
-#include "notification_slot.h"
-#include "notification_slot_group.h"
-#include "notification_sorting_map.h"
 #include "notification_subscriber.h"
 
 namespace OHOS {
