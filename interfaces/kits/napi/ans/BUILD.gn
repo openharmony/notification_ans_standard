@@ -61,8 +61,6 @@ ohos_shared_library("notification") {
     "src/unsubscribe.cpp",
   ]
 
-  ldflags = [ "-Wl,-rpath=/system/lib/module/multimedia/" ]
-
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
