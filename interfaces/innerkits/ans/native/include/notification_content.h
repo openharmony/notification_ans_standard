@@ -16,15 +16,13 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_CONTENT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_CONTENT_H
 
-#include <memory>
-#include <string>
 #include "notification_basic_content.h"
-#include "notification_normal_content.h"
-#include "notification_long_text_content.h"
-#include "notification_picture_content.h"
 #include "notification_conversational_content.h"
-#include "notification_multiline_content.h"
+#include "notification_long_text_content.h"
 #include "notification_media_content.h"
+#include "notification_multiline_content.h"
+#include "notification_normal_content.h"
+#include "notification_picture_content.h"
 #include "parcel.h"
 
 namespace OHOS {

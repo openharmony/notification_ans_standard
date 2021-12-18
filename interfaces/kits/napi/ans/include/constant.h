@@ -15,10 +15,7 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_CONSTANT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_CONSTANT_H
 
-#include "ans_log_wrapper.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "notification_helper.h"
+#include "common.h"
 
 namespace OHOS {
 namespace NotificationNapi {

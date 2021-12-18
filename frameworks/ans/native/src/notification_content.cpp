@@ -106,8 +106,10 @@ std::string NotificationContent::Dump()
                                  : (contentType_ == NotificationContent::Type::MULTILINE)    ? "MULTILINE"
                                  : (contentType_ == NotificationContent::Type::PICTURE)      ? "PICTURE" : "NONE";
 
-    return "NotificationContent[ contentType = " + contentTypeStr +
-           ", content = " + (content_ ? "not null" : "null") + "]";
+    return "NotificationContent{ "
+            "contentType = " + contentTypeStr +
+            ", content = " + (content_ ? content_->Dump() : "null") +
+            " }";
 }
 
 bool NotificationContent::Marshalling(Parcel &parcel) const
@@ -135,7 +137,7 @@ bool NotificationContent::Marshalling(Parcel &parcel) const
 
 NotificationContent *NotificationContent::Unmarshalling(Parcel &parcel)
 {
-    auto pContent = new NotificationContent();
+    auto pContent = new (std::nothrow) NotificationContent();
     if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;
@@ -154,68 +156,38 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
     }
 
     switch (contentType_) {
-        case NotificationContent::Type::BASIC_TEXT: {
-            std::shared_ptr<NotificationNormalContent> normalContent(
-                parcel.ReadParcelable<NotificationNormalContent>());
-            if (!normalContent) {
-                ANS_LOGE("Failed to read normal content");
-                return false;
-            }
-            content_ = std::dynamic_pointer_cast<NotificationBasicContent>(normalContent);
+        case NotificationContent::Type::BASIC_TEXT:
+            content_ = std::static_pointer_cast<NotificationBasicContent>(
+                std::shared_ptr<NotificationNormalContent>(parcel.ReadParcelable<NotificationNormalContent>()));
             break;
-        }
-        case NotificationContent::Type::CONVERSATION: {
-            std::shared_ptr<NotificationConversationalContent> conversationalContent(
-                parcel.ReadParcelable<NotificationConversationalContent>());
-            if (!conversationalContent) {
-                ANS_LOGE("Failed to read conversational content");
-                return false;
-            }
-            content_ = std::dynamic_pointer_cast<NotificationBasicContent>(conversationalContent);
+        case NotificationContent::Type::CONVERSATION:
+            content_ =
+                std::static_pointer_cast<NotificationBasicContent>(std::shared_ptr<NotificationConversationalContent>(
+                    parcel.ReadParcelable<NotificationConversationalContent>()));
             break;
-        }
-        case NotificationContent::Type::LONG_TEXT: {
-            std::shared_ptr<NotificationLongTextContent> longTextContent(
-                parcel.ReadParcelable<NotificationLongTextContent>());
-            if (!longTextContent) {
-                ANS_LOGE("Failed to read long text content");
-                return false;
-            }
-            content_ = std::dynamic_pointer_cast<NotificationBasicContent>(longTextContent);
+        case NotificationContent::Type::LONG_TEXT:
+            content_ = std::static_pointer_cast<NotificationBasicContent>(
+                std::shared_ptr<NotificationLongTextContent>(parcel.ReadParcelable<NotificationLongTextContent>()));
             break;
-        }
-        case NotificationContent::Type::MEDIA: {
-            std::shared_ptr<NotificationMediaContent> mediaContent(parcel.ReadParcelable<NotificationMediaContent>());
-            if (!mediaContent) {
-                ANS_LOGE("Failed to read media content");
-                return false;
-            }
-            content_ = std::dynamic_pointer_cast<NotificationBasicContent>(mediaContent);
+        case NotificationContent::Type::MEDIA:
+            content_ = std::static_pointer_cast<NotificationBasicContent>(
+                std::shared_ptr<NotificationMediaContent>(parcel.ReadParcelable<NotificationMediaContent>()));
             break;
-        }
-        case NotificationContent::Type::MULTILINE: {
-            std::shared_ptr<NotificationMultiLineContent> multiLineContent(
-                parcel.ReadParcelable<NotificationMultiLineContent>());
-            if (!multiLineContent) {
-                ANS_LOGE("Failed to read multiLine content");
-                return false;
-            }
-            content_ = std::dynamic_pointer_cast<NotificationBasicContent>(multiLineContent);
+        case NotificationContent::Type::MULTILINE:
+            content_ = std::static_pointer_cast<NotificationBasicContent>(
+                std::shared_ptr<NotificationMultiLineContent>(parcel.ReadParcelable<NotificationMultiLineContent>()));
             break;
-        }
-        case NotificationContent::Type::PICTURE: {
-            std::shared_ptr<NotificationPictureContent> pictureContent(
-                parcel.ReadParcelable<NotificationPictureContent>());
-            if (!pictureContent) {
-                ANS_LOGE("Failed to read picture content");
-                return false;
-            }
-            content_ = std::dynamic_pointer_cast<NotificationBasicContent>(pictureContent);
+        case NotificationContent::Type::PICTURE:
+            content_ = std::static_pointer_cast<NotificationBasicContent>(
+                std::shared_ptr<NotificationPictureContent>(parcel.ReadParcelable<NotificationPictureContent>()));
             break;
-        }
-        default: {
+        default:
+            ANS_LOGE("Invalid contentType");
             return false;
-        }
+    }
+    if (!content_) {
+        ANS_LOGE("Failed to read content");
+        return false;
     }
 
     return true;

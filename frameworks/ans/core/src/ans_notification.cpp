@@ -18,8 +18,6 @@
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
 #include "iservice_registry.h"
-#include "notification_request.h"
-#include "notification_sorting.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {

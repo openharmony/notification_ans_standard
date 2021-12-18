@@ -50,8 +50,11 @@ const std::shared_ptr<Media::PixelMap> NotificationPictureContent::GetBigPicture
 
 std::string NotificationPictureContent::Dump()
 {
-    return "NotificationPictureContent[ " + NotificationBasicContent::Dump() + ", briefText = " + briefText_ +
-           ", expandedTitle = " + expandedTitle_ + ", bigPicture = " + (bigPicture_ ? "not null" : "null") + " ]";
+    return "NotificationPictureContent{ " + NotificationBasicContent::Dump() +
+            ", briefText = " + briefText_ +
+            ", expandedTitle = " + expandedTitle_ +
+            ", bigPicture = " + (bigPicture_ ? "not null" : "null") +
+            " }";
 }
 
 bool NotificationPictureContent::Marshalling(Parcel &parcel) const
@@ -89,7 +92,7 @@ bool NotificationPictureContent::Marshalling(Parcel &parcel) const
 
 NotificationPictureContent *NotificationPictureContent::Unmarshalling(Parcel &parcel)
 {
-    auto pContent = new NotificationPictureContent();
+    auto pContent = new (std::nothrow) NotificationPictureContent();
     if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <uv.h>
 #include <mutex>
+#include <uv.h>
 #include "subscribe.h"
 
 namespace OHOS {
@@ -957,12 +957,12 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info,
     napi_valuetype valuetype = napi_undefined;
 
     // argv[0]:subscriber
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type for arg0. NotificationSubscriber object expected.");
 
     SubscriberInstancesInfo subscriberInstancesInfo;
-    if (!HasNotificationSubscriber(env, argv[0], subscriberInstancesInfo)) {
-        if (GetNotificationSubscriber(env, argv[0], subscriberInstancesInfo) == nullptr) {
+    if (!HasNotificationSubscriber(env, argv[PARAM0], subscriberInstancesInfo)) {
+        if (GetNotificationSubscriber(env, argv[PARAM0], subscriberInstancesInfo) == nullptr) {
             ANS_LOGE("NotificationSubscriber parse failed");
             if (subscriberInstancesInfo.subscriber) {
                 delete subscriberInstancesInfo.subscriber;
@@ -983,14 +983,14 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info,
 
     // argv[1]:callback or NotificationSubscribeInfo
     if (argc >= SUBSRIBE_MAX_PARA - 1) {
-        NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
         NAPI_ASSERT(env,
             (valuetype == napi_function) || (valuetype == napi_object),
             "Wrong argument type for arg1. Function or NotificationSubscribeInfo object expected.");
         if (valuetype == napi_function) {
-            napi_create_reference(env, argv[1], 1, &callback);
+            napi_create_reference(env, argv[PARAM1], 1, &callback);
         } else {
-            if (Common::GetNotificationSubscriberInfo(env, argv[1], subscriberInfo) == nullptr) {
+            if (Common::GetNotificationSubscriberInfo(env, argv[PARAM1], subscriberInfo) == nullptr) {
                 ANS_LOGE("NotificationSubscribeInfo parse failed");
                 return nullptr;
             }
@@ -999,9 +999,9 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info,
 
     // argv[2]:callback
     if (argc >= SUBSRIBE_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[SUBSRIBE_MAX_PARA - 1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[SUBSRIBE_MAX_PARA - 1], 1, &callback);
+        napi_create_reference(env, argv[PARAM2], 1, &callback);
     }
 
     return Common::NapiGetNull(env);

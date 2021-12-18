@@ -16,8 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SLOT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SLOT_H
 
-#include <string>
-
 #include "notification_content.h"
 #include "notification_request.h"
 #include "parcel.h"

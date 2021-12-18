@@ -57,7 +57,7 @@ bool NotificationSubscribeInfo::Marshalling(Parcel &parcel) const
 
 NotificationSubscribeInfo *NotificationSubscribeInfo::Unmarshalling(Parcel &parcel)
 {
-    NotificationSubscribeInfo *info = new NotificationSubscribeInfo();
+    NotificationSubscribeInfo *info = new (std::nothrow) NotificationSubscribeInfo();
     if (info && !info->ReadFromParcel(parcel)) {
         delete info;
         info = nullptr;
@@ -74,7 +74,14 @@ bool NotificationSubscribeInfo::ReadFromParcel(Parcel &parcel)
 
 std::string NotificationSubscribeInfo::Dump()
 {
-    return "Dump";
+    std::string appNames = "";
+    for (auto name : appNames_) {
+        appNames += name;
+        appNames += ", ";
+    }
+    return "NotificationSubscribeInfo{ "
+            "appNames = [" + appNames + "]" +
+            " }";
 }
 }  // namespace Notification
 }  // namespace OHOS

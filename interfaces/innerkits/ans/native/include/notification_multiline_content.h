@@ -16,8 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_MULTILINE_CONTENT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_MULTILINE_CONTENT_H
 
-#include <string>
-#include <vector>
 #include "notification_basic_content.h"
 #include "parcel.h"
 

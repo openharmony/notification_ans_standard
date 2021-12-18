@@ -14,7 +14,6 @@
  */
 
 #include "constant.h"
-#include "common.h"
 
 namespace OHOS {
 namespace NotificationNapi {

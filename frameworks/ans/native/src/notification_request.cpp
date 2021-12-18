@@ -716,46 +716,48 @@ std::string NotificationRequest::GetLabel() const
 
 std::string NotificationRequest::Dump()
 {
-    return "NotificationRequest[ notificationId = " + std::to_string(notificationId_) +
-           ", slotType = " + std::to_string(static_cast<int32_t>(slotType_)) +
-           ", createTime = " + std::to_string(createTime_) + ", deliveryTime = " + std::to_string(deliveryTime_) +
-           ", autoDeletedTime = " + std::to_string(autoDeletedTime_) + ", settingsText = " + settingsText_ +
-           ", creatorBundleName = " + creatorBundleName_ +
-           ", creatorPid = " + std::to_string(static_cast<int32_t>(creatorPid_)) +
-           ", creatorUid = " + std::to_string(static_cast<int32_t>(creatorUid_)) +
-           ", ownerBundleName = " + ownerBundleName_ + ", groupName = " + groupName_ +
-           ", statusBarText = " + statusBarText_ + ", label = " + label_ + ", shortcutId = " + shortcutId_ +
-           ", sortingKey = " + sortingKey_ +
-           ", groupAlertType = " + std::to_string(static_cast<int32_t>(groupAlertType_)) +
-           ", color = " + std::to_string(color_) + ", badgeNumber = " + std::to_string(badgeNumber_) +
-           ", visiblenessType = " + std::to_string(static_cast<int32_t>(visiblenessType_)) +
-           ", progressValue = " + std::to_string(progressValue_) + ", progressMax = " + std::to_string(progressMax_) +
-           ", badgeStyle = " + std::to_string(static_cast<int32_t>(badgeStyle_)) +
-           ", classification = " + classification_ +
-           ", notificationContentType = " + std::to_string(static_cast<int32_t>(notificationContentType_)) +
-           ", showDeliveryTime = " + (showDeliveryTime_ ? "true" : "false") +
-           ", tapDismissed = " + (tapDismissed_ ? "true" : "false") +
-           ", colorEnabled = " + (colorEnabled_ ? "true" : "false") +
-           ", alertOneTime = " + (alertOneTime_ ? "true" : "false") +
-           ", showStopwatch = " + (showStopwatch_ ? "true" : "false") +
-           ", isCountdown = " + (isCountdown_ ? "true" : "false") +
-           ", inProgress = " + (inProgress_ ? "true" : "false") +
-           ", groupOverview = " + (groupOverview_ ? "true" : "false") +
-           ", progressIndeterminate = " + (progressIndeterminate_ ? "true" : "false") +
-           ", unremovable = " + (unremovable_ ? "true" : "false") +
-           ", floatingIcon = " + (floatingIcon_ ? "true" : "false") +
-           ", onlyLocal = " + (onlyLocal_ ? "true" : "false") + ", permitted = " + (permitted_ ? "true" : "false") +
-           ", context = " + (context_ ? "not null" : "null") + ", wantAgent = " + (wantAgent_ ? "not null" : "null") +
-           ", removalWantAgent = " + (removalWantAgent_ ? "not null" : "null") +
-           ", maxScreenWantAgent = " + (maxScreenWantAgent_ ? "not null" : "null") +
-           ", additionalParams = " + (additionalParams_ ? "not null" : "null") +
-           ", littleIcon = " + (littleIcon_ ? "not null" : "null") +
-           ", bigIcon = " + (bigIcon_ ? "not null" : "null") +
-           ", notificationContent = " + (notificationContent_ ? "not null" : "null") +
-           ", publicNotification = " + (publicNotification_ ? "not null" : "null") +
-           ", actionButtons = " + (!actionButtons_.empty() ? "not empty" : "empty") +
-           ", messageUsers = " + (!messageUsers_.empty() ? "not empty" : "empty") +
-           ", userInputHistory = " + (!userInputHistory_.empty() ? "not empty" : "empty") + " ]";
+    return "NotificationRequest{ "
+            "notificationId = " + std::to_string(notificationId_) +
+            ", slotType = " + std::to_string(static_cast<int32_t>(slotType_)) +
+            ", createTime = " + std::to_string(createTime_) + ", deliveryTime = " + std::to_string(deliveryTime_) +
+            ", autoDeletedTime = " + std::to_string(autoDeletedTime_) + ", settingsText = " + settingsText_ +
+            ", creatorBundleName = " + creatorBundleName_ +
+            ", creatorPid = " + std::to_string(static_cast<int32_t>(creatorPid_)) +
+            ", creatorUid = " + std::to_string(static_cast<int32_t>(creatorUid_)) +
+            ", ownerBundleName = " + ownerBundleName_ + ", groupName = " + groupName_ +
+            ", statusBarText = " + statusBarText_ + ", label = " + label_ + ", shortcutId = " + shortcutId_ +
+            ", sortingKey = " + sortingKey_ +
+            ", groupAlertType = " + std::to_string(static_cast<int32_t>(groupAlertType_)) +
+            ", color = " + std::to_string(color_) + ", badgeNumber = " + std::to_string(badgeNumber_) +
+            ", visiblenessType = " + std::to_string(static_cast<int32_t>(visiblenessType_)) +
+            ", progressValue = " + std::to_string(progressValue_) + ", progressMax = " + std::to_string(progressMax_) +
+            ", badgeStyle = " + std::to_string(static_cast<int32_t>(badgeStyle_)) +
+            ", classification = " + classification_ +
+            ", notificationContentType = " + std::to_string(static_cast<int32_t>(notificationContentType_)) +
+            ", showDeliveryTime = " + (showDeliveryTime_ ? "true" : "false") +
+            ", tapDismissed = " + (tapDismissed_ ? "true" : "false") +
+            ", colorEnabled = " + (colorEnabled_ ? "true" : "false") +
+            ", alertOneTime = " + (alertOneTime_ ? "true" : "false") +
+            ", showStopwatch = " + (showStopwatch_ ? "true" : "false") +
+            ", isCountdown = " + (isCountdown_ ? "true" : "false") +
+            ", inProgress = " + (inProgress_ ? "true" : "false") +
+            ", groupOverview = " + (groupOverview_ ? "true" : "false") +
+            ", progressIndeterminate = " + (progressIndeterminate_ ? "true" : "false") +
+            ", unremovable = " + (unremovable_ ? "true" : "false") +
+            ", floatingIcon = " + (floatingIcon_ ? "true" : "false") +
+            ", onlyLocal = " + (onlyLocal_ ? "true" : "false") + ", permitted = " + (permitted_ ? "true" : "false") +
+            ", context = " + (context_ ? "not null" : "null") + ", wantAgent = " + (wantAgent_ ? "not null" : "null") +
+            ", removalWantAgent = " + (removalWantAgent_ ? "not null" : "null") +
+            ", maxScreenWantAgent = " + (maxScreenWantAgent_ ? "not null" : "null") +
+            ", additionalParams = " + (additionalParams_ ? "not null" : "null") +
+            ", littleIcon = " + (littleIcon_ ? "not null" : "null") +
+            ", bigIcon = " + (bigIcon_ ? "not null" : "null") +
+            ", notificationContent = " + (notificationContent_ ? notificationContent_->Dump() : "null") +
+            ", publicNotification = " + (publicNotification_ ? "not null" : "null") +
+            ", actionButtons = " + (!actionButtons_.empty() ? actionButtons_.at(0)->Dump() : "empty") +
+            ", messageUsers = " + (!messageUsers_.empty() ? messageUsers_.at(0)->Dump() : "empty") +
+            ", userInputHistory = " + (!userInputHistory_.empty() ? userInputHistory_.at(0) : "empty") +
+            " }";
 }
 
 bool NotificationRequest::Marshalling(Parcel &parcel) const
@@ -1092,7 +1094,7 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
 
 NotificationRequest *NotificationRequest::Unmarshalling(Parcel &parcel)
 {
-    auto objptr = new NotificationRequest();
+    auto objptr = new (std::nothrow) NotificationRequest();
     if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;

@@ -16,15 +16,10 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_USER_INPUT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_USER_INPUT_H
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
 #include "notification_constant.h"
-#include "pac_map.h"
-#include "want.h"
 #include "parcel.h"
 #include "uri.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Notification {
@@ -50,22 +45,22 @@ public:
      * collection services when sending input results to an WantAgent.
      * @param userInputs Indicates the list of NotificationUserInput objects for which the input results are provided.
      * @param want Indicates the Want to which the input results are to be added.
-     * @param pacMap Indicates the PacMap object holding the input results.
-     * The PacMap key must match the keys contained in the objects specified in userInputs.
+     * @param additional Indicates the AAFwk::WantParams object holding the input results.
+     * The AAFwk::WantParams key must match the keys contained in the objects specified in userInputs.
      */
     static void AddInputsToWant(const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs,
-        AAFwk::Want &want, const AppExecFwk::PacMap &pacMap);
+        AAFwk::Want &want, const AAFwk::WantParams &additional);
 
     /**
      * Obtains the input text results from a specified Want.
      * @param want Indicates the Want object containing one or more user input results.
-     * @return the PacMap object containing the input text results.
+     * @return the AAFwk::WantParams object containing the input text results.
      */
-    static std::shared_ptr<AppExecFwk::PacMap> GetInputsFromWant(const AAFwk::Want &want);
+    static std::shared_ptr<AAFwk::WantParams> GetInputsFromWant(const AAFwk::Want &want);
 
     /**
      * Adds the given NotificationUserInput object of a specified MIME type to an Want. This method is similar to
-     * addInputsToWant(NotificationUserInput, Want, PacMap) except that the MIME type must be specified.
+     * addInputsToWant(NotificationUserInput, Want, AAFwk::WantParams) except that the MIME type must be specified.
      * @param userInput Indicates the NotificationUserInput object for which the input results are provided.
      * @param want Indicates the Want to which the input results are to be added.
      * @param results Indicates a map containing the MIME type and its URI result.
@@ -86,7 +81,8 @@ public:
 public:
     /**
      * A static function used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the PacMap key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      * @return the shared_ptr object owns the created NotificationUserInput object otherwise return empty object if
      * inputKey is empty.
      */
@@ -94,14 +90,15 @@ public:
 
     /**
      * A static function used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the PacMap key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      * @param tag Indicates the tag to be displayed.
      * @param options Indicates the list of predefined options to be provided for user input.
      * @param permitFreeFormInput Specifies whether to allow arbitrary text values. The default value is true,
      * indicating that arbitrary text values are allowed. If this parameter is set to false, you must pass a non-empty
      * std::vector of options or a non-empty std::set of permitMimeTypes. Otherwise, return empty object.
      * @param permitMimeTypes Indicates the MIME type allowed.
-     * @param pacMap Indicates the PacMap object containing the additional data.
+     * @param additional Indicates the AAFwk::WantParams object containing the additional data.
      * @param editType Indicates the edit type to set. For details about available values, see
      * NotificationConstant::InputEditType.
      * @return the shared_ptr object owns the created NotificationUserInput object otherwise return empty object if
@@ -109,7 +106,7 @@ public:
      */
     static std::shared_ptr<NotificationUserInput> Create(const std::string &inputKey, const std::string &tag,
         const std::vector<std::string> &options, bool permitFreeFormInput, const std::set<std::string> &permitMimeTypes,
-        const std::shared_ptr<AppExecFwk::PacMap> &pacMap, NotificationConstant::InputEditType editType);
+        const std::shared_ptr<AAFwk::WantParams> &additional, NotificationConstant::InputEditType editType);
 
     /**
      * Default deconstructor used to deconstruct.
@@ -124,16 +121,16 @@ public:
 
     /**
      * Adds additional data to this Builder.
-     * The value of pacMap will replace the existing extras value in this Builder.
-     * @param pacMap Indicates the PacMap object containing the additional data.
+     * The value of AAFwk::WantParams will replace the existing extras value in this Builder.
+     * @param additional Indicates the AAFwk::WantParams object containing the additional data.
      */
-    void AddAdditionalData(AppExecFwk::PacMap &pacMap);
+    void AddAdditionalData(AAFwk::WantParams &additional);
 
     /**
      * Obtains the additional data included in this NotificationUserInput object.
      * @return the additional data in this NotificationUserInput object.
      */
-    const std::shared_ptr<AppExecFwk::PacMap> GetAdditionalData() const;
+    const std::shared_ptr<AAFwk::WantParams> GetAdditionalData() const;
 
     /**
      * Sets the edit type of the options provided by this NotificationUserInput object.
@@ -236,13 +233,15 @@ private:
 
     /**
      * A constructor used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the PacMap key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      */
     explicit NotificationUserInput(const std::string &inputKey);
 
     /**
      * A constructor used to create a NotificationUserInput instance with the input parameters passed.
-     * @param inputKey Indicates the PacMap key used to identify this input when the input is collected from the user.
+     * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
+     * when the input is collected from the user.
      * @param tag Indicates the tag to be displayed.
      * @param options Indicates the list of predefined options to be provided for user input.
      * @param permitFreeFormInput Specifies whether to allow arbitrary text values. The default value is true,
@@ -250,13 +249,13 @@ private:
      * setOptions(const std::vector<std::string> &) to set a non-empty list or call
      * setPermitMimeTypes(std::string, bool) to allow a MIME type.
      * @param permitMimeTypes Indicates the MIME type allowed.
-     * @param pacMap Indicates the PacMap object containing the additional data.
+     * @param additional Indicates the AAFwk::WantParams object containing the additional data.
      * @param editType Indicates the edit type to set. For details about available values, see
      * NotificationConstant::InputEditType.
      */
     NotificationUserInput(const std::string &inputKey, const std::string &tag, const std::vector<std::string> &options,
         bool permitFreeFormInput, const std::set<std::string> &permitMimeTypes,
-        const std::shared_ptr<AppExecFwk::PacMap> &pacMap, NotificationConstant::InputEditType editType);
+        const std::shared_ptr<AAFwk::WantParams> &additional, NotificationConstant::InputEditType editType);
 
     /**
      * Read a NotificationUserInput object from a Parcel.
@@ -270,7 +269,7 @@ private:
     std::vector<std::string> options_ {};
     bool permitFreeFormInput_ {true};
     std::set<std::string> permitMimeTypes_ {};
-    std::shared_ptr<AppExecFwk::PacMap> pacMap_ {};
+    std::shared_ptr<AAFwk::WantParams> additionalData_ {};
     NotificationConstant::InputEditType editType_ {NotificationConstant::InputEditType::EDIT_AUTO};
 };
 }  // namespace Notification

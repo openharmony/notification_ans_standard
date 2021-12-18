@@ -12,11 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "publish.h"
-#include "notification_basic_content.h"
-#include "notification_constant.h"
-#include "notification_content.h"
-#include "notification_normal_content.h"
 
 namespace OHOS {
 namespace NotificationNapi {
@@ -56,17 +53,17 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
 
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
 
     // argv[0] : NotificationRequest
-    if (Common::GetNotificationRequest(env, argv[0], params.request) == nullptr) {
+    if (Common::GetNotificationRequest(env, argv[PARAM0], params.request) == nullptr) {
         return nullptr;
     }
 
     // argv[1] : callback
     if (argc >= PUBLISH_NOTIFICATION_MAX) {
-        if (GetCallback(env, argv[1], params) == nullptr) {
+        if (GetCallback(env, argv[PARAM1], params) == nullptr) {
             return nullptr;
         }
     }

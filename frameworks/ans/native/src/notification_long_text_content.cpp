@@ -63,9 +63,11 @@ std::string NotificationLongTextContent::GetLongText() const
 
 std::string NotificationLongTextContent::Dump()
 {
-    return "NotificationLongTextContent[ " + NotificationBasicContent::Dump() +
-           " longText = " + longText_ + " briefText = " + briefText_ +
-           " expandedTitle = " + expandedTitle_ + " ]";
+    return "NotificationLongTextContent{ " + NotificationBasicContent::Dump() +
+            ", longText = " + longText_ +
+            ", briefText = " + briefText_ +
+            ", expandedTitle = " + expandedTitle_ +
+            " }";
 }
 
 bool NotificationLongTextContent::Marshalling(Parcel &parcel) const
@@ -95,7 +97,7 @@ bool NotificationLongTextContent::Marshalling(Parcel &parcel) const
 
 NotificationLongTextContent *NotificationLongTextContent::Unmarshalling(Parcel &parcel)
 {
-    auto pContent = new NotificationLongTextContent();
+    auto pContent = new (std::nothrow) NotificationLongTextContent();
     if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;

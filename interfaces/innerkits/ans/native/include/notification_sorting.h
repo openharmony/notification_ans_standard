@@ -16,9 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SORTING_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SORTING_H
 
-#include <string>
-#include <vector>
-
 #include "ans_log_wrapper.h"
 #include "notification_slot.h"
 #include "parcel.h"

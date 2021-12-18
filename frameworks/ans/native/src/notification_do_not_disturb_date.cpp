@@ -55,10 +55,11 @@ int64_t NotificationDoNotDisturbDate::GetEndDate() const
 
 std::string NotificationDoNotDisturbDate::Dump()
 {
-    return "NotificationDoNotDisturbDate[ "\
-           "doNotDisturbType = " + std::to_string(static_cast<int32_t>(doNotDisturbType_)) +
-           ", beginDate = " + std::to_string(beginDate_) +
-           ", endDate = " + std::to_string(endDate_) + " ]";
+    return "NotificationDoNotDisturbDate{ "
+            "doNotDisturbType = " + std::to_string(static_cast<int32_t>(doNotDisturbType_)) +
+            ", beginDate = " + std::to_string(beginDate_) +
+            ", endDate = " + std::to_string(endDate_) +
+            " }";
 }
 
 bool NotificationDoNotDisturbDate::Marshalling(Parcel &parcel) const

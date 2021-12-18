@@ -22,7 +22,7 @@ const int ENABLE_NOTIFICATION_MIN_PARA = 2;
 const int IS_NOTIFICATION_ENABLE_MAX_PARA = 2;
 
 struct EnableParams {
-    BundleOption option;
+    NotificationBundleOption option;
     bool enable = false;
     napi_ref callback = nullptr;
 };
@@ -35,7 +35,7 @@ struct AsyncCallbackInfoEnable {
 };
 
 struct IsEnableParams {
-    BundleOption option;
+    NotificationBundleOption option;
     napi_ref callback = nullptr;
     bool hasBundleOption = false;
 };
@@ -60,24 +60,24 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[0]: bundle
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type.Object expected.");
-    auto retValue = Common::GetBundleOption(env, argv[0], params.option);
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
     if (retValue == nullptr) {
         ANS_LOGE("GetBundleOption failed.");
         return nullptr;
     }
 
     // argv[1]: enable
-    NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
-    napi_get_value_bool(env, argv[1], &params.enable);
+    napi_get_value_bool(env, argv[PARAM1], &params.enable);
 
     // argv[2]:callback
     if (argc >= ENABLE_NOTIFICATION_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[ENABLE_NOTIFICATION_MAX_PARA - 1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[ENABLE_NOTIFICATION_MAX_PARA - 1], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM2], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -98,29 +98,51 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[0]: bundle / callback
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env,
         (valuetype == napi_function) || (valuetype == napi_object),
         "Wrong argument type. Function or object expected.");
     if (valuetype == napi_object) {
-        auto retValue = Common::GetBundleOption(env, argv[0], params.option);
+        auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
         if (retValue == nullptr) {
             ANS_LOGE("GetBundleOption failed.");
             return nullptr;
         }
         params.hasBundleOption = true;
     } else {
-        napi_create_reference(env, argv[0], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM0], 1, &params.callback);
     }
 
     // argv[1]:callback
     if (argc >= IS_NOTIFICATION_ENABLE_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[1], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM1], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);
+}
+
+void AsyncCompleteCallbackEnableNotification(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("enter");
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+    AsyncCallbackInfoEnable *asynccallbackinfo = (AsyncCallbackInfoEnable *)data;
+
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
+    }
 }
 
 napi_value EnableNotification(napi_env env, napi_callback_info info)
@@ -149,30 +171,12 @@ napi_value EnableNotification(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("EnableNotification napi_create_async_work start");
             AsyncCallbackInfoEnable *asynccallbackinfo = (AsyncCallbackInfoEnable *)data;
-            NotificationBundleOption bundleOption;
-            bundleOption.SetBundleName(asynccallbackinfo->params.option.bundle);
-            bundleOption.SetUid(asynccallbackinfo->params.option.uid);
-            std::string deviceId;
+            std::string deviceId {""};
             asynccallbackinfo->info.errorCode = NotificationHelper::SetNotificationsEnabledForSpecifiedBundle(
-                bundleOption, deviceId, asynccallbackinfo->params.enable);
+                asynccallbackinfo->params.option, deviceId, asynccallbackinfo->params.enable);
             ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d", asynccallbackinfo->info.errorCode);
         },
-        [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("EnableNotification napi_create_async_work end");
-            AsyncCallbackInfoEnable *asynccallbackinfo = (AsyncCallbackInfoEnable *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
-        },
+        AsyncCompleteCallbackEnableNotification,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 
@@ -182,6 +186,30 @@ napi_value EnableNotification(napi_env env, napi_callback_info info)
         return Common::NapiGetNull(env);
     } else {
         return promise;
+    }
+}
+
+void AsyncCompleteCallbackIsNotificationEnabled(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("enter");
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+    AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
+
+    napi_value result = nullptr;
+    napi_get_boolean(env, asynccallbackinfo->allowed, &result);
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
     }
 }
 
@@ -213,39 +241,18 @@ napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)
             AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
 
             if (asynccallbackinfo->params.hasBundleOption) {
-                NotificationBundleOption bundleOption;
-                bundleOption.SetBundleName(asynccallbackinfo->params.option.bundle);
-                bundleOption.SetUid(asynccallbackinfo->params.option.uid);
-                ANS_LOGI("asynccallbackinfo->params.option.bundle = %{public}s",
-                    asynccallbackinfo->params.option.bundle.c_str());
-                ANS_LOGI("asynccallbackinfo->params.option.uid = %{public}d", asynccallbackinfo->params.option.uid);
-                ANS_LOGI("asynccallbackinfo->allowed = %{public}d", asynccallbackinfo->allowed);
+                ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d",
+                    asynccallbackinfo->params.option.GetBundleName().c_str(),
+                    asynccallbackinfo->params.option.GetUid());
                 asynccallbackinfo->info.errorCode =
-                    NotificationHelper::IsAllowedNotify(bundleOption, asynccallbackinfo->allowed);
+                    NotificationHelper::IsAllowedNotify(asynccallbackinfo->params.option, asynccallbackinfo->allowed);
             } else {
-                ANS_LOGI("asynccallbackinfo->allowed = %{public}d", asynccallbackinfo->allowed);
                 asynccallbackinfo->info.errorCode = NotificationHelper::IsAllowedNotify(asynccallbackinfo->allowed);
             }
-            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d", asynccallbackinfo->info.errorCode);
+            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d, allowed = %{public}d",
+                asynccallbackinfo->info.errorCode, asynccallbackinfo->allowed);
         },
-        [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("IsNotificationEnabled napi_create_async_work end");
-            AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
-
-            napi_value result = nullptr;
-            napi_get_boolean(env, asynccallbackinfo->allowed, &result);
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
-        },
+        AsyncCompleteCallbackIsNotificationEnabled,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 

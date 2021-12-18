@@ -27,7 +27,6 @@
 #include "notification_request.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
-#include "notification_sorting.h"
 #include "notification_subscribe_info.h"
 
 namespace OHOS {
@@ -106,6 +105,7 @@ public:
     virtual ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) = 0;
     virtual ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date) = 0;
     virtual ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport) = 0;
+
     virtual ErrCode CancelGroup(const std::string &groupName) = 0;
     virtual ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) = 0;

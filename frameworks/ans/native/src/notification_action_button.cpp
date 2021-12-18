@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Notification {
 std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const std::shared_ptr<Media::PixelMap> &icon,
     const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
-    const std::shared_ptr<AppExecFwk::PacMap> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
+    const std::shared_ptr<AAFwk::WantParams> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
     bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
     const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
 {
@@ -32,9 +32,9 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
 
     auto realExtras = extras;
     if (!realExtras) {
-        realExtras = std::make_shared<AppExecFwk::PacMap>();
+        realExtras = std::make_shared<AAFwk::WantParams>();
         if (!realExtras) {
-            ANS_LOGE("create PacMap object failed");
+            ANS_LOGE("create WantParams object failed");
             return {};
         }
     }
@@ -86,7 +86,7 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(
 
 NotificationActionButton::NotificationActionButton(const std::shared_ptr<Media::PixelMap> &icon,
     const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
-    const std::shared_ptr<AppExecFwk::PacMap> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
+    const std::shared_ptr<AAFwk::WantParams> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
     bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
     const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
     : icon_(icon),
@@ -115,12 +115,14 @@ const std::shared_ptr<WantAgent::WantAgent> NotificationActionButton::GetWantAge
     return wantAgent_;
 }
 
-void NotificationActionButton::AddAdditionalData(AppExecFwk::PacMap &pacMap)
+void NotificationActionButton::AddAdditionalData(AAFwk::WantParams &extras)
 {
-    extras_->PutAll(pacMap);
+    if (extras_) {
+        *extras_ = extras;
+    }
 }
 
-const std::shared_ptr<AppExecFwk::PacMap> NotificationActionButton::GetAdditionalData() const
+const std::shared_ptr<AAFwk::WantParams> NotificationActionButton::GetAdditionalData() const
 {
     return extras_;
 }
@@ -192,10 +194,34 @@ bool NotificationActionButton::IsContextDependent() const
 
 std::string NotificationActionButton::Dump()
 {
-    return "NotificationActionButton[ title = " + title_ +
-           ", semanticActionButton = " + std::to_string(static_cast<int32_t>(semanticActionButton_)) +
-           ", autoCreatedReplies = " + (autoCreatedReplies_ ? "true" : "false") +
-           ", isContextual = " + (isContextual_ ? "true" : "false") + " ]";
+    std::string mimeTypeOnlyUserInputs = "";
+    for (auto &item : mimeTypeOnlyUserInputs_) {
+        if (!item) {
+            mimeTypeOnlyUserInputs += "nullptr, ";
+            continue;
+        }
+        mimeTypeOnlyUserInputs += item->Dump();
+        mimeTypeOnlyUserInputs += ", ";
+    }
+
+    std::string userInputs = "";
+    for (auto &item : userInputs_) {
+        if (!item) {
+            userInputs += "nullptr, ";
+            continue;
+        }
+        userInputs += item->Dump();
+        userInputs += ", ";
+    }
+
+    return "NotificationActionButton{ "
+            "title = " + title_ +
+            ", semanticActionButton = " + std::to_string(static_cast<int32_t>(semanticActionButton_)) +
+            ", autoCreatedReplies = " + (autoCreatedReplies_ ? "true" : "false") +
+            ", isContextual = " + (isContextual_ ? "true" : "false") +
+            ", mimeTypeOnlyUserInputs = [" + mimeTypeOnlyUserInputs + "]" +
+            ", userInputs = [" + userInputs + "]" +
+            " }";
 }
 
 bool NotificationActionButton::Marshalling(Parcel &parcel) const
@@ -286,7 +312,7 @@ bool NotificationActionButton::Marshalling(Parcel &parcel) const
 
 NotificationActionButton *NotificationActionButton::Unmarshalling(Parcel &parcel)
 {
-    auto pButton = new NotificationActionButton();
+    auto pButton = new (std::nothrow) NotificationActionButton();
     if ((pButton != nullptr) && !pButton->ReadFromParcel(parcel)) {
         delete pButton;
         pButton = nullptr;
@@ -330,7 +356,7 @@ bool NotificationActionButton::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        extras_ = std::shared_ptr<AppExecFwk::PacMap>(parcel.ReadParcelable<AppExecFwk::PacMap>());
+        extras_ = std::shared_ptr<AAFwk::WantParams>(parcel.ReadParcelable<AAFwk::WantParams>());
         if (!extras_) {
             ANS_LOGE("Failed to read extras");
             return false;

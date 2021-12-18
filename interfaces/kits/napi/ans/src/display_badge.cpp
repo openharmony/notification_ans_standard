@@ -22,7 +22,7 @@ const int ENABLE_BADGE_DISPLAYED_MIN_PARA = 2;
 const int IS_DISPLAY_BADGE_MAX_PARA = 2;
 
 struct EnableBadgeParams {
-    BundleOption option;
+    NotificationBundleOption option;
     bool enable = false;
     napi_ref callback = nullptr;
 };
@@ -35,7 +35,7 @@ struct AsyncCallbackInfoEnableBadge {
 };
 
 struct IsDisplayBadgeParams {
-    BundleOption option;
+    NotificationBundleOption option;
     napi_ref callback = nullptr;
     bool hasBundleOption = false;
 };
@@ -60,24 +60,24 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[0]: bundle
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type.Object expected.");
-    auto retValue = Common::GetBundleOption(env, argv[0], params.option);
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
     if (retValue == nullptr) {
         ANS_LOGE("GetBundleOption failed.");
         return nullptr;
     }
 
     // argv[1]: enable
-    NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
-    napi_get_value_bool(env, argv[1], &params.enable);
+    napi_get_value_bool(env, argv[PARAM1], &params.enable);
 
     // argv[2]:callback
     if (argc >= ENABLE_BADGE_DISPLAYED_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[ENABLE_BADGE_DISPLAYED_MAX_PARA - 1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[ENABLE_BADGE_DISPLAYED_MAX_PARA - 1], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM2], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -98,26 +98,26 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[0]: bundle / callback
     napi_valuetype valuetype = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[0], &valuetype));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env,
         (valuetype == napi_function) || (valuetype == napi_object),
         "Wrong argument type. Function or object expected.");
     if (valuetype == napi_object) {
-        auto retValue = Common::GetBundleOption(env, argv[0], params.option);
+        auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
         if (retValue == nullptr) {
             ANS_LOGE("GetBundleOption failed.");
             return nullptr;
         }
         params.hasBundleOption = true;
     } else {
-        napi_create_reference(env, argv[0], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM0], 1, &params.callback);
     }
 
     // argv[1]:callback
     if (argc >= IS_DISPLAY_BADGE_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[1], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[1], 1, &params.callback);
+        napi_create_reference(env, argv[PARAM1], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -149,15 +149,12 @@ napi_value DisplayBadge(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("DisplayBadge napi_create_async_work start");
             AsyncCallbackInfoEnableBadge *asynccallbackinfo = (AsyncCallbackInfoEnableBadge *)data;
-            NotificationBundleOption bundleOption;
-            bundleOption.SetBundleName(asynccallbackinfo->params.option.bundle);
-            bundleOption.SetUid(asynccallbackinfo->params.option.uid);
-            ANS_LOGI("asynccallbackinfo->params.option.bundle = %{public}s",
-                asynccallbackinfo->params.option.bundle.c_str());
-            ANS_LOGI("asynccallbackinfo->params.option.uid = %{public}d", asynccallbackinfo->params.option.uid);
-            ANS_LOGI("asynccallbackinfo->params.enable = %{public}d", asynccallbackinfo->params.enable);
-            asynccallbackinfo->info.errorCode =
-                NotificationHelper::SetShowBadgeEnabledForBundle(bundleOption, asynccallbackinfo->params.enable);
+            ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d enable = %{public}d",
+                asynccallbackinfo->params.option.GetBundleName().c_str(),
+                asynccallbackinfo->params.option.GetUid(),
+                asynccallbackinfo->params.enable);
+            asynccallbackinfo->info.errorCode = NotificationHelper::SetShowBadgeEnabledForBundle(
+                asynccallbackinfo->params.option, asynccallbackinfo->params.enable);
             ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d", asynccallbackinfo->info.errorCode);
         },
         [](napi_env env, napi_status status, void *data) {
@@ -188,6 +185,30 @@ napi_value DisplayBadge(napi_env env, napi_callback_info info)
     }
 }
 
+void AsyncCompleteCallbackIsBadgeDisplayed(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("enter");
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+    AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = (AsyncCallbackInfoIsDisplayBadge *)data;
+
+    napi_value result = nullptr;
+    napi_get_boolean(env, asynccallbackinfo->enabled, &result);
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
+    }
+}
+
 napi_value IsBadgeDisplayed(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
@@ -215,40 +236,19 @@ napi_value IsBadgeDisplayed(napi_env env, napi_callback_info info)
             ANS_LOGI("IsBadgeDisplayed napi_create_async_work start");
             AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = (AsyncCallbackInfoIsDisplayBadge *)data;
 
-            NotificationBundleOption bundleOption;
-            bundleOption.SetBundleName(asynccallbackinfo->params.option.bundle);
-            bundleOption.SetUid(asynccallbackinfo->params.option.uid);
             if (asynccallbackinfo->params.hasBundleOption) {
-                ANS_LOGI("asynccallbackinfo->params.option.bundle = %{public}s",
-                    asynccallbackinfo->params.option.bundle.c_str());
-                ANS_LOGI("asynccallbackinfo->params.option.uid = %{public}d", asynccallbackinfo->params.option.uid);
-                ANS_LOGI("asynccallbackinfo->enabled = %{public}d", asynccallbackinfo->enabled);
-                asynccallbackinfo->info.errorCode =
-                    NotificationHelper::GetShowBadgeEnabledForBundle(bundleOption, asynccallbackinfo->enabled);
+                ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d",
+                    asynccallbackinfo->params.option.GetBundleName().c_str(),
+                    asynccallbackinfo->params.option.GetUid());
+                asynccallbackinfo->info.errorCode = NotificationHelper::GetShowBadgeEnabledForBundle(
+                    asynccallbackinfo->params.option, asynccallbackinfo->enabled);
             } else {
-                ANS_LOGI("asynccallbackinfo->enabled = %{public}d", asynccallbackinfo->enabled);
                 asynccallbackinfo->info.errorCode = NotificationHelper::GetShowBadgeEnabled(asynccallbackinfo->enabled);
             }
-            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d", asynccallbackinfo->info.errorCode);
+            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d, enabled = %{public}d",
+                asynccallbackinfo->info.errorCode, asynccallbackinfo->enabled);
         },
-        [](napi_env env, napi_status status, void *data) {
-            ANS_LOGI("IsBadgeDisplayed napi_create_async_work end");
-            AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = (AsyncCallbackInfoIsDisplayBadge *)data;
-
-            napi_value result = nullptr;
-            napi_get_boolean(env, asynccallbackinfo->enabled, &result);
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
-        },
+        AsyncCompleteCallbackIsBadgeDisplayed,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 

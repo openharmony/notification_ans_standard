@@ -561,17 +561,17 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00200, Function
         NotificationActionButton::Create(nullptr, "title", wantAgent);
     std::shared_ptr<NotificationUserInput> userInput = NotificationUserInput::Create("inputKey");
     std::vector<std::shared_ptr<NotificationUserInput>> userInputs;
-    AppExecFwk::PacMap pacMap;
+    AAFwk::WantParams additional;
     std::map<std::string, std::shared_ptr<Uri>> results;
     std::vector<std::string> options;
     std::set<std::string> permitMimeTypes;
-    std::shared_ptr<AppExecFwk::PacMap> pacMapPtr;
+    std::shared_ptr<AAFwk::WantParams> additionalPtr;
     userInput->SetInputsSource(g_want, NotificationConstant::FREE_FORM_INPUT);
-    userInput->AddInputsToWant(userInputs, g_want, pacMap);
+    userInput->AddInputsToWant(userInputs, g_want, additional);
     std::shared_ptr<NotificationUserInput> userInputMine = NotificationUserInput::Create(
-        "Key", "tag", options, false, permitMimeTypes, pacMapPtr, NotificationConstant::EDIT_AUTO);
+        "Key", "tag", options, false, permitMimeTypes, additionalPtr, NotificationConstant::EDIT_AUTO);
     userInput->AddMimeInputToWant(*userInputMine, g_want, results);
-    userInput->AddAdditionalData(pacMap);
+    userInput->AddAdditionalData(additional);
     userInput->SetEditType(NotificationConstant::EDIT_DISABLED);
     userInput->SetOptions(options);
     userInput->SetPermitMimeTypes("mimeType", false);
@@ -622,8 +622,8 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00300, Function
     std::shared_ptr<NotificationActionButton> actionButton =
         NotificationActionButton::Create(nullptr, "title", wantAgent);
     std::shared_ptr<NotificationUserInput> onlyUserInput = NotificationUserInput::Create("onlyUserInputKey");
-    AppExecFwk::PacMap pacMap;
-    actionButton->AddAdditionalData(pacMap);
+    AAFwk::WantParams additional;
+    actionButton->AddAdditionalData(additional);
     actionButton->SetSemanticActionButton(NotificationConstant::NONE_ACTION_BUTTON);
     actionButton->SetAutoCreatedReplies(true);
     actionButton->AddMimeTypeOnlyUserInput(onlyUserInput);

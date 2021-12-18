@@ -16,9 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_H
 
-#include <memory>
-#include <vector>
-
 #include "notification_request.h"
 #include "parcel.h"
 #include "uri.h"

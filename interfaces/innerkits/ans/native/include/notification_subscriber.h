@@ -16,8 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SUBSCRIBER_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SUBSCRIBER_H
 
-#include <memory>
-
 #include "ans_manager_interface.h"
 #include "ans_subscriber_stub.h"
 #include "notification_request.h"

@@ -14,14 +14,8 @@
  */
 
 #include "common.h"
-#include <cinttypes>
 #include "napi_common.h"
-#include "notification_long_text_content.h"
-#include "notification_multiline_content.h"
-#include "notification_slot.h"
 #include "pixel_map_napi.h"
-#include "publish.h"
-#include "want_agent.h"
 
 namespace OHOS {
 namespace NotificationNapi {
@@ -160,9 +154,9 @@ napi_value Common::ParseParaOnlyCallback(const napi_env &env, const napi_callbac
     // argv[0]:callback
     napi_valuetype valuetype = napi_undefined;
     if (argc >= ONLY_CALLBACK_MAX_PARA) {
-        NAPI_CALL(env, napi_typeof(env, argv[ONLY_CALLBACK_MIN_PARA], &valuetype));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
         NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[ONLY_CALLBACK_MIN_PARA], 1, &callback);
+        napi_create_reference(env, argv[PARAM0], 1, &callback);
     }
 
     return Common::NapiGetNull(env);
@@ -1133,9 +1127,12 @@ napi_value Common::SetNotificationActionButtonByExtras(
     const napi_env &env, const std::shared_ptr<NotificationActionButton> &actionButton, napi_value &result)
 {
     ANS_LOGI("enter");
-
+    if (!actionButton) {
+        ANS_LOGE("actionButton is null");
+        return NapiGetBoolean(env, false);
+    }
     // extras?: {[key: string]: any}
-    std::shared_ptr<AAFwk::WantParams> extras = nullptr;
+    auto extras = actionButton->GetAdditionalData();
     if (extras) {
         napi_value nExtras = nullptr;
         nExtras = OHOS::AppExecFwk::WrapWantParams(env, *extras);
@@ -1197,8 +1194,8 @@ napi_value Common::SetNotificationActionButtonByUserInput(
     napi_create_int64(env, userInput->GetEditType(), &value);
     napi_set_named_property(env, result, "editType", value);
 
-    // additionalData?: {[key: string]: any}
-    std::shared_ptr<AAFwk::WantParams> additionalData = nullptr;
+    // additionalData?: {[key: string]: Object}
+    auto additionalData = userInput->GetAdditionalData();
     if (additionalData) {
         napi_value nAdditionalData = nullptr;
         nAdditionalData = OHOS::AppExecFwk::WrapWantParams(env, *additionalData);
@@ -2131,6 +2128,7 @@ napi_value Common::GetNotificationActionButtonsDetailedByExtras(
         if (!OHOS::AppExecFwk::UnwrapWantParams(env, result, wantParams)) {
             return nullptr;
         }
+        pActionButton->AddAdditionalData(wantParams);
     }
     return NapiGetNull(env);
 }
@@ -2223,14 +2221,13 @@ napi_value Common::GetNotificationUserInputByTag(
 
     // tag: string
     NAPI_CALL(env, napi_has_named_property(env, userInputResult, "tag", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, userInputResult, "tag", &value);
-        NAPI_CALL(env, napi_typeof(env, value, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-        NAPI_CALL(env, napi_get_value_string_utf8(env, value, str, STR_MAX_SIZE - 1, &strLen));
-        userInput->SetTag(str);
-        ANS_LOGI("NotificationUserInput::tag = %{public}s", str);
-    }
+    NAPI_ASSERT(env, hasProperty, "Property tag expected.");
+    napi_get_named_property(env, userInputResult, "tag", &value);
+    NAPI_CALL(env, napi_typeof(env, value, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+    NAPI_CALL(env, napi_get_value_string_utf8(env, value, str, STR_MAX_SIZE - 1, &strLen));
+    userInput->SetTag(str);
+    ANS_LOGI("NotificationUserInput::tag = %{public}s", str);
 
     return NapiGetNull(env);
 }
@@ -2254,24 +2251,24 @@ napi_value Common::GetNotificationUserInputByOptions(
 
     // options: Array<string>
     NAPI_CALL(env, napi_has_named_property(env, userInputResult, "options", &hasProperty));
-    if (hasProperty) {
-        napi_get_named_property(env, userInputResult, "options", &value);
-        napi_is_array(env, value, &isArray);
-        NAPI_ASSERT(env, isArray, "Property options is expected to be an array.");
-        napi_get_array_length(env, value, &length);
-        NAPI_ASSERT(env, length > 0, "The array is empty.");
-        std::vector<std::string> options;
-        for (uint32_t i = 0; i < length; ++i) {
-            napi_value option = nullptr;
-            char str[STR_MAX_SIZE] = {0};
-            napi_get_element(env, value, i, &option);
-            NAPI_CALL(env, napi_typeof(env, option, &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-            NAPI_CALL(env, napi_get_value_string_utf8(env, option, str, STR_MAX_SIZE - 1, &strLen));
-            options.emplace_back(str);
-        }
-        userInput->SetOptions(options);
+    NAPI_ASSERT(env, hasProperty, "Property options expected.");
+    napi_get_named_property(env, userInputResult, "options", &value);
+    napi_is_array(env, value, &isArray);
+    NAPI_ASSERT(env, isArray, "Property options is expected to be an array.");
+    napi_get_array_length(env, value, &length);
+    NAPI_ASSERT(env, length > 0, "The array is empty.");
+    std::vector<std::string> options;
+    for (uint32_t i = 0; i < length; ++i) {
+        napi_value option = nullptr;
+        char str[STR_MAX_SIZE] = {0};
+        napi_get_element(env, value, i, &option);
+        NAPI_CALL(env, napi_typeof(env, option, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, option, str, STR_MAX_SIZE - 1, &strLen));
+        options.emplace_back(str);
     }
+    userInput->SetOptions(options);
+
     return NapiGetNull(env);
 }
 
@@ -2382,7 +2379,7 @@ napi_value Common::GetNotificationUserInputByAdditionalData(
         return nullptr;
     }
 
-    // additionalData?: {[key: string]: any}
+    // additionalData?: {[key: string]: Object}
     NAPI_CALL(env, napi_has_named_property(env, userInputResult, "additionalData", &hasProperty));
     if (hasProperty) {
         napi_get_named_property(env, userInputResult, "additionalData", &result);
@@ -2392,6 +2389,7 @@ napi_value Common::GetNotificationUserInputByAdditionalData(
         if (!OHOS::AppExecFwk::UnwrapWantParams(env, result, wantParams)) {
             return nullptr;
         }
+        userInput->AddAdditionalData(wantParams);
     }
 
     return NapiGetNull(env);
@@ -3396,7 +3394,7 @@ napi_value Common::GetNotificationSlotByVibration(const napi_env &env, const nap
     return NapiGetNull(env);
 }
 
-napi_value Common::GetBundleOption(const napi_env &env, const napi_value &value, BundleOption &option)
+napi_value Common::GetBundleOption(const napi_env &env, const napi_value &value, NotificationBundleOption &option)
 {
     ANS_LOGI("enter");
 
@@ -3413,15 +3411,17 @@ napi_value Common::GetBundleOption(const napi_env &env, const napi_value &value,
     NAPI_CALL(env, napi_typeof(env, result, &valuetype));
     NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
     NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
-    option.bundle = str;
+    option.SetBundleName(str);
 
     // uid?: number
     NAPI_CALL(env, napi_has_named_property(env, value, "uid", &hasProperty));
     if (hasProperty) {
+        int32_t uid = 0;
         napi_get_named_property(env, value, "uid", &result);
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
         NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-        napi_get_value_int32(env, result, &option.uid);
+        napi_get_value_int32(env, result, &uid);
+        option.SetUid(uid);
     }
 
     return NapiGetNull(env);

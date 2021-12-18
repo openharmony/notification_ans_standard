@@ -16,10 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SORTING_MAP_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_SORTING_MAP_H
 
-#include <map>
-#include <string>
-#include <vector>
-
 #include "notification_sorting.h"
 #include "parcel.h"
 

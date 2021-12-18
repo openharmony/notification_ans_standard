@@ -78,11 +78,13 @@ std::string NotificationSlotGroup::Dump() const
             contents += ",";
         }
     }
-    return "NotificationSlotGroup[id = " + id_ +
-                                  ", name = " + name_ +
-                                  ", description = " + description_ +
-                                  ", slots = " + contents +
-                                  ", isDisabled = " + (isDisabled_ ? "true" : "false") + "]";
+    return "NotificationSlotGroup{ "
+            "id = " + id_ +
+            ", name = " + name_ +
+            ", description = " + description_ +
+            ", slots = " + contents +
+            ", isDisabled = " + (isDisabled_ ? "true" : "false") +
+            " }";
 }
 
 bool NotificationSlotGroup::Marshalling(Parcel &parcel) const
@@ -150,7 +152,7 @@ bool NotificationSlotGroup::ReadFromParcel(Parcel &parcel)
 
 NotificationSlotGroup *NotificationSlotGroup::Unmarshalling(Parcel &parcel)
 {
-    NotificationSlotGroup *notificationSlotGroup = new NotificationSlotGroup();
+    NotificationSlotGroup *notificationSlotGroup = new (std::nothrow) NotificationSlotGroup();
 
     if (notificationSlotGroup && !notificationSlotGroup->ReadFromParcel(parcel)) {
         delete notificationSlotGroup;

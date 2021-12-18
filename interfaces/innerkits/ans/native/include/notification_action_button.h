@@ -16,15 +16,11 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_ACTION_BUTTON_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_ACTION_BUTTON_H
 
-#include <memory>
-#include <string>
-#include <vector>
 #include "notification_constant.h"
 #include "notification_user_input.h"
-#include "want_agent.h"
-#include "pac_map.h"
-#include "pixel_map.h"
 #include "parcel.h"
+#include "pixel_map.h"
+#include "want_agent.h"
 
 namespace OHOS {
 namespace Notification {
@@ -35,7 +31,7 @@ public:
      * @param icon Indicates the icon to represent this NotificationActionButton.
      * @param title Indicates the title of this NotificationActionButton.
      * @param wantAgent Indicates the wantAgent to be triggered when this NotificationActionButton is triggered.
-     * @param extras Indicates the PacMap object containing the additional data.
+     * @param extras Indicates the AAFwk::WantParams object containing the additional data.
      * @param semanticActionButton Indicates the semantic action to add.
      * @param autoCreatedReplies Indicates whether to allow the platform to automatically generate possible replies.
      * @param mimeTypeOnlyInputs Indicates the NotificationUserInput object to add which allows only values of
@@ -48,7 +44,7 @@ public:
      */
     static std::shared_ptr<NotificationActionButton> Create(const std::shared_ptr<Media::PixelMap> &icon,
         const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
-        const std::shared_ptr<AppExecFwk::PacMap> &extras = {},
+        const std::shared_ptr<AAFwk::WantParams> &extras = {},
         NotificationConstant::SemanticActionButton semanticActionButton =
             NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON,
         bool autoCreatedReplies = true,
@@ -89,15 +85,15 @@ public:
 
     /**
      * Adds additional data to this NotificationActionButton.
-     * @param pacMap Indicates the PacMap object containing the additional data.
+     * @param extras Indicates the AAFwk::WantParams object containing the additional data.
      */
-    void AddAdditionalData(AppExecFwk::PacMap &pacMap);
+    void AddAdditionalData(AAFwk::WantParams &extras);
 
     /**
      * Obtains the additional data included in this NotificationActionButton.
      * @return the additional data included in this NotificationActionButton.
      */
-    const std::shared_ptr<AppExecFwk::PacMap> GetAdditionalData() const;
+    const std::shared_ptr<AAFwk::WantParams> GetAdditionalData() const;
 
     /**
      * Sets a semantic action for this NotificationActionButton.
@@ -199,7 +195,7 @@ private:
      * @param icon Indicates the icon to represent this NotificationActionButton.
      * @param title Indicates the title of this NotificationActionButton.
      * @param wantAgent Indicates the WantAgent to be triggered when this NotificationActionButton is triggered.
-     * @param extras Indicates the PacMap object containing the additional data.
+     * @param extras Indicates the AAFwk::WantParams object containing the additional data.
      * @param semanticActionButton Indicates the semantic action to add.
      * @param autoCreatedReplies Indicates whether to allow the platform to automatically generate possible replies.
      * @param mimeTypeOnlyInputs Indicates the NotificationUserInput object to add which allows only values of
@@ -208,7 +204,7 @@ private:
      * @param isContextual Indicates whether this NotificationActionButton is a contextual action.
      */
     NotificationActionButton(const std::shared_ptr<Media::PixelMap> &icon, const std::string &title,
-        const std::shared_ptr<WantAgent::WantAgent> &wantAgent, const std::shared_ptr<AppExecFwk::PacMap> &extras,
+        const std::shared_ptr<WantAgent::WantAgent> &wantAgent, const std::shared_ptr<AAFwk::WantParams> &extras,
         NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
         const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
         const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual);
@@ -223,7 +219,7 @@ private:
     std::shared_ptr<Media::PixelMap> icon_ {};
     std::string title_ {};
     std::shared_ptr<WantAgent::WantAgent> wantAgent_ {};
-    std::shared_ptr<AppExecFwk::PacMap> extras_ {};
+    std::shared_ptr<AAFwk::WantParams> extras_ {};
     NotificationConstant::SemanticActionButton semanticActionButton_ {
         NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON
     };

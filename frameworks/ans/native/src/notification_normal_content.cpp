@@ -19,7 +19,7 @@ namespace OHOS {
 namespace Notification {
 std::string NotificationNormalContent::Dump()
 {
-    return "NotificationNormalContent[ " + NotificationBasicContent::Dump() + " ]";
+    return "NotificationNormalContent{ " + NotificationBasicContent::Dump() + " }";
 }
 
 bool NotificationNormalContent::Marshalling(Parcel &parcel) const
@@ -29,7 +29,7 @@ bool NotificationNormalContent::Marshalling(Parcel &parcel) const
 
 NotificationNormalContent *NotificationNormalContent::Unmarshalling(Parcel &parcel)
 {
-    auto pContent = new NotificationNormalContent();
+    auto pContent = new (std::nothrow) NotificationNormalContent();
     if ((pContent != nullptr) && !pContent->ReadFromParcel(parcel)) {
         delete pContent;
         pContent = nullptr;

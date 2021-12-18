@@ -16,17 +16,14 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "context.h"
 #include "message_user.h"
 #include "notification_action_button.h"
 #include "notification_content.h"
-#include "want_agent.h"
-#include "context.h"
 #include "ohos/aafwk/content/want_params.h"
-#include "pixel_map.h"
 #include "parcel.h"
+#include "pixel_map.h"
+#include "want_agent.h"
 
 namespace OHOS {
 namespace Notification {
@@ -859,7 +856,7 @@ public:
 
     /**
      * Unmarshal object from a Parcel.
-     * @return the NotificationRequest
+     * @return the NotificationRequest.
      */
     static NotificationRequest *Unmarshalling(Parcel &parcel);
 
@@ -878,7 +875,7 @@ private:
      * the maximum number of action buttons is 3.
      */
     static const std::size_t MAX_ACTION_BUTTONS;
-    
+
 private:
     /**
      * Read a NotificationRequest object from a Parcel.

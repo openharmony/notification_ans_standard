@@ -88,12 +88,14 @@ bool MessageUser::IsUserImportant() const
 
 std::string MessageUser::Dump() const
 {
-    return "MessageUser[key = " + key_ +
-                        ", name = " + name_ +
-                        ", pixelMap = " + (pixelMap_ ? "not null" : "null") +
-                        ", uri = " + uri_.ToString() +
-                        ", isMachine = " + (isMachine_ ? "true" : "false") +
-                        ", isUserImportant = " + (isUserImportant_ ? "true" : "false") + "]";
+    return "MessageUser{ "
+            "key = " + key_ +
+            ", name = " + name_ +
+            ", pixelMap = " + (pixelMap_ ? "not null" : "null") +
+            ", uri = " + uri_.ToString() +
+            ", isMachine = " + (isMachine_ ? "true" : "false") +
+            ", isUserImportant = " + (isUserImportant_ ? "true" : "false") +
+            " }";
 }
 
 bool MessageUser::Marshalling(Parcel &parcel) const
@@ -181,7 +183,7 @@ bool MessageUser::ReadFromParcel(Parcel &parcel)
 
 MessageUser *MessageUser::Unmarshalling(Parcel &parcel)
 {
-    MessageUser *messageUser = new MessageUser();
+    MessageUser *messageUser = new (std::nothrow) MessageUser();
 
     if (messageUser && !messageUser->ReadFromParcel(parcel)) {
         delete messageUser;
