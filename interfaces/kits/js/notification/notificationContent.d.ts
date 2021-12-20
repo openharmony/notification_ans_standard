@@ -14,7 +14,9 @@
  */
 
 import notification from '../@ohos.notification';
-import image from './@ohos.multimedia.image';
+import image from '../@ohos.multimedia.image';
+import { MessageUser } from './notificationMessageUser';
+
 /**
  * Describes a normal text notification.
  *
@@ -120,6 +122,68 @@ export interface NotificationPictureContent extends NotificationBasicContent {
 }
 
 /**
+ * Constructs a conversation-like notification that includes message communication among multiple users.
+ *
+ * @since 8
+ */
+export interface NotificationConversationalContent extends NotificationBasicContent {
+  /**
+   * Indicates the {@code MessageUser} who sends all objects in this conversation-like notification.
+   * This parameter cannot be null.
+   */
+  user: MessageUser;
+
+  /**
+   * Obtains all messages included in this conversation-like notification.
+   */
+  messages: Array<ConversationalMessage>;
+
+  /**
+   * Checks whether this notification represents a group conversation.
+   */
+  conversationGroup?: boolean;
+
+  /**
+   * Obtains the title to be displayed for the conversation.
+   */
+  conversationTitle?: string;
+}
+
+/**
+ * Provides methods for defining a conversational message that is used in notifications created with
+ * {@link NotificationConversationalContent}. Each message contains the message content, timestamp, and
+ * sender; and the message content and sender information will be displayed in the notification bar.
+ *
+ * @since 8
+ */
+export interface ConversationalMessage {
+  /**
+   * Obtains the text to be displayed as the content of this message.
+   */
+  text: string;
+
+  /**
+   * Obtains the time when this message arrived.
+   */
+  timestamp: number;
+
+  /**
+   * Obtains the sender of this message.
+   */
+  sender: MessageUser;
+
+  /**
+   * Obtains the MIME type of this message.
+   */
+  mimeType?: string;
+
+  /**
+   * Obtains the URI of this message.
+   */
+  uri?: string;
+}
+
+/**
  * Describes notification types.
  *
  * @name NotificationContent
@@ -153,4 +217,11 @@ export interface NotificationContent {
    * Picture-attached notification.
    */
   picture?: NotificationPictureContent;
+
+  /**
+   * Constructs a conversation-like notification that includes message communication among multiple users.
+   *
+   * @since 8
+   */
+  conversation?: NotificationConversationalContent;
 }

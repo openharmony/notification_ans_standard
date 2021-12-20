@@ -13,43 +13,45 @@
  * limitations under the License.
  */
 
+import image from '../@ohos.multimedia.image';
+
 /**
- * Describes a NotificationUserInput instance.
+ * Represents a message sender that can be used by {@link NotificationRequest},
  *
- * @name NotificationUserInput
+ * @name MessageUser
  * @since 8
  * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  * @sysCap SystemCapability.Notification.ANS
  */
-export interface NotificationUserInput {
+export interface MessageUser {
   /**
-   * Obtains the key used to identify this input when the input is collected from the user.
+   * Obtains the name of this {@code MessageUser}.
    */
-  inputKey: string;
+  name: string;
 
   /**
-   * Obtains the tag to be displayed to the user when collecting this input from the user.
+   * Obtains the key of this {@code MessageUser}.
    */
-  tag: string;
+  key: string;
 
   /**
-   * Obtains the options provided to users to satisfy user input needs. All options are displayed in a single line.
+   * Obtains the URI of this {@code MessageUser}.
    */
-  options: Array<string>;
+  uri: string;
 
   /**
-   * Obtains whether users can input values of the given MIME type.
+   * Checks whether this {@code MessageUser} is important.
    */
-  permitMimeTypes?: Array<string>;
+  isMachine: boolean;
 
   /**
-   * Obtains the edit type of the options provided by this {@code NotificationUserInput} object.
+   * Checks whether this {@code MessageUser} is a machine.
    */
-  editType?: number;
+  isUserImportant: boolean;
 
   /**
-   * Obtains additional data to this NotificationUserInput.
+   * Obtains the icon of this {@code MessageUser}.
    */
-  additionalData?: {[key: string]: Object};
+  icon?: image.PixelMap;
 }
