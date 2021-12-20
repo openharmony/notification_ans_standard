@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
 constexpr int SYSTEMAPP_UUID = 1000;
 
 void MockBundleMgrService::MockSetIsSystemApp(bool isSystemApp)

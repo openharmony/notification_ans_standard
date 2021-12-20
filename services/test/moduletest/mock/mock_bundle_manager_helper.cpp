@@ -45,6 +45,5 @@ void BundleManagerHelper::Connect()
 
 void BundleManagerHelper::Disconnect()
 {}
-
 }  // namespace Notification
 }  // namespace OHOS

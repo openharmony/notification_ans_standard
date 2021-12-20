@@ -18,7 +18,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
 std::shared_ptr<EventHandler> EventHandler::Current()
 {
     const std::weak_ptr<EventHandler> &wp = std::make_shared<EventHandler>(EventRunner::Create(true));

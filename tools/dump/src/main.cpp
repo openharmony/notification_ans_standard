@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 #include "notification_shell_command.h"
 
 int main(int argc, char *argv[])

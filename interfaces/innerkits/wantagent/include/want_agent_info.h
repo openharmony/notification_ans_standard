@@ -32,11 +32,11 @@ namespace OHOS::Notification::WantAgent {
  *
  */
 class WantAgentInfo final : public std::enable_shared_from_this<WantAgentInfo> {
+public:
     /**
      * Default constructor used to create an empty WantAgentInfo instance.
      *
      */
-public:
     WantAgentInfo();
     virtual ~WantAgentInfo() = default;
 

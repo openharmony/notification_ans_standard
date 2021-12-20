@@ -23,6 +23,8 @@
 
 namespace OHOS::Notification::WantAgent {
 class CompletedCallback {
+public:
+    virtual ~CompletedCallback() = default;
     /**
      * Called when a Send operation as completed.
      *
@@ -31,8 +33,6 @@ class CompletedCallback {
      * @param resultData The final data collected by a broadcast.
      * @param resultExtras The final extras collected by a broadcast.
      */
-public:
-    virtual ~CompletedCallback() = default;
     virtual void OnSendFinished(const AAFwk::Want &want, int resultCode, const std::string &resultData,
         const AAFwk::WantParams &resultExtras) = 0;
 };
