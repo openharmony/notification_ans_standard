@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 #include "ans_subscriber_stub.h"
 
 #include "ans_const_define.h"

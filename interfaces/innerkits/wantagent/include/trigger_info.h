@@ -23,11 +23,11 @@
 
 namespace OHOS::Notification::WantAgent {
 class TriggerInfo final : public std::enable_shared_from_this<TriggerInfo> {
+public:
     /**
      * Default constructor used to create a {@code TriggerInfo} instance.
      *
      */
-public:
     TriggerInfo();
     virtual ~TriggerInfo() = default;
 
@@ -100,11 +100,11 @@ public:
      */
 public:
     class Builder final : public std::enable_shared_from_this<Builder> {
+    public:
         /**
          * Default constructor used to create a {@code Builder} instance.
          *
          */
-    public:
         Builder();
         virtual ~Builder() = default;
 

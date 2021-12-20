@@ -45,6 +45,7 @@ bool BundleManagerHelper::IsSystemApp(int uid)
 {
     return (uid == SYSTEM_APP_UID);
 }
+
 void BundleManagerHelper::Connect()
 {}
 

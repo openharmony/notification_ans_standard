@@ -18,12 +18,12 @@
 
 namespace OHOS::Notification::WantAgent {
 class CancelListener {
+public:
     /**
      * Called when a Cancel operation as completed.
      *
      * @param resultCode The final result code determined by the Send.
      */
-public:
     virtual void OnCancelled(int resultCode) = 0;
     virtual ~CancelListener() = default;
 };

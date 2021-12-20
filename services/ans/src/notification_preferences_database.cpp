@@ -14,7 +14,6 @@
  */
 #include "notification_preferences_database.h"
 
-
 #include "ans_log_wrapper.h"
 
 #include "uri.h"

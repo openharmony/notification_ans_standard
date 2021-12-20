@@ -28,6 +28,11 @@ class WantAgent final : public std::enable_shared_from_this<WantAgent>, public P
 public:
     WantAgent() {};
     virtual ~WantAgent() = default;
+    /**
+     * Constructor.
+     *
+     * @param obj The proxy object.
+     */
     explicit WantAgent(const std::shared_ptr<PendingWant> &pendingWant);
 
     /**
@@ -40,7 +45,7 @@ public:
     /**
      * Sets proxy obj.
      *
-     * @return Return obj.
+     * @param obj The proxy object.
      */
     void SetPendingWant(const std::shared_ptr<PendingWant> &pendingWant);
 
@@ -62,12 +67,6 @@ public:
 
 private:
     std::shared_ptr<PendingWant> pendingWant_;
-
-    /**
-     * Constructor.
-     *
-     * @param obj The proxy object.
-     */
 };
 }  // namespace OHOS::Notification::WantAgent
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_WANTAGENT_INCLUDE_WANT_AGENT_H
