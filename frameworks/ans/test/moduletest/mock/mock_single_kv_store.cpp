@@ -66,7 +66,7 @@ Status AnsTestSingleKvStore::GetCountWithQuery(const DataQuery &query, int &resu
 }
 
 Status AnsTestSingleKvStore::Sync(
-    const std::vector<std::string> &deviceIdList, const SyncMode &mode, uint32_t allowedDelayMs)
+    const std::vector<std::string> &deviceIds, SyncMode mode, uint32_t allowedDelayMs)
 {
     return Status::SUCCESS;
 }
@@ -170,6 +170,22 @@ Status AnsTestSingleKvStore::GetSecurityLevel(SecurityLevel &securityLevel) cons
 }
 
 Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam, KvParam &output)
+{
+    return Status::SUCCESS;
+}
+
+Status AnsTestSingleKvStore::SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
+                                               const DataQuery &query)
+{
+    return Status::SUCCESS;
+}
+
+Status AnsTestSingleKvStore::SubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
+{
+    return Status::SUCCESS;
+}
+
+Status AnsTestSingleKvStore::UnSubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
 {
     return Status::SUCCESS;
 }

@@ -52,7 +52,7 @@ public:
     virtual Status GetCountWithQuery(const DataQuery &query, int &result) const override;
 
     virtual Status Sync(
-        const std::vector<std::string> &deviceIdList, const SyncMode &mode, uint32_t allowedDelayMs = 0) override;
+        const std::vector<std::string> &deviceIds, SyncMode mode, uint32_t allowedDelayMs = 0) override;
 
     virtual Status RemoveDeviceData(const std::string &device) override;
 
@@ -92,6 +92,13 @@ public:
         const std::vector<std::string> &remoteSupportLabels) const override;
 
     virtual Status GetSecurityLevel(SecurityLevel &securityLevel) const override;
+
+    virtual Status SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
+                                     const DataQuery &query) override;
+
+    virtual Status SubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
+
+    virtual Status UnSubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
 
     Status GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
                               std::shared_ptr<KvStoreSnapshot> &snapshot) const override;
