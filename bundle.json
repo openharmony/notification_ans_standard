@@ -1,0 +1,61 @@
+{
+    "name": "@ohos/notification_ans_standard",
+    "version": "",
+    "description": "为应用程序提供发布通知的能力",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/notification_ans_standard",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "base"
+    ],
+    "keywords": [
+        "notification",
+        "ans",
+        "standard"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "base/notification/ans_standard"
+    },
+    "component": {
+        "name": "advanced_notification_service",
+        "subsystem": "notification",
+        "syscap": [
+            "SystemCapability.AdvancedNotificationService"
+        ],
+        "features": [],
+        "adated_system_type": [
+            "small",
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
