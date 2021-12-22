@@ -616,13 +616,6 @@ void NotificationFuzzTestManager::RegisterLauncherService()
         temp->IsAbilityEnabled(abilityInfo);
     });
 
-    callFunctionMap_.emplace("LauncherServiceGetShortcutInfos", []() {
-        std::shared_ptr<OHOS::AppExecFwk::LauncherService> temp = GetParamLauncherService();
-        const std::string bundleName = GetStringParam();
-        std::vector<LauncherShortcutInfo> launcherShortcutInfo = GetParamLauncherShortcutInfoVector();
-        temp->GetShortcutInfos(bundleName, launcherShortcutInfo);
-    });
-
     callFunctionMap_.emplace("LauncherServiceRegisterCallback", []() {
         std::shared_ptr<OHOS::AppExecFwk::LauncherService> temp = GetParamLauncherService();
         const sptr<IBundleStatusCallback> callback = GetParamIBundleStatusCallback();
