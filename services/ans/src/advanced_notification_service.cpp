@@ -32,6 +32,8 @@
 #include "notification_subscriber_manager.h"
 #include "permission_filter.h"
 
+#include "reminder_data_manager.h"
+
 namespace OHOS {
 namespace Notification {
 namespace {
@@ -225,6 +227,68 @@ sptr<NotificationBundleOption> AdvancedNotificationService::GenerateValidBundleO
         validBundleOption = bundleOption;
     }
     return validBundleOption;
+}
+
+void AdvancedNotificationService::SaveNotificationInfo(
+    sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption)
+{
+    ErrCode result = PrepereNotificationRequest(request);
+    if (result != ERR_OK) {
+        REMINDER_LOGE("SaveNotificationInfo fail");
+        return;
+    }
+    bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        REMINDER_LOGE("SaveNotificationInfo fail.");
+        return;
+    }
+    REMINDER_LOGI(
+        "bundleName=%{public}s, uid=%{public}d", (bundleOption->GetBundleName()).c_str(), bundleOption->GetUid());
+}
+
+ErrCode AdvancedNotificationService::PublishSavedNotification(
+    sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption)
+{
+    REMINDER_LOGI("PublishSavedNotification");
+    auto record = std::make_shared<NotificationRecord>();
+    record->request = request;
+    record->notification = new Notification(request);
+    record->bundleOption = bundleOption;
+
+    ErrCode result = ERR_OK;
+
+    handler_->PostSyncTask(std::bind([&]() {
+        result = AssignValidNotificationSlot(record);
+        if (result != ERR_OK) {
+            ANS_LOGE("Can not assign valid slot!");
+            return;
+        }
+
+        result = Filter(record);
+        if (result != ERR_OK) {
+            ANS_LOGE("Reject by filters: %{public}d", result);
+            return;
+        }
+
+        if (!IsNotificationExists(record->notification->GetKey())) {
+            result = FlowControl(record);
+            if (result != ERR_OK) {
+                return;
+            }
+        } else {
+            if (record->request->IsAlertOneTime()) {
+                record->notification->SetEnableLight(false);
+                record->notification->SetEnableSound(false);
+                record->notification->SetEnableViration(false);
+            }
+            UpdateInNotificationList(record);
+        }
+
+        UpdateRecentNotification(record->notification, false, 0);
+        sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+        NotificationSubscriberManager::GetInstance()->NotifyConsumed(record->notification, sortingMap);
+    }));
+    return result;
 }
 
 ErrCode AdvancedNotificationService::Publish(const std::string &label, const sptr<NotificationRequest> &request)
@@ -1374,6 +1438,59 @@ ErrCode AdvancedNotificationService::CancelContinuousTaskNotification(const std:
         }
     }));
     return result;
+}
+
+ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &reminder)
+{
+    REMINDER_LOGI("Publish reminder");
+    ReminderDataManager::GetInstance()->SetService(this);
+    sptr<NotificationRequest> notificationRequest = reminder->GetNotificationRequest();
+    sptr<NotificationBundleOption> bundleOption = nullptr;
+    SaveNotificationInfo(notificationRequest, bundleOption);
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+    ReminderDataManager::GetInstance()->PublishReminder(reminder, bundleOption);
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::CancelReminder(const int32_t reminderId)
+{
+    REMINDER_LOGI("Cancel Reminder");
+    ReminderDataManager::GetInstance()->SetService(this);
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+    ReminderDataManager::GetInstance()->CancelReminder(reminderId, bundleOption);
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::CancelAllReminders()
+{
+    REMINDER_LOGI("Cancel all reminders");
+    ReminderDataManager::GetInstance()->SetService(this);
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+    ReminderDataManager::GetInstance()->CancelAllReminders(bundleOption);
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders)
+{
+    REMINDER_LOGI("GetValidReminders");
+    ReminderDataManager::GetInstance()->SetService(this);
+    reminders.clear();
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+    ReminderDataManager::GetInstance()->GetValidReminders(bundleOption, reminders);
+    REMINDER_LOGD("Valid reminders size=%{public}d", reminders.size());
+    REMINDER_LOGD("Dump:%{public}s", ReminderDataManager::GetInstance()->Dump().c_str());  // todo delete
+    return ERR_OK;
 }
 
 ErrCode AdvancedNotificationService::ActiveNotificationDump(std::vector<std::string> &dumpInfo)

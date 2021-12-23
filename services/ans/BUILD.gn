@@ -21,6 +21,7 @@ group("ans_targets") {
 config("public_ans_config") {
   include_dirs = [
     "${services_path}/ans/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
@@ -45,6 +46,9 @@ ohos_shared_library("libans") {
     "src/notification_subscriber_manager.cpp",
     "src/permission_filter.cpp",
     "src/system_event_observer.cpp",
+    "src/reminder_timer_info.cpp",
+    "src/reminder_data_manager.cpp",
+    "src/reminder_event_manager.cpp",
   ]
 
   configs = [
@@ -58,8 +62,10 @@ ohos_shared_library("libans") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//utils/native/base:utils",
+    "//base/miscservices/time/services:time_service",
   ]
 
   if (is_double_framework) {

@@ -14,6 +14,7 @@
         "//base/notification/ans_standard/services/ans/test/unittest:ans_unit_test",
         "//base/notification/ans_standard/services/test/moduletest:ans_module_test",
         "//base/notification/ans_standard/frameworks/ans/test/moduletest:moduletest",
+        "//base/notification/ans_standard/frameworks/ans/native/test/unittest:ans_reminder_unit_test",
         "//base/notification/ans_standard/frameworks/wantagent/test/:unittest",
         "//base/notification/ans_standard/test:systemtest"
       ]

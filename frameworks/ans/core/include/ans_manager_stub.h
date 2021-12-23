@@ -106,6 +106,10 @@ public:
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
+    virtual ErrCode PublishReminder(sptr<ReminderRequest> &reminder) override;
+    virtual ErrCode CancelReminder(const int32_t reminderId) override;
+    virtual ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
+    virtual ErrCode CancelAllReminders() override;
 
 private:
     static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
@@ -167,6 +171,10 @@ private:
     ErrCode HandleDoesSupportDoNotDisturbMode(MessageParcel &data, MessageParcel &reply);
     ErrCode HandlePublishContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandlePublishReminder(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleCancelReminder(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetValidReminders(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleCancelAllReminders(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

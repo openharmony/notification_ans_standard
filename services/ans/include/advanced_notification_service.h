@@ -108,12 +108,19 @@ public:
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
+    ErrCode PublishReminder(sptr<ReminderRequest> &reminder) override;
+    ErrCode CancelReminder(const int32_t reminderId) override;
+    ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
+    ErrCode CancelAllReminders() override;
 
     // SystemEvent
     void OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption);
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();
+    void SaveNotificationInfo(sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
+    ErrCode PublishSavedNotification(
+        sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
 
 private:
     struct RecentInfo;

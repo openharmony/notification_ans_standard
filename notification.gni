@@ -21,6 +21,8 @@ interfaces_path = "${ans_standard_path}/interfaces"
 
 core_path = "${frameworks_path}/ans/core"
 
+native_path = "${frameworks_path}/ans/native"
+
 test_path = "${ans_standard_path}/test"
 
 tools_path = "${ans_standard_path}/tools"
