@@ -33,6 +33,7 @@ namespace Notification {
 enum class AnsLogLevel : uint8_t { DEBUG = 0, INFO, WARN, ERROR, FATAL };
 
 static constexpr OHOS::HiviewDFX::HiLogLabel ANS_LABEL = {LOG_CORE, LOG_DOMAIN, "ANS_STANDARD"};
+static constexpr OHOS::HiviewDFX::HiLogLabel ANS_REMINDER_LABEL = {LOG_CORE, LOG_DOMAIN, "ANS_REMINDER_derek"};
 
 class AnsLogWrapper {
 public:
@@ -71,6 +72,21 @@ private:
 #define ANS_LOGW(fmt, ...) PRINT_LOG(WARN, Warn, fmt, ##__VA_ARGS__)
 #define ANS_LOGE(fmt, ...) PRINT_LOG(ERROR, Error, fmt, ##__VA_ARGS__)
 #define ANS_LOGF(fmt, ...) PRINT_LOG(FATAL, Fatal, fmt, ##__VA_ARGS__)
+
+#define PRINT_REMINDER_LOG(LEVEL, Level, fmt, ...)                  \
+    if (AnsLogWrapper::JudgeLevel(AnsLogLevel::LEVEL))     \
+    OHOS::HiviewDFX::HiLog::Level(ANS_REMINDER_LABEL,      \
+        "[%{public}s(%{public}s):%{public}d] " fmt,        \
+        AnsLogWrapper::GetBriefFileName(__FILE__).c_str(), \
+        __FUNCTION__,                                      \
+        __LINE__,                                          \
+        ##__VA_ARGS__)
+
+#define REMINDER_LOGD(fmt, ...) PRINT_REMINDER_LOG(DEBUG, Debug, fmt, ##__VA_ARGS__)
+#define REMINDER_LOGI(fmt, ...) PRINT_REMINDER_LOG(INFO, Info, fmt, ##__VA_ARGS__)
+#define REMINDER_LOGW(fmt, ...) PRINT_REMINDER_LOG(WARN, Warn, fmt, ##__VA_ARGS__)
+#define REMINDER_LOGE(fmt, ...) PRINT_REMINDER_LOG(ERROR, Error, fmt, ##__VA_ARGS__)
+#define REMINDER_LOGF(fmt, ...) PRINT_REMINDER_LOG(FATAL, Fatal, fmt, ##__VA_ARGS__)
 }  // namespace Notification
 }  // namespace OHOS
 

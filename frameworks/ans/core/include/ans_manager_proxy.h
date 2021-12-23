@@ -102,6 +102,11 @@ public:
     ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
 
+    ErrCode PublishReminder(sptr<ReminderRequest> &reminder) override;
+    ErrCode CancelReminder(const int32_t reminderId) override;
+    ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
+    ErrCode CancelAllReminders() override;
+
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);
 
@@ -111,6 +116,8 @@ private:
     template<typename T>
     bool ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos, MessageParcel &reply, ErrCode &result);
     static inline BrokerDelegator<AnsManagerProxy> delegator_;
+
+    ErrCode ReadReminders(uint8_t &count, MessageParcel &reply, std::vector<sptr<ReminderRequest>> &reminders);
 };
 }  // namespace Notification
 }  // namespace OHOS

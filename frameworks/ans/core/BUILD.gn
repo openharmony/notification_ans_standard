@@ -31,6 +31,8 @@ config("public_ans_core_config") {
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
   ]
+
+  cflags_cc = [ "-fexceptions" ]
 }
 
 ohos_shared_library("ans_core") {
@@ -66,6 +68,10 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/ans/native/src/notification_subscribe_info.cpp",
     "${frameworks_path}/ans/native/src/notification_subscriber.cpp",
     "${frameworks_path}/ans/native/src/notification_user_input.cpp",
+    "${frameworks_path}/ans/native/src/reminder_helper.cpp",
+    "${frameworks_path}/ans/native/src/reminder_request.cpp",
+    "${frameworks_path}/ans/native/src/reminder_request_timer.cpp",
+    "${frameworks_path}/ans/native/src/reminder_request_alarm.cpp",
   ]
 
   configs = [ ":private_config" ]
@@ -74,8 +80,12 @@ ohos_shared_library("ans_core") {
 
   deps = [
     "${frameworks_path}/wantagent:wantagent_innerkits",
+    "//base/miscservices/time/services:time_service",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
+    "//foundation/appexecfwk/standard/kits:appkit_native",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
