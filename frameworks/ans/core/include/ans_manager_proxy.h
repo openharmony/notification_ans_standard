@@ -101,6 +101,7 @@ public:
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
+    ErrCode IsSupportTemplate(const std::string &templateName, bool &support) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

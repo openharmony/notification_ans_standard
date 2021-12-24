@@ -630,6 +630,14 @@ public:
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId);
 
     /**
+     * Obtains whether the template is supported by the system.
+     *
+     * @param support whether is it a system supported template.
+     * @return Returns check result.
+     */
+    ErrCode IsSupportTemplate(const std::string &templateName, bool &support);
+
+    /**
      * Reset ans manager proxy when OnRemoteDied called.
      */
     void ResetAnsManagerProxy();
