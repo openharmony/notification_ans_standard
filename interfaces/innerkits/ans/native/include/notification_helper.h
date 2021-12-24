@@ -524,7 +524,7 @@ public:
      *                 only be null or an empty string, indicating the current device.
      * @param enabled Specifies whether to allow the current application to publish notifications. The value
      *                true indicates that notifications are allowed, and the value false indicates that
-     *                notifications are not allowed.
+      *                notifications are not allowed.
      * @return Returns set notifications enabled for default bundle result.
      */
     static ErrCode SetNotificationsEnabledForDefaultBundle(const std::string &deviceId, bool enabled);
@@ -629,6 +629,14 @@ public:
      * @return Returns cancel continuous task notification result.
      */
     static ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId);
+
+    /**
+     * Obtains whether the template is supported by the system.
+     *
+     * @param support whether is it a system supported template.
+     * @return Returns check result.
+     */
+    static ErrCode IsSupportTemplate(const std::string &templateName, bool &support);
 };
 }  // namespace Notification
 }  // namespace OHOS

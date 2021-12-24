@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "ans_log_wrapper.h"
 #include "notification_request.h"
+
+#include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
@@ -111,6 +112,8 @@ NotificationRequest::NotificationRequest(const NotificationRequest &other)
     this->actionButtons_ = other.actionButtons_;
     this->messageUsers_ = other.messageUsers_;
     this->userInputHistory_ = other.userInputHistory_;
+
+    this->notificationTemplate_ = other.notificationTemplate_;
 }
 
 NotificationRequest &NotificationRequest::operator=(const NotificationRequest &other)
@@ -170,6 +173,8 @@ NotificationRequest &NotificationRequest::operator=(const NotificationRequest &o
     this->actionButtons_ = other.actionButtons_;
     this->messageUsers_ = other.messageUsers_;
     this->userInputHistory_ = other.userInputHistory_;
+
+    this->notificationTemplate_ = other.notificationTemplate_;
 
     return *this;
 }
@@ -754,6 +759,7 @@ std::string NotificationRequest::Dump()
             ", bigIcon = " + (bigIcon_ ? "not null" : "null") +
             ", notificationContent = " + (notificationContent_ ? notificationContent_->Dump() : "null") +
             ", publicNotification = " + (publicNotification_ ? "not null" : "null") +
+            ", notificationTemplate = " + (notificationTemplate_ ? "not null" : "null") +
             ", actionButtons = " + (!actionButtons_.empty() ? actionButtons_.at(0)->Dump() : "empty") +
             ", messageUsers = " + (!messageUsers_.empty() ? messageUsers_.at(0)->Dump() : "empty") +
             ", userInputHistory = " + (!userInputHistory_.empty() ? userInputHistory_.at(0) : "empty") +
@@ -1089,6 +1095,19 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    valid = notificationTemplate_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write the flag which indicate whether publicNotification is null");
+        return false;
+    }
+
+    if (valid) {
+        if (!parcel.WriteParcelable(notificationTemplate_.get())) {
+            ANS_LOGE("Failed to write notificationTemplate");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1283,6 +1302,15 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
+    valid = parcel.ReadBool();
+    if (valid) {
+        notificationTemplate_ = std::shared_ptr<NotificationTemplate>(parcel.ReadParcelable<NotificationTemplate>());
+        if (!notificationTemplate_) {
+            ANS_LOGE("Failed to read notificationTemplate");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1293,6 +1321,16 @@ int64_t NotificationRequest::GetNowSysTime()
     auto value = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
     int64_t duration = value.count();
     return duration;
+}
+
+void NotificationRequest::SetTemplate(const std::shared_ptr<NotificationTemplate> &templ)
+{
+    notificationTemplate_ = templ;
+}
+
+std::shared_ptr<NotificationTemplate> NotificationRequest::GetTemplate() const
+{
+    return notificationTemplate_;
 }
 }  // namespace Notification
 }  // namespace OHOS

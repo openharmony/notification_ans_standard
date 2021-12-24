@@ -113,6 +113,7 @@ public:
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) = 0;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) = 0;
     virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) = 0;
+    virtual ErrCode IsSupportTemplate(const std::string &templateName, bool &support) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -172,6 +173,7 @@ protected:
         SHELL_DUMP,
         PUBLISH_CONTINUOUS_TASK_NOTIFICATION,
         CANCEL_CONTINUOUS_TASK_NOTIFICATION,
+        IS_SUPPORT_TEMPLATE,
     };
 };
 }  // namespace Notification

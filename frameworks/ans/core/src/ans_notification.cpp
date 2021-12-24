@@ -1045,5 +1045,15 @@ ErrCode AnsNotification::CheckImageSize(const NotificationRequest &request)
 
     return ERR_OK;
 }
+
+ErrCode AnsNotification::IsSupportTemplate(const std::string &templateName, bool &support)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->IsSupportTemplate(templateName, support);
+}
 }  // namespace Notification
 }  // namespace OHOS
