@@ -400,7 +400,7 @@ napi_value Common::SetNotificationRequestByPixelMap(
         return NapiGetBoolean(env, false);
     }
 
-   // smallIcon?: image.PixelMap
+    // smallIcon?: image.PixelMap
     std::shared_ptr<Media::PixelMap> littleIcon = request->GetLittleIcon();
     if (littleIcon) {
         napi_value smallIconResult = nullptr;
@@ -481,6 +481,18 @@ napi_value Common::SetNotificationRequestByCustom(
         }
     }
     napi_set_named_property(env, result, "actionButtons", arr);
+
+    // template?: NotificationTemplate;
+    std::shared_ptr<NotificationTemplate> templ = request->GetTemplate();
+    if (templ) {
+        napi_value templateResult = nullptr;
+        napi_create_object(env, &templateResult);
+        if (!SetNotificationTemplateInfo(env, templ, templateResult)) {
+            ANS_LOGE("SetNotificationTemplate call failed");
+            return NapiGetBoolean(env, false);
+        }
+        napi_set_named_property(env, result, "template", templateResult);
+    }
 
     return NapiGetBoolean(env, true);
 }
@@ -1406,6 +1418,10 @@ napi_value Common::GetNotificationRequestByCustom(
     }
     // largeIcon?: image.PixelMap
     if (GetNotificationLargeIcon(env, value, request) == nullptr) {
+        return nullptr;
+    }
+    // template?: NotificationTemplate
+    if (GetNotificationTemplate(env, value, request) == nullptr) {
         return nullptr;
     }
     return NapiGetNull(env);
@@ -2823,7 +2839,7 @@ napi_value Common::GetNotificationConversationalContentMessages(
     napi_value conversationalContentResult = nullptr;
     bool hasProperty = false;
 
-   // messages: Array<ConversationalMessage>
+    // messages: Array<ConversationalMessage>
     NAPI_CALL(env, napi_has_named_property(env, contentResult, "messages", &hasProperty));
     NAPI_ASSERT(env, hasProperty, "Property messages expected.");
     napi_get_named_property(env, contentResult, "messages", &conversationalContentResult);
@@ -3750,6 +3766,100 @@ napi_value Common::CreateWantAgentByJS(const napi_env &env, const std::shared_pt
         nullptr);
 
     return wantAgent;
+}
+
+napi_value Common::GetNotificationTemplate(const napi_env &env, const napi_value &value, NotificationRequest &request)
+{
+    ANS_LOGI("enter");
+
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+    bool hasProperty = false;
+
+    NAPI_CALL(env, napi_has_named_property(env, value, "template", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "template", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+
+        std::shared_ptr<NotificationTemplate> templ = std::make_shared<NotificationTemplate>();
+        if (templ == nullptr) {
+            ANS_LOGE("template is null");
+            return nullptr;
+        }
+        if (GetNotificationTemplateInfo(env, value, templ) == nullptr) {
+            return nullptr;
+        }
+
+        request.SetTemplate(templ);
+    }
+
+    return NapiGetNull(env);
+}
+
+napi_value Common::GetNotificationTemplateInfo(const napi_env &env, const napi_value &value,
+    std::shared_ptr<NotificationTemplate> &templ)
+{
+    ANS_LOGI("enter");
+
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+    bool hasProperty = false;
+    char str[STR_MAX_SIZE] = {0};
+    size_t strLen = 0;
+
+    // name: string
+    NAPI_CALL(env, napi_has_named_property(env, value, "name", &hasProperty));
+    NAPI_ASSERT(env, hasProperty, "Property text expected.");
+    napi_get_named_property(env, value, "name", &result);
+    NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+    NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+    NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
+    std::string strInput = str;
+    templ->SetTemplateName(strInput);
+
+    // data?: {[key: string]: object}
+    NAPI_CALL(env, napi_has_named_property(env, value, "data", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "data", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+        AAFwk::WantParams wantParams;
+        if (!OHOS::AppExecFwk::UnwrapWantParams(env, result, wantParams)) {
+            return nullptr;
+        }
+
+        std::shared_ptr<AAFwk::WantParams> data = std::make_shared<AAFwk::WantParams>(wantParams);
+        templ->SetTemplateData(data);
+    }
+
+    return NapiGetNull(env);
+}
+
+napi_value Common::SetNotificationTemplateInfo(
+    const napi_env &env, const std::shared_ptr<NotificationTemplate> &templ, napi_value &result)
+{
+    ANS_LOGI("enter");
+
+    if (templ == nullptr) {
+        ANS_LOGE("templ is null");
+        return NapiGetBoolean(env, false);
+    }
+
+    napi_value value = nullptr;
+
+    // name: string;
+    napi_create_string_utf8(env, templ->GetTemplateName().c_str(), NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, "name", value);
+
+    // data?: {[key: string]: object};
+    std::shared_ptr<AAFwk::WantParams> data = templ->GetTemplateData();
+    if (data) {
+        value = OHOS::AppExecFwk::WrapWantParams(env, *data);
+        napi_set_named_property(env, result, "data", value);
+    }
+
+    return NapiGetBoolean(env, true);
 }
 }  // namespace NotificationNapi
 }  // namespace OHOS

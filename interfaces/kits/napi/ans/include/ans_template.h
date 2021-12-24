@@ -13,11 +13,17 @@
  * limitations under the License.
  */
 
-#include "notification_shell_command.h"
+#ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_TEMPLATE_H
+#define BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_TEMPLATE_H
 
-int main(int argc, char *argv[])
-{
-    OHOS::Notification::NotificationShellCommand cmd(argc, argv);
-    std::cout << cmd.ExecCommand();
-    return 0;
-}
+#include "common.h"
+
+namespace OHOS {
+namespace NotificationNapi {
+using namespace OHOS::Notification;
+
+napi_value IsSupportTemplate(napi_env env, napi_callback_info info);
+}  // namespace NotificationNapi
+}  // namespace OHOS
+
+#endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_TEMPLATE_H

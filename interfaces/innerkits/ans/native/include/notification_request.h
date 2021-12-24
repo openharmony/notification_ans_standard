@@ -20,6 +20,7 @@
 #include "message_user.h"
 #include "notification_action_button.h"
 #include "notification_content.h"
+#include "notification_template.h"
 #include "ohos/aafwk/content/want_params.h"
 #include "parcel.h"
 #include "pixel_map.h"
@@ -860,6 +861,18 @@ public:
      */
     static NotificationRequest *Unmarshalling(Parcel &parcel);
 
+    /**
+     * Sets the template of this notification.
+     * @param template the template of this notification.
+     */
+    void SetTemplate(const std::shared_ptr<NotificationTemplate> &templ);
+
+    /**
+     * Obtains the Template of the notification.
+     * @return the Template of the notification.
+     */
+    std::shared_ptr<NotificationTemplate> GetTemplate() const;
+
 private:
     /**
      * Indicates the color mask, used for calculation with the ARGB value set by setColor(int32_t).
@@ -945,6 +958,7 @@ private:
     std::vector<std::shared_ptr<NotificationActionButton>> actionButtons_ {};
     std::vector<std::shared_ptr<MessageUser>> messageUsers_ {};
     std::vector<std::string> userInputHistory_ {};
+    std::shared_ptr<NotificationTemplate> notificationTemplate_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS
