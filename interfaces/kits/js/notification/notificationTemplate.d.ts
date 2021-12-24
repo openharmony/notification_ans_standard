@@ -13,37 +13,23 @@
  * limitations under the License.
  */
 
-import { NotificationUserInput } from './notificationUserInput';
-import { WantAgent } from '../@ohos.wantAgent';
-
 /**
- * Describes an action button displayed in a notification.
- * @name NotificationActionButton
- * @since 7
+ * Describes a NotificationTemplate instance.
+ *
+ * @name NotificationTemplate
+ * @since 8
  * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  * @sysCap SystemCapability.Notification.ANS
  */
-export interface NotificationActionButton {
+export interface NotificationTemplate {
   /**
-   * Button title.
+   * Obtains the type of a notification template.
    */
-  title: string;
+  name: string;
 
   /**
-   * WantAgent of the button.
+   * Obtains the data of a notification template.
    */
-  wantAgent: WantAgent;
-
-  /**
-   * Extra information of the button.
-   */
-  extras?: {[key: string]: any};
-
-  /**
-   * User input
-   *
-   * @since 8
-   */
-  userInput?: NotificationUserInput;
+  data: {[key: string]: Object};
 }

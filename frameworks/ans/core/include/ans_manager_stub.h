@@ -106,6 +106,7 @@ public:
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
+    virtual ErrCode IsSupportTemplate(const std::string &templateName, bool &support) override;
 
 private:
     static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
@@ -167,6 +168,7 @@ private:
     ErrCode HandleDoesSupportDoNotDisturbMode(MessageParcel &data, MessageParcel &reply);
     ErrCode HandlePublishContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsSupportTemplate(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

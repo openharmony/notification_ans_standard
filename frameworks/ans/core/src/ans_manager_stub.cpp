@@ -195,6 +195,10 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
             std::bind(
                 &AnsManagerStub::HandleCancelContinuousTaskNotification, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
+        {AnsManagerStub::IS_SUPPORT_TEMPLATE,
+            std::bind(
+                &AnsManagerStub::HandleIsSupportTemplate, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
 };
 
 AnsManagerStub::AnsManagerStub()
@@ -1295,6 +1299,29 @@ bool AnsManagerStub::ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos,
     return true;
 }
 
+ErrCode AnsManagerStub::HandleIsSupportTemplate(MessageParcel &data, MessageParcel &reply)
+{
+    std::string templateName;
+    if (!data.ReadString(templateName)) {
+        ANS_LOGW("[HandleIsSupportTemplate] fail: read template name failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    bool support = false;
+    ErrCode result = IsSupportTemplate(templateName, support);
+
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleIsSupportTemplate] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteBool(support)) {
+        ANS_LOGW("[HandleIsSupportTemplate] fail: write support failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::Publish(const std::string &label, const sptr<NotificationRequest> &notification)
 {
     ANS_LOGW("AnsManagerStub::Publish called!");
@@ -1636,6 +1663,12 @@ ErrCode AnsManagerStub::PublishContinuousTaskNotification(const sptr<Notificatio
 ErrCode AnsManagerStub::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
 {
     ANS_LOGW("AnsManagerStub::CancelContinuousTaskNotification called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::IsSupportTemplate(const std::string &templateName, bool &support)
+{
+    ANS_LOGW("AnsManagerStub::IsSupportTemplate called!");
     return ERR_INVALID_OPERATION;
 }
 }  // namespace Notification

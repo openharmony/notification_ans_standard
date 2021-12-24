@@ -2007,5 +2007,39 @@ bool AnsManagerProxy::ReadParcelableVector(std::vector<sptr<T>> &parcelableInfos
 
     return true;
 }
+
+ErrCode AnsManagerProxy::IsSupportTemplate(const std::string &templateName, bool &support)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[IsSupportTemplate] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(templateName)) {
+        ANS_LOGW("[IsSupportTemplate] fail: write template name failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(IS_SUPPORT_TEMPLATE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[IsSupportTemplate] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[IsSupportTemplate] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(support)) {
+        ANS_LOGW("[IsSupportTemplate] fail: read support failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
 }  // namespace Notification
 }  // namespace OHOS

@@ -37,6 +37,9 @@ constexpr uint32_t SYSTEM_SERVICE_UID = 1000;
 const static Uri DEFAULT_NOTIFICATION_SOUND("file://system/etc/Light.ogg");
 const static std::vector<int64_t> DEFAULT_NOTIFICATION_VIBRATION = {200};
 
+// Default path for template
+const static std::string DEFAULT_TEMPLATE_PATH("/system/etc/external.json");
+
 }  // namespace Notification
 }  // namespace OHOS
 
