@@ -1489,7 +1489,6 @@ ErrCode AdvancedNotificationService::GetValidReminders(std::vector<sptr<Reminder
     }
     ReminderDataManager::GetInstance()->GetValidReminders(bundleOption, reminders);
     REMINDER_LOGD("Valid reminders size=%{public}d", reminders.size());
-    REMINDER_LOGD("Dump:%{public}s", ReminderDataManager::GetInstance()->Dump().c_str());  // todo delete
     return ERR_OK;
 }
 

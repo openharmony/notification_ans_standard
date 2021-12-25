@@ -253,7 +253,7 @@ bool ReminderCommon::GetObject(const napi_env &env, const napi_value &value,
 
     NAPI_CALL(env, napi_has_named_property(env, value, propertyName, &hasProperty));
     if (!hasProperty) {
-        return true;
+        return false;
     }
     napi_get_named_property(env, value, propertyName, &propertyVal);
     NAPI_CALL(env, napi_typeof(env, propertyVal, &valuetype));
@@ -311,43 +311,41 @@ napi_value ReminderCommon::CreateReminderAlarm(
 
     // daysOfWeek
     napi_value result = nullptr;
-    if (!GetObject(env, value, ReminderAgentNapi::ALARM_DAYS_OF_WEEK, result)) {
-        REMINDER_LOGE("Correct property %{public}s expected.", ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
-        return nullptr;
-    }
     std::vector<uint8_t> daysOfWeek;
-    if (result != nullptr) {  // function line too long
-        bool isArray = false;
-        napi_is_array(env, result, &isArray);
-        if (!isArray) {
-            REMINDER_LOGE("Property %{public}s is expected to be an array.", ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
-            return nullptr;
-        }
-        uint32_t length = 0;
-        napi_get_array_length(env, result, &length);
-        uint8_t maxDaysOfWeek = 7;
-        if (length > maxDaysOfWeek) {
-            REMINDER_LOGE("The max length of array of %{public}s is %{public}d.", ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
-            return nullptr;
-        }
-        napi_valuetype valuetype = napi_undefined;
-        for (size_t i = 0; i < length; i++) {
-            int32_t propertyDayVal = 10;
-            napi_value repeatDayVal = nullptr;
-            napi_get_element(env, result, i, &repeatDayVal);
-            NAPI_CALL(env, napi_typeof(env, repeatDayVal, &valuetype));
-            if (valuetype != napi_number) {
-                REMINDER_LOGE("%{public}s's element is expected to be number.",
-                    ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
+    if (GetObject(env, value, ReminderAgentNapi::ALARM_DAYS_OF_WEEK, result)) {
+        if (result != nullptr) {  // function line too long
+            bool isArray = false;
+            napi_is_array(env, result, &isArray);
+            if (!isArray) {
+                REMINDER_LOGE("Property %{public}s is expected to be an array.", ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
                 return nullptr;
             }
-            napi_get_value_int32(env, repeatDayVal, &propertyDayVal);
-            if (propertyDayVal < 1 || propertyDayVal > maxDaysOfWeek) {
-                REMINDER_LOGE("%{public}s's element must between [1, %{public}d].",
-                    ReminderAgentNapi::ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
+            uint32_t length = 0;
+            napi_get_array_length(env, result, &length);
+            uint8_t maxDaysOfWeek = 7;
+            if (length > maxDaysOfWeek) {
+                REMINDER_LOGE("The max length of array of %{public}s is %{public}d.", ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
                 return nullptr;
             }
-            daysOfWeek.push_back(static_cast<uint8_t>(propertyDayVal));
+            napi_valuetype valuetype = napi_undefined;
+            for (size_t i = 0; i < length; i++) {
+                int32_t propertyDayVal = 10;
+                napi_value repeatDayVal = nullptr;
+                napi_get_element(env, result, i, &repeatDayVal);
+                NAPI_CALL(env, napi_typeof(env, repeatDayVal, &valuetype));
+                if (valuetype != napi_number) {
+                    REMINDER_LOGE("%{public}s's element is expected to be number.",
+                        ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
+                    return nullptr;
+                }
+                napi_get_value_int32(env, repeatDayVal, &propertyDayVal);
+                if (propertyDayVal < 1 || propertyDayVal > maxDaysOfWeek) {
+                    REMINDER_LOGE("%{public}s's element must between [1, %{public}d].",
+                        ReminderAgentNapi::ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
+                    return nullptr;
+                }
+                daysOfWeek.push_back(static_cast<uint8_t>(propertyDayVal));
+            }
         }
     }
     reminder = std::make_shared<ReminderRequestAlarm>(

@@ -75,19 +75,11 @@ std::string ReminderRequest::Dump() const
     uint8_t dateTimeLen = 80;
     char dateTimeBuffer[dateTimeLen];
     strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", timeInfo);
-    // todo
     return "Reminder["
            "id=" + std::to_string(reminderId_) +
            ", type=" + std::to_string(static_cast<uint8_t>(reminderType_)) +
            ", state=" + GetState(state_) +
            ", nextTriggerTime=" + dateTimeBuffer +
-        //    ", isExpired=" + std::to_string(isExpired_) +
-        //    ", title=" + title_ +
-        //    ", content=" + content_ +
-        //    ", expiredContent=" + expiredContent_ +
-        //    ", notificationId=" + std::to_string(notificationId_) +
-        //    ", slotType=" + std::to_string(slotType_) +
-        //    ", wantAgent=" + wantAgentInfo_->pkgName + "#" + wantAgentInfo_->abilityName +
            "]";
 }
 
@@ -232,7 +224,6 @@ void ReminderRequest::OnSameNotificationIdCovered()
 
 void ReminderRequest::OnShow(bool isSysTimeChanged, bool allowToNotify)
 {
-    // todo isSysTimeChanged
     if (allowToNotify) {
         SetState(true, REMINDER_STATUS_SHOWING, "OnShow");
     }

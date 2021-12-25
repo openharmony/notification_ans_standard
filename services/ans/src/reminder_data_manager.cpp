@@ -159,11 +159,6 @@ void ReminderDataManager::GetValidReminders(
     }
 }
 
-void ReminderDataManager::AddDefaultSlotIfNeeded(sptr<ReminderRequest> &reminder)
-{
-    // todo
-}
-
 std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo() const
 {
     auto sharedTimerInfo = std::make_shared<ReminderTimerInfo>();
@@ -223,7 +218,7 @@ bool ReminderDataManager::cmp(sptr<ReminderRequest> &reminderRequest, sptr<Remin
 
 void ReminderDataManager::CloseReminder(const OHOS::EventFwk::Want &want, bool cancelNotification)
 {
-    int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));  // todo fail to get param
+    int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));
     CloseReminder(reminderId, cancelNotification);
 }
 
@@ -335,8 +330,6 @@ void ReminderDataManager::ShowDesignatedReminderLocked(sptr<ReminderRequest> &re
             REMINDER_LOGD("publish notification.(reminderId=%{public}d)", reminderId);
             (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::REMOVAL_WANT_AGENT, "");
             (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::ACTION_BUTTON, "");
-
-            // todo update expiredContent
             advancedNotificationService_->PublishSavedNotification(notificationRequest, bundleOption);
             (*it)->OnShow(isSysTimeChanged, true);
             HandleSameNotificationIdShowing((*it));

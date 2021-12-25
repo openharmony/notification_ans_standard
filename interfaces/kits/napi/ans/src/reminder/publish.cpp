@@ -525,12 +525,17 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             asynccallbackinfo->info.errorCode = ReminderHelper::PublishReminder(*(asynccallbackinfo->reminder));
             REMINDER_LOGD("Return reminderId=%{public}d", asynccallbackinfo->reminder->GetReminderId());
+
+            // reminderId
+            napi_value napiReminderId = nullptr;
+            napi_create_int32(env, asynccallbackinfo->reminder->GetReminderId(), &napiReminderId);
+            asynccallbackinfo->result = napiReminderId;
         },
         [](napi_env env, napi_status status, void *data) {
             REMINDER_LOGI("Publish napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             NotificationNapi::Common::ReturnCallbackPromise(
-                env, asynccallbackinfo->info, NotificationNapi::Common::NapiGetNull(env));
+                env, asynccallbackinfo->info, asynccallbackinfo->result);
             if (asynccallbackinfo->info.callback != nullptr) {
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }

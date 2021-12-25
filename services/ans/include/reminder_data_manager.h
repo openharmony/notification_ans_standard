@@ -113,13 +113,6 @@ public:
 
 private:
     /**
-     * Add default slot to the reminder if no slot set by user.
-     *
-     * @param reminder Indicates the reminder.
-     */
-    void AddDefaultSlotIfNeeded(sptr<ReminderRequest> &reminder);
-
-    /**
      * Cancels the notification relative to the reminder.
      *
      * @param reminder Indicates the reminder.
