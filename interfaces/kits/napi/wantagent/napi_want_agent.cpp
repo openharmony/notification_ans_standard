@@ -235,6 +235,10 @@ auto NAPI_GetBundleNameExecuteCallBack = [](napi_env env, void *data) {
 auto NAPI_GetBundleNameCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("GetBundleName compeleted(CallBack Mode)...");
     AsyncGetBundleNameCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetBundleNameCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
     napi_value callback = nullptr;
     napi_value undefined = nullptr;
@@ -251,16 +255,22 @@ auto NAPI_GetBundleNameCompleteCallBack = [](napi_env env, napi_status status, v
     }
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 auto NAPI_GetBundleNamePromiseCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("GetBundleName compeleted(Promise Mode)...");
     AsyncGetBundleNameCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetBundleNameCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_string_utf8(env, asyncCallbackInfo->bundleName.c_str(), NAPI_AUTO_LENGTH, &result);
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 napi_value NAPI_GetBundleNameWrap(
@@ -354,12 +364,20 @@ napi_value NAPI_GetBundleName(napi_env env, napi_callback_info info)
 auto NAPI_GetUidWrapExecuteCallBack = [](napi_env env, void *data) {
     HILOG_INFO("GetUid called(CallBack Mode)...");
     AsyncGetUidCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetUidCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     asyncCallbackInfo->uid = WantAgentHelper::GetUid(asyncCallbackInfo->wantAgent);
 };
 
 auto NAPI_GetUidWrapCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("GetUid compeleted(CallBack Mode)...");
     AsyncGetUidCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetUidCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_value result[NUMBER_OF_PARAMETERS_TWO] = {0};
     napi_value callback = nullptr;
     napi_value undefined = nullptr;
@@ -376,16 +394,22 @@ auto NAPI_GetUidWrapCompleteCallBack = [](napi_env env, napi_status status, void
     }
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 auto NAPI_GetUidWrapPromiseCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("GetUid compeleted(Promise Mode)...");
     AsyncGetUidCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetUidCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_int32(env, asyncCallbackInfo->uid, &result);
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 napi_value NAPI_GetUidWrap(
@@ -478,12 +502,20 @@ napi_value NAPI_GetUid(napi_env env, napi_callback_info info)
 auto NAPI_GetWantWrapExecuteCallBack = [](napi_env env, void *data) {
     HILOG_INFO("GetWant called(CallBack Mode)...");
     AsyncGetWantCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetWantCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     asyncCallbackInfo->want = WantAgentHelper::GetWant(asyncCallbackInfo->wantAgent);
 };
 
 auto NAPI_GetWantWrapCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("GetWant compeleted(CallBack Mode)...");
     AsyncGetWantCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetWantCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr || asyncCallbackInfo->want == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo or want is nullptr.");
+        return;
+    }
     napi_value result[NUMBER_OF_PARAMETERS_TWO] = {};
     napi_value callback = nullptr;
     napi_value undefined = nullptr;
@@ -499,15 +531,21 @@ auto NAPI_GetWantWrapCompleteCallBack = [](napi_env env, napi_status status, voi
     }
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 auto NAPI_GetWantWrapPromiseCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("GetWant compeleted(Promise Mode)...");
     AsyncGetWantCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetWantCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr || asyncCallbackInfo->want == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo or want is nullptr.");
+        return;
+    }
     napi_value result = WrapWant(env, *(asyncCallbackInfo->want));
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 napi_value NAPI_GetWantWrap(
@@ -622,6 +660,10 @@ auto NAPI_CancelWrapExecuteCallBack = [](napi_env env, void *data) {
 auto NAPI_CancelWrapCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("Cancel compeleted(CallBack Mode)...");
     AsyncCancelCallbackInfo *asyncCallbackInfo = static_cast<AsyncCancelCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_value result[NUMBER_OF_PARAMETERS_TWO] = {nullptr};
     napi_value callback = nullptr;
     napi_value undefined = nullptr;
@@ -638,16 +680,22 @@ auto NAPI_CancelWrapCompleteCallBack = [](napi_env env, napi_status status, void
     }
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 auto NAPI_CancelWrapPromiseCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("Cancel compeleted(Promise Mode)...");
     AsyncCancelCallbackInfo *asyncCallbackInfo = static_cast<AsyncCancelCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_value result = nullptr;
     napi_get_null(env, &result);
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 napi_value NAPI_CancelWrap(
@@ -751,8 +799,13 @@ auto NAPI_TriggerWrapExecuteCallBack = [](napi_env env, void *data) {
 auto NAPI_TriggerWrapCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("Trigger compeleted ...");
     AsyncTriggerCallbackInfo *asyncCallbackInfo = static_cast<AsyncTriggerCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 napi_value NAPI_TriggerWrap(napi_env env, napi_callback_info info, AsyncTriggerCallbackInfo &asyncCallbackInfo)
@@ -898,6 +951,10 @@ auto NAPI_EqualWrapExecuteCallBack = [](napi_env env, void *data) {
 auto NAPI_EqualWrapCompleteCallBack = [](napi_env env, napi_status status, void *data) {
     HILOG_INFO("Equal compeleted(CallBack Mode)...");
     AsyncEqualCallbackInfo *asyncCallbackInfo = static_cast<AsyncEqualCallbackInfo *>(data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo is nullptr.");
+        return;
+    }
     napi_value result[NUMBER_OF_PARAMETERS_TWO] = {};
     napi_value callback = nullptr;
     napi_value undefined = nullptr;
@@ -914,6 +971,7 @@ auto NAPI_EqualWrapCompleteCallBack = [](napi_env env, napi_status status, void 
     }
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 auto NAPI_EqualWrapPromiseCompleteCallBack = [](napi_env env, napi_status status, void *data) {
@@ -924,6 +982,7 @@ auto NAPI_EqualWrapPromiseCompleteCallBack = [](napi_env env, napi_status status
     napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
     delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
 };
 
 napi_value NAPI_EqualWrap(
