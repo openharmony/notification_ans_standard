@@ -49,7 +49,7 @@ ohos_shared_library("reminderagent") {
     "../common.cpp",
     "../slot.cpp",
     "native_module.cpp",
-    "common.cpp",
+    "reminder_common.cpp",
     "publish.cpp",
   ]
 

@@ -48,7 +48,7 @@ public:
      */
     explicit ReminderRequestAlarm(const ReminderRequestAlarm &other);
     ReminderRequestAlarm& operator = (const ReminderRequestAlarm &other);
-    ~ReminderRequestAlarm(){};
+    ~ReminderRequestAlarm() {};
 
     /**
      * Obtains the repeat days vector.
@@ -148,7 +148,6 @@ private:
     uint8_t minute_ = {0};
     uint8_t repeatDays_ = {0};
 };
-
 }  // namespace Notification
 }  // namespace OHOS
 

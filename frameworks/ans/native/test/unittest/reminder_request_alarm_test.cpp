@@ -24,12 +24,13 @@ namespace OHOS {
 namespace Notification {
 class ReminderRequestAlarmTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
-    void SetUp(){};
-    void TearDown(){
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
+    void SetUp() {}
+    void TearDown()
+    {
         ReminderHelper::CancelAllReminders();
-    };
+    }
 };
 
 /**
@@ -44,7 +45,7 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00100, Function | SmallTest | Level1
         auto rrc = std::make_shared<ReminderRequestAlarm>(-1, 1, daysOfWeek);
         EXPECT_TRUE(false) << "hour < 0 should throw exception.";
     } catch (const std::invalid_argument &e) {
-        REMINDER_LOGI("hour < 0 throw exception.");
+        ANSR_LOGI("hour < 0 throw exception.");
     }
 }
 
@@ -60,7 +61,7 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00200, Function | SmallTest | Level1
         auto rrc = std::make_shared<ReminderRequestAlarm>(24, 1, daysOfWeek);
         EXPECT_TRUE(false) << "hour > 23 should throw exception.";
     } catch (const std::invalid_argument &e) {
-        REMINDER_LOGI("hour > 23 throw exception.");
+        ANSR_LOGI("hour > 23 throw exception.");
     }
 }
 
@@ -100,7 +101,7 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00400, Function | SmallTest | Level1
         auto rrc = std::make_shared<ReminderRequestAlarm>(1, -1, daysOfWeek);
         EXPECT_TRUE(false) << "minute < 0 should throw exception.";
     } catch (const std::invalid_argument &e) {
-        REMINDER_LOGI("minute < 0 throw exception.");
+        ANSR_LOGI("minute < 0 throw exception.");
     }
 }
 
@@ -116,7 +117,7 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00500, Function | SmallTest | Level1
         auto rrc = std::make_shared<ReminderRequestAlarm>(1, 60, daysOfWeek);
         EXPECT_TRUE(false) << "minute > 59 should throw exception.";
     } catch (const std::invalid_argument &e) {
-        REMINDER_LOGI("minute > 59 throw exception.");
+        ANSR_LOGI("minute > 59 throw exception.");
     }
 }
 

@@ -404,9 +404,10 @@ public:
 protected:
     ReminderRequest();
     explicit ReminderRequest(ReminderType reminderType);
-    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const {
+    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const
+    {
         return INVALID_LONG_VALUE;
-    };
+    }
 
 private:
     void AddActionButtons();

@@ -24,12 +24,16 @@ namespace OHOS {
 namespace Notification {
 class ReminderRequestTimerTest : public testing::Test {
 public:
-    static void SetUpTestCase(){};
-    static void TearDownTestCase(){};
-    void SetUp(){};
-    void TearDown(){
+    static void SetUpTestCase()
+    {
         ReminderHelper::CancelAllReminders();
-    };
+    }
+    static void TearDownTestCase() {}
+    void SetUp() {}
+    void TearDown()
+    {
+        ReminderHelper::CancelAllReminders();
+    }
 };
 
 /**
@@ -43,7 +47,7 @@ HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00100, Function | SmallTest
         auto rrc = std::make_shared<ReminderRequestTimer>(0);
         EXPECT_TRUE(false) << "countDownTime < 0 should throw exception.";
     } catch (const std::invalid_argument &e) {
-        REMINDER_LOGI("countDownTime < 0 throw exception.");
+        ANSR_LOGI("countDownTime < 0 throw exception.");
     }
 }
 
@@ -58,7 +62,7 @@ HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00200, Function | SmallTest
         auto rrc = std::make_shared<ReminderRequestTimer>(UINT64_MAX / 1000);
         EXPECT_TRUE(false) << "countDownTime >= (UINT64_MAX / 1000) should throw exception.";
     } catch (const std::invalid_argument &e) {
-        REMINDER_LOGI("countDownTime > (UINT64_MAX / 1000) throw exception.");
+        ANSR_LOGI("countDownTime > (UINT64_MAX / 1000) throw exception.");
     }
 }
 

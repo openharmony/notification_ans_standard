@@ -15,9 +15,10 @@
 
 #include "ans_log_wrapper.h"
 #include "common.h"
-#include "reminder/publish.h"
 #include "reminder_request_alarm.h"
 #include "reminder_request_timer.h"
+
+#include "reminder/publish.h"
 
 namespace OHOS {
 namespace ReminderAgentNapi {
@@ -46,7 +47,7 @@ napi_value GetCallback(const napi_env &env, const napi_value &value, Parameters 
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, value, &valuetype));
     if (valuetype != napi_function) {
-        REMINDER_LOGE("Wrong argument type. Function expected.");
+        ANSR_LOGE("Wrong argument type. Function expected.");
         return nullptr;
     }
     napi_create_reference(env, value, 1, &params.callback);
@@ -71,20 +72,20 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[PUBLISH_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc < 1 || argc > PUBLISH_PARAM_LEN) {
-        REMINDER_LOGE("Wrong number of arguments");
+        ANSR_LOGE("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0] : reminderRequest
     if (ReminderCommon::GetReminderRequest(env, argv[0], params.reminder) == nullptr) {
-        REMINDER_LOGE("[reminderAgent]CreateReminder returns nullptr");
+        ANSR_LOGE("[reminderAgent]CreateReminder returns nullptr");
         return nullptr;
     }
 
     // argv[1]: callback
     if (argc == PUBLISH_PARAM_LEN) {
         if (GetCallback(env, argv[1], params) == nullptr) {
-            REMINDER_LOGE("[reminderAgent]GetCallbak returns nullptr");
+            ANSR_LOGE("[reminderAgent]GetCallbak returns nullptr");
             return nullptr;
         }
     }
@@ -93,23 +94,23 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
 napi_value ParseCanCelParameter(const napi_env &env, const napi_callback_info &info, Parameters &params)
 {
-    REMINDER_LOGI("ParseCanCelParameter");
+    ANSR_LOGI("ParseCanCelParameter");
     size_t argc = CANCEL_PARAM_LEN;
     napi_value argv[CANCEL_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc < 1 || argc > CANCEL_PARAM_LEN) {
-        REMINDER_LOGE("Wrong number of arguments");
+        ANSR_LOGE("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0]: reminder id
     int32_t reminderId = -1;
     if (!ReminderCommon::GetInt32(env, argv[0], nullptr, reminderId)) {
-        REMINDER_LOGE("Param id of cancels Reminder should be a number.");
+        ANSR_LOGE("Param id of cancels Reminder should be a number.");
         return nullptr;
     }
     if (reminderId < 0) {
-        REMINDER_LOGE("Param id of cancels Reminder is illegal.");
+        ANSR_LOGE("Param id of cancels Reminder is illegal.");
         return nullptr;
     }
     params.reminderId = reminderId;
@@ -117,7 +118,7 @@ napi_value ParseCanCelParameter(const napi_env &env, const napi_callback_info &i
     // argv[1]: callback
     if (argc >= CANCEL_PARAM_LEN) {
         if (GetCallback(env, argv[1], params) == nullptr) {
-            REMINDER_LOGE("GetCallbak is nullptr");
+            ANSR_LOGE("GetCallbak is nullptr");
             return nullptr;
         }
     }
@@ -126,19 +127,19 @@ napi_value ParseCanCelParameter(const napi_env &env, const napi_callback_info &i
 
 napi_value ParseCanCelAllParameter(const napi_env &env, const napi_callback_info &info, Parameters &params)
 {
-    REMINDER_LOGI("ParseCanCelAllParameter");
+    ANSR_LOGI("ParseCanCelAllParameter");
     size_t argc = CANCEL_ALL_PARAM_LEN;
     napi_value argv[CANCEL_ALL_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc > CANCEL_ALL_PARAM_LEN) {
-        REMINDER_LOGE("Wrong number of arguments");
+        ANSR_LOGE("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0]: callback
     if (argc == CANCEL_ALL_PARAM_LEN) {
         if (GetCallback(env, argv[0], params) == nullptr) {
-            REMINDER_LOGE("getCallbak is nullptr");
+            ANSR_LOGE("getCallbak is nullptr");
             return nullptr;
         }
     }
@@ -151,22 +152,23 @@ napi_value ParseGetValidParameter(const napi_env &env, const napi_callback_info 
     napi_value argv[GET_VALID_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc < 0 || argc > GET_VALID_PARAM_LEN) {
-        REMINDER_LOGE("Wrong number of arguments");
+        ANSR_LOGE("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0]: callback
     if (argc == GET_VALID_PARAM_LEN) {
         if (GetCallback(env, argv[0], params) == nullptr) {
-            REMINDER_LOGI("getCallbak is nullptr");
+            ANSR_LOGI("getCallbak is nullptr");
             return nullptr;
         }
     }
     return NotificationNapi::Common::NapiGetNull(env);
 }
 
-napi_value CancelReminder(napi_env env, napi_callback_info info) {
-    REMINDER_LOGI("Cancel reminder");
+napi_value CancelReminder(napi_env env, napi_callback_info info)
+{
+    ANSR_LOGI("Cancel reminder");
 
     // param
     Parameters params;
@@ -191,12 +193,12 @@ napi_value CancelReminder(napi_env env, napi_callback_info info) {
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            REMINDER_LOGI("Cancel napi_create_async_work start");
+            ANSR_LOGI("Cancel napi_create_async_work start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             asynccallbackinfo->info.errorCode = ReminderHelper::CancelReminder(asynccallbackinfo->reminderId);
         },
         [](napi_env env, napi_status status, void *data) {
-            REMINDER_LOGI("Cancel napi_create_async_work complete start");
+            ANSR_LOGI("Cancel napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, NotificationNapi::Common::NapiGetNull(env));
@@ -208,7 +210,7 @@ napi_value CancelReminder(napi_env env, napi_callback_info info) {
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
-            REMINDER_LOGI("Cancel napi_create_async_work complete end");
+            ANSR_LOGI("Cancel napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -223,7 +225,7 @@ napi_value CancelReminder(napi_env env, napi_callback_info info) {
 
 napi_value CancelAllReminders(napi_env env, napi_callback_info info)
 {
-    REMINDER_LOGI("Cancel all reminder");
+    ANSR_LOGI("Cancel all reminder");
 
     // param
     Parameters params;
@@ -247,12 +249,12 @@ napi_value CancelAllReminders(napi_env env, napi_callback_info info)
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            REMINDER_LOGI("CancelAll napi_create_async_work start");
+            ANSR_LOGI("CancelAll napi_create_async_work start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             asynccallbackinfo->info.errorCode = ReminderHelper::CancelAllReminders();
         },
         [](napi_env env, napi_status status, void *data) {
-            REMINDER_LOGD("CancelAll napi_create_async_work complete start");
+            ANSR_LOGD("CancelAll napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, NotificationNapi::Common::NapiGetNull(env));
@@ -264,7 +266,7 @@ napi_value CancelAllReminders(napi_env env, napi_callback_info info)
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
-            REMINDER_LOGD("CancelAll napi_create_async_work complete end");
+            ANSR_LOGD("CancelAll napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -289,7 +291,7 @@ void ParseReminder(
             break;
         }
         case ReminderRequest::ReminderType::ALARM: {
-            REMINDER_LOGD("Parse alarm info");
+            ANSR_LOGD("Parse alarm info");
 
             // hour
             ReminderRequestAlarm& alarm = (ReminderRequestAlarm&)reminder;
@@ -312,7 +314,7 @@ void ParseReminder(
                     count++;
                 }
             }
-            REMINDER_LOGD("Parse alarm info end");
+            ANSR_LOGD("Parse alarm info end");
             break;
         }
         default: {
@@ -332,7 +334,6 @@ void ParseActionButtons(const napi_env &env, ReminderRequest &reminder, napi_val
     int index = 0;
     for (std::map<ReminderRequest::ActionButtonType, ReminderRequest::ActionButtonInfo>::iterator it
         = actionButtonsMap.begin(); it != actionButtonsMap.end(); ++it) {
-
         // create obj
         napi_value actionButton = nullptr;
         napi_create_object(env, &actionButton);
@@ -365,7 +366,7 @@ void ParseWantAgent(const napi_env &env, ReminderRequest &reminder, napi_value &
 
 napi_value SetValidReminder(const napi_env &env, ReminderRequest &reminder, napi_value &result)
 {
-    REMINDER_LOGI("enter");
+    ANSR_LOGI("enter");
     napi_value value = nullptr;
 
     napi_create_string_utf8(env, reminder.Dump().c_str(), NAPI_AUTO_LENGTH, &value);
@@ -414,24 +415,24 @@ void GetValidRemindersInner(napi_env env, std::vector<sptr<ReminderRequest>>& va
     napi_create_array(env, &arr);
     for (auto reminder : validReminders) {
         if (reminder == nullptr) {
-            REMINDER_LOGE("reminder is null");
+            ANSR_LOGE("reminder is null");
             continue;
         }
         napi_value result = nullptr;
         napi_create_object(env, &result);
         if (!SetValidReminder(env, *reminder, result)) {
-            REMINDER_LOGW("Set reminder object failed");
+            ANSR_LOGW("Set reminder object failed");
             continue;
         }
         napi_set_element(env, arr, count, result);
         count++;
     }
-    REMINDER_LOGI("GetValid reminders count = %{public}d", count);
+    ANSR_LOGI("GetValid reminders count = %{public}d", count);
 }
 
 napi_value GetValidReminders(napi_env env, napi_callback_info info)
 {
-    REMINDER_LOGI("Get valid reminders");
+    ANSR_LOGI("Get valid reminders");
 
     // param
     Parameters params;
@@ -455,7 +456,7 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            REMINDER_LOGI("GetValid reminders napi_create_async_work start");
+            ANSR_LOGI("GetValid reminders napi_create_async_work start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             std::vector<sptr<ReminderRequest>> validReminders;
             asynccallbackinfo->info.errorCode = ReminderHelper::GetValidReminders(validReminders);
@@ -468,7 +469,6 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
             asynccallbackinfo->result = arr;
         },
         [](napi_env env, napi_status status, void *data) {
-            REMINDER_LOGI("GetValid reminders napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, asynccallbackinfo->result);
@@ -480,7 +480,6 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
-            REMINDER_LOGI("GetValid reminders napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -495,12 +494,12 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
 
 napi_value PublishReminder(napi_env env, napi_callback_info info)
 {
-    REMINDER_LOGI("PublishReminder");
+    ANSR_LOGI("PublishReminder");
 
     // param
     Parameters params;
     if (ParseParameters(env, info, params) == nullptr) {
-        REMINDER_LOGE("Parse params error");
+        ANSR_LOGE("Parse params error");
         return NotificationNapi::Common::JSParaError(env, params.callback);
     }
 
@@ -521,10 +520,10 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            REMINDER_LOGI("Publish napi_create_async_work start");
+            ANSR_LOGI("Publish napi_create_async_work start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             asynccallbackinfo->info.errorCode = ReminderHelper::PublishReminder(*(asynccallbackinfo->reminder));
-            REMINDER_LOGD("Return reminderId=%{public}d", asynccallbackinfo->reminder->GetReminderId());
+            ANSR_LOGD("Return reminderId=%{public}d", asynccallbackinfo->reminder->GetReminderId());
 
             // reminderId
             napi_value napiReminderId = nullptr;
@@ -532,7 +531,7 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
             asynccallbackinfo->result = napiReminderId;
         },
         [](napi_env env, napi_status status, void *data) {
-            REMINDER_LOGI("Publish napi_create_async_work complete start");
+            ANSR_LOGI("Publish napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, asynccallbackinfo->result);
@@ -544,7 +543,7 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
-            REMINDER_LOGI("Publish napi_create_async_work complete end");
+            ANSR_LOGI("Publish napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);

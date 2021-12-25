@@ -234,22 +234,22 @@ void AdvancedNotificationService::SaveNotificationInfo(
 {
     ErrCode result = PrepereNotificationRequest(request);
     if (result != ERR_OK) {
-        REMINDER_LOGE("SaveNotificationInfo fail");
+        ANSR_LOGE("SaveNotificationInfo fail");
         return;
     }
     bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
-        REMINDER_LOGE("SaveNotificationInfo fail.");
+        ANSR_LOGE("SaveNotificationInfo fail.");
         return;
     }
-    REMINDER_LOGI(
+    ANSR_LOGI(
         "bundleName=%{public}s, uid=%{public}d", (bundleOption->GetBundleName()).c_str(), bundleOption->GetUid());
 }
 
 ErrCode AdvancedNotificationService::PublishSavedNotification(
     sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption)
 {
-    REMINDER_LOGI("PublishSavedNotification");
+    ANSR_LOGI("PublishSavedNotification");
     auto record = std::make_shared<NotificationRecord>();
     record->request = request;
     record->notification = new Notification(request);
@@ -1442,7 +1442,7 @@ ErrCode AdvancedNotificationService::CancelContinuousTaskNotification(const std:
 
 ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &reminder)
 {
-    REMINDER_LOGI("Publish reminder");
+    ANSR_LOGI("Publish reminder");
     ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationRequest> notificationRequest = reminder->GetNotificationRequest();
     sptr<NotificationBundleOption> bundleOption = nullptr;
@@ -1456,7 +1456,7 @@ ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &remi
 
 ErrCode AdvancedNotificationService::CancelReminder(const int32_t reminderId)
 {
-    REMINDER_LOGI("Cancel Reminder");
+    ANSR_LOGI("Cancel Reminder");
     ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
@@ -1468,7 +1468,7 @@ ErrCode AdvancedNotificationService::CancelReminder(const int32_t reminderId)
 
 ErrCode AdvancedNotificationService::CancelAllReminders()
 {
-    REMINDER_LOGI("Cancel all reminders");
+    ANSR_LOGI("Cancel all reminders");
     ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
@@ -1480,7 +1480,7 @@ ErrCode AdvancedNotificationService::CancelAllReminders()
 
 ErrCode AdvancedNotificationService::GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders)
 {
-    REMINDER_LOGI("GetValidReminders");
+    ANSR_LOGI("GetValidReminders");
     ReminderDataManager::GetInstance()->SetService(this);
     reminders.clear();
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
@@ -1488,7 +1488,7 @@ ErrCode AdvancedNotificationService::GetValidReminders(std::vector<sptr<Reminder
         return ERR_ANS_INVALID_BUNDLE;
     }
     ReminderDataManager::GetInstance()->GetValidReminders(bundleOption, reminders);
-    REMINDER_LOGD("Valid reminders size=%{public}d", reminders.size());
+    ANSR_LOGD("Valid reminders size=%{public}d", reminders.size());
     return ERR_OK;
 }
 

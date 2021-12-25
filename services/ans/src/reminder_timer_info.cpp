@@ -14,9 +14,10 @@
  */
 
 #include "ans_log_wrapper.h"
-#include "reminder_timer_info.h"
-#include "reminder_request.h"
 #include "common_event_manager.h"
+#include "reminder_request.h"
+
+#include "reminder_timer_info.h"
 
 using namespace OHOS::EventFwk;
 namespace OHOS {
@@ -43,7 +44,7 @@ void ReminderTimerInfo::SetWantAgent(std::shared_ptr<OHOS::Notification::WantAge
 
 void ReminderTimerInfo::OnTrigger()
 {
-    REMINDER_LOGI("ReminderTimer is triggerred");
+    ANSR_LOGI("ReminderTimer is triggerred");
     PublishCommonEvent(ReminderRequest::REMINDER_EVENT_ALARM_ALERT);
 }
 

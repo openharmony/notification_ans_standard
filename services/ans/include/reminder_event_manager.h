@@ -23,19 +23,17 @@
 
 namespace OHOS {
 namespace Notification {
-class ReminderEventManager
-{
+class ReminderEventManager {
 public:
     ReminderEventManager(std::shared_ptr<ReminderDataManager> &reminderDataManager);
-    virtual ~ReminderEventManager(){};
+    virtual ~ReminderEventManager() {};
     ReminderEventManager(ReminderEventManager &other) = delete;
     ReminderEventManager& operator = (const ReminderEventManager &other) = delete;
 
 private:
     void init(std::shared_ptr<ReminderDataManager> &reminderDataManager) const;
 
-class ReminderEventSubscriber : public EventFwk::CommonEventSubscriber
-{
+class ReminderEventSubscriber : public EventFwk::CommonEventSubscriber {
 public:
     ReminderEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscriberInfo,
         std::shared_ptr<ReminderDataManager> &reminderDataManager);
@@ -47,5 +45,4 @@ private:
 };
 }  // namespace OHOS
 }  // namespace Notification
-
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_CORE_INCLUDE_REMINDER_EVENT_MANAGER_H

@@ -15,9 +15,10 @@
 
 #include "ans_log_wrapper.h"
 #include "common.h"
-#include "reminder/common.h"
 #include "reminder_request_alarm.h"
 #include "reminder_request_timer.h"
+
+#include "reminder/reminder_common.h"
 
 namespace OHOS {
 namespace ReminderAgentNapi {
@@ -29,7 +30,7 @@ napi_value ReminderCommon::GetReminderRequest(
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, value, &valuetype));
     if (valuetype != napi_object) {
-        REMINDER_LOGE("Wrong argument type. Object expected.");
+        ANSR_LOGE("Wrong argument type. Object expected.");
         return nullptr;
     }
 
@@ -45,39 +46,39 @@ bool ReminderCommon::GenActionButtons(
 {
     char str[NotificationNapi::STR_MAX_SIZE] = {0};
     napi_valuetype valuetype = napi_undefined;
-
     napi_value actionButtons = nullptr;
-    if (GetObject(env, value, ReminderAgentNapi::ACTION_BUTTON, actionButtons)) {
-        bool isArray = false;
-        napi_is_array(env, actionButtons, &isArray);
-        if (!isArray) {
-            REMINDER_LOGE("Wrong argument type:%{public}s. array expected.", ACTION_BUTTON);
+    if (!GetObject(env, value, ReminderAgentNapi::ACTION_BUTTON, actionButtons)) {
+        return true;
+    }
+    bool isArray = false;
+    napi_is_array(env, actionButtons, &isArray);
+    if (!isArray) {
+        ANSR_LOGE("Wrong argument type:%{public}s. array expected.", ACTION_BUTTON);
+        return false;
+    }
+
+    uint32_t length = 0;
+    napi_get_array_length(env, actionButtons, &length);
+    for (size_t i = 0; i < length; i++) {
+        napi_value actionButton = nullptr;
+        napi_get_element(env, actionButtons, i, &actionButton);
+        NAPI_CALL(env, napi_typeof(env, actionButton, &valuetype));
+        if (valuetype != napi_object) {
+            ANSR_LOGE("Wrong element type:%{public}s. object expected.", ACTION_BUTTON);
             return false;
         }
 
-        uint32_t length = 0;
-        napi_get_array_length(env, actionButtons, &length);
-        for (size_t i = 0; i < length; i++) {
-            napi_value actionButton = nullptr;
-            napi_get_element(env, actionButtons, i, &actionButton);
-            NAPI_CALL(env, napi_typeof(env, actionButton, &valuetype));
-            if (valuetype != napi_object) {
-                REMINDER_LOGE("Wrong element type:%{public}s. object expected.", ACTION_BUTTON);
+        int32_t buttonType = static_cast<int32_t>(ReminderRequest::ActionButtonType::INVALID);
+        if (GetStringUtf8(env, actionButton,
+            ReminderAgentNapi::ACTION_BUTTON_TITLE, str, NotificationNapi::STR_MAX_SIZE) &&
+            GetInt32(env, actionButton, ReminderAgentNapi::ACTION_BUTTON_TYPE, buttonType)) {
+            if (ReminderRequest::ActionButtonType(buttonType) != ReminderRequest::ActionButtonType::CLOSE) {
+                ANSR_LOGE("Wrong argument type:%{public}s. buttonType not support.", ACTION_BUTTON);
                 return false;
             }
-
-            int32_t buttonType = static_cast<int32_t>(ReminderRequest::ActionButtonType::INVALID);
-            if (GetStringUtf8(env, actionButton,
-                ReminderAgentNapi::ACTION_BUTTON_TITLE, str, NotificationNapi::STR_MAX_SIZE) &&
-                GetInt32(env, actionButton, ReminderAgentNapi::ACTION_BUTTON_TYPE, buttonType)) {
-                if (ReminderRequest::ActionButtonType(buttonType) != ReminderRequest::ActionButtonType::CLOSE) {
-                    REMINDER_LOGE("Wrong argument type:%{public}s. buttonType not support.", ACTION_BUTTON);
-                    return false;
-                }
-                std::string title(str);
-                reminder->SetActionButton(title, static_cast<ReminderRequest::ActionButtonType>(buttonType));
-                REMINDER_LOGD("button title=%{public}s, type=%{public}d", title.c_str(), buttonType);
-            }
+            std::string title(str);
+            reminder->SetActionButton(title, static_cast<ReminderRequest::ActionButtonType>(buttonType));
+            ANSR_LOGD("button title=%{public}s, type=%{public}d", title.c_str(), buttonType);
         }
     }
     return true;
@@ -89,7 +90,7 @@ void ReminderCommon::GenWantAgent(
     char str[NotificationNapi::STR_MAX_SIZE] = {0};
     napi_value wantAgent = nullptr;
     if (GetObject(env, value, ReminderAgentNapi::WANT_AGENT, wantAgent)) {
-        std::shared_ptr<ReminderRequest::WantAgentInfo> wantAgentInfo(new ReminderRequest::WantAgentInfo());
+        auto wantAgentInfo = std::make_shared<ReminderRequest::WantAgentInfo>();
         if (GetStringUtf8(env, wantAgent, ReminderAgentNapi::WANT_AGENT_PKG, str, NotificationNapi::STR_MAX_SIZE)) {
             wantAgentInfo->pkgName = str;
         }
@@ -109,7 +110,7 @@ napi_value ReminderCommon::GenReminder(
     // reminderType
     NAPI_CALL(env, napi_has_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &hasProperty));
     if (!hasProperty) {
-        REMINDER_LOGE("Property %{public}s expected.", ReminderAgentNapi::REMINDER_TYPE);
+        ANSR_LOGE("Property %{public}s expected.", ReminderAgentNapi::REMINDER_TYPE);
         return nullptr;
     }
     napi_value result = nullptr;
@@ -129,7 +130,7 @@ napi_value ReminderCommon::GenReminder(
     }
 
     if (reminder == nullptr) {
-        REMINDER_LOGE("Instance of reminder error.");
+        ANSR_LOGE("Instance of reminder error.");
         return nullptr;
     }
 
@@ -189,7 +190,7 @@ bool ReminderCommon::GetStringUtf8(const napi_env &env, const napi_value &value,
         napi_get_named_property(env, value, propertyName, &result);
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
         if (valuetype != napi_string) {
-            REMINDER_LOGE("Wrong argument type:%{public}s. string expected.", propertyName);
+            ANSR_LOGE("Wrong argument type:%{public}s. string expected.", propertyName);
             return false;
         }
         NAPI_CALL(env, napi_get_value_string_utf8(env, result, propertyVal, size - 1, &strLen));
@@ -236,9 +237,9 @@ bool ReminderCommon::GetPropertyValIfExist(const napi_env &env, const napi_value
     NAPI_CALL(env, napi_typeof(env, propertyVal, &valuetype));
     if (valuetype != napi_number) {
         if (propertyName == nullptr) {
-            REMINDER_LOGE("Wrong argument type. number expected.");
+            ANSR_LOGE("Wrong argument type. number expected.");
         } else {
-            REMINDER_LOGE("Wrong argument type:%{public}s. number expected.", propertyName);
+            ANSR_LOGE("Wrong argument type:%{public}s. number expected.", propertyName);
         }
         return false;
     }
@@ -258,7 +259,7 @@ bool ReminderCommon::GetObject(const napi_env &env, const napi_value &value,
     napi_get_named_property(env, value, propertyName, &propertyVal);
     NAPI_CALL(env, napi_typeof(env, propertyVal, &valuetype));
     if (valuetype != napi_object) {
-        REMINDER_LOGE("Wrong argument type:%{public}s. object expected.", propertyName);
+        ANSR_LOGE("Wrong argument type:%{public}s. object expected.", propertyName);
         return false;
     }
     return true;
@@ -269,13 +270,13 @@ napi_value ReminderCommon::CreateReminderTimer(
 {
     int64_t propertyCountDownTime = 0;
     if (!GetInt64(env, value, ReminderAgentNapi::TIMER_COUNT_DOWN_TIME, propertyCountDownTime)) {
-        REMINDER_LOGE("Correct property %{public}s expected.", ReminderAgentNapi::TIMER_COUNT_DOWN_TIME);
+        ANSR_LOGE("Correct property %{public}s expected.", ReminderAgentNapi::TIMER_COUNT_DOWN_TIME);
         return nullptr;
     }
 
     if (propertyCountDownTime <= 0 ||
         propertyCountDownTime > static_cast<int64_t>((UINT64_MAX / ReminderRequest::MILLI_SECONDS))) {
-        REMINDER_LOGE("Property %{public}s must between (0, %{public}llu).",
+        ANSR_LOGE("Property %{public}s must between (0, %{public}llu).",
             ReminderAgentNapi::ALARM_MINUTE, (UINT64_MAX / ReminderRequest::MILLI_SECONDS));
         return nullptr;
     }
@@ -290,66 +291,75 @@ napi_value ReminderCommon::CreateReminderAlarm(
     // hour
     int32_t propertyHourVal = 0;
     if (!GetInt32(env, value, ReminderAgentNapi::ALARM_HOUR, propertyHourVal)) {
-        REMINDER_LOGE("Correct property %{public}s expected.", ReminderAgentNapi::ALARM_HOUR);
+        ANSR_LOGE("Correct property %{public}s expected.", ReminderAgentNapi::ALARM_HOUR);
         return nullptr;
     }
 
     // minute
     int32_t propertyMinuteVal = 0;
     if (!GetInt32(env, value, ReminderAgentNapi::ALARM_MINUTE, propertyMinuteVal)) {
-        REMINDER_LOGE("Correct property %{public}s expected.", ReminderAgentNapi::ALARM_MINUTE);
+        ANSR_LOGE("Correct property %{public}s expected.", ReminderAgentNapi::ALARM_MINUTE);
         return nullptr;
     }
     if (propertyHourVal < 0 || propertyHourVal > 23) {
-        REMINDER_LOGE("Property %{public}s must between [0, 23].", ReminderAgentNapi::ALARM_HOUR);
+        ANSR_LOGE("Property %{public}s must between [0, 23].", ReminderAgentNapi::ALARM_HOUR);
         return nullptr;
     }
     if (propertyMinuteVal < 0 || propertyMinuteVal > 59) {
-        REMINDER_LOGE("Property %{public}s must between [0, 59].", ReminderAgentNapi::ALARM_MINUTE);
+        ANSR_LOGE("Property %{public}s must between [0, 59].", ReminderAgentNapi::ALARM_MINUTE);
         return nullptr;
     }
 
     // daysOfWeek
-    napi_value result = nullptr;
     std::vector<uint8_t> daysOfWeek;
-    if (GetObject(env, value, ReminderAgentNapi::ALARM_DAYS_OF_WEEK, result)) {
-        if (result != nullptr) {  // function line too long
-            bool isArray = false;
-            napi_is_array(env, result, &isArray);
-            if (!isArray) {
-                REMINDER_LOGE("Property %{public}s is expected to be an array.", ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
-                return nullptr;
-            }
-            uint32_t length = 0;
-            napi_get_array_length(env, result, &length);
-            uint8_t maxDaysOfWeek = 7;
-            if (length > maxDaysOfWeek) {
-                REMINDER_LOGE("The max length of array of %{public}s is %{public}d.", ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
-                return nullptr;
-            }
-            napi_valuetype valuetype = napi_undefined;
-            for (size_t i = 0; i < length; i++) {
-                int32_t propertyDayVal = 10;
-                napi_value repeatDayVal = nullptr;
-                napi_get_element(env, result, i, &repeatDayVal);
-                NAPI_CALL(env, napi_typeof(env, repeatDayVal, &valuetype));
-                if (valuetype != napi_number) {
-                    REMINDER_LOGE("%{public}s's element is expected to be number.",
-                        ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
-                    return nullptr;
-                }
-                napi_get_value_int32(env, repeatDayVal, &propertyDayVal);
-                if (propertyDayVal < 1 || propertyDayVal > maxDaysOfWeek) {
-                    REMINDER_LOGE("%{public}s's element must between [1, %{public}d].",
-                        ReminderAgentNapi::ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
-                    return nullptr;
-                }
-                daysOfWeek.push_back(static_cast<uint8_t>(propertyDayVal));
-            }
-        }
-    }
+    ParseDaysOfWeek(env, value, daysOfWeek);
     reminder = std::make_shared<ReminderRequestAlarm>(
         static_cast<uint8_t>(propertyHourVal), static_cast<uint8_t>(propertyMinuteVal), daysOfWeek);
+    return NotificationNapi::Common::NapiGetNull(env);
+}
+
+napi_value ReminderCommon::ParseDaysOfWeek(
+    const napi_env &env, const napi_value &value, std::vector<uint8_t> &daysOfWeek)
+{
+    napi_value result = nullptr;
+    if (!GetObject(env, value, ReminderAgentNapi::ALARM_DAYS_OF_WEEK, result)) {
+        return NotificationNapi::Common::NapiGetNull(env);
+    }
+    if (result != nullptr) {
+        bool isArray = false;
+        napi_is_array(env, result, &isArray);
+        if (!isArray) {
+            ANSR_LOGE("Property %{public}s is expected to be an array.", ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
+            return nullptr;
+        }
+        uint32_t length = 0;
+        napi_get_array_length(env, result, &length);
+        uint8_t maxDaysOfWeek = 7;
+        if (length > maxDaysOfWeek) {
+            ANSR_LOGE(
+                "The max length of array of %{public}s is %{public}d.", ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
+            return nullptr;
+        }
+        napi_valuetype valuetype = napi_undefined;
+        for (size_t i = 0; i < length; i++) {
+            int32_t propertyDayVal = 10;
+            napi_value repeatDayVal = nullptr;
+            napi_get_element(env, result, i, &repeatDayVal);
+            NAPI_CALL(env, napi_typeof(env, repeatDayVal, &valuetype));
+            if (valuetype != napi_number) {
+                ANSR_LOGE("%{public}s's element is expected to be number.",
+                    ReminderAgentNapi::ALARM_DAYS_OF_WEEK);
+                return nullptr;
+            }
+            napi_get_value_int32(env, repeatDayVal, &propertyDayVal);
+            if (propertyDayVal < 1 || propertyDayVal > maxDaysOfWeek) {
+                ANSR_LOGE("%{public}s's element must between [1, %{public}d].",
+                    ReminderAgentNapi::ALARM_DAYS_OF_WEEK, maxDaysOfWeek);
+                return nullptr;
+            }
+            daysOfWeek.push_back(static_cast<uint8_t>(propertyDayVal));
+        }
+    }
     return NotificationNapi::Common::NapiGetNull(env);
 }
 }
