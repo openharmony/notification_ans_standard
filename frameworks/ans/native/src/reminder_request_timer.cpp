@@ -14,21 +14,22 @@
  */
 
 #include <chrono>
-#include <limits.h>
+#include <cstdlib>
 
 #include "ans_log_wrapper.h"
-#include "reminder_request_timer.h"
 #include "time_service_client.h"
+
+#include "reminder_request_timer.h"
 
 namespace OHOS {
 namespace Notification {
-ReminderRequestTimer::ReminderRequestTimer(uint64_t countDownTimeInSeconds)
-: ReminderRequest(ReminderRequest::ReminderType::TIMER)
+ReminderRequestTimer::ReminderRequestTimer(uint64_t countDownTimeInSeconds) :
+    ReminderRequest(ReminderRequest::ReminderType::TIMER)
 {
     CheckParamsValid(countDownTimeInSeconds);
     countDownTimeInSeconds_ = countDownTimeInSeconds;
     time_t now;  // unit is seconds.
-    time(&now);
+    (void)time(&now);
     ReminderRequest::SetTriggerTimeInMilli(
         (static_cast<uint64_t>(now) + countDownTimeInSeconds_) * ReminderRequest::MILLI_SECONDS);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
@@ -48,7 +49,7 @@ uint64_t ReminderRequestTimer::GetInitInfo() const
 
 uint64_t ReminderRequestTimer::PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const
 {
-    REMINDER_LOGD("countdonw time not support PreGetNextTriggerTimeIgnoreSnooze");
+    ANSR_LOGD("countdonw time not support PreGetNextTriggerTimeIgnoreSnooze");
     return ReminderRequest::INVALID_LONG_VALUE;
 }
 
@@ -66,7 +67,7 @@ bool ReminderRequestTimer::OnTimeZoneChange()
 
 bool ReminderRequestTimer::UpdateNextReminder()
 {
-    REMINDER_LOGD("countdonw time not support repeat reminder, no need to update next triggerTime");
+    ANSR_LOGD("countdonw time not support repeat reminder, no need to update next triggerTime");
     SetExpired(true);
     return false;
 }
@@ -74,7 +75,7 @@ bool ReminderRequestTimer::UpdateNextReminder()
 void ReminderRequestTimer::CheckParamsValid(const uint64_t countDownTimeInSeconds) const
 {
     if (countDownTimeInSeconds == 0 || countDownTimeInSeconds >= (UINT64_MAX / ReminderRequest::MILLI_SECONDS)) {
-        REMINDER_LOGE("Illegal count down time, please check the description of the constructor");
+        ANSR_LOGE("Illegal count down time, please check the description of the constructor");
         throw std::invalid_argument("Illegal count down time, please check the description of the constructor");
     }
 }
@@ -84,9 +85,9 @@ void ReminderRequestTimer::UpdateTimeInfo(const std::string description)
     if (IsExpired()) {
         return;
     }
-    REMINDER_LOGD("%{public}s, update countdown time trigger time", description.c_str());
+    ANSR_LOGD("%{public}s, update countdown time trigger time", description.c_str());
     time_t now;
-    time(&now);  // unit is seconds.
+    (void)time(&now);  // unit is seconds.
     whenToChangeSysTime_ = static_cast<uint64_t>(now) * MILLI_SECONDS;
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
     int64_t bootTime = timer->GetBootTimeMs();
@@ -100,11 +101,11 @@ bool ReminderRequestTimer::Marshalling(Parcel &parcel) const
 
     // write int
     if (!parcel.WriteUint64(firstRealTimeInMilliSeconds_)) {
-        REMINDER_LOGE("Failed to write firstRealTimeInMilliSeconds");
+        ANSR_LOGE("Failed to write firstRealTimeInMilliSeconds");
         return false;
     }
     if (!parcel.WriteUint64(countDownTimeInSeconds_)) {
-        REMINDER_LOGE("Failed to write countDownTimeInSeconds");
+        ANSR_LOGE("Failed to write countDownTimeInSeconds");
         return false;
     }
     return true;
@@ -113,7 +114,7 @@ bool ReminderRequestTimer::Marshalling(Parcel &parcel) const
 ReminderRequestTimer *ReminderRequestTimer::Unmarshalling(Parcel &parcel)
 {
     auto objptr = new ReminderRequestTimer();
-    if ((nullptr != objptr) && !objptr->ReadFromParcel(parcel)) {
+    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
@@ -126,11 +127,11 @@ bool ReminderRequestTimer::ReadFromParcel(Parcel &parcel)
 
     // read int
     if (!parcel.ReadUint64(firstRealTimeInMilliSeconds_)) {
-        REMINDER_LOGE("Failed to read firstRealTimeInMilliSeconds");
+        ANSR_LOGE("Failed to read firstRealTimeInMilliSeconds");
         return false;
     }
     if (!parcel.ReadUint64(countDownTimeInSeconds_)) {
-        REMINDER_LOGE("Failed to read countDownTimeInSeconds");
+        ANSR_LOGE("Failed to read countDownTimeInSeconds");
         return false;
     }
     return true;

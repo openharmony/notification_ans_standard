@@ -25,11 +25,10 @@
 
 namespace OHOS {
 namespace Notification {
-class ReminderDataManager final
-{
+class ReminderDataManager final {
 public:
-    ReminderDataManager(){};
-    ~ReminderDataManager(){};
+    ReminderDataManager() {};
+    ~ReminderDataManager() {};
 
     ReminderDataManager(ReminderDataManager &other) = delete;
     ReminderDataManager& operator = (const ReminderDataManager &other) = delete;

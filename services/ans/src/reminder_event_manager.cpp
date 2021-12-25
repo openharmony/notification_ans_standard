@@ -16,8 +16,9 @@
 #include "ans_log_wrapper.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "reminder_event_manager.h"
 #include "bundle_constants.h"
+
+#include "reminder_event_manager.h"
 
 using namespace OHOS::EventFwk;
 namespace OHOS {
@@ -40,9 +41,9 @@ void ReminderEventManager::init(std::shared_ptr<ReminderDataManager> &reminderDa
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto subscriber = std::make_shared<ReminderEventSubscriber>(subscriberInfo, reminderDataManager);
     if (CommonEventManager::SubscribeCommonEvent(subscriber)) {
-        REMINDER_LOGD("SubscribeCommonEvent ok");
+        ANSR_LOGD("SubscribeCommonEvent ok");
     } else {
-        REMINDER_LOGD("SubscribeCommonEvent fail");
+        ANSR_LOGD("SubscribeCommonEvent fail");
     }
 }
 
@@ -57,7 +58,7 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
 {
     Want want = data.GetWant();
     std::string action = want.GetAction();
-    REMINDER_LOGD("Recieved common event:%{public}s", action.c_str());
+    ANSR_LOGD("Recieved common event:%{public}s", action.c_str());
     if (action == ReminderRequest::REMINDER_EVENT_ALARM_ALERT) {
         reminderDataManager_->ShowReminder(false);
         return;
@@ -74,7 +75,7 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
         OHOS::AppExecFwk::ElementName ele = want.GetElement();
         std::string bundleName = ele.GetBundleName();
         int uid = want.GetIntParam(OHOS::AppExecFwk::Constants::UID, -1);
-        REMINDER_LOGD("bundleName=%{public}s, uid=%{public}d", bundleName.c_str(), uid);
+        ANSR_LOGD("bundleName=%{public}s, uid=%{public}d", bundleName.c_str(), uid);
         sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
         reminderDataManager_->CancelAllReminders(bundleOption);
         return;

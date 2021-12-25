@@ -13,11 +13,8 @@
  * limitations under the License.
  */
 
-#include <chrono>
-#include <stdexcept>
-
-#include "ans_log_wrapper.h"
 #include "reminder_request_alarm.h"
+#include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
@@ -29,8 +26,8 @@ const uint16_t ReminderRequestAlarm::SECONDS_PER_HOUR = 3600;
 const uint8_t ReminderRequestAlarm::MINUTES_PER_HOUR = 60;
 const int8_t ReminderRequestAlarm::INVALID_INT_VALUE = -1;
 
-ReminderRequestAlarm::ReminderRequestAlarm(uint8_t hour, uint8_t minute, const std::vector<uint8_t> daysOfWeek)
-: ReminderRequest(ReminderRequest::ReminderType::ALARM)
+ReminderRequestAlarm::ReminderRequestAlarm(uint8_t hour, uint8_t minute, const std::vector<uint8_t> daysOfWeek) :
+    ReminderRequest(ReminderRequest::ReminderType::ALARM)
 {
     hour_ = hour;
     minute_ = minute;
@@ -44,17 +41,17 @@ ReminderRequestAlarm::ReminderRequestAlarm(const ReminderRequestAlarm &other) : 
     this->hour_ = other.hour_;
     this->minute_ = other.minute_;
     this->repeatDays_ = other.repeatDays_;
-    REMINDER_LOGD("hour_=%{public}d, minute_=%{public}d, repeatDays_=%{public}d", hour_, minute_, repeatDays_);
+    ANSR_LOGD("hour_=%{public}d, minute_=%{public}d, repeatDays_=%{public}d", hour_, minute_, repeatDays_);
 }
 
 void ReminderRequestAlarm::CheckParamValid() const
 {
     if (hour_ >= HOURS_PER_DAY || hour_ < 0) {
-        REMINDER_LOGE("setted hour is not between [0, 24)");
+        ANSR_LOGE("setted hour is not between [0, 24)");
         throw std::invalid_argument("setted hour is not between [0, 24)");
     }
     if (minute_ < 0 || minute_ >= MINUTES_PER_HOUR) {
-        REMINDER_LOGE("setted minute is not between [0, 60)");
+        ANSR_LOGE("setted minute is not between [0, 60)");
         throw std::invalid_argument("setted minute is not between [0, 60)");
     }
 }
@@ -65,7 +62,7 @@ void ReminderRequestAlarm::SetDaysOfWeek(bool set, std::vector<uint8_t> daysOfWe
         return;
     }
     if (daysOfWeek.size() > DAYS_PER_WEEK) {
-        REMINDER_LOGE("The length of daysOfWeek should not larger than 7");
+        ANSR_LOGE("The length of daysOfWeek should not larger than 7");
         throw std::invalid_argument("The length of daysOfWeek should not larger than 7");
     }
     for (std::vector<uint8_t>::iterator it = daysOfWeek.begin(); it != daysOfWeek.end(); ++it) {
@@ -88,7 +85,7 @@ uint64_t ReminderRequestAlarm::PreGetNextTriggerTimeIgnoreSnooze(bool forceToGet
 uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
 {
     time_t now;
-    time(&now);  // unit is seconds.
+    (void)time(&now);  // unit is seconds.
     struct tm *nowTime;
     nowTime = localtime(&now);
 
@@ -99,11 +96,11 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     tar.tm_hour = hour_;
     tar.tm_min = minute_;
     tar.tm_sec = 0;
-    REMINDER_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
+    ANSR_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d, tar_hour=%{public}d, tar_min=%{public}d",
         nowTime->tm_year, nowTime->tm_mon, nowTime->tm_mday, nowTime->tm_hour,
         nowTime->tm_min, nowTime->tm_sec, nowTime->tm_wday, hour_, minute_);
-    REMINDER_LOGD("Tar: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
+    ANSR_LOGD("Tar: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d",
         tar.tm_year, tar.tm_mon, tar.tm_mday, tar.tm_hour, tar.tm_min, tar.tm_sec, tar.tm_wday);
 
@@ -123,7 +120,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     }
     struct tm *test;
     test = localtime(&nextTriggerTime);
-    REMINDER_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
+    ANSR_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld", test->tm_year,
         test->tm_mon, test->tm_mday, test->tm_hour, test->tm_min, test->tm_sec, test->tm_wday, nextTriggerTime);
 
@@ -147,7 +144,7 @@ int8_t ReminderRequestAlarm::GetNextAlarm(const time_t now, const time_t target)
             break;
         }
     }
-    REMINDER_LOGI("NextDayInterval is %{public}d", dayCount);
+    ANSR_LOGI("NextDayInterval is %{public}d", dayCount);
     return dayCount;
 }
 
@@ -197,17 +194,17 @@ bool ReminderRequestAlarm::OnTimeZoneChange()
 bool ReminderRequestAlarm::UpdateNextReminder()
 {
     if (repeatDays_ == 0) {
-        REMINDER_LOGD("Set reminder to expired");
+        ANSR_LOGD("Set reminder to expired");
         SetExpired(true);
         return false;
     }
     uint64_t nextTriggerTime = GetNextTriggerTime(true);
     if (nextTriggerTime != 0) {
-        REMINDER_LOGI("Set next trigger time=%{public}llu", nextTriggerTime);
+        ANSR_LOGI("Set next trigger time=%{public}llu", nextTriggerTime);
         SetTriggerTimeInMilli(nextTriggerTime);
         return true;
     } else {
-        REMINDER_LOGD("Set reminder to expired");
+        ANSR_LOGD("Set reminder to expired");
         SetExpired(true);
         return false;
     }
@@ -219,15 +216,15 @@ bool ReminderRequestAlarm::Marshalling(Parcel &parcel) const
 
     // write int
     if (!parcel.WriteUint8(hour_)) {
-        REMINDER_LOGE("Failed to write hour");
+        ANSR_LOGE("Failed to write hour");
         return false;
     }
     if (!parcel.WriteUint8(minute_)) {
-        REMINDER_LOGE("Failed to write minute");
+        ANSR_LOGE("Failed to write minute");
         return false;
     }
     if (!parcel.WriteUint8(repeatDays_)) {
-        REMINDER_LOGE("Failed to write daysOfWeek");
+        ANSR_LOGE("Failed to write daysOfWeek");
         return false;
     }
 
@@ -237,9 +234,9 @@ bool ReminderRequestAlarm::Marshalling(Parcel &parcel) const
 ReminderRequestAlarm *ReminderRequestAlarm::Unmarshalling(Parcel &parcel)
 {
     std::vector<uint8_t> daysOfWeek;
-    REMINDER_LOGD("New alarm");
+    ANSR_LOGD("New alarm");
     auto objptr = new ReminderRequestAlarm();
-    if ((nullptr != objptr) && !objptr->ReadFromParcel(parcel)) {
+    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
@@ -252,18 +249,18 @@ bool ReminderRequestAlarm::ReadFromParcel(Parcel &parcel)
 
     // read int
     if (!parcel.ReadUint8(hour_)) {
-        REMINDER_LOGE("Failed to read hour");
+        ANSR_LOGE("Failed to read hour");
         return false;
     }
     if (!parcel.ReadUint8(minute_)) {
-        REMINDER_LOGE("Failed to read minute");
+        ANSR_LOGE("Failed to read minute");
         return false;
     }
     if (!parcel.ReadUint8(repeatDays_)) {
-        REMINDER_LOGE("Failed to read repeatDays");
+        ANSR_LOGE("Failed to read repeatDays");
         return false;
     }
-    REMINDER_LOGD("hour_=%{public}d, minute_=%{public}d, repeatDays_=%{public}d", hour_, minute_, repeatDays_);
+    ANSR_LOGD("hour_=%{public}d, minute_=%{public}d, repeatDays_=%{public}d", hour_, minute_, repeatDays_);
     return true;
 }
 }

@@ -84,6 +84,9 @@ private:
 
     static napi_value CreateReminderAlarm(
         const napi_env &env, const napi_value &value, std::shared_ptr<ReminderRequest>& reminder);
+
+    static napi_value ParseDaysOfWeek(
+        const napi_env &env, const napi_value &value, std::vector<uint8_t> &daysOfWeek);
 };
 }  // namespace OHOS
 }  // namespace ReminderAgentNapi

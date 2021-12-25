@@ -14,8 +14,9 @@
  */
 
 #include "ans_log_wrapper.h"
-#include "reminder_request.h"
 #include "want_agent_helper.h"
+
+#include "reminder_request.h"
 
 namespace OHOS {
 namespace Notification {
@@ -74,7 +75,7 @@ std::string ReminderRequest::Dump() const
     timeInfo = localtime(&nextTriggerTime);
     uint8_t dateTimeLen = 80;
     char dateTimeBuffer[dateTimeLen];
-    strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", timeInfo);
+    (void)strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", timeInfo);
     return "Reminder["
            "id=" + std::to_string(reminderId_) +
            ", type=" + std::to_string(static_cast<uint8_t>(reminderType_)) +
@@ -86,7 +87,7 @@ std::string ReminderRequest::Dump() const
 ReminderRequest& ReminderRequest::SetActionButton(const std::string &title, const ActionButtonType &type)
 {
     if (type != ActionButtonType::CLOSE) {
-        REMINDER_LOGI("Button type only support: %{public}d", static_cast<uint8_t>(ActionButtonType::CLOSE));
+        ANSR_LOGI("Button type only support: %{public}d", static_cast<uint8_t>(ActionButtonType::CLOSE));
         return *this;
     }
     ActionButtonInfo actionButtonInfo;
@@ -117,11 +118,11 @@ void ReminderRequest::InitReminderId()
 {
     std::lock_guard<std::mutex> lock(std::mutex);
     if (GLOBAL_ID < 0) {
-        REMINDER_LOGW("GLOBAL_ID overdule");
+        ANSR_LOGW("GLOBAL_ID overdule");
         GLOBAL_ID = 0;
     }
     reminderId_ = ++GLOBAL_ID;
-    REMINDER_LOGI("reminderId_=%{public}d", reminderId_);
+    ANSR_LOGI("reminderId_=%{public}d", reminderId_);
 }
 
 bool ReminderRequest::IsExpired() const
@@ -140,7 +141,7 @@ bool ReminderRequest::IsShowing() const
 void ReminderRequest::OnClose(bool updateNext)
 {
     if ((state_ & REMINDER_STATUS_SHOWING) == 0) {
-        REMINDER_LOGE("onClose, the state of reminder is incorrect, state:%{public}s", GetState(state_).c_str());
+        ANSR_LOGE("onClose, the state of reminder is incorrect, state:%{public}s", GetState(state_).c_str());
         return;
     }
     SetState(false, REMINDER_STATUS_SHOWING, "onClose()");
@@ -173,7 +174,7 @@ bool ReminderRequest::HandleSysTimeChange(uint64_t oriTriggerTime, uint64_t optT
         time_t now;
         time(&now);  // unit is seconds.
         if (static_cast<int64_t>(now) < 0) {
-            REMINDER_LOGE("Get now time error");
+            ANSR_LOGE("Get now time error");
             return false;
         }
         if (oriTriggerTime <= (static_cast<uint64_t>(now) * MILLI_SECONDS)) {
@@ -188,12 +189,13 @@ bool ReminderRequest::HandleSysTimeChange(uint64_t oriTriggerTime, uint64_t optT
     return showImmediately;
 }
 
-bool ReminderRequest::HandleTimeZoneChange(uint64_t oldZoneTriggerTime, uint64_t newZoneTriggerTime, uint64_t optTriggerTime)
+bool ReminderRequest::HandleTimeZoneChange(
+    uint64_t oldZoneTriggerTime, uint64_t newZoneTriggerTime, uint64_t optTriggerTime)
 {
     if (isExpired_) {
         return false;
     }
-    REMINDER_LOGD("Handle timezone change, oldZoneTriggerTime:%{public}llu, newZoneTriggerTime:%{public}llu",
+    ANSR_LOGD("Handle timezone change, oldZoneTriggerTime:%{public}llu, newZoneTriggerTime:%{public}llu",
         oldZoneTriggerTime, newZoneTriggerTime);
     bool showImmediately = false;
     if (optTriggerTime != INVALID_LONG_VALUE && oldZoneTriggerTime < newZoneTriggerTime) {
@@ -203,7 +205,7 @@ bool ReminderRequest::HandleTimeZoneChange(uint64_t oldZoneTriggerTime, uint64_t
         time_t now;
         time(&now);  // unit is seconds.
         if (static_cast<int64_t>(now) < 0) {
-            REMINDER_LOGE("Get now time error");
+            ANSR_LOGE("Get now time error");
             return false;
         }
         if (newZoneTriggerTime <= (static_cast<uint64_t>(now))) {
@@ -269,8 +271,8 @@ ReminderRequest& ReminderRequest::SetWantAgentInfo(const std::shared_ptr<WantAge
     return *this;
 }
 
-std::map<ReminderRequest::ActionButtonType,
-    ReminderRequest::ActionButtonInfo> ReminderRequest::GetActionButtons() const
+std::map<ReminderRequest::ActionButtonType, ReminderRequest::ActionButtonInfo> ReminderRequest::GetActionButtons()
+    const
 {
     return actionButtonMap_;
 }
@@ -342,8 +344,8 @@ bool ReminderRequest::UpdateNextReminder()
 
 void ReminderRequest::UpdateNotificationRequest(UpdateNotificationType type, std::string extra)
 {
-    REMINDER_LOGI("UpdateNotification type=%{public}d", static_cast<uint8_t>(type));
-    switch(type) {
+    ANSR_LOGI("UpdateNotification type=%{public}d", static_cast<uint8_t>(type));
+    switch (type) {
         case UpdateNotificationType::ACTION_BUTTON: {
             AddActionButtons();
             break;
@@ -364,63 +366,63 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
 {
     // write string
     if (!parcel.WriteString(content_)) {
-        REMINDER_LOGE("Failed to write content");
+        ANSR_LOGE("Failed to write content");
         return false;
     }
     if (!parcel.WriteString(expiredContent_)) {
-        REMINDER_LOGE("Failed to write expiredContent");
+        ANSR_LOGE("Failed to write expiredContent");
         return false;
     }
     if (!parcel.WriteString(title_)) {
-        REMINDER_LOGE("Failed to write title");
+        ANSR_LOGE("Failed to write title");
         return false;
     }
     if (!parcel.WriteString(wantAgentInfo_->abilityName)) {
-        REMINDER_LOGE("Failed to write wantAgentInfo`s abilityName");
+        ANSR_LOGE("Failed to write wantAgentInfo`s abilityName");
         return false;
     }
     if (!parcel.WriteString(wantAgentInfo_->pkgName)) {
-        REMINDER_LOGE("Failed to write wantAgentInfo`s pkgName");
+        ANSR_LOGE("Failed to write wantAgentInfo`s pkgName");
         return false;
     }
 
     // write int
     if (!parcel.WriteInt32(reminderId_)) {
-        REMINDER_LOGE("Failed to write reminderId");
+        ANSR_LOGE("Failed to write reminderId");
         return false;
     }
     if (!parcel.WriteInt32(notificationId_)) {
-        REMINDER_LOGE("Failed to write notificationId");
+        ANSR_LOGE("Failed to write notificationId");
         return false;
     }
     if (!parcel.WriteUint64(triggerTimeInMilli_)) {
-        REMINDER_LOGE("Failed to write triggerTimeInMilli");
+        ANSR_LOGE("Failed to write triggerTimeInMilli");
         return false;
     }
 
     // write enum
     if (!parcel.WriteUint8(static_cast<uint8_t>(reminderType_))) {
-        REMINDER_LOGE("Failed to write reminder type");
+        ANSR_LOGE("Failed to write reminder type");
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(slotType_))) {
-        REMINDER_LOGE("Failed to write slot type");
+        ANSR_LOGE("Failed to write slot type");
         return false;
     }
 
     // write map
     int32_t buttonMapSize = static_cast<int32_t>(actionButtonMap_.size());
     if (!parcel.WriteInt32(buttonMapSize)) {
-        REMINDER_LOGE("Failed to write action button size");
+        ANSR_LOGE("Failed to write action button size");
         return false;
     }
     for (auto it = actionButtonMap_.begin(); it != actionButtonMap_.end(); ++it) {
         if (!parcel.WriteUint8(static_cast<uint8_t>(it->first))) {
-            REMINDER_LOGE("Failed to write action button type");
+            ANSR_LOGE("Failed to write action button type");
             return false;
         }
         if (!parcel.WriteString(static_cast<std::string>(it->second.title))) {
-            REMINDER_LOGE("Failed to write action button title");
+            ANSR_LOGE("Failed to write action button title");
             return false;
         }
     }
@@ -430,7 +432,7 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
 ReminderRequest *ReminderRequest::Unmarshalling(Parcel &parcel)
 {
     auto objptr = new ReminderRequest();
-    if ((nullptr != objptr) && !objptr->ReadFromParcel(parcel)) {
+    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
@@ -442,54 +444,54 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
 {
     // read string
     if (!parcel.ReadString(content_)) {
-        REMINDER_LOGE("Failed to read content");
+        ANSR_LOGE("Failed to read content");
         return false;
     }
     if (!parcel.ReadString(expiredContent_)) {
-        REMINDER_LOGE("to read expiredContent");
+        ANSR_LOGE("to read expiredContent");
         return false;
     }
     if (!parcel.ReadString(title_)) {
-        REMINDER_LOGE("Failed to read title");
+        ANSR_LOGE("Failed to read title");
         return false;
     }
     if (!parcel.ReadString(wantAgentInfo_->abilityName)) {
-        REMINDER_LOGE("Failed to read wantAgentInfo`s abilityName");
+        ANSR_LOGE("Failed to read wantAgentInfo`s abilityName");
         return false;
     }
     if (!parcel.ReadString(wantAgentInfo_->pkgName)) {
-        REMINDER_LOGE("Failed to read wantAgentInfo`s pkgName");
+        ANSR_LOGE("Failed to read wantAgentInfo`s pkgName");
         return false;
     }
 
     // read int
     int32_t tempReminderId = -1;
     if (!parcel.ReadInt32(tempReminderId)) {
-        REMINDER_LOGE("Failed to read tempReminderId");
+        ANSR_LOGE("Failed to read tempReminderId");
         return false;
     }
     reminderId_ = tempReminderId == -1 ? reminderId_ : tempReminderId;
 
     if (!parcel.ReadInt32(notificationId_)) {
-        REMINDER_LOGE("Failed to read notificationId");
+        ANSR_LOGE("Failed to read notificationId");
         return false;
     }
     if (!parcel.ReadUint64(triggerTimeInMilli_)) {
-        REMINDER_LOGE("Failed to read triggerTimeInMilli");
+        ANSR_LOGE("Failed to read triggerTimeInMilli");
         return false;
     }
 
     // read enum
     uint8_t reminderType = static_cast<uint8_t>(ReminderType::INVALID);
     if (!parcel.ReadUint8(reminderType)) {
-        REMINDER_LOGE("Failed to read reminderType");
+        ANSR_LOGE("Failed to read reminderType");
         return false;
     }
     reminderType_ = static_cast<ReminderType>(reminderType);
 
     int32_t slotType = static_cast<int32_t>(NotificationConstant::SlotType::OTHER);
     if (!parcel.ReadInt32(slotType)) {
-        REMINDER_LOGE("Failed to read slotType");
+        ANSR_LOGE("Failed to read slotType");
         return false;
     }
     slotType_ = static_cast<NotificationConstant::SlotType>(slotType);
@@ -497,13 +499,13 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
     // read map
     int32_t buttonMapSize = 0;
     if (!parcel.ReadInt32(buttonMapSize)) {
-        REMINDER_LOGE("Failed to read buttonMapSize");
+        ANSR_LOGE("Failed to read buttonMapSize");
         return false;
     }
     for (int i = 0; i < buttonMapSize; i++) {
         uint8_t buttonType = static_cast<uint8_t>(ActionButtonType::INVALID);
         if (!parcel.ReadUint8(buttonType)) {
-            REMINDER_LOGE("Failed to read buttonType");
+            ANSR_LOGE("Failed to read buttonType");
             return false;
         }
         ActionButtonType type = static_cast<ActionButtonType>(buttonType);
@@ -519,7 +521,7 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
 
 void ReminderRequest::InitNotificationRequest()
 {
-    REMINDER_LOGI("Init notification");
+    ANSR_LOGI("Init notification");
     auto notificationNormalContent = std::make_shared<NotificationNormalContent>();
     notificationNormalContent->SetText(content_);
     notificationNormalContent->SetTitle(title_);
@@ -554,7 +556,7 @@ void ReminderRequest::AddActionButtons()
         auto type = it->first;
         if (type == ActionButtonType::CLOSE) {
             want->SetAction(REMINDER_EVENT_CLOSE_ALERT);
-            REMINDER_LOGD("Add action button, type is close");
+            ANSR_LOGD("Add action button, type is close");
         }
         want->SetParam("REMINDER_ID", reminderId_);
         std::vector<std::shared_ptr<AAFwk::Want>> wants;
@@ -577,7 +579,6 @@ void ReminderRequest::AddActionButtons()
 
 void ReminderRequest::AddRemovalWantAgent()
 {
-    // todo add RemovalWantAgent
     int requestCode = 10;
     std::vector<WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
@@ -586,7 +587,6 @@ void ReminderRequest::AddRemovalWantAgent()
     want->SetParam(PARAM_REMINDER_ID, reminderId_);
     std::vector<std::shared_ptr<AAFwk::Want>> wants;
     wants.push_back(want);
-    REMINDER_LOGD("~~1");
     WantAgent::WantAgentInfo wantAgentInfo(
         requestCode,
         WantAgent::WantAgentConstant::OperationType::SEND_COMMON_EVENT,
@@ -596,7 +596,6 @@ void ReminderRequest::AddRemovalWantAgent()
     );
     std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo);
     notificationRequest_->SetRemovalWantAgent(wantAgent);
-    REMINDER_LOGD("~~2");
 }
 
 void ReminderRequest::SetWantAgent()
@@ -628,7 +627,7 @@ void ReminderRequest::SetState(bool deSet, const uint8_t newState, std::string f
     } else {
         state_ &= ~newState;
     }
-    REMINDER_LOGI("Switch the reminder(id=%{public}d) state, from %{public}s to %{public}s, called by %{public}s",
+    ANSR_LOGI("Switch the reminder(id=%{public}d) state, from %{public}s to %{public}s, called by %{public}s",
         reminderId_, GetState(oldState).c_str(), GetState(state_).c_str(), function.c_str());
 }
 }

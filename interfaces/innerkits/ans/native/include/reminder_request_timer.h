@@ -40,7 +40,7 @@ public:
      */
     explicit ReminderRequestTimer(const ReminderRequestTimer &other);
     ReminderRequestTimer& operator = (const ReminderRequestTimer &other);
-    ~ReminderRequestTimer(){};
+    ~ReminderRequestTimer() {};
 
     uint64_t GetInitInfo() const;
     virtual bool OnDateTimeChange() override;
@@ -65,14 +65,13 @@ protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const override;
 
 private:
-    ReminderRequestTimer(){};
+    ReminderRequestTimer() {};
     void CheckParamsValid(const uint64_t countDownTimeInSeconds) const;
     void UpdateTimeInfo(const std::string description);
     uint64_t countDownTimeInSeconds_ {0};
     uint64_t firstRealTimeInMilliSeconds_ {-1};
     uint64_t whenToChangeSysTime_ {-1};
 };
-
 }  // namespace Reminder
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_CORE_INCLUDE_REMINDER_REQUEST_TIMER_H

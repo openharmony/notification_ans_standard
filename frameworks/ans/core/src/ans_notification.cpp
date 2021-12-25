@@ -873,15 +873,15 @@ ErrCode AnsNotification::PublishReminder(ReminderRequest &reminder)
 
     sptr<ReminderRequest> tarReminder;
     if (reminder.GetReminderType() == ReminderRequest::ReminderType::ALARM) {
-        REMINDER_LOGI("Publish alarm");
+        ANSR_LOGI("Publish alarm");
         ReminderRequestAlarm &alarm = (ReminderRequestAlarm &)reminder;
         tarReminder = new (std::nothrow) ReminderRequestAlarm(alarm);
     } else if (reminder.GetReminderType() == ReminderRequest::ReminderType::TIMER) {
-        REMINDER_LOGI("Publish timer");
+        ANSR_LOGI("Publish timer");
         ReminderRequestTimer &timer = (ReminderRequestTimer &)reminder;
         tarReminder = new (std::nothrow) ReminderRequestTimer(timer);
     } else {
-        REMINDER_LOGW("PublishReminder fail.");
+        ANSR_LOGW("PublishReminder fail.");
         return ERR_ANS_INVALID_PARAM;
     }
     ErrCode code = ansManagerProxy_->PublishReminder(tarReminder);

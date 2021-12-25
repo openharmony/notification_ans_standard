@@ -1267,33 +1267,33 @@ ErrCode AnsManagerStub::HandleShellDump(MessageParcel &data, MessageParcel &repl
 
 ErrCode AnsManagerStub::HandlePublishReminder(MessageParcel &data, MessageParcel &reply)
 {
-    REMINDER_LOGI("HandlePublishReminder");
+    ANSR_LOGI("HandlePublishReminder");
     uint8_t typeInfo = static_cast<uint8_t>(ReminderRequest::ReminderType::INVALID);
     if (!data.ReadUint8(typeInfo)) {
-        REMINDER_LOGE("Failed to read reminder type");
+        ANSR_LOGE("Failed to read reminder type");
         return ERR_ANS_PARCELABLE_FAILED;
     }
     ReminderRequest::ReminderType reminderType = static_cast<ReminderRequest::ReminderType>(typeInfo);
     sptr<ReminderRequest> reminder;
     if (ReminderRequest::ReminderType::ALARM == reminderType) {
-        REMINDER_LOGD("Publish alarm");
+        ANSR_LOGD("Publish alarm");
         reminder = data.ReadParcelable<ReminderRequestAlarm>();
     } else if (ReminderRequest::ReminderType::TIMER == reminderType) {
-        REMINDER_LOGD("Publish timer");
+        ANSR_LOGD("Publish timer");
         reminder = data.ReadParcelable<ReminderRequestTimer>();
     } else {
-        REMINDER_LOGE("Reminder type invalid");
+        ANSR_LOGE("Reminder type invalid");
         return ERR_ANS_INVALID_PARAM;
     }
     if (!reminder) {
-        REMINDER_LOGE("Reminder ReadParcelable failed");
+        ANSR_LOGE("Reminder ReadParcelable failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
     ErrCode result = PublishReminder(reminder);
 
     if (!reply.WriteInt32(reminder->GetReminderId())) {
-        REMINDER_LOGE("Write back reminderId failed");
+        ANSR_LOGE("Write back reminderId failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
     return result;
@@ -1301,14 +1301,14 @@ ErrCode AnsManagerStub::HandlePublishReminder(MessageParcel &data, MessageParcel
 
 ErrCode AnsManagerStub::HandleCancelReminder(MessageParcel &data, MessageParcel &reply)
 {
-    REMINDER_LOGI("HandleCancelReminder");
+    ANSR_LOGI("HandleCancelReminder");
     int32_t reminderId = -1;
     if (!data.ReadInt32(reminderId)) {
-        REMINDER_LOGE("Read reminder id failed.");
+        ANSR_LOGE("Read reminder id failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
-    
-    REMINDER_LOGD("ReminderId=%{public}d", reminderId);
+
+    ANSR_LOGD("ReminderId=%{public}d", reminderId);
     return CancelReminder(reminderId);
 }
 
@@ -1319,26 +1319,26 @@ ErrCode AnsManagerStub::HandleCancelAllReminders(MessageParcel &data, MessagePar
 
 ErrCode AnsManagerStub::HandleGetValidReminders(MessageParcel &data, MessageParcel &reply)
 {
-    REMINDER_LOGI("HandleGetValidReminders");
+    ANSR_LOGI("HandleGetValidReminders");
     std::vector<sptr<ReminderRequest>> validReminders;
     ErrCode result = GetValidReminders(validReminders);
 
-    REMINDER_LOGD("Write back size=%{public}d", validReminders.size());
+    ANSR_LOGD("Write back size=%{public}d", validReminders.size());
     if (!reply.WriteUint8(static_cast<uint8_t>(validReminders.size()))) {
-        REMINDER_LOGE("Write back reminder count failed");
+        ANSR_LOGE("Write back reminder count failed");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
     for (auto it = validReminders.begin(); it != validReminders.end(); ++it) {
         sptr<ReminderRequest> reminder = (*it);
         uint8_t reminderType = static_cast<uint8_t>(reminder->GetReminderType());
-        REMINDER_LOGD("ReminderType=%{public}d", reminderType);
+        ANSR_LOGD("ReminderType=%{public}d", reminderType);
         if (!reply.WriteUint8(reminderType)) {
-            REMINDER_LOGW("Write reminder type failed");
+            ANSR_LOGW("Write reminder type failed");
             return ERR_ANS_PARCELABLE_FAILED;
         }
         if (!reply.WriteParcelable(reminder)) {
-            REMINDER_LOGW("Write reminder parcelable failed");
+            ANSR_LOGW("Write reminder parcelable failed");
             return ERR_ANS_PARCELABLE_FAILED;
         }
     }

@@ -17,16 +17,16 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_CORE_INCLUDE_REMINDER_TIMER_INFO_H
 
 #include "itimer_info.h"
+#include "advanced_notification_service.h"
 #include "notification_request.h"
 #include "reminder_request.h"
-#include "advanced_notification_service.h"
 
 namespace OHOS {
 namespace Notification {
 class ReminderTimerInfo : public MiscServices::ITimerInfo {
 public:
-    ReminderTimerInfo(){};
-    virtual ~ReminderTimerInfo(){};
+    ReminderTimerInfo() {};
+    virtual ~ReminderTimerInfo() {};
 
     ReminderTimerInfo(ReminderTimerInfo &other) = delete;
     ReminderTimerInfo& operator = (const ReminderTimerInfo &other) = delete;
