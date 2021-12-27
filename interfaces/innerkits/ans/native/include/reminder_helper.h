@@ -27,7 +27,7 @@ class ReminderHelper {
 public:
     /**
      * Publishes a scheduled reminder.
-     * 
+     *
      * Third-party applications can call this method to publish a scheduled reminder. After this method is called,
      * the timing and pop-up notification functions of the calling application will be performed by the system service
      * agent in the background, even when the application is frozen or exits. You can call the
@@ -41,19 +41,18 @@ public:
      *
      * @note One application can create a maximum of 30 valid reminders, and the total number of valid reminders
      * in the system cannot exceed 2000. The minimum snooze interval for a reminder is 5 minutes.
-     * 
+     *
      * @param reminder Indicates the reminder instance to publish. This parameter cannot be null. Otherwise,
      *                 an exception will be thrown due to invalid parameters, causing the application to crash.
      * @return Returns publish reminder result.
      *                 Reminder id will be set with a number >= 0 if publishing the reminder successfully, Otherwise
      *                 reminder id is -1. You can call reminder.GetReminderId() to get the reminder id.
-     *                 
      */
     static ErrCode PublishReminder(ReminderRequest &reminder);
 
     /**
      * Cancels a specified reminder.
-     * 
+     *
      * @param reminderId Indicates the ID of the reminder instace to cancel.
      * @return Returns cancel reminder result.
      */
@@ -61,7 +60,7 @@ public:
 
     /**
      * Cancels all reminders of current third part application.
-     * 
+     *
      * @return Returns cancel all reminders result.
      */
     static ErrCode CancelAllReminders();
@@ -69,7 +68,7 @@ public:
     /**
      * Obtains all valid reminder notifications set by the current application, namely, the reminders that will
      * still be triggered later. If a reminder will never be triggered again, it is not considered a valid reminder.
-     * 
+     *
      * @param[out] validReminders Indicates an initial vector to recieve the result.
      * @return Returns an array list containing all valid reminder notifications set by the current application.
      */
@@ -77,14 +76,14 @@ public:
 
     /**
      * Creates a NotificationSlot.
-     * 
+     *
      * After a notification slot is created by using this method, only the name and description of the notification
      * slot can be changed. Changes to the other attributes, such as the vibration status and notification tone,
      * will no longer take effect.
-     * 
+     *
      * You can call the ReminderRequest#setSlotId(String) method to bind the slot for publishing a reminder.
      * When the application is uninstalled, all notification slots related to the application will be deleted.
-     * 
+     *
      * @param slot Indicates the NotificationSlot instance to add.
      * @return Returns add notification slot result.
      */
@@ -92,7 +91,7 @@ public:
 
     /**
      * Removes a NotificationSlot instance used by the reminder.
-     * 
+     *
      * @param slotType Indicates the type of the slot, which is set when calling AddNotificationSlot to add a slot.
      * @return Returns remove notification slot result.
      */

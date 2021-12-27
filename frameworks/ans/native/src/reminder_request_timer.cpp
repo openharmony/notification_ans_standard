@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace Notification {
-ReminderRequestTimer::ReminderRequestTimer(uint64_t countDownTimeInSeconds) :
-    ReminderRequest(ReminderRequest::ReminderType::TIMER)
+ReminderRequestTimer::ReminderRequestTimer(uint64_t countDownTimeInSeconds)
+    : ReminderRequest(ReminderRequest::ReminderType::TIMER)
 {
     CheckParamsValid(countDownTimeInSeconds);
     countDownTimeInSeconds_ = countDownTimeInSeconds;
