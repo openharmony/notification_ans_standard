@@ -16,8 +16,8 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_CORE_INCLUDE_REMINDER_TIMER_INFO_H
 #define BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_CORE_INCLUDE_REMINDER_TIMER_INFO_H
 
-#include "itimer_info.h"
 #include "advanced_notification_service.h"
+#include "itimer_info.h"
 #include "notification_request.h"
 #include "reminder_request.h"
 

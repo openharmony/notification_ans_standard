@@ -26,8 +26,8 @@ const uint16_t ReminderRequestAlarm::SECONDS_PER_HOUR = 3600;
 const uint8_t ReminderRequestAlarm::MINUTES_PER_HOUR = 60;
 const int8_t ReminderRequestAlarm::INVALID_INT_VALUE = -1;
 
-ReminderRequestAlarm::ReminderRequestAlarm(uint8_t hour, uint8_t minute, const std::vector<uint8_t> daysOfWeek) :
-    ReminderRequest(ReminderRequest::ReminderType::ALARM)
+ReminderRequestAlarm::ReminderRequestAlarm(uint8_t hour, uint8_t minute, const std::vector<uint8_t> daysOfWeek)
+    : ReminderRequest(ReminderRequest::ReminderType::ALARM)
 {
     hour_ = hour;
     minute_ = minute;

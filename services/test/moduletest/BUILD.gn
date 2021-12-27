@@ -21,6 +21,7 @@ ohos_moduletest("ans_module_test") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "//base/miscservices/time/interfaces/innerkits/include",
     "//foundation/appexecfwk/standard/libs/libeventhandler/src",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
