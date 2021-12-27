@@ -18,7 +18,6 @@
 
 #include "reminder_request.h"
 
-#include <time.h>
 #include <vector>
 
 namespace OHOS {

@@ -31,7 +31,6 @@
 #include "notification_slot_filter.h"
 #include "notification_subscriber_manager.h"
 #include "permission_filter.h"
-
 #include "reminder_data_manager.h"
 
 namespace OHOS {
