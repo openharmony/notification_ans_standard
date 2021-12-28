@@ -196,7 +196,7 @@ bool ReminderRequest::HandleTimeZoneChange(
         return false;
     }
     ANSR_LOGD("Handle timezone change, oldZoneTriggerTime:%{public}llu, newZoneTriggerTime:%{public}llu",
-        oldZoneTriggerTime, newZoneTriggerTime);
+        (unsigned long long)oldZoneTriggerTime, (unsigned long long)newZoneTriggerTime);
     bool showImmediately = false;
     if (optTriggerTime != INVALID_LONG_VALUE && oldZoneTriggerTime < newZoneTriggerTime) {
         // case1. timezone change to smaller

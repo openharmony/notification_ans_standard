@@ -121,8 +121,9 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     struct tm *test;
     test = localtime(&nextTriggerTime);
     ANSR_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
-        "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld", test->tm_year,
-        test->tm_mon, test->tm_mday, test->tm_hour, test->tm_min, test->tm_sec, test->tm_wday, nextTriggerTime);
+        "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld",
+        test->tm_year, test->tm_mon, test->tm_mday, test->tm_hour, test->tm_min, test->tm_sec,
+        test->tm_wday, (long long)nextTriggerTime);
 
     if (static_cast<int64_t>(nextTriggerTime) <= 0) {
         return 0;
@@ -200,7 +201,7 @@ bool ReminderRequestAlarm::UpdateNextReminder()
     }
     uint64_t nextTriggerTime = GetNextTriggerTime(true);
     if (nextTriggerTime != 0) {
-        ANSR_LOGI("Set next trigger time=%{public}llu", nextTriggerTime);
+        ANSR_LOGI("Set next trigger time=%{public}llu", (unsigned long long)nextTriggerTime);
         SetTriggerTimeInMilli(nextTriggerTime);
         return true;
     } else {

@@ -1323,7 +1323,7 @@ ErrCode AnsManagerStub::HandleGetValidReminders(MessageParcel &data, MessageParc
     std::vector<sptr<ReminderRequest>> validReminders;
     ErrCode result = GetValidReminders(validReminders);
 
-    ANSR_LOGD("Write back size=%{public}d", validReminders.size());
+    ANSR_LOGD("Write back size=%{public}zu", validReminders.size());
     if (!reply.WriteUint8(static_cast<uint8_t>(validReminders.size()))) {
         ANSR_LOGE("Write back reminder count failed");
         return ERR_ANS_PARCELABLE_FAILED;

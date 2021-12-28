@@ -278,7 +278,7 @@ napi_value ReminderCommon::CreateReminderTimer(
     if (propertyCountDownTime <= 0 ||
         propertyCountDownTime > static_cast<int64_t>((UINT64_MAX / ReminderRequest::MILLI_SECONDS))) {
         ANSR_LOGE("Property %{public}s must between (0, %{public}llu).",
-            ReminderAgentNapi::ALARM_MINUTE, (UINT64_MAX / ReminderRequest::MILLI_SECONDS));
+            ReminderAgentNapi::ALARM_MINUTE, (unsigned long long)(UINT64_MAX / ReminderRequest::MILLI_SECONDS));
         return nullptr;
     }
 
