@@ -14,7 +14,7 @@
 group("interfaces_target") {
   deps = [
     "kits/napi/ans:notification",
-    "kits/napi/wantagent:wantagent",
     "kits/napi/ans/src/reminder:reminderagent",
+    "kits/napi/wantagent:wantagent",
   ]
 }

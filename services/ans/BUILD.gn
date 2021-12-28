@@ -45,10 +45,10 @@ ohos_shared_library("libans") {
     "src/notification_slot_filter.cpp",
     "src/notification_subscriber_manager.cpp",
     "src/permission_filter.cpp",
-    "src/system_event_observer.cpp",
-    "src/reminder_timer_info.cpp",
     "src/reminder_data_manager.cpp",
     "src/reminder_event_manager.cpp",
+    "src/reminder_timer_info.cpp",
+    "src/system_event_observer.cpp",
   ]
 
   configs = [
@@ -60,12 +60,12 @@ ohos_shared_library("libans") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
+    "//base/miscservices/time/services:time_service",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//utils/native/base:utils",
-    "//base/miscservices/time/services:time_service",
   ]
 
   if (is_double_framework) {

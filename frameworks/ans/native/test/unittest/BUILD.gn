@@ -18,58 +18,58 @@ import("//build/test.gni")
 module_output_path = "ans_reminder/unittest"
 
 ohos_unittest("ans_reminder_unit_test") {
-    module_out_path = module_output_path
+  module_out_path = module_output_path
 
-    include_dirs = [
-        ".",
-        "include",
-        "//foundation/appexecfwk/standard/libs/libeventhandler/src",
-        "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
-        "//utils/native/base/include",
-        "//utils/system/safwk/native/include",
-        "/${services_path}/ans/include",
-        "${services_path}/ans/test/unittest/mock/include",
-        "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
-        "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
-        "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
-        "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-        "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
-        "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
-        "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
-        "//developtools/bytrace_standard/interfaces/innerkits/native/include",
-    ]
+  include_dirs = [
+    ".",
+    "include",
+    "//foundation/appexecfwk/standard/libs/libeventhandler/src",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
+    "//utils/native/base/include",
+    "//utils/system/safwk/native/include",
+    "/${services_path}/ans/include",
+    "${services_path}/ans/test/unittest/mock/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
+    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
+  ]
 
-    sources = [
-        "${native_path}/test/unittest/reminder_request_test.cpp",
-        "${native_path}/test/unittest/reminder_request_alarm_test.cpp",
-    ]
+  sources = [
+    "${native_path}/test/unittest/reminder_request_alarm_test.cpp",
+    "${native_path}/test/unittest/reminder_request_test.cpp",
+  ]
 
-    configs = [ "//utils/native/base:utils_config" ]
+  configs = [ "//utils/native/base:utils_config" ]
 
-    deps = [
-        "${core_path}:ans_core",
-        "${frameworks_path}/ans/native:ans_innerkits",
-        "${frameworks_path}/wantagent:wantagent_innerkits",
-        "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-        "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
-        "//third_party/googletest:gtest_main",
-        "//utils/native/base:utils",
-    ]
+  deps = [
+    "${core_path}:ans_core",
+    "${frameworks_path}/ans/native:ans_innerkits",
+    "${frameworks_path}/wantagent:wantagent_innerkits",
+    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
+    "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
+  ]
 
-    external_deps = [
-        "aafwk_standard:want",
-        "appexecfwk_standard:appexecfwk_base",
-        "appexecfwk_standard:appexecfwk_core",
-        "appexecfwk_standard:libeventhandler",
-        "ces_standard:cesfwk_innerkits",
-        "hiviewdfx_hilog_native:libhilog",
-        "ipc:ipc_core",
-        "safwk:system_ability_fwk",
-        "samgr_standard:samgr_proxy",
-    ]
+  external_deps = [
+    "aafwk_standard:want",
+    "appexecfwk_standard:appexecfwk_base",
+    "appexecfwk_standard:appexecfwk_core",
+    "appexecfwk_standard:libeventhandler",
+    "ces_standard:cesfwk_innerkits",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+  ]
 
-    subsystem_name = "notification"
-    part_name = "ans_standard"
+  subsystem_name = "notification"
+  part_name = "ans_standard"
 }
 
 group("unittest") {
