@@ -63,7 +63,7 @@ ohos_shared_library("reminderagent") {
     "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common:napi_common",
     "//foundation/ace/napi:ace_napi",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libuv:uv_static",
     "//utils/native/base:utils",
