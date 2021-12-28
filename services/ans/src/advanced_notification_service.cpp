@@ -1487,7 +1487,7 @@ ErrCode AdvancedNotificationService::GetValidReminders(std::vector<sptr<Reminder
         return ERR_ANS_INVALID_BUNDLE;
     }
     ReminderDataManager::GetInstance()->GetValidReminders(bundleOption, reminders);
-    ANSR_LOGD("Valid reminders size=%{public}d", reminders.size());
+    ANSR_LOGD("Valid reminders size=%{public}zu", reminders.size());
     return ERR_OK;
 }
 

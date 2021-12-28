@@ -368,7 +368,7 @@ void ReminderDataManager::StopTimer()
         ANSR_LOGD("Timer is not running");
         return;
     }
-    ANSR_LOGD("Stop timer id=%{public}llu", timerId_);
+    ANSR_LOGD("Stop timer id=%{public}llu", (unsigned long long)timerId_);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
     timer->StopTimer(timerId_);
     ResetStates();
@@ -589,7 +589,7 @@ void ReminderDataManager::ResetStates()
 
 void ReminderDataManager::StartTimerLocked(sptr<ReminderRequest> &reminderRequest)
 {
-    ANSR_LOGD("Start timer: millSeconds=%{public}llu", reminderRequest->GetTriggerTimeInMilli());
+    ANSR_LOGD("Start timer: millSeconds=%{public}llu", (unsigned long long)(reminderRequest->GetTriggerTimeInMilli()));
     std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
     timerId_ = timer->CreateTimer(REMINDER_DATA_MANAGER->CreateTimerInfo());

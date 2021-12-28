@@ -2051,7 +2051,7 @@ ErrCode AnsManagerProxy::GetValidReminders(std::vector<sptr<ReminderRequest>> &r
         if (result != ERR_OK) {
             ANSR_LOGE("[GetValidReminders] fail: ReadReminders ErrCode=%{public}d", result);
         } else {
-            ANSR_LOGD("[GetValidReminders], size=%{public}d", reminders.size());
+            ANSR_LOGD("[GetValidReminders], size=%{public}zu", reminders.size());
         }
     }
     return result;
