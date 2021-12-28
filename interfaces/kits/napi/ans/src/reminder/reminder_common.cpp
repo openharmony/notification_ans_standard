@@ -105,19 +105,11 @@ void ReminderCommon::GenWantAgent(
 napi_value ReminderCommon::GenReminder(
     const napi_env &env, const napi_value &value, std::shared_ptr<ReminderRequest>& reminder)
 {
-    bool hasProperty = false;
-
     // reminderType
-    NAPI_CALL(env, napi_has_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &hasProperty));
-    if (!hasProperty) {
-        ANSR_LOGE("Property %{public}s expected.", ReminderAgentNapi::REMINDER_TYPE);
-        return nullptr;
+    int32_t propertyVal = -1;
+    if (!GetInt32(env, value, ReminderAgentNapi::REMINDER_TYPE, propertyVal)) {
+        ANSR_LOGW("Reminder type must be setted, please check the reminderType");
     }
-    napi_value result = nullptr;
-    napi_get_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &result);
-    int32_t propertyVal = 0;
-    napi_get_value_int32(env, result, &propertyVal);
-
     switch (ReminderRequest::ReminderType(propertyVal)) {
         case ReminderRequest::ReminderType::TIMER:
             CreateReminderTimer(env, value, reminder);
@@ -126,14 +118,13 @@ napi_value ReminderCommon::GenReminder(
             CreateReminderAlarm(env, value, reminder);
             break;
         default:
+            ANSR_LOGW("Reminder type is not support.");
             break;
     }
-
     if (reminder == nullptr) {
-        ANSR_LOGE("Instance of reminder error.");
+        ANSR_LOGW("Instance of reminder error.");
         return nullptr;
     }
-
     char str[NotificationNapi::STR_MAX_SIZE] = {0};
 
     // title
@@ -173,7 +164,6 @@ napi_value ReminderCommon::GenReminder(
     if (!GenActionButtons(env, value, reminder)) {
         return nullptr;
     }
-
     return NotificationNapi::Common::NapiGetNull(env);
 }
 

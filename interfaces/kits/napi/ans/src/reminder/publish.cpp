@@ -47,7 +47,7 @@ napi_value GetCallback(const napi_env &env, const napi_value &value, Parameters 
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, value, &valuetype));
     if (valuetype != napi_function) {
-        ANSR_LOGE("Wrong argument type. Function expected.");
+        ANSR_LOGW("Wrong argument type. Function expected.");
         return nullptr;
     }
     napi_create_reference(env, value, 1, &params.callback);
@@ -72,20 +72,20 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[PUBLISH_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc < 1 || argc > PUBLISH_PARAM_LEN) {
-        ANSR_LOGE("Wrong number of arguments");
+        ANSR_LOGW("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0] : reminderRequest
     if (ReminderCommon::GetReminderRequest(env, argv[0], params.reminder) == nullptr) {
-        ANSR_LOGE("[reminderAgent]CreateReminder returns nullptr");
+        ANSR_LOGW("[reminderAgent]CreateReminder returns nullptr");
         return nullptr;
     }
 
     // argv[1]: callback
     if (argc == PUBLISH_PARAM_LEN) {
         if (GetCallback(env, argv[1], params) == nullptr) {
-            ANSR_LOGE("[reminderAgent]GetCallbak returns nullptr");
+            ANSR_LOGW("[reminderAgent]GetCallbak returns nullptr");
             return nullptr;
         }
     }
@@ -99,18 +99,18 @@ napi_value ParseCanCelParameter(const napi_env &env, const napi_callback_info &i
     napi_value argv[CANCEL_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc < 1 || argc > CANCEL_PARAM_LEN) {
-        ANSR_LOGE("Wrong number of arguments");
+        ANSR_LOGW("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0]: reminder id
     int32_t reminderId = -1;
     if (!ReminderCommon::GetInt32(env, argv[0], nullptr, reminderId)) {
-        ANSR_LOGE("Param id of cancels Reminder should be a number.");
+        ANSR_LOGW("Param id of cancels Reminder should be a number.");
         return nullptr;
     }
     if (reminderId < 0) {
-        ANSR_LOGE("Param id of cancels Reminder is illegal.");
+        ANSR_LOGW("Param id of cancels Reminder is illegal.");
         return nullptr;
     }
     params.reminderId = reminderId;
@@ -118,7 +118,7 @@ napi_value ParseCanCelParameter(const napi_env &env, const napi_callback_info &i
     // argv[1]: callback
     if (argc >= CANCEL_PARAM_LEN) {
         if (GetCallback(env, argv[1], params) == nullptr) {
-            ANSR_LOGE("GetCallbak is nullptr");
+            ANSR_LOGW("GetCallbak is nullptr");
             return nullptr;
         }
     }
@@ -132,14 +132,14 @@ napi_value ParseCanCelAllParameter(const napi_env &env, const napi_callback_info
     napi_value argv[CANCEL_ALL_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc > CANCEL_ALL_PARAM_LEN) {
-        ANSR_LOGE("Wrong number of arguments");
+        ANSR_LOGW("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0]: callback
     if (argc == CANCEL_ALL_PARAM_LEN) {
         if (GetCallback(env, argv[0], params) == nullptr) {
-            ANSR_LOGE("getCallbak is nullptr");
+            ANSR_LOGW("getCallbak is nullptr");
             return nullptr;
         }
     }
@@ -152,14 +152,14 @@ napi_value ParseGetValidParameter(const napi_env &env, const napi_callback_info 
     napi_value argv[GET_VALID_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc < 0 || argc > GET_VALID_PARAM_LEN) {
-        ANSR_LOGE("Wrong number of arguments");
+        ANSR_LOGW("Wrong number of arguments");
         return nullptr;
     }
 
     // argv[0]: callback
     if (argc == GET_VALID_PARAM_LEN) {
         if (GetCallback(env, argv[0], params) == nullptr) {
-            ANSR_LOGI("getCallbak is nullptr");
+            ANSR_LOGW("getCallbak is nullptr");
             return nullptr;
         }
     }
@@ -415,7 +415,7 @@ void GetValidRemindersInner(napi_env env, std::vector<sptr<ReminderRequest>>& va
     napi_create_array(env, &arr);
     for (auto reminder : validReminders) {
         if (reminder == nullptr) {
-            ANSR_LOGE("reminder is null");
+            ANSR_LOGW("reminder is null");
             continue;
         }
         napi_value result = nullptr;
@@ -499,7 +499,7 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
     // param
     Parameters params;
     if (ParseParameters(env, info, params) == nullptr) {
-        ANSR_LOGE("Parse params error");
+        ANSR_LOGW("Parse params error");
         return NotificationNapi::Common::JSParaError(env, params.callback);
     }
 
