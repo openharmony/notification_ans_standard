@@ -49,8 +49,8 @@ ohos_shared_library("reminderagent") {
     "../common.cpp",
     "../slot.cpp",
     "native_module.cpp",
-    "reminder_common.cpp",
     "publish.cpp",
+    "reminder_common.cpp",
   ]
 
   deps = [
