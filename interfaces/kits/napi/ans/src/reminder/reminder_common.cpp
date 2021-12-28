@@ -73,12 +73,15 @@ bool ReminderCommon::GenActionButtons(
             ReminderAgentNapi::ACTION_BUTTON_TITLE, str, NotificationNapi::STR_MAX_SIZE) &&
             GetInt32(env, actionButton, ReminderAgentNapi::ACTION_BUTTON_TYPE, buttonType)) {
             if (ReminderRequest::ActionButtonType(buttonType) != ReminderRequest::ActionButtonType::CLOSE) {
-                ANSR_LOGE("Wrong argument type:%{public}s. buttonType not support.", ACTION_BUTTON);
+                ANSR_LOGW("Wrong argument type:%{public}s. buttonType not support.", ACTION_BUTTON);
                 return false;
             }
             std::string title(str);
             reminder->SetActionButton(title, static_cast<ReminderRequest::ActionButtonType>(buttonType));
             ANSR_LOGD("button title=%{public}s, type=%{public}d", title.c_str(), buttonType);
+        } else {
+            ANSR_LOGW("Parse action button error.");
+            return false;
         }
     }
     return true;
@@ -106,10 +109,18 @@ napi_value ReminderCommon::GenReminder(
     const napi_env &env, const napi_value &value, std::shared_ptr<ReminderRequest>& reminder)
 {
     // reminderType
-    int32_t propertyVal = -1;
-    if (!GetInt32(env, value, ReminderAgentNapi::REMINDER_TYPE, propertyVal)) {
-        ANSR_LOGW("Reminder type must be setted, please check the reminderType");
+    bool hasProperty = false;
+
+    // reminderType
+    NAPI_CALL(env, napi_has_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &hasProperty));
+    if (!hasProperty) {
+        ANSR_LOGE("Property %{public}s expected.", ReminderAgentNapi::REMINDER_TYPE);
+        return nullptr;
     }
+    napi_value result = nullptr;
+    napi_get_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &result);
+    int32_t propertyVal = -1;
+    napi_get_value_int32(env, result, &propertyVal);
     switch (ReminderRequest::ReminderType(propertyVal)) {
         case ReminderRequest::ReminderType::TIMER:
             CreateReminderTimer(env, value, reminder);
@@ -227,9 +238,9 @@ bool ReminderCommon::GetPropertyValIfExist(const napi_env &env, const napi_value
     NAPI_CALL(env, napi_typeof(env, propertyVal, &valuetype));
     if (valuetype != napi_number) {
         if (propertyName == nullptr) {
-            ANSR_LOGE("Wrong argument type. number expected.");
+            ANSR_LOGW("Wrong argument type. number expected.");
         } else {
-            ANSR_LOGE("Wrong argument type:%{public}s. number expected.", propertyName);
+            ANSR_LOGW("Wrong argument type:%{public}s, number expected.", propertyName);
         }
         return false;
     }
