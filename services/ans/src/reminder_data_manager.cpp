@@ -329,6 +329,7 @@ void ReminderDataManager::ShowDesignatedReminderLocked(sptr<ReminderRequest> &re
             (*it)->OnShow(isSysTimeChanged, false);
         } else {
             ANSR_LOGD("publish notification.(reminderId=%{public}d)", reminderId);
+            (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::COMMON, "");
             (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::REMOVAL_WANT_AGENT, "");
             (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::ACTION_BUTTON, "");
             advancedNotificationService_->PublishSavedNotification(notificationRequest, bundleOption);

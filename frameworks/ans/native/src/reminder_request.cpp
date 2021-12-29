@@ -346,6 +346,10 @@ void ReminderRequest::UpdateNotificationRequest(UpdateNotificationType type, std
 {
     ANSR_LOGI("UpdateNotification type=%{public}d", static_cast<uint8_t>(type));
     switch (type) {
+        case UpdateNotificationType::COMMON: {
+            UpdateNotificationCommon();
+            break;
+        }
         case UpdateNotificationType::ACTION_BUTTON: {
             AddActionButtons();
             break;
@@ -528,6 +532,7 @@ void ReminderRequest::InitNotificationRequest()
     auto notificationContent = std::make_shared<NotificationContent>(notificationNormalContent);
     notificationRequest_ = new NotificationRequest(notificationId_);
     notificationRequest_->SetLabel(NOTIFICATION_LABEL);
+    notificationRequest_->SetShowDeliveryTime(true);
     notificationRequest_->SetSlotType(slotType_);
     notificationRequest_->SetContent(notificationContent);
     SetWantAgent();  // todo move to updateNotification
@@ -629,6 +634,13 @@ void ReminderRequest::SetState(bool deSet, const uint8_t newState, std::string f
     }
     ANSR_LOGI("Switch the reminder(id=%{public}d) state, from %{public}s to %{public}s, called by %{public}s",
         reminderId_, GetState(oldState).c_str(), GetState(state_).c_str(), function.c_str());
+}
+
+void ReminderRequest::UpdateNotificationCommon()
+{
+    time_t now;
+    (void)time(&now);  // unit is seconds.
+    notificationRequest_->SetDeliveryTime(static_cast<int64_t>(now * MILLI_SECONDS));
 }
 }
 }

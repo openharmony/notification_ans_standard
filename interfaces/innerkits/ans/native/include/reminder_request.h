@@ -71,6 +71,7 @@ public:
      * @brief Supported notification update type.
      */
     enum class UpdateNotificationType : uint8_t {
+        COMMON,
         ACTION_BUTTON,
         REMOVAL_WANT_AGENT,
         CONTENT
@@ -418,6 +419,7 @@ private:
     void InitNotificationRequest();
     void SetState(bool deSet, const uint8_t newState, std::string function);
     void SetWantAgent();
+    void UpdateNotificationCommon();
 
     static const uint8_t REMINDER_STATUS_INACTIVE;
     static const uint8_t REMINDER_STATUS_SHOWING;
