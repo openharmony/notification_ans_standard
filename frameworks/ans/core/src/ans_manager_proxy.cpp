@@ -1970,15 +1970,14 @@ ErrCode AnsManagerProxy::PublishReminder(sptr<ReminderRequest> &reminder)
     if (result != ERR_OK) {
         ANSR_LOGE("[PublishReminder] fail: transact ErrCode=%{public}d", result);
         return ERR_ANS_TRANSACT_FAILED;
-    } else {
-        int32_t reminderId = -1;
-        if (!reply.ReadInt32(reminderId)) {
-            ANSR_LOGE("[PublishReminder] fail: derek read reminder id failed.");
-            return ERR_ANS_PARCELABLE_FAILED;
-        }
-        reminder->SetReminderId(reminderId);
-        ANSR_LOGD("ReminderId=%{public}d", reminder->GetReminderId());
     }
+    int32_t reminderId = -1;
+    if (!reply.ReadInt32(reminderId)) {
+        ANSR_LOGE("[PublishReminder] fail: derek read reminder id failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    reminder->SetReminderId(reminderId);
+    ANSR_LOGD("ReminderId=%{public}d", reminder->GetReminderId());
     return result;
 }
 
@@ -2039,20 +2038,19 @@ ErrCode AnsManagerProxy::GetValidReminders(std::vector<sptr<ReminderRequest>> &r
     if (result != ERR_OK) {
         ANSR_LOGE("[GetValidReminders] fail: transact ErrCode=%{public}d", result);
         return ERR_ANS_TRANSACT_FAILED;
+    }
+    uint8_t count = 0;
+    if (!reply.ReadUint8(count)) {
+        ANSR_LOGE("[GetValidReminders] fail: read reminder count failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    ANSR_LOGD("[GetValidReminders] count=%{public}u", count);
+    reminders.clear();
+    result = ReadReminders(count, reply, reminders);
+    if (result != ERR_OK) {
+        ANSR_LOGE("[GetValidReminders] fail: ReadReminders ErrCode=%{public}d", result);
     } else {
-        uint8_t count = 0;
-        if (!reply.ReadUint8(count)) {
-            ANSR_LOGE("[GetValidReminders] fail: read reminder count failed.");
-            return ERR_ANS_PARCELABLE_FAILED;
-        }
-        ANSR_LOGD("[GetValidReminders] count=%{public}u", count);
-        reminders.clear();
-        result = ReadReminders(count, reply, reminders);
-        if (result != ERR_OK) {
-            ANSR_LOGE("[GetValidReminders] fail: ReadReminders ErrCode=%{public}d", result);
-        } else {
-            ANSR_LOGD("[GetValidReminders], size=%{public}zu", reminders.size());
-        }
+        ANSR_LOGD("[GetValidReminders], size=%{public}zu", reminders.size());
     }
     return result;
 }
