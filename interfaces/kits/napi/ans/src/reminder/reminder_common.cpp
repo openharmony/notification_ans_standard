@@ -105,23 +105,10 @@ void ReminderCommon::GenWantAgent(
     }
 }
 
-napi_value ReminderCommon::GenReminder(
-    const napi_env &env, const napi_value &value, std::shared_ptr<ReminderRequest>& reminder)
+bool ReminderCommon::CreateReminder(const napi_env &env, const napi_value &value,
+    const int32_t &reminderType, std::shared_ptr<ReminderRequest>& reminder)
 {
-    // reminderType
-    bool hasProperty = false;
-
-    // reminderType
-    NAPI_CALL(env, napi_has_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &hasProperty));
-    if (!hasProperty) {
-        ANSR_LOGE("Property %{public}s expected.", ReminderAgentNapi::REMINDER_TYPE);
-        return nullptr;
-    }
-    napi_value result = nullptr;
-    napi_get_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &result);
-    int32_t propertyVal = -1;
-    napi_get_value_int32(env, result, &propertyVal);
-    switch (ReminderRequest::ReminderType(propertyVal)) {
+    switch (ReminderRequest::ReminderType(reminderType)) {
         case ReminderRequest::ReminderType::TIMER:
             CreateReminderTimer(env, value, reminder);
             break;
@@ -134,6 +121,28 @@ napi_value ReminderCommon::GenReminder(
     }
     if (reminder == nullptr) {
         ANSR_LOGW("Instance of reminder error.");
+        return false;
+    }
+    return true;
+}
+
+napi_value ReminderCommon::GenReminder(
+    const napi_env &env, const napi_value &value, std::shared_ptr<ReminderRequest>& reminder)
+{
+    // reminderType
+    bool hasProperty = false;
+    NAPI_CALL(env, napi_has_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &hasProperty));
+    if (!hasProperty) {
+        ANSR_LOGE("Property %{public}s expected.", ReminderAgentNapi::REMINDER_TYPE);
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    napi_get_named_property(env, value, ReminderAgentNapi::REMINDER_TYPE, &result);
+    int32_t propertyVal = -1;
+    napi_get_value_int32(env, result, &propertyVal);
+
+    // createReminder
+    if (!CreateReminder(env, value, propertyVal, reminder)) {
         return nullptr;
     }
     char str[NotificationNapi::STR_MAX_SIZE] = {0};
@@ -163,6 +172,7 @@ napi_value ReminderCommon::GenReminder(
     if (GetInt32(env, value, ReminderAgentNapi::SLOT_TYPE, slotType)) {
         enum NotificationConstant::SlotType actureType = NotificationConstant::SlotType::OTHER;
         if (!NotificationNapi::Common::SlotTypeJSToC(NotificationNapi::SlotType(slotType), actureType)) {
+            ANSR_LOGW("slot type not support.");
             return nullptr;
         }
         reminder->SetSlotType(actureType);

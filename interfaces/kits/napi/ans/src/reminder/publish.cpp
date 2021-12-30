@@ -397,7 +397,9 @@ napi_value SetValidReminder(const napi_env &env, ReminderRequest &reminder, napi
     napi_set_named_property(env, result, NOTIFICATION_ID, value);
 
     // slotType
-    napi_create_int32(env, static_cast<int32_t>(reminder.GetSlotType()), &value);
+    NotificationNapi::SlotType jsSlotType;
+    NotificationNapi::Common::SlotTypeCToJS(reminder.GetSlotType(), jsSlotType);
+    napi_create_int32(env, static_cast<int32_t>(jsSlotType), &value);
     napi_set_named_property(env, result, SLOT_TYPE, value);
 
     // wantAgent
