@@ -118,9 +118,10 @@ public:
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();
-    void SaveNotificationInfo(sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
-    ErrCode PublishSavedNotification(
-        sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
+    ErrCode PrepareNotificationInfo(
+        const sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
+    ErrCode PublishPreparedNotification(
+        const sptr<NotificationRequest> &request, const sptr<NotificationBundleOption> &bundleOption);
 
 private:
     struct RecentInfo;
