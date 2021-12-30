@@ -67,6 +67,9 @@ public:
         const char* propertyName, napi_value& propertyVal);
 
 private:
+    static bool CreateReminder(const napi_env &env, const napi_value &value,
+        const int32_t &reminderType, std::shared_ptr<ReminderRequest>& reminder);
+
     static bool GetPropertyValIfExist(const napi_env &env, const napi_value &value,
         const char* propertyName, napi_value& propertyVal);
 
