@@ -68,14 +68,14 @@ void ReminderDataManager::CancelNotification(sptr<ReminderRequest> &reminder) co
     sptr<NotificationRequest> notification = reminder->GetNotificationRequest();
     if (notification == nullptr) {
         ANSR_LOGW("Cancel notification fail");
-    } else {
-        ANSR_LOGD("Cancel notification");
-        if (advancedNotificationService_ == nullptr) {
-            ANSR_LOGE("Cancel notification fail");
-            return;
-        }
-        advancedNotificationService_->Cancel(notification->GetNotificationId(), ReminderRequest::NOTIFICATION_LABEL);
+        return;
     }
+    ANSR_LOGD("Cancel notification");
+    if (advancedNotificationService_ == nullptr) {
+        ANSR_LOGE("Cancel notification fail");
+        return;
+    }
+    advancedNotificationService_->Cancel(notification->GetNotificationId(), ReminderRequest::NOTIFICATION_LABEL);
 }
 
 bool ReminderDataManager::CheckReminderLimitExceededLocked(const std::string &bundleName) const
