@@ -228,34 +228,34 @@ sptr<NotificationBundleOption> AdvancedNotificationService::GenerateValidBundleO
     return validBundleOption;
 }
 
-void AdvancedNotificationService::SaveNotificationInfo(
-    sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption)
+ErrCode AdvancedNotificationService::PrepareNotificationInfo(
+    const sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption)
 {
+    if ((request->GetSlotType() == NotificationConstant::SlotType::CUSTOM) && !IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
     ErrCode result = PrepereNotificationRequest(request);
     if (result != ERR_OK) {
-        ANSR_LOGE("SaveNotificationInfo fail");
-        return;
+        return result;
     }
     bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
-        ANSR_LOGE("SaveNotificationInfo fail.");
-        return;
+        return ERR_ANS_INVALID_BUNDLE;
     }
-    ANSR_LOGI(
+    ANS_LOGI(
         "bundleName=%{public}s, uid=%{public}d", (bundleOption->GetBundleName()).c_str(), bundleOption->GetUid());
+    return ERR_OK;
 }
 
-ErrCode AdvancedNotificationService::PublishSavedNotification(
-    sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption)
+ErrCode AdvancedNotificationService::PublishPreparedNotification(
+    const sptr<NotificationRequest> &request, const sptr<NotificationBundleOption> &bundleOption)
 {
-    ANSR_LOGI("PublishSavedNotification");
+    ANS_LOGI("PublishPreparedNotification");
     auto record = std::make_shared<NotificationRecord>();
     record->request = request;
     record->notification = new Notification(request);
     record->bundleOption = bundleOption;
-
     ErrCode result = ERR_OK;
-
     handler_->PostSyncTask(std::bind([&]() {
         result = AssignValidNotificationSlot(record);
         if (result != ERR_OK) {
@@ -282,7 +282,6 @@ ErrCode AdvancedNotificationService::PublishSavedNotification(
             }
             UpdateInNotificationList(record);
         }
-
         UpdateRecentNotification(record->notification, false, 0);
         sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
         NotificationSubscriberManager::GetInstance()->NotifyConsumed(record->notification, sortingMap);
@@ -293,59 +292,12 @@ ErrCode AdvancedNotificationService::PublishSavedNotification(
 ErrCode AdvancedNotificationService::Publish(const std::string &label, const sptr<NotificationRequest> &request)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-
-    if ((request->GetSlotType() == NotificationConstant::SlotType::CUSTOM) && !IsSystemApp()) {
-        return ERR_ANS_NON_SYSTEM_APP;
-    }
-
-    ErrCode result = PrepereNotificationRequest(request);
+    sptr<NotificationBundleOption> bundleOption;
+    ErrCode result = PrepareNotificationInfo(request, bundleOption);
     if (result != ERR_OK) {
         return result;
     }
-
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
-    }
-
-    std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
-    record->request = request;
-    record->notification = new Notification(request);
-    record->bundleOption = bundleOption;
-
-    handler_->PostSyncTask(std::bind([&]() {
-        result = AssignValidNotificationSlot(record);
-        if (result != ERR_OK) {
-            ANS_LOGE("Can not assign valid slot!");
-            return;
-        }
-
-        result = Filter(record);
-        if (result != ERR_OK) {
-            ANS_LOGE("Reject by filters: %{public}d", result);
-            return;
-        }
-
-        if (!IsNotificationExists(record->notification->GetKey())) {
-            result = FlowControl(record);
-            if (result != ERR_OK) {
-                return;
-            }
-        } else {
-            if (record->request->IsAlertOneTime()) {
-                record->notification->SetEnableLight(false);
-                record->notification->SetEnableSound(false);
-                record->notification->SetEnableViration(false);
-            }
-            UpdateInNotificationList(record);
-        }
-
-        UpdateRecentNotification(record->notification, false, 0);
-        sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
-        NotificationSubscriberManager::GetInstance()->NotifyConsumed(record->notification, sortingMap);
-    }));
-
-    return result;
+    return PublishPreparedNotification(request, bundleOption);
 }
 
 bool AdvancedNotificationService::IsNotificationExists(const std::string &key)
@@ -1445,9 +1397,10 @@ ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &remi
     ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationRequest> notificationRequest = reminder->GetNotificationRequest();
     sptr<NotificationBundleOption> bundleOption = nullptr;
-    SaveNotificationInfo(notificationRequest, bundleOption);
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
+    ErrCode result = PrepareNotificationInfo(notificationRequest, bundleOption);
+    if (result != ERR_OK) {
+        ANSR_LOGW("PrepareNotificationInfo fail");
+        return result;
     }
     ReminderDataManager::GetInstance()->PublishReminder(reminder, bundleOption);
     return ERR_OK;

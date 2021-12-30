@@ -102,7 +102,7 @@ bool ReminderDataManager::CheckReminderLimitExceededLocked(const std::string &bu
     }
     if (count >= ReminderDataManager::MAX_NUM_REMINDER_LIMIT_APP) {
         ANSR_LOGW("The number of validate reminders exceeds the application upper limit:%{public}d, and new \
-            reminder can not be published", MAX_NUM_REMINDER_LIMIT_SYSTEM);
+            reminder can not be published", MAX_NUM_REMINDER_LIMIT_APP);
         return true;
     }
     return false;
@@ -332,7 +332,7 @@ void ReminderDataManager::ShowDesignatedReminderLocked(sptr<ReminderRequest> &re
             (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::COMMON, "");
             (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::REMOVAL_WANT_AGENT, "");
             (*it)->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::ACTION_BUTTON, "");
-            advancedNotificationService_->PublishSavedNotification(notificationRequest, bundleOption);
+            advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
             (*it)->OnShow(isSysTimeChanged, true);
             HandleSameNotificationIdShowing((*it));
         }
