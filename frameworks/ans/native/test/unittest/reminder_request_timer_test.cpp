@@ -78,10 +78,10 @@ HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00300, Function | SmallTest
     EXPECT_TRUE(rrc->GetInitInfo() == 1) << "countDownTime is not 1";
 
     auto rrc2 = std::make_shared<ReminderRequestTimer>(10);
-    EXPECT_TRUE(rrc2->GetInitInfo() == 1) << "countDownTime is not 10";
+    EXPECT_TRUE(rrc2->GetInitInfo() == 10) << "countDownTime is not 10";
 
     auto rrc3 = std::make_shared<ReminderRequestTimer>(100);
-    EXPECT_TRUE(rrc3->GetInitInfo() == 1) << "countDownTime is not 1";
+    EXPECT_TRUE(rrc3->GetInitInfo() == 100) << "countDownTime is not 1";
 }
 }
 }
