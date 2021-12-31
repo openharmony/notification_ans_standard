@@ -235,8 +235,7 @@ void ReminderRequest::OnShow(bool isSysTimeChanged, bool allowToNotify)
 bool ReminderRequest::OnTimeZoneChange()
 {
     time_t oldZoneTriggerTime = static_cast<time_t>(triggerTimeInMilli_ / MILLI_SECONDS);
-    struct tm *oriTime;
-    oriTime = gmtime(&oldZoneTriggerTime);
+    struct tm *oriTime = gmtime(&oldZoneTriggerTime);
     time_t newZoneTriggerTime = mktime(oriTime);
     uint64_t nextTriggerTime = PreGetNextTriggerTimeIgnoreSnooze(false);
     return HandleTimeZoneChange(oldZoneTriggerTime, newZoneTriggerTime, nextTriggerTime);

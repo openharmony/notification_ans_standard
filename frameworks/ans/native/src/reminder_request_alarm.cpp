@@ -86,8 +86,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
 {
     time_t now;
     (void)time(&now);  // unit is seconds.
-    struct tm *nowTime;
-    nowTime = localtime(&now);
+    struct tm *nowTime = localtime(&now);
 
     struct tm tar;
     tar.tm_year = nowTime->tm_year;
@@ -118,8 +117,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     } else {
         nextTriggerTime = target + nextDayInterval * HOURS_PER_DAY * SECONDS_PER_HOUR;
     }
-    struct tm *test;
-    test = localtime(&nextTriggerTime);
+    struct tm *test = localtime(&nextTriggerTime);
     ANSR_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld",
         test->tm_year, test->tm_mon, test->tm_mday, test->tm_hour, test->tm_min, test->tm_sec,
