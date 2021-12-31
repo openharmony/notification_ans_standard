@@ -83,6 +83,7 @@ ohos_unittest("ans_unit_test") {
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
