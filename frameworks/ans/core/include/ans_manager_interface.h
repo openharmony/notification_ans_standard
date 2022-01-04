@@ -181,8 +181,8 @@ protected:
         PUBLISH_REMINDER,
         CANCEL_REMINDER,
         CANCEL_ALL_REMINDERS,
-        GET_ALL_VALID_REMINDERS
-        IS_SUPPORT_TEMPLATE,
+        GET_ALL_VALID_REMINDERS,
+        IS_SUPPORT_TEMPLATE
     };
 };
 }  // namespace Notification
