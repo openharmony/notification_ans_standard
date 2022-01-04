@@ -42,12 +42,14 @@ bool BundleMgrProxy::GetApplicationInfos(
     return true;
 }
 
-bool BundleMgrProxy::GetBundleInfo(const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo)
+bool BundleMgrProxy::GetBundleInfo(
+    const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId)
 {
     return true;
 }
 
-bool BundleMgrProxy::GetBundleInfos(const BundleFlag flag, std::vector<BundleInfo> &bundleInfos)
+bool BundleMgrProxy::GetBundleInfos(
+    const BundleFlag flag, std::vector<BundleInfo> &bundleInfos, int32_t userId)
 {
     return true;
 }
@@ -200,7 +202,8 @@ bool BundleMgrProxy::UnregisterBundleStatusCallback()
     return true;
 }
 
-bool BundleMgrProxy::DumpInfos(const DumpFlag flag, const std::string &bundleName, std::string &result)
+bool BundleMgrProxy::DumpInfos(
+    const DumpFlag flag, const std::string &bundleName, int32_t userId, std::string &result)
 {
     return true;
 }
