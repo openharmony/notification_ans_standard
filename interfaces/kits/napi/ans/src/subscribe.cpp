@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include "subscribe.h"
+
 #include <mutex>
 #include <uv.h>
-#include "subscribe.h"
 
 namespace OHOS {
 namespace NotificationNapi {

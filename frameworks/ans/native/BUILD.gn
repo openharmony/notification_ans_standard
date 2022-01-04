@@ -63,6 +63,7 @@ ohos_shared_library("ans_innerkits") {
     "src/notification_subscribe_info.cpp",
     "src/notification_subscriber.cpp",
     "src/notification_user_input.cpp",
+    "src/notification_template.cpp",
   ]
 
   configs = [

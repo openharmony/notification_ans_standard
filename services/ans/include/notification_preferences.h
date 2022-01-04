@@ -68,6 +68,7 @@ public:
     ErrCode SetNotificationsEnabled(const bool &enabled);
     ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date);
     ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> date);
+    ErrCode GetTemplateSupported(const std::string& templateName, bool &support);
 
     ErrCode ClearNotificationInRestoreFactorySettings();
 

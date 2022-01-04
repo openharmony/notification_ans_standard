@@ -112,6 +112,7 @@ public:
     ErrCode CancelReminder(const int32_t reminderId) override;
     ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
     ErrCode CancelAllReminders() override;
+    ErrCode IsSupportTemplate(const std::string &templateName, bool &support) override;
 
     // SystemEvent
     void OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption);
