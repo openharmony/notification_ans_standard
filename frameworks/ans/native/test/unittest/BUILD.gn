@@ -15,16 +15,14 @@ import("//base/notification/ans_standard/notification.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "ans_standard/unittest"
+module_output_path = "ans_reminder/unittest"
 
-ohos_unittest("ans_unit_test") {
+ohos_unittest("ans_reminder_unit_test") {
   module_out_path = module_output_path
+
   include_dirs = [
     ".",
     "include",
-    "//base/miscservices/time/interfaces/innerkits/include",
-    "//base/miscservices/time/services/time_manager/include",
-    "//base/miscservices/time/utils/native/include",
     "//foundation/appexecfwk/standard/libs/libeventhandler/src",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//utils/native/base/include",
@@ -42,33 +40,9 @@ ohos_unittest("ans_unit_test") {
   ]
 
   sources = [
-    "${services_path}/ans/src/advanced_notification_service.cpp",
-    "${services_path}/ans/src/advanced_notification_service_ability.cpp",
-    "${services_path}/ans/src/notification_preferences.cpp",
-    "${services_path}/ans/src/notification_preferences_database.cpp",
-    "${services_path}/ans/src/notification_preferences_info.cpp",
-    "${services_path}/ans/src/notification_slot_filter.cpp",
-    "${services_path}/ans/src/notification_subscriber_manager.cpp",
-    "${services_path}/ans/src/permission_filter.cpp",
-    "${services_path}/ans/src/reminder_data_manager.cpp",
-    "${services_path}/ans/src/reminder_event_manager.cpp",
-    "${services_path}/ans/src/reminder_timer_info.cpp",
-    "${services_path}/ans/src/system_event_observer.cpp",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src/ikvstore_snapshot.cpp",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/autils/src/constant.cpp",
-    "advanced_notification_service_ability_test.cpp",
-    "advanced_notification_service_test.cpp",
-    "mock/blob.cpp",
-    "mock/distributed_kv_data_manager.cpp",
-    "mock/mock_bundle_manager_helper.cpp",
-    "mock/mock_event_handler.cpp",
-    "mock/mock_ipc.cpp",
-    "mock/mock_single_kv_store.cpp",
-    "notification_preferences_database_test.cpp",
-    "notification_preferences_test.cpp",
-    "notification_slot_filter_test.cpp",
-    "notification_subscriber_manager_test.cpp",
-    "permission_filter_test.cpp",
+    "${native_path}/test/unittest/reminder_request_alarm_test.cpp",
+    "${native_path}/test/unittest/reminder_request_test.cpp",
+    "${native_path}/test/unittest/reminder_request_timer_test.cpp",
   ]
 
   configs = [ "//utils/native/base:utils_config" ]
@@ -77,10 +51,7 @@ ohos_unittest("ans_unit_test") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//base/miscservices/time/services:time_service",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -106,5 +77,5 @@ group("unittest") {
   testonly = true
   deps = []
 
-  deps += [ ":ans_unit_test" ]
+  deps += [ ":ans_reminder_unit_test" ]
 }

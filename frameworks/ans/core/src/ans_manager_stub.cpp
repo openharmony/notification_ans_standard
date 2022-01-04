@@ -20,6 +20,8 @@
 #include "message_option.h"
 #include "message_parcel.h"
 #include "parcel.h"
+#include "reminder_request_alarm.h"
+#include "reminder_request_timer.h"
 
 namespace OHOS {
 namespace Notification {
@@ -194,6 +196,19 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::CANCEL_CONTINUOUS_TASK_NOTIFICATION,
             std::bind(
                 &AnsManagerStub::HandleCancelContinuousTaskNotification, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::PUBLISH_REMINDER,
+            std::bind(&AnsManagerStub::HandlePublishReminder, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::CANCEL_REMINDER,
+            std::bind(&AnsManagerStub::HandleCancelReminder, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::CANCEL_ALL_REMINDERS,
+            std::bind(
+                &AnsManagerStub::HandleCancelAllReminders, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::GET_ALL_VALID_REMINDERS,
+            std::bind(&AnsManagerStub::HandleGetValidReminders, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
 };
 
@@ -1250,6 +1265,86 @@ ErrCode AnsManagerStub::HandleShellDump(MessageParcel &data, MessageParcel &repl
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandlePublishReminder(MessageParcel &data, MessageParcel &reply)
+{
+    ANSR_LOGI("HandlePublishReminder");
+    uint8_t typeInfo = static_cast<uint8_t>(ReminderRequest::ReminderType::INVALID);
+    if (!data.ReadUint8(typeInfo)) {
+        ANSR_LOGE("Failed to read reminder type");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    ReminderRequest::ReminderType reminderType = static_cast<ReminderRequest::ReminderType>(typeInfo);
+    sptr<ReminderRequest> reminder;
+    if (ReminderRequest::ReminderType::ALARM == reminderType) {
+        ANSR_LOGD("Publish alarm");
+        reminder = data.ReadParcelable<ReminderRequestAlarm>();
+    } else if (ReminderRequest::ReminderType::TIMER == reminderType) {
+        ANSR_LOGD("Publish timer");
+        reminder = data.ReadParcelable<ReminderRequestTimer>();
+    } else {
+        ANSR_LOGE("Reminder type invalid");
+        return ERR_ANS_INVALID_PARAM;
+    }
+    if (!reminder) {
+        ANSR_LOGE("Reminder ReadParcelable failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = PublishReminder(reminder);
+
+    if (!reply.WriteInt32(reminder->GetReminderId())) {
+        ANSR_LOGE("Write back reminderId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return result;
+}
+
+ErrCode AnsManagerStub::HandleCancelReminder(MessageParcel &data, MessageParcel &reply)
+{
+    ANSR_LOGI("HandleCancelReminder");
+    int32_t reminderId = -1;
+    if (!data.ReadInt32(reminderId)) {
+        ANSR_LOGE("Read reminder id failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ANSR_LOGD("ReminderId=%{public}d", reminderId);
+    return CancelReminder(reminderId);
+}
+
+ErrCode AnsManagerStub::HandleCancelAllReminders(MessageParcel &data, MessageParcel &reply)
+{
+    return CancelAllReminders();
+}
+
+ErrCode AnsManagerStub::HandleGetValidReminders(MessageParcel &data, MessageParcel &reply)
+{
+    ANSR_LOGI("HandleGetValidReminders");
+    std::vector<sptr<ReminderRequest>> validReminders;
+    ErrCode result = GetValidReminders(validReminders);
+
+    ANSR_LOGD("Write back size=%{public}zu", validReminders.size());
+    if (!reply.WriteUint8(static_cast<uint8_t>(validReminders.size()))) {
+        ANSR_LOGE("Write back reminder count failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    for (auto it = validReminders.begin(); it != validReminders.end(); ++it) {
+        sptr<ReminderRequest> reminder = (*it);
+        uint8_t reminderType = static_cast<uint8_t>(reminder->GetReminderType());
+        ANSR_LOGD("ReminderType=%{public}d", reminderType);
+        if (!reply.WriteUint8(reminderType)) {
+            ANSR_LOGW("Write reminder type failed");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+        if (!reply.WriteParcelable(reminder)) {
+            ANSR_LOGW("Write reminder parcelable failed");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+    }
+    return result;
+}
+
 template<typename T>
 bool AnsManagerStub::WriteParcelableVector(
     const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result)
@@ -1636,6 +1731,29 @@ ErrCode AnsManagerStub::PublishContinuousTaskNotification(const sptr<Notificatio
 ErrCode AnsManagerStub::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
 {
     ANS_LOGW("AnsManagerStub::CancelContinuousTaskNotification called!");
+    return ERR_INVALID_OPERATION;
+}
+ErrCode AnsManagerStub::PublishReminder(sptr<ReminderRequest> &reminder)
+{
+    ANS_LOGW("AnsManagerStub::PublishReminder called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::CancelReminder(const int32_t reminderId)
+{
+    ANS_LOGW("AnsManagerStub::CancelReminder called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders)
+{
+    ANS_LOGW("AnsManagerStub::getValidReminders called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::CancelAllReminders()
+{
+    ANS_LOGW("AnsManagerStub::cancelAllReminders called!");
     return ERR_INVALID_OPERATION;
 }
 }  // namespace Notification

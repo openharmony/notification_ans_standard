@@ -28,6 +28,7 @@
 #include "notification_slot.h"
 #include "notification_slot_group.h"
 #include "notification_subscribe_info.h"
+#include "reminder_request.h"
 
 namespace OHOS {
 namespace Notification {
@@ -113,6 +114,10 @@ public:
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) = 0;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) = 0;
     virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) = 0;
+    virtual ErrCode PublishReminder(sptr<ReminderRequest> &reminder) = 0;
+    virtual ErrCode CancelReminder(const int32_t reminderId) = 0;
+    virtual ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) = 0;
+    virtual ErrCode CancelAllReminders() = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -172,6 +177,10 @@ protected:
         SHELL_DUMP,
         PUBLISH_CONTINUOUS_TASK_NOTIFICATION,
         CANCEL_CONTINUOUS_TASK_NOTIFICATION,
+        PUBLISH_REMINDER,
+        CANCEL_REMINDER,
+        CANCEL_ALL_REMINDERS,
+        GET_ALL_VALID_REMINDERS
     };
 };
 }  // namespace Notification

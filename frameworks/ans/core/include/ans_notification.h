@@ -639,6 +639,36 @@ public:
      */
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo);
 
+    /**
+     * Publishes a scheduled reminder.
+     *
+     * @param reminder Indicates a reminder.
+     * @return Returns publish result.
+     */
+    ErrCode PublishReminder(ReminderRequest &reminder);
+
+    /**
+     * Cancels a specified reminder.
+     *
+     * @return Returns cancel result.
+     */
+    ErrCode CancelReminder(const int32_t reminderId);
+
+    /**
+     * Cancels all reminders of current third part application.
+     *
+     * @return Returns cancel result.
+     */
+    ErrCode CancelAllReminders();
+
+    /**
+     * Obtains all valid reminder notifications set by the current application.
+     *
+     * @param[out] validReminders Indicates the vector to store the result.
+     * @return Returns get valid reminders result.
+     */
+    ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &validReminders);
+
 private:
     /**
      * Get Ans Manager proxy.
