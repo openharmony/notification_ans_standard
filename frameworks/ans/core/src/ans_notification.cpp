@@ -18,6 +18,8 @@
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
 #include "iservice_registry.h"
+#include "reminder_request_alarm.h"
+#include "reminder_request_timer.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -860,6 +862,58 @@ ErrCode AnsNotification::ShellDump(const std::string &dumpOption, std::vector<st
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
     return ansManagerProxy_->ShellDump(dumpOption, dumpInfo);
+}
+
+ErrCode AnsNotification::PublishReminder(ReminderRequest &reminder)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<ReminderRequest> tarReminder;
+    if (reminder.GetReminderType() == ReminderRequest::ReminderType::ALARM) {
+        ANSR_LOGI("Publish alarm");
+        ReminderRequestAlarm &alarm = (ReminderRequestAlarm &)reminder;
+        tarReminder = new (std::nothrow) ReminderRequestAlarm(alarm);
+    } else if (reminder.GetReminderType() == ReminderRequest::ReminderType::TIMER) {
+        ANSR_LOGI("Publish timer");
+        ReminderRequestTimer &timer = (ReminderRequestTimer &)reminder;
+        tarReminder = new (std::nothrow) ReminderRequestTimer(timer);
+    } else {
+        ANSR_LOGW("PublishReminder fail.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+    ErrCode code = ansManagerProxy_->PublishReminder(tarReminder);
+    reminder.SetReminderId(tarReminder->GetReminderId());
+    return code;
+}
+
+ErrCode AnsNotification::CancelReminder(const int32_t reminderId)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->CancelReminder(reminderId);
+}
+
+ErrCode AnsNotification::CancelAllReminders()
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->CancelAllReminders();
+}
+
+ErrCode AnsNotification::GetValidReminders(std::vector<sptr<ReminderRequest>> &validReminders)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->GetValidReminders(validReminders);
 }
 
 bool AnsNotification::GetAnsManagerProxy()

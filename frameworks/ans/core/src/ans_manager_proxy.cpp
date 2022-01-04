@@ -20,6 +20,8 @@
 #include "message_option.h"
 #include "message_parcel.h"
 #include "parcel.h"
+#include "reminder_request_alarm.h"
+#include "reminder_request_timer.h"
 
 namespace OHOS {
 namespace Notification {
@@ -1939,6 +1941,148 @@ ErrCode AnsManagerProxy::CancelContinuousTaskNotification(const std::string &lab
     }
 
     return result;
+}
+
+ErrCode AnsManagerProxy::PublishReminder(sptr<ReminderRequest> &reminder)
+{
+    ANSR_LOGI("PublishReminder");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANSR_LOGE("[PublishReminder] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    if (reminder == nullptr) {
+        ANSR_LOGW("[PublishReminder] fail: reminder is null ptr.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+    if (!data.WriteUint8(static_cast<uint8_t>(reminder->GetReminderType()))) {
+        ANSR_LOGE("[PublishReminder] fail: write reminder type failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    if (!data.WriteParcelable(reminder)) {
+        ANSR_LOGE("[Publish] fail: write reminder parcelable failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(PUBLISH_REMINDER, option, data, reply);
+    if (result != ERR_OK) {
+        ANSR_LOGE("[PublishReminder] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+    int32_t reminderId = -1;
+    if (!reply.ReadInt32(reminderId)) {
+        ANSR_LOGE("[PublishReminder] fail: derek read reminder id failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    reminder->SetReminderId(reminderId);
+    ANSR_LOGD("ReminderId=%{public}d", reminder->GetReminderId());
+    return result;
+}
+
+ErrCode AnsManagerProxy::CancelReminder(const int32_t reminderId)
+{
+    ANSR_LOGI("[CancelReminder]");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANSR_LOGE("[CancelReminder] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    if (!data.WriteInt32(reminderId)) {
+        ANSR_LOGE("[CancelReminder] fail: write reminder id failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(CANCEL_REMINDER, option, data, reply);
+    if (result != ERR_OK) {
+        ANSR_LOGE("[CancelReminder] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+    return result;
+}
+
+ErrCode AnsManagerProxy::CancelAllReminders()
+{
+    ANSR_LOGI("[CancelAllReminders]");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANSR_LOGE("[CancelAllReminders] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(CANCEL_ALL_REMINDERS, option, data, reply);
+    if (result != ERR_OK) {
+        ANSR_LOGE("[CancelAllReminders] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+    return result;
+}
+
+ErrCode AnsManagerProxy::GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders)
+{
+    ANSR_LOGI("[GetValidReminders]");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANSR_LOGE("[GetValidReminders] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(GET_ALL_VALID_REMINDERS, option, data, reply);
+    if (result != ERR_OK) {
+        ANSR_LOGE("[GetValidReminders] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+    uint8_t count = 0;
+    if (!reply.ReadUint8(count)) {
+        ANSR_LOGE("[GetValidReminders] fail: read reminder count failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    ANSR_LOGD("[GetValidReminders] count=%{public}u", count);
+    reminders.clear();
+    result = ReadReminders(count, reply, reminders);
+    if (result != ERR_OK) {
+        ANSR_LOGE("[GetValidReminders] fail: ReadReminders ErrCode=%{public}d", result);
+    } else {
+        ANSR_LOGD("[GetValidReminders], size=%{public}zu", reminders.size());
+    }
+    return result;
+}
+
+ErrCode AnsManagerProxy::ReadReminders(
+    uint8_t &count, MessageParcel &reply, std::vector<sptr<ReminderRequest>> &reminders)
+{
+    for (int i = 0; i < count; i++) {
+        uint8_t typeInfo = static_cast<uint8_t>(ReminderRequest::ReminderType::INVALID);
+        if (!reply.ReadUint8(typeInfo)) {
+            ANSR_LOGE("Failed to read reminder type");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+        auto reminderType = static_cast<ReminderRequest::ReminderType>(typeInfo);
+        sptr<ReminderRequest> reminder;
+        if (ReminderRequest::ReminderType::ALARM == reminderType) {
+            ANSR_LOGD("[GetValidReminders] alarm");
+            reminder = reply.ReadParcelable<ReminderRequestAlarm>();
+        } else if (ReminderRequest::ReminderType::TIMER == reminderType) {
+            ANSR_LOGD("[GetValidReminders] timer");
+            reminder = reply.ReadParcelable<ReminderRequestTimer>();
+        } else {
+            ANSR_LOGW("[GetValidReminders] type=%{public}d", typeInfo);
+            return ERR_ANS_INVALID_PARAM;
+        }
+        if (!reminder) {
+            ANSR_LOGE("[GetValidReminders] fail: Reminder ReadParcelable failed");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+        reminders.push_back(reminder);
+    }
+    return ERR_OK;
 }
 
 ErrCode AnsManagerProxy::InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply)
