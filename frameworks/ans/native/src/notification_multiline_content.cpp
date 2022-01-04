@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-#include "ans_log_wrapper.h"
 #include "notification_multiline_content.h"
+
+#include <algorithm>
+
+#include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {

@@ -173,6 +173,7 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/aafwk/standard/interfaces/innerkits/base:base",
     "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
