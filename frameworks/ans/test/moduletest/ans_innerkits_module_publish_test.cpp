@@ -28,6 +28,8 @@
 #include "system_ability_definition.h"
 #include "want_agent_info.h"
 #include "want_agent_helper.h"
+#include "want_params.h"
+#include "ohos/aafwk/base/int_wrapper.h"
 
 using namespace testing::ext;
 namespace OHOS {
@@ -52,6 +54,7 @@ const int32_t CASE_TEN = 10;
 const int32_t CASE_ELEVEN = 11;
 const int32_t CASE_TWELVE = 12;
 const int32_t CASE_THIRTEEN = 13;
+const int32_t CASE_FOURTEEN = 14;
 const int32_t CALLING_UID = 9999;
 
 const int32_t PIXEL_MAP_TEST_WIDTH = 32;
@@ -131,6 +134,8 @@ public:
         } else if (CASE_THIRTEEN == notificationRequest.GetNotificationId()) {
             EXPECT_EQ(NotificationRequest::GroupAlertType::ALL, notificationRequest.GetGroupAlertType());
             EXPECT_EQ(true, notificationRequest.IsGroupOverview());
+        } else if (CASE_FOURTEEN == notificationRequest.GetNotificationId()) {
+            CheckCaseFourteenResult(notificationRequest);
         } else {
             GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish::OnConsumed do nothing!!!!!";
         }
@@ -351,6 +356,18 @@ private:
         EXPECT_EQ(0, notificationRequest.GetProgressMax());
         EXPECT_EQ(0, notificationRequest.GetProgressValue());
         EXPECT_EQ(false, notificationRequest.IsProgressIndeterminate());
+    }
+
+    void CheckCaseFourteenResult(const NotificationRequest& notificationRequest) const
+    {
+        std::shared_ptr<NotificationTemplate> notiTemplate = notificationRequest.GetTemplate();
+        if (notiTemplate != nullptr) {
+            EXPECT_EQ("process", notiTemplate->GetTemplateName());
+            std::shared_ptr<AAFwk::WantParams> param = notiTemplate->GetTemplateData();
+            int value = AAFwk::Integer::Unbox(AAFwk::IInteger::Query(param->GetParam("process")));
+            EXPECT_EQ(20, value); // 20 test input
+        }
+        EXPECT_EQ(NotificationConstant::OTHER, notificationRequest.GetSlotType());
     }
 };
 
@@ -1155,6 +1172,50 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_CancelGroup_10100, Func
     sleep(SLEEP_TIME);
     OnCanceledReceived = false;
 
+    g_unsubscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
+    WaitOnUnsubscribeResult();
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_Publish_04000
+ * @tc.name      : Publish_04000
+ * @tc.desc      : Add notification slot(type is OTHER), make a subscriber and publish a template notification.
+ * @tc.expected  : Add notification slot success, make a subscriber and publish a ltemplate notification success.
+ */
+HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_04000, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::OTHER);
+    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
+    auto subscriber = TestAnsSubscriber();
+    NotificationSubscribeInfo info = NotificationSubscribeInfo();
+    info.AddAppName("bundleName");
+    g_subscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
+    WaitOnSubscribeResult();
+
+    std::shared_ptr<NotificationTemplate> notiTemplate = std::make_shared<NotificationTemplate>();
+    EXPECT_NE(notiTemplate, nullptr);
+    notiTemplate->SetTemplateName("process");
+    // [{'process':20}]
+    AAFwk::WantParams wantParams;
+    std::string key("process");
+    int resultValue = 20;
+    wantParams.SetParam(key,  AAFwk::Integer::Box(resultValue));
+    notiTemplate->SetTemplateData(std::make_shared<AAFwk::WantParams>(wantParams));
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_04000::notiTemplate::" << notiTemplate->Dump();
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
+    NotificationRequest req;
+    req.SetContent(content);
+    req.SetTemplate(notiTemplate);
+    req.SetSlotType(NotificationConstant::OTHER);
+    req.SetNotificationId(CASE_FOURTEEN);
+    g_consumed_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+    WaitOnConsumed();
     g_unsubscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
     WaitOnUnsubscribeResult();

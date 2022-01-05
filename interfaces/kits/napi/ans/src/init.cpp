@@ -14,6 +14,7 @@
  */
 
 #include "init.h"
+#include "ans_template.h"
 #include "cancel.h"
 #include "constant.h"
 #include "display_badge.h"
@@ -66,6 +67,7 @@ napi_value NotificationInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setDoNotDisturbDate", SetDoNotDisturbDate),
         DECLARE_NAPI_FUNCTION("getDoNotDisturbDate", GetDoNotDisturbDate),
         DECLARE_NAPI_FUNCTION("supportDoNotDisturbMode", SupportDoNotDisturbMode),
+        DECLARE_NAPI_FUNCTION("isSupportTemplate", IsSupportTemplate),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

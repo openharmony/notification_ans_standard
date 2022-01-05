@@ -331,5 +331,10 @@ ErrCode NotificationHelper::CancelContinuousTaskNotification(const std::string &
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->CancelContinuousTaskNotification(label, notificationId);
 }
+
+ErrCode NotificationHelper::IsSupportTemplate(const std::string &templateName, bool &support)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->IsSupportTemplate(templateName, support);
+}
 }  // namespace Notification
 }  // namespace OHOS

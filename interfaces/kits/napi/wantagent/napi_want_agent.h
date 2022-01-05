@@ -16,22 +16,21 @@
 #ifndef NAPI_WANT_AGENT_H
 #define NAPI_WANT_AGENT_H
 
-#include <mutex>
-#include <memory>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <uv.h>
 
-#include "napi/native_common.h"
-#include "napi/native_node_api.h"
-
-#include "want_agent_constant.h"
+#include "ability.h"
 #include "completed_callback.h"
 #include "context.h"
-#include "want.h"
-#include "want_params.h"
-#include "ability.h"
-#include "want_agent.h"
+#include "napi/native_common.h"
+#include "napi/native_node_api.h"
 #include "trigger_info.h"
+#include "want.h"
+#include "want_agent.h"
+#include "want_agent_constant.h"
+#include "want_params.h"
 
 namespace OHOS {
 using namespace OHOS::AppExecFwk;

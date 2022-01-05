@@ -118,6 +118,7 @@ public:
     virtual ErrCode CancelReminder(const int32_t reminderId) = 0;
     virtual ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) = 0;
     virtual ErrCode CancelAllReminders() = 0;
+    virtual ErrCode IsSupportTemplate(const std::string &templateName, bool &support) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -180,7 +181,8 @@ protected:
         PUBLISH_REMINDER,
         CANCEL_REMINDER,
         CANCEL_ALL_REMINDERS,
-        GET_ALL_VALID_REMINDERS
+        GET_ALL_VALID_REMINDERS,
+        IS_SUPPORT_TEMPLATE
     };
 };
 }  // namespace Notification
