@@ -404,6 +404,15 @@ public:
 
     static napi_value CreateWantAgentByJS(const napi_env &env, const std::shared_ptr<WantAgent::WantAgent> &agent);
 
+    static napi_value GetNotificationTemplate(
+        const napi_env &env, const napi_value &value, NotificationRequest &request);
+
+    static napi_value GetNotificationTemplateInfo(const napi_env &env, const napi_value &value,
+        std::shared_ptr<NotificationTemplate> &templ);
+
+    static napi_value SetNotificationTemplateInfo(
+        const napi_env &env, const std::shared_ptr<NotificationTemplate> &templ, napi_value &result);
+
 private:
     static const int ARGS_ONE = 1;
     static const int ARGS_TWO = 2;

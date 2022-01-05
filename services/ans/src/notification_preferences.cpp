@@ -15,9 +15,12 @@
 
 #include "notification_preferences.h"
 
+#include <fstream>
+
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace Notification {
@@ -772,6 +775,37 @@ void NotificationPreferences::OnDistributedKvStoreDeathRecipient()
         if (preferncesDB_->StoreDeathRecipient()) {
         }
     }
+}
+
+ErrCode NotificationPreferences::GetTemplateSupported(const std::string& templateName, bool &support)
+{
+    if (templateName.length() == 0) {
+        ANS_LOGE("template name is null.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    std::ifstream inFile;
+    inFile.open(DEFAULT_TEMPLATE_PATH.c_str(), std::ios::in);
+    if (!inFile.is_open()) {
+        ANS_LOGE("read template config error.");
+        return ERR_ANS_PREFERENCES_NOTIFICATION_READ_TEMPLATE_CONFIG_FAILED;
+    }
+
+    nlohmann::json jsonObj;
+    inFile >> jsonObj;
+    if (jsonObj.is_discarded()) {
+        ANS_LOGE("template json discarded error.");
+        inFile.close();
+        return ERR_ANS_PREFERENCES_NOTIFICATION_READ_TEMPLATE_CONFIG_FAILED;
+    }
+
+    if (jsonObj.contains(templateName)) {
+        support = true;
+    }
+
+    jsonObj.clear();
+    inFile.close();
+    return ERR_OK;
 }
 }  // namespace Notification
 }  // namespace OHOS

@@ -2088,5 +2088,16 @@ ErrCode AdvancedNotificationService::PrepereContinuousTaskNotificationRequest(
     ErrCode result = CheckPictureSize(request);
     return result;
 }
+
+ErrCode AdvancedNotificationService::IsSupportTemplate(const std::string& templateName, bool &support)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        support = false;
+        result = NotificationPreferences::GetInstance().GetTemplateSupported(templateName, support);
+    }));
+    return result;
+}
 }  // namespace Notification
 }  // namespace OHOS

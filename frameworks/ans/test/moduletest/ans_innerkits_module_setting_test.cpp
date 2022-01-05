@@ -134,5 +134,48 @@ HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_004
     EXPECT_EQ("bundlename", bundleOption.GetBundleName());
     EXPECT_EQ(CALLING_UID, bundleOption.GetUid());
 }
+
+/**
+ * @tc.number    : ANS_Interface_MT_NotificationSetting_00500
+ * @tc.name      : NotificationSetting_00500
+ * @tc.desc      : If the template configuration file does not exist, query whether the template exists.
+ * @tc.expected  : Query return failed.
+ */
+HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_00500, Function | MediumTest | Level1)
+{
+    std::string templateName("process");
+    bool support = false;
+    EXPECT_EQ((int)ERR_ANS_PREFERENCES_NOTIFICATION_READ_TEMPLATE_CONFIG_FAILED,
+        NotificationHelper::IsSupportTemplate(templateName, support));
+    EXPECT_EQ(false, support);
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_NotificationSetting_00600
+ * @tc.name      : NotificationSetting_00600
+ * @tc.desc      : The template exists in the system, query whether the template exists.
+ * @tc.expected  : Query return success.
+ */
+HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_00600, Function | MediumTest | Level1)
+{
+    std::string templateName("process");
+    bool support = false;
+    EXPECT_EQ(0, NotificationHelper::IsSupportTemplate(templateName, support));
+    EXPECT_EQ(true, support);
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_NotificationSetting_00700
+ * @tc.name      : NotificationSetting_00700
+ * @tc.desc      : The template does not exist in the system, query whether the template exists.
+ * @tc.expected  : Query return failed.
+ */
+HWTEST_F(AnsInterfaceModuleSettingTest, ANS_Interface_MT_NotificationSetting_00700, Function | MediumTest | Level1)
+{
+    std::string templateName("template123");
+    bool support = false;
+    EXPECT_EQ(0, NotificationHelper::IsSupportTemplate(templateName, support));
+    EXPECT_EQ(false, support);
+}
 }  // namespace Notification
 }  // namespace OHOS

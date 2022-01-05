@@ -67,6 +67,7 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/ans/native/src/notification_sorting_map.cpp",
     "${frameworks_path}/ans/native/src/notification_subscribe_info.cpp",
     "${frameworks_path}/ans/native/src/notification_subscriber.cpp",
+    "${frameworks_path}/ans/native/src/notification_template.cpp",
     "${frameworks_path}/ans/native/src/notification_user_input.cpp",
     "${frameworks_path}/ans/native/src/reminder_helper.cpp",
     "${frameworks_path}/ans/native/src/reminder_request.cpp",

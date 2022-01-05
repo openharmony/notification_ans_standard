@@ -46,6 +46,7 @@ ohos_shared_library("notification") {
   configs = [ ":native_module_config" ]
 
   sources = [
+    "src/ans_template.cpp",
     "src/cancel.cpp",
     "src/common.cpp",
     "src/constant.cpp",
