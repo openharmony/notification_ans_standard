@@ -369,10 +369,10 @@ group("moduletest") {
   deps = []
 
   deps += [
+    ":ReminderAgentTest",
     ":ans_fw_module_test",
     ":ans_innerkits_module_publish_test",
     ":ans_innerkits_module_setting_test",
     ":ans_innerkits_module_slot_test",
-    ":ReminderAgentTest",
   ]
 }
