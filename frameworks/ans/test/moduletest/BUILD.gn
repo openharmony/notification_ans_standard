@@ -358,11 +358,19 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
   part_name = "ans_standard"
 }
 
+ohos_js_unittest("ReminderAgentTest") {
+  module_out_path = module_output_path
+
+  hap_profile = "./config.json"
+  certificate_profile = "//test/developertest/signature/openharmony_sx.p7b"
+}
+
 group("moduletest") {
   testonly = true
   deps = []
 
   deps += [
+    ":ReminderAgentTest",
     ":ans_fw_module_test",
     ":ans_innerkits_module_publish_test",
     ":ans_innerkits_module_setting_test",
