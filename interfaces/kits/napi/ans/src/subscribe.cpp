@@ -1050,6 +1050,7 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
                 ANS_LOGI("Subscribe with NotificationSubscribeInfo");
                 OHOS::Notification::NotificationSubscribeInfo subscribeInfo;
                 subscribeInfo.AddAppNames(asynccallbackinfo->subscriberInfo.bundleNames);
+                subscribeInfo.AddAppUserId(asynccallbackinfo->subscriberInfo.userId);
                 asynccallbackinfo->info.errorCode =
                     NotificationHelper::SubscribeNotification(*(asynccallbackinfo->objectInfo), subscribeInfo);
             } else {

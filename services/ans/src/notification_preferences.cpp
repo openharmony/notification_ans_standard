@@ -21,6 +21,7 @@
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
 #include "nlohmann/json.hpp"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace Notification {
@@ -54,7 +55,8 @@ ErrCode NotificationPreferences::AddNotificationSlots(
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutSlotsToDisturbeDB(GenerateBundleKey(bundleOption), slots))) {
+    if (result == ERR_OK &&
+        (!preferncesDB_->PutSlotsToDisturbeDB(bundleOption->GetBundleName(), bundleOption->GetUid(), slots))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -81,7 +83,8 @@ ErrCode NotificationPreferences::AddNotificationSlotGroups(
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutGroupsToDisturbeDB(GenerateBundleKey(bundleOption), groups))) {
+    if (result == ERR_OK &&
+        (!preferncesDB_->PutGroupsToDisturbeDB(bundleOption->GetBundleName(), bundleOption->GetUid(), groups))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -223,7 +226,8 @@ ErrCode NotificationPreferences::UpdateNotificationSlots(
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutSlotsToDisturbeDB(GenerateBundleKey(bundleOption), slots))) {
+    if (result == ERR_OK &&
+        (!preferncesDB_->PutSlotsToDisturbeDB(bundleOption->GetBundleName(), bundleOption->GetUid(), slots))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -251,7 +255,8 @@ ErrCode NotificationPreferences::UpdateNotificationSlotGroups(
         }
     }
 
-    if (result == ERR_OK && (!preferncesDB_->PutGroupsToDisturbeDB(GenerateBundleKey(bundleOption), groups))) {
+    if (result == ERR_OK &&
+        (!preferncesDB_->PutGroupsToDisturbeDB(bundleOption->GetBundleName(), bundleOption->GetUid(), groups))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -489,18 +494,51 @@ ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(
     return result;
 }
 
-ErrCode NotificationPreferences::GetNotificationsEnabled(bool &enabled)
+bool NotificationPreferences::GetActiveUserId(int& userId)
 {
-    enabled = preferencesInfo_.GetEnabledAllNotification();
-    return ERR_OK;
+    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
+    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+
+    for (auto iter : osAccountInfos) {
+        if (iter.GetIsActived()) {
+            userId = iter.GetLocalId();
+            return true;
+        }
+    }
+    return false;
 }
 
-ErrCode NotificationPreferences::SetNotificationsEnabled(const bool &enabled)
+ErrCode NotificationPreferences::GetNotificationsEnabled(
+    const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
 {
-    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    preferencesInfo.SetEnabledAllNotification(enabled);
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    int userId = SUBSCRIBE_USER_INIT;
+    (void)GetActiveUserId(userId);
+
     ErrCode result = ERR_OK;
-    if (!preferncesDB_->PutNotificationsEnabled(enabled)) {
+    if (!preferencesInfo_.GetEnabledAllNotification(userId, enabled)) {
+        result = ERR_ANS_INVALID_PARAM;
+    }
+    return result;
+}
+
+ErrCode NotificationPreferences::SetNotificationsEnabled(
+    const sptr<NotificationBundleOption> &bundleOption, const bool &enabled)
+{
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    int userId = SUBSCRIBE_USER_INIT;
+    (void)GetActiveUserId(userId);
+
+    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
+    preferencesInfo.SetEnabledAllNotification(userId, enabled);
+    ErrCode result = ERR_OK;
+    if (!preferncesDB_->PutNotificationsEnabled(userId, enabled)) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -510,18 +548,39 @@ ErrCode NotificationPreferences::SetNotificationsEnabled(const bool &enabled)
     return result;
 }
 
-ErrCode NotificationPreferences::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date)
+ErrCode NotificationPreferences::GetDoNotDisturbDate(
+    const sptr<NotificationBundleOption> &bundleOption, sptr<NotificationDoNotDisturbDate> &date)
 {
-    date = preferencesInfo_.GetDoNotDisturbDate();
-    return ERR_OK;
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    int userId = SUBSCRIBE_USER_INIT;
+    (void)GetActiveUserId(userId);
+    
+    ErrCode result = ERR_OK;
+    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
+    if (!preferencesInfo.GetDoNotDisturbDate(userId, date)) {
+        result = ERR_ANS_INVALID_PARAM;
+    }
+    return result;
 }
 
-ErrCode NotificationPreferences::SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> date)
+ErrCode NotificationPreferences::SetDoNotDisturbDate(
+    const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationDoNotDisturbDate> date)
 {
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    int userId = SUBSCRIBE_USER_INIT;
+    (void)GetActiveUserId(userId);
+
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
-    preferencesInfo.SetDoNotDisturbDate(date);
+    preferencesInfo.SetDoNotDisturbDate(userId, date);
+    
     ErrCode result = ERR_OK;
-    if (!preferncesDB_->PutDoNotDisturbDate(date)) {
+    if (!preferncesDB_->PutDoNotDisturbDate(userId, date)) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -706,23 +765,23 @@ ErrCode NotificationPreferences::SaveBundleProperty(NotificationPreferencesInfo:
     switch (type) {
         case BundleType::BUNDLE_IMPORTANCE_TYPE:
             bundleInfo.SetImportance(value);
-            storeDBResult = preferncesDB_->PutImportance(bundleOption->GetBundleName(), value);
+            storeDBResult = preferncesDB_->PutImportance(bundleInfo, value);
             break;
         case BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE:
             bundleInfo.SetBadgeTotalNum(value);
-            storeDBResult = preferncesDB_->PutTotalBadgeNums(bundleOption->GetBundleName(), value);
+            storeDBResult = preferncesDB_->PutTotalBadgeNums(bundleInfo, value);
             break;
         case BundleType::BUNDLE_SHOW_BADGE_TYPE:
             bundleInfo.SetIsShowBadge(value);
-            storeDBResult = preferncesDB_->PutShowBadge(bundleOption->GetBundleName(), value);
+            storeDBResult = preferncesDB_->PutShowBadge(bundleInfo, value);
             break;
         case BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE:
             bundleInfo.SetIsPrivateAllowed(value);
-            storeDBResult = preferncesDB_->PutPrivateNotificationsAllowed(bundleOption->GetBundleName(), value);
+            storeDBResult = preferncesDB_->PutPrivateNotificationsAllowed(bundleInfo, value);
             break;
         case BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE:
             bundleInfo.SetEnableNotification(value);
-            storeDBResult = preferncesDB_->PutNotificationsEnabledForBundle(bundleOption->GetBundleName(), value);
+            storeDBResult = preferncesDB_->PutNotificationsEnabledForBundle(bundleInfo, value);
             break;
         default:
             break;
