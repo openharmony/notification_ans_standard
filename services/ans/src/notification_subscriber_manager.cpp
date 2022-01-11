@@ -19,8 +19,11 @@
 #include <memory>
 #include <set>
 
+#include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "ipc_skeleton.h"
+#include "os_account_manager.h"
 #include "remote_death_recipient.h"
 
 namespace OHOS {
@@ -29,6 +32,7 @@ struct NotificationSubscriberManager::SubscriberRecord {
     sptr<IAnsSubscriber> subscriber {nullptr};
     std::set<std::string> bundleList_ {};
     bool subscribedAll {false};
+    int32_t userId {SUBSCRIBE_USER_INIT};
 };
 
 NotificationSubscriberManager::NotificationSubscriberManager()
@@ -52,9 +56,23 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
         return ERR_ANS_INVALID_PARAM;
     }
 
+    sptr<NotificationSubscribeInfo> subInfo = subscribeInfo;
+    if (subInfo == nullptr) {
+        subInfo = new (std::nothrow) NotificationSubscribeInfo();
+        if (subInfo == nullptr) {
+            ANS_LOGE("Failed to create NotificationSubscribeInfo ptr.");
+            return ERR_ANS_NO_MEMORY;
+        }
+
+        int userId = SUBSCRIBE_USER_INIT;
+        int uid = IPCSkeleton::GetCallingUid();
+        OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+        subInfo->AddAppUserId(userId);
+    }
+
     ErrCode result = ERR_ANS_TASK_ERR;
-    handler_->PostSyncTask(std::bind([this, &subscriber, &subscribeInfo, &result]() {
-        result = this->AddSubscriberInner(subscriber, subscribeInfo);
+    handler_->PostSyncTask(std::bind([this, &subscriber, &subInfo, &result]() {
+        result = this->AddSubscriberInner(subscriber, subInfo);
     }),
         AppExecFwk::EventQueue::Priority::HIGH);
     return result;
@@ -188,6 +206,7 @@ void NotificationSubscriberManager::AddRecordInfo(
         for (auto bundle : subscribeInfo->GetAppNames()) {
             record->bundleList_.insert(bundle);
         }
+        record->userId = subscribeInfo->GetAppUserId();
     } else {
         record->bundleList_.clear();
         record->subscribedAll = true;
@@ -266,7 +285,8 @@ void NotificationSubscriberManager::NotifyConsumedInner(
         auto BundleNames = notification->GetBundleName();
 
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
-        if (!record->subscribedAll == (iter != record->bundleList_.end())) {
+        if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
+            (notification->GetUserId() == record->userId || notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
             record->subscriber->OnConsumed(notification, notificationMap);
             record->subscriber->OnConsumed(notification);
         }
@@ -280,7 +300,8 @@ void NotificationSubscriberManager::NotifyCanceledInner(
         auto BundleNames = notification->GetBundleName();
 
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
-        if (!record->subscribedAll == (iter != record->bundleList_.end())) {
+        if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
+            (notification->GetUserId() == record->userId || notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
             record->subscriber->OnCanceled(notification, notificationMap, deleteReason);
             record->subscriber->OnCanceled(notification);
         }

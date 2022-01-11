@@ -32,6 +32,7 @@ const static std::string KEY_BUNDLE_SHOW_BADGE = "showBadge";
 const static std::string KEY_BUNDLE_BADGE_TOTAL_NUM = "badgeTotalNum";
 const static std::string KEY_BUNDLE_PRIVATE_ALLOWED = "privateAllowed";
 const static std::string KEY_BUNDLE_ENABLE_NOTIFICATION = "enabledNotification";
+const static std::string KEY_BUNDLE_UID = "uid";
 
 const static std::string KEY_GROUP = "group";
 const static std::string KEY_GROUP_ID = "id";
