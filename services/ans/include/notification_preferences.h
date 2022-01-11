@@ -64,10 +64,12 @@ public:
     ErrCode SetPrivateNotificationsAllowed(const sptr<NotificationBundleOption> &bundleOption, const bool allow);
     ErrCode GetNotificationsEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled);
     ErrCode SetNotificationsEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, const bool enabled);
-    ErrCode GetNotificationsEnabled(bool &enabled);
-    ErrCode SetNotificationsEnabled(const bool &enabled);
-    ErrCode GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date);
-    ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> date);
+    ErrCode GetNotificationsEnabled(const sptr<NotificationBundleOption> &bundleOption, bool &enabled);
+    ErrCode SetNotificationsEnabled(const sptr<NotificationBundleOption> &bundleOption, const bool &enabled);
+    ErrCode GetDoNotDisturbDate(const sptr<NotificationBundleOption> &bundleOption,
+        sptr<NotificationDoNotDisturbDate> &date);
+    ErrCode SetDoNotDisturbDate(const sptr<NotificationBundleOption> &bundleOption,
+        const sptr<NotificationDoNotDisturbDate> date);
     ErrCode GetTemplateSupported(const std::string& templateName, bool &support);
 
     ErrCode ClearNotificationInRestoreFactorySettings();
@@ -87,16 +89,17 @@ private:
         const sptr<NotificationSlot> &slot, NotificationPreferencesInfo &preferencesInfo) const;
     ErrCode CheckGroupForUpdateSlotGroup(const sptr<NotificationBundleOption> &bundleOption,
         const sptr<NotificationSlotGroup> &group, NotificationPreferencesInfo &preferencesInfo) const;
-    template<typename T>
+    template <typename T>
     ErrCode SetBundleProperty(NotificationPreferencesInfo &preferencesInfo,
         const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, const T &value);
-    template<typename T>
+    template <typename T>
     ErrCode SaveBundleProperty(NotificationPreferencesInfo::BundleInfo &bundleInfo,
         const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, const T &value);
-    template<typename T>
+    template <typename T>
     ErrCode GetBundleProperty(
         const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, T &value) const;
     std::string GenerateBundleKey(const sptr<NotificationBundleOption> &bundleOption) const;
+    bool GetActiveUserId(int& userId);
 
 private:
     NotificationPreferencesInfo preferencesInfo_ {};

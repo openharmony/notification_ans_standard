@@ -159,6 +159,7 @@ private:
     void AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate);
     bool CheckPermission(const std::string &bundleName);
     ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
+    bool GetActiveUserId(int& userId);
 
 private:
     static sptr<AdvancedNotificationService> instance_;
