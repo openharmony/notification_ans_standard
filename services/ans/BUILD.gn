@@ -25,6 +25,10 @@ config("public_ans_config") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
+    "//base/account/os_account/frameworks/common/database/include/",
+    "//base/account/os_account/frameworks/common/account_error/include",
+    "//base/account/os_account/frameworks/common/log/include",
   ]
   defines = [
     "APP_LOG_TAG = \"Ans\"",
@@ -60,6 +64,7 @@ ohos_shared_library("libans") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
+    "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
     "//base/miscservices/time/services:time_service",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",

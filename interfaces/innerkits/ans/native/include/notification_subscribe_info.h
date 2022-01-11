@@ -65,6 +65,20 @@ public:
     std::vector<std::string> GetAppNames() const;
 
     /**
+     * @brief application current userid.
+     *
+     * @param appNames Indicates the userid of application.
+     **/
+    void AddAppUserId(const int32_t userId);
+
+    /**
+     * @brief Obtains the userid of application.
+     *
+     * @return Returns the userid of application.
+     **/
+    int32_t GetAppUserId() const;
+
+    /**
      * @brief Marshals a NotificationSubscribeInfo object into a Parcel.
      *
      * @param parcel Indicates the Parcel object for marshalling.
@@ -90,6 +104,7 @@ private:
 
 private:
     std::vector<std::string> appNames_ {};
+    int32_t userId_ {-1};
 };
 }  // namespace Notification
 }  // namespace OHOS

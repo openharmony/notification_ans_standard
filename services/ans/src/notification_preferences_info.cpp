@@ -227,26 +227,6 @@ int NotificationPreferencesInfo::BundleInfo::GetBundleUid() const
     return uid_;
 }
 
-void NotificationPreferencesInfo::SetEnabledAllNotification(const bool &value)
-{
-    isEnabledAllNotification_ = value;
-}
-
-bool NotificationPreferencesInfo::GetEnabledAllNotification() const
-{
-    return isEnabledAllNotification_;
-}
-
-void NotificationPreferencesInfo::SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date)
-{
-    doNotDisturbDate_ = date;
-}
-
-sptr<NotificationDoNotDisturbDate> NotificationPreferencesInfo::GetDoNotDisturbDate() const
-{
-    return doNotDisturbDate_;
-}
-
 void NotificationPreferencesInfo::SetBundleInfo(const BundleInfo &info)
 {
     std::string bundleKey = info.GetBundleName().append(std::to_string(info.GetBundleUid()));
@@ -289,6 +269,38 @@ bool NotificationPreferencesInfo::IsExsitBundleInfo(const sptr<NotificationBundl
 void NotificationPreferencesInfo::ClearBundleInfo()
 {
     infos_.clear();
+}
+
+void NotificationPreferencesInfo::SetDoNotDisturbDate(const int32_t &userId,
+    const sptr<NotificationDoNotDisturbDate> &doNotDisturbDate)
+{
+    doNotDisturbDate_.insert_or_assign(userId, doNotDisturbDate);
+}
+
+bool NotificationPreferencesInfo::GetDoNotDisturbDate(const int32_t &userId,
+    sptr<NotificationDoNotDisturbDate> &doNotDisturbDate) const
+{
+    auto iter = doNotDisturbDate_.find(userId);
+    if (iter != doNotDisturbDate_.end()) {
+        doNotDisturbDate = iter->second;
+        return true;
+    }
+    return false;
+}
+
+void NotificationPreferencesInfo::SetEnabledAllNotification(const int32_t &userId, const bool &enable)
+{
+    isEnabledAllNotification_.insert_or_assign(userId, enable);
+}
+
+bool NotificationPreferencesInfo::GetEnabledAllNotification(const int32_t &userId, bool &enable) const
+{
+    auto iter = isEnabledAllNotification_.find(userId);
+    if (iter != isEnabledAllNotification_.end()) {
+        enable = iter->second;
+        return true;
+    }
+    return false;
 }
 }  // namespace Notification
 }  // namespace OHOS

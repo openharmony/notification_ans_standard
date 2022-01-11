@@ -182,6 +182,14 @@ NotificationConstant::SourceType Notification::GetSourceType() const
     return sourceType_;
 }
 
+int32_t Notification::GetUserId() const
+{
+    if (request_ == nullptr) {
+        return 0;
+    }
+    return request_->GetCreatorUserId();
+}
+
 bool Notification::MarshallingBool(Parcel &parcel) const
 {
     if (!parcel.WriteBool(enableLight_)) {

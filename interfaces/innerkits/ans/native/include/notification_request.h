@@ -844,6 +844,18 @@ public:
     std::string GetLabel() const;
 
     /**
+     * Sets the UserId of the notification creator.
+     * @param userId the UserId of the notification creator.
+     */
+    void SetCreatorUserId(int32_t userId);
+
+    /**
+     * Obtains the UserId of the notification creator.
+     * @return the UserId of the notification creator.
+     */
+    int32_t GetCreatorUserId() const;
+
+    /**
      * Returns a string representation of the object.
      * @return a string representation of the object.
      */
@@ -914,6 +926,7 @@ private:
 
     pid_t creatorPid_ {0};
     pid_t creatorUid_ {0};
+    int32_t creatorUserId_ {-1};
 
     std::string settingsText_ {};
     std::string creatorBundleName_ {};
