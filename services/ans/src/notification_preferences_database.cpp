@@ -14,7 +14,9 @@
  */
 #include "notification_preferences_database.h"
 
+#include "ans_const_define.h"
 #include "ans_log_wrapper.h"
+#include "os_account_manager.h"
 
 #include "uri.h"
 namespace OHOS {
@@ -112,6 +114,11 @@ const std::map<std::string,
             std::bind(&NotificationPreferencesDatabase::ParseBundleEnableNotification, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3),
         },
+        {
+            KEY_BUNDLE_UID,
+            std::bind(&NotificationPreferencesDatabase::ParseBundleUid, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3),
+        },
 };
 
 NotificationPreferencesDatabase::NotificationPreferencesDatabase()
@@ -165,10 +172,10 @@ bool NotificationPreferencesDatabase::CheckKvStore()
 }
 
 bool NotificationPreferencesDatabase::PutSlotsToDisturbeDB(
-    const std::string &bundleKey, const std::vector<sptr<NotificationSlot>> &slots)
+    const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (bundleKey.empty()) {
+    if (bundleName.empty()) {
         ANS_LOGE("Bundle name is null.");
         return false;
     }
@@ -181,7 +188,7 @@ bool NotificationPreferencesDatabase::PutSlotsToDisturbeDB(
     bool result = true;
     std::vector<OHOS::DistributedKv::Entry> entries;
     for (auto iter : slots) {
-        result = SlotToEntry(bundleKey, iter, entries);
+        result = SlotToEntry(bundleName, bundleUid, iter, entries);
         if (!result) {
             return result;
         }
@@ -196,9 +203,9 @@ bool NotificationPreferencesDatabase::PutSlotsToDisturbeDB(
 }
 
 bool NotificationPreferencesDatabase::PutGroupsToDisturbeDB(
-    const std::string &bundleKey, const std::vector<sptr<NotificationSlotGroup>> &groups)
+    const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
-    if (bundleKey.empty()) {
+    if (bundleName.empty()) {
         ANS_LOGE("Bundle name is null.");
         return false;
     }
@@ -211,7 +218,7 @@ bool NotificationPreferencesDatabase::PutGroupsToDisturbeDB(
     bool result = true;
     std::vector<OHOS::DistributedKv::Entry> entries;
     for (auto iter : groups) {
-        result = GroupToEntry(bundleKey, iter, entries);
+        result = GroupToEntry(bundleName, bundleUid, iter, entries);
         if (!result) {
             return result;
         }
@@ -238,12 +245,12 @@ bool NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
         return false;
     }
 
-    std::string bundleKeyStr = KEY_BUNDLE_LABEL + bundleInfo.GetBundleName();
+    std::string bundleKeyStr = KEY_BUNDLE_LABEL + GenerateBundleLablel(bundleInfo);
     bool result = false;
     GetValueFromDisturbeDB(bundleKeyStr, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
         switch (status) {
             case OHOS::DistributedKv::Status::KEY_NOT_FOUND: {
-                result = PutBundleToDisturbeDB(bundleInfo.GetBundleName(), bundleInfo);
+                result = PutBundleToDisturbeDB(bundleKeyStr, bundleInfo);
                 break;
             }
             case OHOS::DistributedKv::Status::SUCCESS: {
@@ -257,62 +264,71 @@ bool NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
     return result;
 }
 
-bool NotificationPreferencesDatabase::PutShowBadge(const std::string &bundleKey, const bool &enable)
+bool NotificationPreferencesDatabase::PutShowBadge(
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &enable)
 {
-    if (bundleKey.empty()) {
+    if (bundleInfo.GetBundleName().empty()) {
         ANS_LOGE("Bundle name is null.");
         return false;
     }
 
-    if (!CheckBundle(bundleKey)) {
+    if (!CheckBundle(bundleInfo.GetBundleName(), bundleInfo.GetBundleUid())) {
         return false;
     }
+
+    std::string bundleKey = GenerateBundleLablel(bundleInfo);
     OHOS::DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_SHOW_BADGE_TYPE, enable);
     return (status == OHOS::DistributedKv::Status::SUCCESS);
 }
 
-bool NotificationPreferencesDatabase::PutImportance(const std::string &bundleKey, const int &importance)
+bool NotificationPreferencesDatabase::PutImportance(
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &importance)
 {
-    if (bundleKey.empty()) {
+    if (bundleInfo.GetBundleName().empty()) {
         ANS_LOGE("Bundle name is null.");
         return false;
     }
 
-    if (!CheckBundle(bundleKey)) {
+    if (!CheckBundle(bundleInfo.GetBundleName(), bundleInfo.GetBundleUid())) {
         return false;
     }
+
+    std::string bundleKey = GenerateBundleLablel(bundleInfo);
     OHOS::DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_IMPORTANCE_TYPE, importance);
     return (status == OHOS::DistributedKv::Status::SUCCESS);
 }
 
-bool NotificationPreferencesDatabase::PutTotalBadgeNums(const std::string &bundleKey, const int &totalBadgeNum)
+bool NotificationPreferencesDatabase::PutTotalBadgeNums(
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &totalBadgeNum)
 {
-    if (bundleKey.empty()) {
+    if (bundleInfo.GetBundleName().empty()) {
         ANS_LOGE("Bundle name is null.");
         return false;
     }
 
-    if (!CheckBundle(bundleKey)) {
+    if (!CheckBundle(bundleInfo.GetBundleName(), bundleInfo.GetBundleUid())) {
         return false;
     }
-
+    std::string bundleKey = GenerateBundleLablel(bundleInfo);
     OHOS::DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, totalBadgeNum);
     return (status == OHOS::DistributedKv::Status::SUCCESS);
 }
 
-bool NotificationPreferencesDatabase::PutPrivateNotificationsAllowed(const std::string &bundleKey, const bool &allow)
+bool NotificationPreferencesDatabase::PutPrivateNotificationsAllowed(
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &allow)
 {
-    if (bundleKey.empty()) {
+    if (bundleInfo.GetBundleName().empty()) {
         ANS_LOGE("Bundle name is null.");
         return false;
     }
 
-    if (!CheckBundle(bundleKey)) {
+    if (!CheckBundle(bundleInfo.GetBundleName(), bundleInfo.GetBundleUid())) {
         return false;
     }
+    std::string bundleKey = GenerateBundleLablel(bundleInfo);
     OHOS::DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE, allow);
 
@@ -320,30 +336,33 @@ bool NotificationPreferencesDatabase::PutPrivateNotificationsAllowed(const std::
 }
 
 bool NotificationPreferencesDatabase::PutNotificationsEnabledForBundle(
-    const std::string &bundleKey, const bool &enabled)
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &enabled)
 {
-    if (bundleKey.empty()) {
+    if (bundleInfo.GetBundleName().empty()) {
         ANS_LOGE("Bundle name is null.");
         return false;
     }
 
-    if (!CheckBundle(bundleKey)) {
+    if (!CheckBundle(bundleInfo.GetBundleName(), bundleInfo.GetBundleUid())) {
         return false;
     }
 
+    std::string bundleKey = GenerateBundleLablel(bundleInfo);
     OHOS::DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
     return (status == OHOS::DistributedKv::Status::SUCCESS);
 }
 
-bool NotificationPreferencesDatabase::PutNotificationsEnabled(const bool &enabled)
+bool NotificationPreferencesDatabase::PutNotificationsEnabled(const int32_t &userId, const bool &enabled)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
 
-    OHOS::DistributedKv::Key enableKey(KEY_ENABLE_ALL_NOTIFICATION);
+    std::string typeKey =
+        std::string().append(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    OHOS::DistributedKv::Key enableKey(typeKey);
     OHOS::DistributedKv::Value enableValue(std::to_string(enabled));
     OHOS::DistributedKv::Status status;
     status = kvStorePtr_->Put(enableKey, enableValue);
@@ -354,7 +373,8 @@ bool NotificationPreferencesDatabase::PutNotificationsEnabled(const bool &enable
     return true;
 }
 
-bool NotificationPreferencesDatabase::PutDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date)
+bool NotificationPreferencesDatabase::PutDoNotDisturbDate(
+    const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date)
 {
     if (date == nullptr) {
         ANS_LOGE("Invalid date.");
@@ -367,15 +387,21 @@ bool NotificationPreferencesDatabase::PutDoNotDisturbDate(const sptr<Notificatio
     }
 
     OHOS::DistributedKv::Entry type;
-    type.key = OHOS::DistributedKv::Key(KEY_DO_NOT_DISTURB_TYPE);
+    std::string typeKey =
+        std::string().append(KEY_DO_NOT_DISTURB_TYPE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    type.key = OHOS::DistributedKv::Key(typeKey);
     type.value = OHOS::DistributedKv::Value(std::to_string((int)date->GetDoNotDisturbType()));
 
     OHOS::DistributedKv::Entry beginDate;
-    beginDate.key = OHOS::DistributedKv::Key(KEY_DO_NOT_DISTURB_BEGIN_DATE);
+    std::string beginDateKey =
+        std::string().append(KEY_DO_NOT_DISTURB_BEGIN_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    beginDate.key = OHOS::DistributedKv::Key(beginDateKey);
     beginDate.value = OHOS::DistributedKv::Value(std::to_string(date->GetBeginDate()));
 
     OHOS::DistributedKv::Entry endDate;
-    endDate.key = OHOS::DistributedKv::Key(KEY_DO_NOT_DISTURB_END_DATE);
+    std::string endDateKey =
+        std::string().append(KEY_DO_NOT_DISTURB_END_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    endDate.key = OHOS::DistributedKv::Key(endDateKey);
     endDate.value = OHOS::DistributedKv::Value(std::to_string(date->GetEndDate()));
 
     std::vector<OHOS::DistributedKv::Entry> entries = {
@@ -432,16 +458,18 @@ void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
     funcion(status, value);
 }
 
-bool NotificationPreferencesDatabase::CheckBundle(const std::string &bundleKey)
+bool NotificationPreferencesDatabase::CheckBundle(const std::string &bundleName, const int &bundleUid)
 {
-    std::string bundleKeyStr = KEY_BUNDLE_LABEL + bundleKey;
+    std::string bundleKeyStr = KEY_BUNDLE_LABEL + bundleName + std::to_string(bundleUid);
+    ANS_LOGD("CheckBundle bundleKeyStr %{public}s", bundleKeyStr.c_str());
     bool result = true;
     GetValueFromDisturbeDB(bundleKeyStr, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
         switch (status) {
             case OHOS::DistributedKv::Status::KEY_NOT_FOUND: {
                 NotificationPreferencesInfo::BundleInfo bundleInfo;
-                bundleInfo.SetBundleName(bundleKey);
-                result = PutBundleToDisturbeDB(bundleKey, bundleInfo);
+                bundleInfo.SetBundleName(bundleName);
+                bundleInfo.SetBundleUid(bundleUid);
+                result = PutBundleToDisturbeDB(bundleKeyStr, bundleInfo);
                 break;
             }
             case OHOS::DistributedKv::Status::SUCCESS: {
@@ -460,8 +488,8 @@ bool NotificationPreferencesDatabase::PutBundlePropertyValueToDisturbeDB(
     const NotificationPreferencesInfo::BundleInfo &bundleInfo)
 {
     std::vector<OHOS::DistributedKv::Entry> entries;
-    std::string bundleKey = bundleInfo.GetBundleName();
-    GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_NAME), bundleKey, entries);
+    std::string bundleKey = bundleInfo.GetBundleName().append(std::to_string(bundleInfo.GetBundleUid()));
+    GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_NAME), bundleInfo.GetBundleName(), entries);
     GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_BADGE_TOTAL_NUM),
         std::to_string(bundleInfo.GetBadgeTotalNum()),
         entries);
@@ -475,6 +503,7 @@ bool NotificationPreferencesDatabase::PutBundlePropertyValueToDisturbeDB(
     GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_ENABLE_NOTIFICATION),
         std::to_string(bundleInfo.GetEnableNotification()),
         entries);
+    GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_UID), std::to_string(bundleInfo.GetBundleUid()), entries);
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
         return false;
@@ -727,8 +756,8 @@ bool NotificationPreferencesDatabase::PutBundleToDisturbeDB(
     }
 
     ANS_LOGD("Key not fund, so create a bundle, bundle key is %{public}s.", bundleKey.c_str());
-    OHOS::DistributedKv::Key bundleDBKey(KEY_BUNDLE_LABEL + bundleKey);
-    OHOS::DistributedKv::Value bundleValue(bundleKey);
+    OHOS::DistributedKv::Key bundleDBKey(bundleKey);
+    OHOS::DistributedKv::Value bundleValue(GenerateBundleLablel(bundleInfo));
     if (kvStorePtr_->Put(bundleDBKey, bundleValue) != OHOS::DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Store bundle name to db is failed.");
         return false;
@@ -752,18 +781,19 @@ void NotificationPreferencesDatabase::GenerateEntry(
     entries.push_back(entry);
 }
 
-bool NotificationPreferencesDatabase::SlotToEntry(
-    const std::string &bundleKey, const sptr<NotificationSlot> &slot, std::vector<OHOS::DistributedKv::Entry> &entries)
+bool NotificationPreferencesDatabase::SlotToEntry(const std::string &bundleName, const int &bundleUid,
+    const sptr<NotificationSlot> &slot, std::vector<OHOS::DistributedKv::Entry> &entries)
 {
     if (slot == nullptr) {
         ANS_LOGE("Notification group is nullptr.");
         return false;
     }
 
-    if (!CheckBundle(bundleKey)) {
+    if (!CheckBundle(bundleName, bundleUid)) {
         return false;
     }
 
+    std::string bundleKey = bundleName + std::to_string(bundleUid);
     GenerateSlotEntry(bundleKey, slot, entries);
     return true;
 }
@@ -799,7 +829,7 @@ void NotificationPreferencesDatabase::GenerateSlotEntry(const std::string &bundl
         entries);
 }
 
-bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleKey,
+bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleName, const int &bundleUid,
     const sptr<NotificationSlotGroup> &group, std::vector<OHOS::DistributedKv::Entry> &entries)
 {
 
@@ -808,10 +838,11 @@ bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleKey,
         return false;
     }
 
-    if (!CheckBundle(bundleKey)) {
+    if (!CheckBundle(bundleName, bundleUid)) {
         return false;
     }
 
+    std::string bundleKey = bundleName + std::to_string(bundleUid);
     GenerateGroupEntry(bundleKey, group, entries);
     return true;
 }
@@ -1087,69 +1118,46 @@ std::string NotificationPreferencesDatabase::SubUniqueIdentifyFromString(
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbType(NotificationPreferencesInfo &info)
 {
-    GetValueFromDisturbeDB(
-        KEY_DO_NOT_DISTURB_TYPE, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
-                PutDoNotDisturbDate(info.GetDoNotDisturbDate());
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
-                if (!value.ToString().empty()) {
-                    auto date = info.GetDoNotDisturbDate();
-                    date->SetDoNotDisturbType((NotificationConstant::DoNotDisturbType)StringToInt(value.ToString()));
-                }
-            } else {
-                ANS_LOGW("Parse disturbe mode failed, use defalut value.");
-            }
-        });
+    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
+    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+
+    for (auto iter : osAccountInfos) {
+        int userId = iter.GetLocalId();
+        NotificationPreferencesDatabase::GetDoNotDisturbType(info, userId);
+    }
 }
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbBeginDate(NotificationPreferencesInfo &info)
 {
-    GetValueFromDisturbeDB(
-        KEY_DO_NOT_DISTURB_BEGIN_DATE, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
-                PutDoNotDisturbDate(info.GetDoNotDisturbDate());
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
-                if (!value.ToString().empty()) {
-                    auto date = info.GetDoNotDisturbDate();
-                    date->SetBeginDate(StringToInt64(value.ToString()));
-                }
-            } else {
-                ANS_LOGW("Parse disturbe start time failed, use defalut value.");
-            }
-        });
+    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
+    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+
+    for (auto iter : osAccountInfos) {
+        int userId = iter.GetLocalId();
+        NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(info, userId);
+    }
 }
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbEndDate(NotificationPreferencesInfo &info)
 {
-    GetValueFromDisturbeDB(
-        KEY_DO_NOT_DISTURB_END_DATE, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
-                PutDoNotDisturbDate(info.GetDoNotDisturbDate());
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
-                if (!value.ToString().empty()) {
-                    auto date = info.GetDoNotDisturbDate();
-                    date->SetEndDate(StringToInt64(value.ToString()));
-                }
-            } else {
-                ANS_LOGW("Parse disturbe end time failed, use defalut value.");
-            }
-        });
+    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
+    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+
+    for (auto iter : osAccountInfos) {
+        int userId = iter.GetLocalId();
+        NotificationPreferencesDatabase::GetDoNotDisturbEndDate(info, userId);
+    }
 }
 
 void NotificationPreferencesDatabase::ParseEnableAllNotification(NotificationPreferencesInfo &info)
 {
-    GetValueFromDisturbeDB(
-        KEY_ENABLE_ALL_NOTIFICATION, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
-                PutNotificationsEnabled(info.GetEnabledAllNotification());
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
-                if (!value.ToString().empty()) {
-                    info.SetEnabledAllNotification(static_cast<bool>(StringToInt(value.ToString())));
-                }
-            } else {
-                ANS_LOGW("Parse enable all notification failed, use defalut value.");
-            }
-        });
+    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
+    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+
+    for (auto iter : osAccountInfos) {
+        int userId = iter.GetLocalId();
+        NotificationPreferencesDatabase::GetEnableAllNotification(info, userId);
+    }
 }
 
 void NotificationPreferencesDatabase::ParseGroupDescription(
@@ -1204,6 +1212,13 @@ void NotificationPreferencesDatabase::ParseBundleEnableNotification(
 {
     ANS_LOGD("SetBundleEnableNotification bundle enable is %{public}s.", value.c_str());
     bundleInfo.SetEnableNotification(static_cast<bool>(StringToInt(value)));
+}
+
+void NotificationPreferencesDatabase::ParseBundleUid(
+    NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const
+{
+    ANS_LOGD("SetBundleUid uuid is %{public}s.", value.c_str());
+    bundleInfo.SetBundleUid(StringToInt(value));
 }
 
 void NotificationPreferencesDatabase::ParseSlotGroupId(sptr<NotificationSlot> &slot, const std::string &value) const
@@ -1291,5 +1306,104 @@ void NotificationPreferencesDatabase::ParseSlotEnableBypassDnd(
     bool enable = static_cast<bool>(StringToInt(value));
     slot->EnableBypassDnd(enable);
 }
+
+std::string NotificationPreferencesDatabase::GenerateBundleLablel(
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo) const
+{
+    return bundleInfo.GetBundleName().append(std::to_string(bundleInfo.GetBundleUid()));
+}
+void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreferencesInfo &info, int userId)
+{
+    std::string key =
+        std::string().append(KEY_DO_NOT_DISTURB_TYPE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    GetValueFromDisturbeDB(
+        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+            sptr<NotificationDoNotDisturbDate> disturbDate =
+                        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+            info.GetDoNotDisturbDate(userId, disturbDate);
+            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+                PutDoNotDisturbDate(userId, disturbDate);
+            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+                if (!value.ToString().empty()) {
+                    if (disturbDate != nullptr) {
+                        disturbDate->SetDoNotDisturbType(
+                            (NotificationConstant::DoNotDisturbType)StringToInt(value.ToString()));
+                    }
+                }
+            } else {
+                ANS_LOGW("Parse disturbe mode failed, use defalut value.");
+            }
+            info.SetDoNotDisturbDate(userId, disturbDate);
+        });
+}
+
+void NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(NotificationPreferencesInfo &info, int userId)
+{
+    std::string key =
+        std::string().append(KEY_DO_NOT_DISTURB_BEGIN_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    GetValueFromDisturbeDB(
+        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+            sptr<NotificationDoNotDisturbDate> disturbDate =
+                        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+            info.GetDoNotDisturbDate(userId, disturbDate);
+            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+                PutDoNotDisturbDate(userId, disturbDate);
+            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+                if (!value.ToString().empty()) {
+                    if (disturbDate != nullptr) {
+                        disturbDate->SetBeginDate(StringToInt64(value.ToString()));
+                    }
+                }
+            } else {
+                ANS_LOGW("Parse disturbe start time failed, use defalut value.");
+            }
+            info.SetDoNotDisturbDate(userId, disturbDate);
+        });
+}
+
+void NotificationPreferencesDatabase::GetDoNotDisturbEndDate(NotificationPreferencesInfo &info, int userId)
+{
+    std::string key =
+        std::string().append(KEY_DO_NOT_DISTURB_END_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    GetValueFromDisturbeDB(
+        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+            sptr<NotificationDoNotDisturbDate> disturbDate =
+                        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+            info.GetDoNotDisturbDate(userId, disturbDate);
+            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+                PutDoNotDisturbDate(userId, disturbDate);
+            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+                if (!value.ToString().empty()) {
+                    if (disturbDate != nullptr) {
+                        disturbDate->SetEndDate(StringToInt64(value.ToString()));
+                    }
+                }
+            } else {
+                ANS_LOGW("Parse disturbe end time failed, use defalut value.");
+            }
+            info.SetDoNotDisturbDate(userId, disturbDate);
+        });
+}
+
+void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPreferencesInfo &info, int userId)
+{
+    std::string key =
+        std::string().append(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    GetValueFromDisturbeDB(
+        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+                bool enable = true;
+                info.GetEnabledAllNotification(userId, enable);
+                PutNotificationsEnabled(userId, enable);
+            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+                if (!value.ToString().empty()) {
+                    info.SetEnabledAllNotification(userId, static_cast<bool>(StringToInt(value.ToString())));
+                }
+            } else {
+                ANS_LOGW("Parse enable all notification failed, use defalut value.");
+            }
+        });
+}
+
 }  // namespace Notification
 }  // namespace OHOS
