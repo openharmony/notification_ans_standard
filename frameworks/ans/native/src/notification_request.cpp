@@ -719,6 +719,16 @@ std::string NotificationRequest::GetLabel() const
     return label_;
 }
 
+void NotificationRequest::SetCreatorUserId(int32_t userId)
+{
+    creatorUserId_ = userId;
+}
+
+int32_t NotificationRequest::GetCreatorUserId() const
+{
+    return creatorUserId_;
+}
+
 std::string NotificationRequest::Dump()
 {
     return "NotificationRequest{ "
