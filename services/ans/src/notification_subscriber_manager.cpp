@@ -99,6 +99,7 @@ void NotificationSubscriberManager::NotifyConsumed(
         ANS_LOGE("handler is nullptr");
         return;
     }
+
     AppExecFwk::EventHandler::Callback NotifyConsumedFunc =
         std::bind(&NotificationSubscriberManager::NotifyConsumedInner, this, notification, notificationMap);
 
@@ -205,6 +206,9 @@ void NotificationSubscriberManager::AddRecordInfo(
             record->subscribedAll = false;
         }
         record->userId = subscribeInfo->GetAppUserId();
+        if (record->userId == SUBSCRIBE_USER_INIT) {
+            record->userId = SUBSCRIBE_USER_ALL;
+        }
     } else {
         record->bundleList_.clear();
         record->subscribedAll = true;
@@ -232,7 +236,6 @@ ErrCode NotificationSubscriberManager::AddSubscriberInner(
     const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
 {
     std::shared_ptr<SubscriberRecord> record = FindSubscriberRecord(subscriber);
-
     if (record == nullptr) {
         record = CreateSubscriberRecord(subscriber);
         if (record == nullptr) {
@@ -281,10 +284,9 @@ void NotificationSubscriberManager::NotifyConsumedInner(
 {
     for (auto record : subscriberRecordList_) {
         auto BundleNames = notification->GetBundleName();
-
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
-            (notification->GetUserId() == record->userId || notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
+            (notification->GetUserId() == record->userId || record->userId == SUBSCRIBE_USER_ALL)) {
             record->subscriber->OnConsumed(notification, notificationMap);
             record->subscriber->OnConsumed(notification);
         }
