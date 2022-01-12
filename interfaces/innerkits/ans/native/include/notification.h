@@ -190,6 +190,13 @@ public:
     NotificationConstant::SourceType GetSourceType() const;
 
     /**
+     * @brief Obtains the UserId of the notification creator.
+     *
+     * @return Return the UserId of the notification creator.
+     */
+    int32_t GetUserId() const;
+
+    /**
      * @brief Dumps a string representation of the object.
      *
      * @return A string representation of the object.

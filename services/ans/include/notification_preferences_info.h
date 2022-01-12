@@ -80,19 +80,21 @@ public:
     {}
     ~NotificationPreferencesInfo()
     {}
-    void SetEnabledAllNotification(const bool &value);
-    bool GetEnabledAllNotification() const;
-    void SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date);
-    sptr<NotificationDoNotDisturbDate> GetDoNotDisturbDate() const;
     void SetBundleInfo(const BundleInfo &info);
     bool GetBundleInfo(const sptr<NotificationBundleOption> &bundleOption, BundleInfo &info) const;
     bool RemoveBundleInfo(const sptr<NotificationBundleOption> &bundleOption);
     bool IsExsitBundleInfo(const sptr<NotificationBundleOption> &bundleOption) const;
     void ClearBundleInfo();
+    void SetDoNotDisturbDate(const int32_t &userId,
+        const sptr<NotificationDoNotDisturbDate> &doNotDisturbDate);
+    bool GetDoNotDisturbDate(const int32_t &userId,
+        sptr<NotificationDoNotDisturbDate> &doNotDisturbDate) const;
+    void SetEnabledAllNotification(const int32_t &userId, const bool &enable);
+    bool GetEnabledAllNotification(const int32_t &userId, bool &enable) const;
 
 private:
-    bool isEnabledAllNotification_ = true;
-    sptr<NotificationDoNotDisturbDate> doNotDisturbDate_ = new NotificationDoNotDisturbDate();
+    std::map<int32_t, bool> isEnabledAllNotification_;
+    std::map<int32_t, sptr<NotificationDoNotDisturbDate>> doNotDisturbDate_;
     std::map<std::string, BundleInfo> infos_;
 };
 }  // namespace Notification

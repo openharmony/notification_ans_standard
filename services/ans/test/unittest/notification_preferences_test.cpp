@@ -1017,7 +1017,7 @@ HWTEST_F(NotificationPreferencesTest, NotificationPreferencesTest_02900, Functio
  */
 HWTEST_F(NotificationPreferencesTest, SetNotificationsEnabled_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetNotificationsEnabled(true), (int)ERR_OK);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetNotificationsEnabled(bundleOption_, true), (int)ERR_OK);
 }
 
 /**
@@ -1027,9 +1027,9 @@ HWTEST_F(NotificationPreferencesTest, SetNotificationsEnabled_00100, Function | 
  */
 HWTEST_F(NotificationPreferencesTest, GetNotificationsEnabled_00100, Function | SmallTest | Level1)
 {
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetNotificationsEnabled(true), (int)ERR_OK);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetNotificationsEnabled(bundleOption_, true), (int)ERR_OK);
     bool enable = false;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationsEnabled(enable), (int)ERR_OK);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationsEnabled(bundleOption_, enable), (int)ERR_OK);
     EXPECT_TRUE(enable);
 }
 
@@ -1049,7 +1049,7 @@ HWTEST_F(NotificationPreferencesTest, SetDoNotDisturbDate_00100, Function | Smal
     sptr<NotificationDoNotDisturbDate> date =
         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
 
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDoNotDisturbDate(date), (int)ERR_OK);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption_, date), (int)ERR_OK);
 }
 
 /**
@@ -1067,13 +1067,58 @@ HWTEST_F(NotificationPreferencesTest, GetDoNotDisturbDate_00100, Function | Smal
     int64_t endDate = endDuration.count();
     sptr<NotificationDoNotDisturbDate> date =
         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDoNotDisturbDate(date), (int)ERR_OK);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption_, date), (int)ERR_OK);
 
     sptr<NotificationDoNotDisturbDate> getDate;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDoNotDisturbDate(getDate), (int)ERR_OK);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDoNotDisturbDate(bundleOption_, getDate), (int)ERR_OK);
     EXPECT_EQ(getDate->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::DAILY);
     EXPECT_EQ(getDate->GetBeginDate(), beginDate);
     EXPECT_EQ(getDate->GetEndDate(), endDate);
+}
+
+/**
+ * @tc.number    : GetNotificationsEnabled_00200
+ * @tc.name      :
+ * @tc.desc      : Same user can get enable setting, different user can not get.
+ */
+HWTEST_F(NotificationPreferencesTest, GetNotificationsEnabled_00200, Function | SmallTest | Level1)
+{
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetNotificationsEnabled(bundleOption_, true), (int)ERR_OK);
+    bool enable = false;
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationsEnabled(bundleOption_, enable), (int)ERR_OK);
+    EXPECT_TRUE(enable);
+
+    enable = false;
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationsEnabled(bundleOption_, enable), (int)ERR_OK);
+    EXPECT_FALSE(enable);
+}
+
+/**
+ * @tc.number    : GetDoNotDisturbDate_00200
+ * @tc.name      :
+ * @tc.desc      : Same user can get DoNotDisturbDate setting, different user can not get.
+ */
+HWTEST_F(NotificationPreferencesTest, GetDoNotDisturbDate_00200, Function | SmallTest | Level1)
+{
+    std::chrono::system_clock::time_point timePoint = std::chrono::system_clock::now();
+    auto beginDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t beginDate = beginDuration.count();
+    timePoint += std::chrono::hours(1);
+    auto endDuration = std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch());
+    int64_t endDate = endDuration.count();
+    sptr<NotificationDoNotDisturbDate> date =
+        new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption_, date), (int)ERR_OK);
+
+    sptr<NotificationDoNotDisturbDate> getDate;
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDoNotDisturbDate(bundleOption_, getDate), (int)ERR_OK);
+    EXPECT_EQ(getDate->GetDoNotDisturbType(), NotificationConstant::DoNotDisturbType::DAILY);
+    EXPECT_EQ(getDate->GetBeginDate(), beginDate);
+    EXPECT_EQ(getDate->GetEndDate(), endDate);
+
+    sptr<NotificationDoNotDisturbDate> getExsitDate;
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDoNotDisturbDate(
+        noExsitbundleOption_, getExsitDate), (int)ERR_ANS_INVALID_PARAM);
 }
 }  // namespace Notification
 }  // namespace OHOS

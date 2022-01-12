@@ -28,6 +28,7 @@
 #include "singleton.h"
 
 #include "ans_subscriber_interface.h"
+#include "notification_bundle_option.h"
 #include "notification_constant.h"
 #include "notification_request.h"
 #include "notification_sorting_map.h"
@@ -54,7 +55,8 @@ private:
     std::shared_ptr<SubscriberRecord> FindSubscriberRecord(const wptr<IRemoteObject> &object);
     std::shared_ptr<SubscriberRecord> FindSubscriberRecord(const sptr<IAnsSubscriber> &subscriber);
     std::shared_ptr<SubscriberRecord> CreateSubscriberRecord(const sptr<IAnsSubscriber> &subscriber);
-    void AddRecordInfo(std::shared_ptr<SubscriberRecord> &record, const sptr<NotificationSubscribeInfo> &subscribeInfo);
+    void AddRecordInfo(
+        std::shared_ptr<SubscriberRecord> &record, const sptr<NotificationSubscribeInfo> &subscribeInfo);
     void RemoveRecordInfo(
         std::shared_ptr<SubscriberRecord> &record, const sptr<NotificationSubscribeInfo> &subscribeInfo);
     ErrCode AddSubscriberInner(
