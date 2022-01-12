@@ -64,9 +64,7 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
             return ERR_ANS_NO_MEMORY;
         }
 
-        int userId = SUBSCRIBE_USER_INIT;
-        int uid = IPCSkeleton::GetCallingUid();
-        OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+        int userId = SUBSCRIBE_USER_ALL;
         subInfo->AddAppUserId(userId);
     }
 
@@ -101,7 +99,6 @@ void NotificationSubscriberManager::NotifyConsumed(
         ANS_LOGE("handler is nullptr");
         return;
     }
-
     AppExecFwk::EventHandler::Callback NotifyConsumedFunc =
         std::bind(&NotificationSubscriberManager::NotifyConsumedInner, this, notification, notificationMap);
 
@@ -202,9 +199,10 @@ void NotificationSubscriberManager::AddRecordInfo(
 {
     if (subscribeInfo != nullptr) {
         record->bundleList_.clear();
-        record->subscribedAll = false;
+        record->subscribedAll = true;
         for (auto bundle : subscribeInfo->GetAppNames()) {
             record->bundleList_.insert(bundle);
+            record->subscribedAll = false;
         }
         record->userId = subscribeInfo->GetAppUserId();
     } else {
