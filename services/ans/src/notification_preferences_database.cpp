@@ -1393,7 +1393,10 @@ void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPrefe
         key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
             if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
                 bool enable = true;
-                info.GetEnabledAllNotification(userId, enable);
+                if (!info.GetEnabledAllNotification(userId, enable)) {
+                    info.SetEnabledAllNotification(userId, enable);
+                    ANS_LOGW("Enable setting not found, default true.");
+                }
                 PutNotificationsEnabled(userId, enable);
             } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
                 if (!value.ToString().empty()) {
