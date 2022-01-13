@@ -162,7 +162,6 @@ inline ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &reque
     int userId = SUBSCRIBE_USER_INIT;
     OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
     request->SetCreatorUserId(userId);
-
     ErrCode result = CheckPictureSize(request);
 
     return result;
