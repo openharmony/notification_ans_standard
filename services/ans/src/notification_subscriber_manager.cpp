@@ -206,7 +206,8 @@ void NotificationSubscriberManager::AddRecordInfo(
             record->subscribedAll = false;
         }
         record->userId = subscribeInfo->GetAppUserId();
-        if (record->userId == SUBSCRIBE_USER_INIT) {
+        if (record->userId == SUBSCRIBE_USER_INIT ||
+            (record->userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && record->userId <= SUBSCRIBE_USER_SYSTEM_END)) {
             record->userId = SUBSCRIBE_USER_ALL;
         }
     } else {
@@ -286,7 +287,9 @@ void NotificationSubscriberManager::NotifyConsumedInner(
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
-            (notification->GetUserId() == record->userId || record->userId == SUBSCRIBE_USER_ALL)) {
+            (notification->GetUserId() == record->userId ||
+                notification->GetUserId() == SUBSCRIBE_USER_ALL ||
+                record->userId == SUBSCRIBE_USER_ALL)) {
             record->subscriber->OnConsumed(notification, notificationMap);
             record->subscriber->OnConsumed(notification);
         }
