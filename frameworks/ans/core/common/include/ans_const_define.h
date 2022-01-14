@@ -32,8 +32,11 @@ constexpr uint32_t MAX_ICON_SIZE = 50 * 1024;
 constexpr uint32_t MAX_PICTURE_SIZE = 2 * 1024 * 1024;
 constexpr bool SUPPORT_DO_NOT_DISTRUB = true;
 constexpr uint32_t SYSTEM_SERVICE_UID = 1000;
+
 constexpr int32_t SUBSCRIBE_USER_INIT = -1;
 constexpr int32_t SUBSCRIBE_USER_ALL = -2;
+constexpr int32_t SUBSCRIBE_USER_SYSTEM_BEGIN = 0;
+constexpr int32_t SUBSCRIBE_USER_SYSTEM_END = 99;
 
 // Default sound for notification
 const static Uri DEFAULT_NOTIFICATION_SOUND("file://system/etc/Light.ogg");
