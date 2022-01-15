@@ -144,7 +144,7 @@ inline ErrCode CheckPictureSize(const sptr<NotificationRequest> &request)
     return result;
 }
 
-inline ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &request)
+ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &request)
 {
     std::string bundle = GetClientBundleName();
     if (bundle.empty()) {
@@ -161,6 +161,9 @@ inline ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &reque
     
     int userId = SUBSCRIBE_USER_INIT;
     OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
+        userId = SUBSCRIBE_USER_ALL;
+    }
     request->SetCreatorUserId(userId);
     ErrCode result = CheckPictureSize(request);
 
