@@ -1,0 +1,92 @@
+{
+  "name": "@ohos/distributed_notification_service",
+  "version": "",
+  "description": "为应用程序提供发布通知的能力",
+  "homePage": "https://gitee.com/openharmony",
+  "license": "Apache V2",
+  "repository": "https://gitee.com/openharmony/notification_ans_standard",
+  "domain": "os",
+  "language": "",
+  "publishAs": "code-segment",
+  "private": false,
+  "scripts": {},
+  "tags": [
+    "base"
+  ],
+  "keywords": [
+    "notification",
+    "ans"
+  ],
+  "envs": [],
+  "dirs": [],
+  "author": {
+    "name": "",
+    "email": "",
+    "url": ""
+  },
+  "contributors": [
+    {
+      "name": "",
+      "email": "",
+      "url": ""
+    }
+  ],
+  "segment": {
+    "destPath": "base/notification/ans_standard"
+  },
+  "component": {
+    "name": "ans_standard",
+    "subsystem": "notification",
+    "syscap": [
+      "SystemCapability.DistributedNotificationService"
+    ],
+    "features": [],
+    "adapted_system_type": [
+      "standard"
+    ],
+    "rom": "",
+    "ram": "",
+    "deps": {
+      "components": [
+        "samgr_standard",
+        "ipc",
+        "aafwk_standard",
+        "dmsfwk_standard",
+        "multimedia_image_standard",
+        "hiviewdfx_hilog_native",
+        "appexecfwk_standard",
+        "time_native",
+        "ces_standard",
+        "napi",
+        "safwk",
+        "distributeddatamgr",
+        "os_account_innerkits"
+      ],
+      "third_party": [
+        "jsoncpp",
+        "libuv",
+        "icu",
+        "node",
+        "json"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//base/notification/ans_standard/frameworks:frameworks_target",
+        "//base/notification/ans_standard/interfaces:interfaces_target",
+        "//base/notification/ans_standard/sa_profile:ans_sa_profile",
+        "//base/notification/ans_standard/services:services_target",
+        "//base/notification/ans_standard/tools:tools_target"
+      ],
+      "inner_kits": [],
+      "test": [
+        "//base/notification/ans_standard/services/ans/test/unittest:ans_unit_test",
+        "//base/notification/ans_standard/services/test/moduletest:ans_module_test",
+        "//base/notification/ans_standard/frameworks/ans/test/moduletest:moduletest",
+        "//base/notification/ans_standard/frameworks/ans/native/test/unittest:ans_reminder_unit_test",
+        "//base/notification/ans_standard/frameworks/wantagent/test/:unittest",
+        "//base/notification/ans_standard/test:systemtest"
+      ]
+    }
+  }
+}
