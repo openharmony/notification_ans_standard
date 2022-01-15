@@ -35,7 +35,6 @@ ohos_shared_library("notification") {
   include_dirs = [
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common",
-    "//foundation/ace/napi/interfaces/kits/napi",
     "//foundation/multimedia/image_standard/interfaces/kits/js/common/include/",
     "include",
     "//third_party/node/src",
@@ -67,11 +66,7 @@ ohos_shared_library("notification") {
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/base:base",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
     "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common:napi_common",
-    "//foundation/ace/napi:ace_napi",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libuv:uv_static",
@@ -79,9 +74,13 @@ ohos_shared_library("notification") {
   ]
 
   external_deps = [
+    "aafwk_standard:base",
+    "aafwk_standard:want",
     "appexecfwk_standard:appexecfwk_base",
+    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 
   relative_install_dir = "module"
