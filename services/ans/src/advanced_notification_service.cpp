@@ -798,16 +798,18 @@ ErrCode AdvancedNotificationService::DeleteAll()
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
+        int activeUserId = SUBSCRIBE_USER_INIT;
+        (void)GetActiveUserId(activeUserId);
         std::vector<std::string> keys = GetNotificationKeys(nullptr);
         for (auto key : keys) {
             sptr<Notification> notification = nullptr;
 
             result = RemoveFromNotificationListForDeleteAll(key, notification);
-            if (result != ERR_OK) {
+            if (result != ERR_OK || notification == nullptr) {
                 continue;
             }
 
-            if (notification != nullptr) {
+            if ((notification->GetUserId() == activeUserId) || (notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
                 int reason = NotificationConstant::CANCEL_ALL_REASON_DELETE;
                 UpdateRecentNotification(notification, true, reason);
                 sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
