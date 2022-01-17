@@ -206,8 +206,7 @@ void NotificationSubscriberManager::AddRecordInfo(
             record->subscribedAll = false;
         }
         record->userId = subscribeInfo->GetAppUserId();
-        if (record->userId == SUBSCRIBE_USER_INIT ||
-            (record->userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && record->userId <= SUBSCRIBE_USER_SYSTEM_END)) {
+        if (record->userId == SUBSCRIBE_USER_INIT) {
             record->userId = SUBSCRIBE_USER_ALL;
         }
     } else {
