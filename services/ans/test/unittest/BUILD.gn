@@ -83,6 +83,7 @@ ohos_unittest("ans_unit_test") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
     "//base/miscservices/time/services:time_service",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",

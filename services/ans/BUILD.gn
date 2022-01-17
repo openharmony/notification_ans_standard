@@ -66,6 +66,7 @@ ohos_shared_library("libans") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
     "//base/miscservices/time/services:time_service",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
