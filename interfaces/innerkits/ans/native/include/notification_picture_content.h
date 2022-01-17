@@ -83,6 +83,19 @@ public:
     std::string Dump() override;
 
     /**
+     * Converts a NotificationPictureContent object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    virtual bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationPictureContent object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationPictureContent.
+     */
+    static NotificationPictureContent *FromJson(const nlohmann::json &jsonObject);
+
+    /**
      * Marshal a object into a Parcel.
      * @param parcel the object into the parcel
      */

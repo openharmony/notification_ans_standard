@@ -71,6 +71,51 @@ std::string NotificationLongTextContent::Dump()
             " }";
 }
 
+bool NotificationLongTextContent::ToJson(nlohmann::json &jsonObject) const
+{
+    if (!NotificationBasicContent::ToJson(jsonObject)) {
+        ANS_LOGE("Cannot convert basicContent to JSON");
+        return false;
+    }
+
+    jsonObject["longText"]      = longText_;
+    jsonObject["expandedTitle"] = expandedTitle_;
+    jsonObject["briefText"]     = briefText_;
+
+    return true;
+}
+
+NotificationLongTextContent *NotificationLongTextContent::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pContent = new (std::nothrow) NotificationLongTextContent();
+    if (pContent == nullptr) {
+        ANS_LOGE("Failed to create longTextContent instance");
+        return nullptr;
+    }
+
+    pContent->ReadFromJson(jsonObject);
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("longText") != jsonEnd) {
+        pContent->longText_ = jsonObject.at("longText").get<std::string>();
+    }
+
+    if (jsonObject.find("expandedTitle") != jsonEnd) {
+        pContent->expandedTitle_ = jsonObject.at("expandedTitle").get<std::string>();
+    }
+
+    if (jsonObject.find("briefText") != jsonEnd) {
+        pContent->briefText_ = jsonObject.at("briefText").get<std::string>();
+    }
+
+    return pContent;
+}
+
 bool NotificationLongTextContent::Marshalling(Parcel &parcel) const
 {
     if (!NotificationBasicContent::Marshalling(parcel)) {

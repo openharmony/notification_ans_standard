@@ -17,6 +17,7 @@
 #define ANS_MOCK_SINGLE_KV_STORE_H
 
 #include <map>
+#include <mutex>
 #include <vector>
 
 #include "kvstore.h"
@@ -106,8 +107,30 @@ public:
     Status ReleaseKvStoreSnapshot(std::shared_ptr<KvStoreSnapshot> &snapshot) override;
 
     Status Clear() override;
+    
+public:
+    static void InsertMockKvStore(AppId appId, StoreId storeId, std::shared_ptr<SingleKvStore> store);
+    static void RemoveMockKvStore(AppId appId, StoreId storeId);
+    static std::shared_ptr<AnsTestSingleKvStore> GetMockKvStorePointer(AppId appId, StoreId storeId);
+    struct Compare {
+        bool operator()(const Key &a, const Key &b) const
+        {
+            return a.Compare(b) == -1;
+        }
+    };
+
+    void InsertDataToDoCallback(const Key &key, const Value &value);
+    void UpdateDataToDoCallback(const Key &key, const Value &value);
+    void DeleteDataToDoCallback(const Key &key);
+
 protected:
     KVSTORE_API virtual Status Control(KvControlCmd cmd, const KvParam &inputParam, KvParam &output) override;
+
+private:
+    static std::mutex mutex_;
+    static std::map<std::pair<std::string, std::string>, std::shared_ptr<SingleKvStore>> kvStoreMap_;
+    std::shared_ptr<KvStoreObserver> observer_;
+    std::map<Key, Value, AnsTestSingleKvStore::Compare> kvstore_;
 };
 }  // namespace DistributedKv
 }  // namespace OHOS

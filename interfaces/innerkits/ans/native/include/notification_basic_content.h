@@ -16,12 +16,12 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_BASIC_CONTENT_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_BASIC_CONTENT_H
 
-#include <string>
+#include "notification_json_convert.h"
 #include "parcel.h"
 
 namespace OHOS {
 namespace Notification {
-class NotificationBasicContent : public Parcelable {
+class NotificationBasicContent : public Parcelable, public NotificationJsonConvertionBase {
 public:
     /**
      * Default deconstructor used to deconstruct.
@@ -73,6 +73,12 @@ public:
     virtual std::string Dump();
 
     /**
+     * Converts a NotificationBasicContent object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    virtual bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
      * Marshal a object into a Parcel.
      * @param parcel the object into the parcel
      */
@@ -90,6 +96,12 @@ protected:
      * @return true if read success; returns false otherwise.
      */
     virtual bool ReadFromParcel(Parcel &parcel);
+
+    /**
+     * Creates a NotificationBasicContent object from a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    void ReadFromJson(const nlohmann::json &jsonObject);
 
 protected:
     std::string text_ {};

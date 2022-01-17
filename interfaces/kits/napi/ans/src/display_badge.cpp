@@ -20,6 +20,7 @@ namespace NotificationNapi {
 const int ENABLE_BADGE_DISPLAYED_MAX_PARA = 3;
 const int ENABLE_BADGE_DISPLAYED_MIN_PARA = 2;
 const int IS_DISPLAY_BADGE_MAX_PARA = 2;
+const int IS_DISPLAY_BADGE_MIN_PARA = 1;
 
 struct EnableBadgeParams {
     NotificationBundleOption option;
@@ -91,10 +92,7 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[IS_DISPLAY_BADGE_MAX_PARA] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-
-    if (argc == 0) {
-        return Common::NapiGetNull(env);
-    }
+    NAPI_ASSERT(env, argc >= IS_DISPLAY_BADGE_MIN_PARA, "Wrong number of arguments");
 
     // argv[0]: bundle / callback
     napi_valuetype valuetype = napi_undefined;

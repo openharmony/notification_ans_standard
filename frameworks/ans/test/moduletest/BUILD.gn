@@ -53,7 +53,7 @@ ohos_moduletest("ans_fw_module_test") {
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//foundation/distributedschedule/samgr/services/samgr/native/include",
     "//foundation/communication/ipc/interfaces/innerkits/libdbinder/include",
-    "//base/notification/ces_standard/cesfwk/interfaces/innerkits/native/include",
+    "//base/notification/ces_standard/interfaces/innerkits/native/include",
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
     "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
@@ -69,17 +69,14 @@ ohos_moduletest("ans_fw_module_test") {
   ]
 
   sources = [
-    "//base/notification/ans_standard/frameworks/ans/core/src/ans_manager_proxy.cpp",
-    "//base/notification/ans_standard/frameworks/ans/core/src/ans_manager_stub.cpp",
-    "//base/notification/ans_standard/frameworks/ans/core/src/ans_notification.cpp",
-    "//base/notification/ans_standard/frameworks/ans/core/src/ans_subscriber_proxy.cpp",
-    "//base/notification/ans_standard/frameworks/ans/core/src/ans_subscriber_stub.cpp",
-    "//base/notification/ans_standard/frameworks/ans/native/src/notification.cpp",
     "ans_fw_module_test.cpp",
     "mock/blob.cpp",
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
+    "mock/mock_change_notification.cpp",
+    "mock/mock_common_event_data.cpp",
+    "mock/mock_common_event_manager.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
   ]
@@ -100,9 +97,14 @@ ohos_moduletest("ans_fw_module_test") {
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
-    "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
+
+  defines = []
+  if (distributed_notification_supported) {
+    defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
+    deps += [ "${services_path}/distributed:libans_distributed" ]
+  }
 
   external_deps = [
     "aafwk_standard:want",
@@ -124,9 +126,14 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${core_path}/include",
     "${interfaces_path}/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/appexecfwk/standard/libs/libeventhandler/src",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//base/notification/ans_standard/services/ans/include",
@@ -135,24 +142,22 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/communication/ipc/utils/include",
     "//foundation/communication/ipc/ipc/softbus_temp",
+    "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//foundation/distributedschedule/samgr/services/samgr/native/include",
     "//foundation/communication/ipc/interfaces/innerkits/libdbinder/include",
-    "//base/notification/ces_standard/cesfwk/interfaces/innerkits/native/include",
+    "//base/notification/ces_standard/interfaces/innerkits/native/include",
+    "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
+    "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
     "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
+    "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
-    "//foundation/multimedia/image_standard/interfaces/innerkits/include",
-    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log/",
   ]
 
   sources = [
@@ -161,11 +166,16 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
+    "mock/mock_change_notification.cpp",
+    "mock/mock_common_event_data.cpp",
+    "mock/mock_common_event_manager.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
   ]
 
   configs = [ "//utils/native/base:utils_config" ]
+
+  ldflags = [ "-Wl,-rpath=/system/lib/module/multimedia/" ]
 
   deps = [
     "${frameworks_path}/ans/core:ans_core",
@@ -185,6 +195,12 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
+
+  defines = []
+  if (distributed_notification_supported) {
+    defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
+    deps += [ "${services_path}/distributed:libans_distributed" ]
+  }
 
   external_deps = [
     "aafwk_standard:want",
@@ -206,9 +222,14 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${core_path}/include",
     "${interfaces_path}/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/appexecfwk/standard/libs/libeventhandler/src",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//base/notification/ans_standard/services/ans/include",
@@ -217,23 +238,22 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/communication/ipc/utils/include",
     "//foundation/communication/ipc/ipc/softbus_temp",
+    "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//foundation/distributedschedule/samgr/services/samgr/native/include",
     "//foundation/communication/ipc/interfaces/innerkits/libdbinder/include",
-    "//base/notification/ces_standard/cesfwk/interfaces/innerkits/native/include",
+    "//base/notification/ces_standard/interfaces/innerkits/native/include",
+    "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
+    "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
     "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
+    "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
-    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log/",
   ]
 
   sources = [
@@ -242,6 +262,9 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
+    "mock/mock_change_notification.cpp",
+    "mock/mock_common_event_data.cpp",
+    "mock/mock_common_event_manager.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
   ]
@@ -260,9 +283,16 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
+
+  defines = []
+  if (distributed_notification_supported) {
+    defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
+    deps += [ "${services_path}/distributed:libans_distributed" ]
+  }
 
   external_deps = [
     "aafwk_standard:want",
@@ -284,9 +314,14 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
   module_out_path = module_output_path
   include_dirs = [
     "include",
+    "${core_path}/include",
     "${interfaces_path}/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
+    "//foundation/appexecfwk/standard/libs/libeventhandler/src",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//base/notification/ans_standard/services/ans/include",
@@ -295,23 +330,22 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "//foundation/communication/ipc/ipc/native/src/core/include",
     "//foundation/communication/ipc/utils/include",
     "//foundation/communication/ipc/ipc/softbus_temp",
+    "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//foundation/distributedschedule/samgr/services/samgr/native/include",
     "//foundation/communication/ipc/interfaces/innerkits/libdbinder/include",
-    "//base/notification/ces_standard/cesfwk/interfaces/innerkits/native/include",
+    "//base/notification/ces_standard/interfaces/innerkits/native/include",
+    "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
+    "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
     "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
+    "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
-    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log/",
   ]
 
   sources = [
@@ -320,6 +354,9 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
+    "mock/mock_change_notification.cpp",
+    "mock/mock_common_event_data.cpp",
+    "mock/mock_common_event_manager.cpp",
     "mock/mock_ipc.cpp",
     "mock/mock_single_kv_store.cpp",
   ]
@@ -338,9 +375,16 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
+
+  defines = []
+  if (distributed_notification_supported) {
+    defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
+    deps += [ "${services_path}/distributed:libans_distributed" ]
+  }
 
   external_deps = [
     "aafwk_standard:want",

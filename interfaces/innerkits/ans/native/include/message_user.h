@@ -15,14 +15,14 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_MESSAGE_USER_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_MESSAGE_USER_H
 
-#include <string>
+#include "notification_json_convert.h"
 #include "pixel_map.h"
 #include "parcel.h"
 #include "uri.h"
 
 namespace OHOS {
 namespace Notification {
-class MessageUser final : public Parcelable {
+class MessageUser final : public Parcelable, public NotificationJsonConvertionBase {
 public:
     /**
      * A constructor used to construct MessageUser
@@ -123,6 +123,19 @@ public:
      * @return A string representation of the object.
      */
     std::string Dump() const;
+
+    /**
+     * Converts a MessageUser object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a MessageUser object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the MessageUser.
+     */
+    static MessageUser *FromJson(const nlohmann::json &jsonObject);
 
     /**
      * Marshals a MessageUser object into a Parcel.

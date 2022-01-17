@@ -14,12 +14,36 @@
  */
 
 #include "notification_normal_content.h"
+#include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
 std::string NotificationNormalContent::Dump()
 {
     return "NotificationNormalContent{ " + NotificationBasicContent::Dump() + " }";
+}
+
+bool NotificationNormalContent::ToJson(nlohmann::json &jsonObject) const
+{
+    return NotificationBasicContent::ToJson(jsonObject);
+}
+
+NotificationNormalContent *NotificationNormalContent::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pContent = new (std::nothrow) NotificationNormalContent();
+    if (pContent == nullptr) {
+        ANS_LOGE("Failed to create normalContent instance");
+        return nullptr;
+    }
+
+    pContent->ReadFromJson(jsonObject);
+
+    return pContent;
 }
 
 bool NotificationNormalContent::Marshalling(Parcel &parcel) const

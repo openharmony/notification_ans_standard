@@ -111,6 +111,12 @@ public:
     virtual ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) = 0;
 
+    virtual ErrCode IsDistributedEnabled(bool &enabled) = 0;
+    virtual ErrCode EnableDistributed(bool enabled) = 0;
+    virtual ErrCode EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) = 0;
+    virtual ErrCode EnableDistributedSelf(bool enabled) = 0;
+    virtual ErrCode IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) = 0;
+
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) = 0;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) = 0;
     virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) = 0;
@@ -175,6 +181,11 @@ protected:
         DOES_SUPPORT_DO_NOT_DISTURB_MODE,
         CANCEL_GROUP,
         REMOVE_GROUP_BY_BUNDLE,
+        IS_DISTRIBUTED_ENABLED,
+        ENABLE_DISTRIBUTED,
+        ENABLE_DISTRIBUTED_BY_BUNDLE,
+        ENABLE_DISTRIBUTED_SELF,
+        IS_DISTRIBUTED_ENABLED_BY_BUNDLE,
         SHELL_DUMP,
         PUBLISH_CONTINUOUS_TASK_NOTIFICATION,
         CANCEL_CONTINUOUS_TASK_NOTIFICATION,

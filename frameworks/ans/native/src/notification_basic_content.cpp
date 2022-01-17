@@ -56,6 +56,36 @@ std::string NotificationBasicContent::Dump()
     return "title = " + title_ + ", text = " + text_ + ", additionalText = " + additionalText_;
 }
 
+bool NotificationBasicContent::ToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["text"]           = text_;
+    jsonObject["title"]          = title_;
+    jsonObject["additionalText"] = additionalText_;
+
+    return true;
+}
+
+void NotificationBasicContent::ReadFromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("text") != jsonEnd) {
+        text_ = jsonObject.at("text").get<std::string>();
+    }
+
+    if (jsonObject.find("title") != jsonEnd) {
+        title_ = jsonObject.at("title").get<std::string>();
+    }
+
+    if (jsonObject.find("additionalText") != jsonEnd) {
+        additionalText_ = jsonObject.at("additionalText").get<std::string>();
+    }
+}
+
 bool NotificationBasicContent::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString(text_)) {

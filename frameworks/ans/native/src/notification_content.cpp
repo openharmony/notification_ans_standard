@@ -112,6 +112,53 @@ std::string NotificationContent::Dump()
             " }";
 }
 
+bool NotificationContent::ToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["contentType"] = static_cast<int32_t>(contentType_);
+
+    if (!content_) {
+        ANS_LOGE("Invalid content. Cannot convert to JSON.");
+        return false;
+    }
+
+    nlohmann::json contentObj;
+    if (!NotificationJsonConverter::ConvertToJosn(content_.get(), contentObj)) {
+        ANS_LOGE("Cannot convert content to JSON");
+        return false;
+    }
+    jsonObject["content"] = contentObj;
+
+    return true;
+}
+
+NotificationContent *NotificationContent::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+    if ((jsonObject.find("contentType") == jsonEnd) || (jsonObject.find("content") == jsonEnd)) {
+        ANS_LOGE("Incomplete NotificationContent json object. Cannot convert content from JSON.");
+        return nullptr;
+    }
+
+    auto pContent = new (std::nothrow) NotificationContent();
+    if (pContent == nullptr) {
+        ANS_LOGE("Failed to create NotificationContent instance");
+        return nullptr;
+    }
+
+    if (!ConvertJsonToContent(pContent, jsonObject)) {
+        delete pContent;
+        pContent = nullptr;
+        return nullptr;
+    }
+
+    return pContent;
+}
+
 bool NotificationContent::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteInt32(static_cast<int32_t>(contentType_))) {
@@ -189,6 +236,52 @@ bool NotificationContent::ReadFromParcel(Parcel &parcel)
         ANS_LOGE("Failed to read content");
         return false;
     }
+
+    return true;
+}
+
+bool NotificationContent::ConvertJsonToContent(NotificationContent *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return false;
+    }
+
+    auto contentTypeValue  = jsonObject.at("contentType").get<int32_t>();
+    target->contentType_   = static_cast<NotificationContent::Type>(contentTypeValue);
+
+    auto contentObj = jsonObject.at("content");
+    if (contentObj.is_null()) {
+        ANS_LOGE("Invalid json object. Cannot convert content from JSON.");
+        return false;
+    }
+
+    NotificationBasicContent *pBasicContent {nullptr};
+    switch (target->contentType_) {
+        case NotificationContent::Type::BASIC_TEXT:
+            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationNormalContent>(contentObj);
+            break;
+        case NotificationContent::Type::CONVERSATION:
+            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationConversationalContent>(contentObj);
+            break;
+        case NotificationContent::Type::LONG_TEXT:
+            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationLongTextContent>(contentObj);
+            break;
+        case NotificationContent::Type::MULTILINE:
+            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationMultiLineContent>(contentObj);
+            break;
+        case NotificationContent::Type::PICTURE:
+            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationPictureContent>(contentObj);
+            break;
+        default:
+            ANS_LOGE("Invalid contentType");
+            break;
+    }
+    if (pBasicContent == nullptr) {
+        ANS_LOGE("Parse content error!");
+        return false;
+    }
+    target->content_ = std::shared_ptr<NotificationBasicContent>(pBasicContent);
 
     return true;
 }
