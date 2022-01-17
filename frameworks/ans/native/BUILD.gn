@@ -32,7 +32,6 @@ config("ans_innerkits_public_config") {
 ohos_shared_library("ans_innerkits") {
   include_dirs = [
     "${interfaces_path}/ans/native/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/multimedia/image_standard/interfaces/innerkits/include",
     "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
@@ -76,16 +75,16 @@ ohos_shared_library("ans_innerkits") {
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "aafwk_standard:want",
+    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "samgr_standard:samgr_proxy",
   ]
 

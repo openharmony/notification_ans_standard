@@ -82,19 +82,19 @@ ohos_shared_library("ans_core") {
   deps = [
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//base/miscservices/time/services:time_service",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
     "//foundation/appexecfwk/standard/kits:appkit_native",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "aafwk_standard:want",
+    "appexecfwk_standard:appexecfwk_base",
+    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "samgr_standard:samgr_proxy",
   ]
 
