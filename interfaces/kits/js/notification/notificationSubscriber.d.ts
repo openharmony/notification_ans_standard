@@ -35,7 +35,6 @@ export interface NotificationSubscriber {
   onConnect?:() => void;
   onDisconnect?:() => void;
   onDestroy?:() => void;
-  onDisturbModeChange?:(mode: notification.DoNotDisturbMode) => void;
 
   /**
    * Callback when the Do Not Disturb setting changed.
