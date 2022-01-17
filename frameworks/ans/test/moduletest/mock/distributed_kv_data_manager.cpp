@@ -33,6 +33,7 @@ Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const 
 {
     std::string storeIdTmp = Constant::TrimCopy<std::string>(storeId.storeId);
     kvStore = std::make_shared<AnsTestSingleKvStore>();
+    AnsTestSingleKvStore::InsertMockKvStore(appId, storeId, kvStore);
     return Status::SUCCESS;
 }
 
@@ -48,6 +49,28 @@ Status DistributedKvDataManager::CloseKvStore(const AppId &appId, std::shared_pt
 
 Status DistributedKvDataManager::DeleteKvStore(const AppId &appId, const StoreId &storeId)
 {
+    AnsTestSingleKvStore::RemoveMockKvStore(appId, storeId);
+    return Status::SUCCESS;
+}
+
+Status DistributedKvDataManager::GetLocalDevice(DeviceInfo &localDevice)
+{
+    localDevice.deviceId = "<localDeviceId>";
+    localDevice.deviceName = "<localDeviceName>";
+    localDevice.deviceType = "<localDeviceType>";
+    return Status::SUCCESS;
+}
+
+Status DistributedKvDataManager::GetDeviceList(std::vector<DeviceInfo> &deviceInfoList, DeviceFilterStrategy strategy)
+{
+    DeviceInfo remoteDevice = {
+        .deviceId = "<remoteDeviceId>",
+        .deviceName = "<remoteDeviceName>",
+        .deviceType = "<remoteDeviceType>",
+    };
+    deviceInfoList.clear();
+    deviceInfoList.push_back(remoteDevice);
+
     return Status::SUCCESS;
 }
 

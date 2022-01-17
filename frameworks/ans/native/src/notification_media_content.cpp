@@ -52,6 +52,41 @@ std::string NotificationMediaContent::Dump()
             " }";
 }
 
+bool NotificationMediaContent::ToJson(nlohmann::json &jsonObject) const
+{
+    if (!NotificationBasicContent::ToJson(jsonObject)) {
+        ANS_LOGE("Cannot convert basicContent to JSON");
+        return false;
+    }
+
+    jsonObject["sequenceNumbers"] = nlohmann::json(sequenceNumbers_);
+
+    return true;
+}
+
+NotificationMediaContent *NotificationMediaContent::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pContent = new (std::nothrow) NotificationMediaContent();
+    if (pContent == nullptr) {
+        ANS_LOGE("Failed to create mediaContent instance");
+        return nullptr;
+    }
+
+    pContent->ReadFromJson(jsonObject);
+
+    const auto& jsonEnd = jsonObject.cend();
+    if (jsonObject.find("sequenceNumbers") != jsonEnd) {
+        pContent->sequenceNumbers_ = jsonObject.at("sequenceNumbers").get<std::vector<uint32_t>>();
+    }
+
+    return pContent;
+}
+
 bool NotificationMediaContent::Marshalling(Parcel &parcel) const
 {
     if (!NotificationBasicContent::Marshalling(parcel)) {
