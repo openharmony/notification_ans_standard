@@ -160,6 +160,7 @@ private:
     bool CheckPermission(const std::string &bundleName);
     ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
     bool GetActiveUserId(int& userId);
+    void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
 
 private:
     static sptr<AdvancedNotificationService> instance_;
