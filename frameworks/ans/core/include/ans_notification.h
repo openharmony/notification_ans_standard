@@ -764,6 +764,13 @@ private:
      */
     ErrCode CheckImageSize(const NotificationRequest &request);
 
+    /**
+     * Check whether the notification doesn't support distribution
+     *
+     * @return Returns true if the notification doesn't support distribution; returns false otherwise.
+     */
+    bool IsNonDistributedNotificationType(const NotificationContent::Type &type);
+
 private:
     std::mutex mutex_;
     sptr<IAnsManager> ansManagerProxy_;
