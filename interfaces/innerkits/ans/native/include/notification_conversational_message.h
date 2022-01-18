@@ -17,12 +17,13 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_CONVERSATIONAL_MESSAGE_H
 
 #include "message_user.h"
+#include "notification_json_convert.h"
 #include "parcel.h"
 #include "uri.h"
 
 namespace OHOS {
 namespace Notification {
-class NotificationConversationalMessage : public Parcelable {
+class NotificationConversationalMessage : public Parcelable, public NotificationJsonConvertionBase {
 public:
     /**
      * A constructor used to create a NotificationConversationalMessage instance with the input parameters passed.
@@ -80,6 +81,19 @@ public:
      * @return a string representation of the object.
      */
     std::string Dump();
+
+    /**
+     * Converts a NotificationConversationalMessage object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationConversationalMessage object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationConversationalMessage.
+     */
+    static NotificationConversationalMessage *FromJson(const nlohmann::json &jsonObject);
 
     /**
      * Marshal a object into a Parcel.

@@ -21,9 +21,6 @@ group("ans_targets") {
 config("public_ans_config") {
   include_dirs = [
     "${services_path}/ans/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
     "//base/account/os_account/frameworks/common/database/include/",
@@ -60,6 +57,8 @@ ohos_shared_library("libans") {
     "//utils/native/base:utils_config",
   ]
 
+  defines = []
+
   deps = [
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
@@ -68,9 +67,7 @@ ohos_shared_library("libans") {
     "//base/miscservices/time/services:time_service",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//utils/native/base:utils",
   ]
 
@@ -78,7 +75,16 @@ ohos_shared_library("libans") {
     cflags = [ "-DCONFIG_DUAL_FRAMEWORK" ]
   }
 
-  external_deps = []
+  if (distributed_notification_supported) {
+    defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
+    deps += [ "${services_path}/distributed:libans_distributed" ]
+    include_dirs += [ "${services_path}/distributed/include" ]
+  }
+
+  external_deps = [
+    "distributeddatamgr:distributeddata_inner",
+    "multimedia_image_standard:image_native",
+  ]
   external_deps += ans_standard_external_deps
 
   subsystem_name = "notification"

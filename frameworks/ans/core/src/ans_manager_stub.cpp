@@ -186,6 +186,21 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::REMOVE_GROUP_BY_BUNDLE,
             std::bind(&AnsManagerStub::HandleRemoveGroupByBundle, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
+        {AnsManagerStub::IS_DISTRIBUTED_ENABLED,
+            std::bind(&AnsManagerStub::HandleIsDistributedEnabled, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::ENABLE_DISTRIBUTED,
+            std::bind(&AnsManagerStub::HandleEnableDistributed, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::ENABLE_DISTRIBUTED_BY_BUNDLE,
+            std::bind(&AnsManagerStub::HandleEnableDistributedByBundle, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::ENABLE_DISTRIBUTED_SELF,
+            std::bind(&AnsManagerStub::HandleEnableDistributedSelf, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::IS_DISTRIBUTED_ENABLED_BY_BUNDLE,
+            std::bind(&AnsManagerStub::HandleIsDistributedEnableByBundle, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::SHELL_DUMP,
             std::bind(
                 &AnsManagerStub::HandleShellDump, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
@@ -1247,6 +1262,103 @@ ErrCode AnsManagerStub::HandleRemoveGroupByBundle(MessageParcel &data, MessagePa
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleIsDistributedEnabled(MessageParcel &data, MessageParcel &reply)
+{
+    bool enabled = false;
+    ErrCode result = IsDistributedEnabled(enabled);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleIsDistributedEnabled] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteBool(enabled)) {
+        ANS_LOGW("[HandleIsDistributedEnabled] fail: write enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleEnableDistributed(MessageParcel &data, MessageParcel &reply)
+{
+    bool enabled = false;
+    if (!data.ReadBool(enabled)) {
+        ANS_LOGW("[HandleEnableDistributed] fail: read enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = EnableDistributed(enabled);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleEnableDistributed] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleEnableDistributedByBundle(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleEnableDistributedByBundle] fail: read bundle failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    bool enabled = false;
+    if (!data.ReadBool(enabled)) {
+        ANS_LOGW("[HandleEnableDistributedByBundle] fail: read enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = EnableDistributedByBundle(bundleOption, enabled);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleEnableDistributedByBundle] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleEnableDistributedSelf(MessageParcel &data, MessageParcel &reply)
+{
+    bool enabled = false;
+    if (!data.ReadBool(enabled)) {
+        ANS_LOGW("[HandleEnableDistributedSelf] fail: read enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = EnableDistributedSelf(enabled);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleEnableDistributedSelf] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleIsDistributedEnableByBundle(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[HandleIsDistributedEnableByBundle] fail: read bundle failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    bool enabled = false;
+    ErrCode result = IsDistributedEnableByBundle(bundleOption, enabled);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleIsDistributedEnableByBundle] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteBool(enabled)) {
+        ANS_LOGW("[HandleIsDistributedEnableByBundle] fail: write enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleShellDump(MessageParcel &data, MessageParcel &reply)
 {
     std::string dumpOption;
@@ -1740,6 +1852,36 @@ ErrCode AnsManagerStub::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &
 ErrCode AnsManagerStub::DoesSupportDoNotDisturbMode(bool &doesSupport)
 {
     ANS_LOGW("AnsManagerStub::DoesSupportDoNotDisturbMode called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::IsDistributedEnabled(bool &enabled)
+{
+    ANS_LOGW("AnsManagerStub::IsDistributedEnabled called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::EnableDistributed(bool enabled)
+{
+    ANS_LOGW("AnsManagerStub::EnableDistributed called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled)
+{
+    ANS_LOGW("AnsManagerStub::EnableDistributedByBundle called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::EnableDistributedSelf(bool enabled)
+{
+    ANS_LOGW("AnsManagerStub::EnableDistributedSelf called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
+{
+    ANS_LOGW("AnsManagerStub::IsDistributedEnableByBundle called!");
     return ERR_INVALID_OPERATION;
 }
 

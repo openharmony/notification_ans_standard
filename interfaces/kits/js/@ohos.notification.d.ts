@@ -547,11 +547,11 @@ declare namespace notification {
    * Obtains whether the template is supported by the system.
    *
    * @since 8
-   * @param plateName Name of template to be Obtained
+   * @param templateName Name of template to be Obtained
    */
-  function isSupportTemplate(plateName: string, callback: AsyncCallback<boolean>): void;
-  function isSupportTemplate(plateName: string): Promise<boolean>;
-  
+  function isSupportTemplate(templateName: string, callback: AsyncCallback<boolean>): void;
+  function isSupportTemplate(templateName: string): Promise<boolean>;
+
   /**
    * Describes a BundleOption.
    */
@@ -569,34 +569,82 @@ declare namespace notification {
   }
 
   /**
-   * DisturbMode
+   * The type of the Do Not Disturb.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  export enum DoNotDisturbType {
+    /**
+     * Non do not disturb type notification
+     */
+    TYPE_NONE = 0,
+
+    /**
+     * Execute do not disturb once in the set time period (only watch hours and minutes)
+     */
+    TYPE_ONCE = 1,
+
+    /**
+     * Execute do not disturb every day with a set time period (only watch hours and minutes)
+     */
+    TYPE_DAILY = 2,
+
+    /**
+     * Execute in the set time period (specify the time, month, day and hour)
+     */
+    TYPE_CLEARLY = 3,
+  }
+
+  /**
+   * Describes a DoNotDisturbDate instance.
    *
    * @systemapi Hide this for inner system use.
    */
-  export enum DoNotDisturbMode {
-    ALLOW_UNKNOWN,
+  export interface DoNotDisturbDate {
+    /**
+     * the type of the Do Not Disturb.
+     *
+     * @since 8
+     */
+    type: DoNotDisturbType;
 
     /**
-     * Indicates that all notifications are allowed to interrupt the user in Do Not Disturb mode.
+     * the start time of the Do Not Disturb.
+     *
+     * @since 8
      */
-    ALLOW_ALL,
+    begin: Date;
 
     /**
-     * Indicates that only notifications meeting the specified priority criteria are allowed to interrupt
-     * the user in Do Not Disturb mode.
+     * the end time of the Do Not Disturb.
+     *
+     * @since 8
      */
-    ALLOW_PRIORITY,
+    end: Date;
+  }
+
+  /**
+   * Notification source type
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  export enum SourceType {
+    /**
+     * General notification
+     */
+    TYPE_NORMAL = 0x00000000,
 
     /**
-     * Indicates that no notifications are allowed to interrupt the user in Do Not Disturb mode.
+     * Continuous notification
      */
-    ALLOW_NONE,
+    TYPE_CONTINUOUS = 0x00000001,
 
     /**
-     * Indicates that only notifications of the {@link NotificationRequest#CLASSIFICATION_ALARM} category
-     * are allowed to interrupt the user in Do Not Disturb mode.
+     * Scheduled notification
      */
-    ALLOW_ALARMS
+    TYPE_TIMER = 0x00000002,
   }
 
   /**

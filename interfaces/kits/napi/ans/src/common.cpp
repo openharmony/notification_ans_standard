@@ -162,6 +162,52 @@ napi_value Common::ParseParaOnlyCallback(const napi_env &env, const napi_callbac
     return Common::NapiGetNull(env);
 }
 
+napi_value Common::SetNotificationByDistributedOptions(
+    const napi_env &env, const OHOS::Notification::Notification *notification, napi_value &result)
+{
+    ANS_LOGI("enter");
+    if (notification == nullptr) {
+        ANS_LOGE("notification is nullptr");
+        return NapiGetBoolean(env, false);
+    }
+
+    NotificationDistributedOptions options = notification->GetNotificationRequest().GetNotificationDistributedOptions();
+    napi_value value = nullptr;
+    // isDistributed?: boolean
+    napi_get_boolean(env, options.IsDistributed(), &value);
+    napi_set_named_property(env, result, "isDistributed", value);
+
+    // supportDisplayDevices?: Array<string>
+    int count = 0;
+    napi_value arrSupportDisplayDevices = nullptr;
+    napi_create_array(env, &arrSupportDisplayDevices);
+    std::vector<std::string> displayDevices = options.GetDevicesSupportDisplay();
+    for (auto vec : displayDevices) {
+        napi_value vecValue = nullptr;
+        ANS_LOGI("supportDisplayDevices = %{public}s", vec.c_str());
+        napi_create_string_utf8(env, vec.c_str(), NAPI_AUTO_LENGTH, &vecValue);
+        napi_set_element(env, arrSupportDisplayDevices, count, vecValue);
+        count ++;
+    }
+    napi_set_named_property(env, result, "supportDisplayDevices", arrSupportDisplayDevices);
+
+    // supportOperateDevices?: Array<string>
+    count = 0;
+    napi_value arrSupportOperateDevices = nullptr;
+    napi_create_array(env, &arrSupportOperateDevices);
+    std::vector<std::string> operateDevices = options.GetDevicesSupportOperate();
+    for (auto vec : operateDevices) {
+        napi_value vecValue = nullptr;
+        ANS_LOGI("supportOperateDevices  = %{public}s", vec.c_str());
+        napi_create_string_utf8(env, vec.c_str(), NAPI_AUTO_LENGTH, &vecValue);
+        napi_set_element(env, arrSupportOperateDevices, count, vecValue);
+        count ++;
+    }
+    napi_set_named_property(env, result, "supportOperateDevices", arrSupportOperateDevices);
+
+    return NapiGetBoolean(env, true);
+}
+
 napi_value Common::SetNotification(
     const napi_env &env, const OHOS::Notification::Notification *notification, napi_value &result)
 {
@@ -197,6 +243,14 @@ napi_value Common::SetNotification(
     napi_create_int32(env, notification->GetPid(), &value);
     napi_set_named_property(env, result, "creatorPid", value);
 
+    // distributedOption?:DistributedOptions
+    napi_value distributedResult = nullptr;
+    napi_create_object(env, &distributedResult);
+    if (!SetNotificationByDistributedOptions(env, notification, distributedResult)) {
+        return NapiGetBoolean(env, false);
+    }
+    napi_set_named_property(env, result, "distributedOption", distributedResult);
+
     // readonly isRemoveAllowed?: boolean
     napi_get_boolean(env, notification->IsRemoveAllowed(), &value);
     napi_set_named_property(env, result, "isRemoveAllowed", value);
@@ -208,6 +262,10 @@ napi_value Common::SetNotification(
     }
     napi_create_int32(env, (int32_t)sourceType, &value);
     napi_set_named_property(env, result, "source", value);
+
+    // readonly deviceId?: string
+    napi_create_string_utf8(env, notification->GetDeviceId().c_str(), NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, "deviceId", value);
 
     return NapiGetBoolean(env, true);
 }
@@ -1420,6 +1478,10 @@ napi_value Common::GetNotificationRequestByCustom(
     if (GetNotificationLargeIcon(env, value, request) == nullptr) {
         return nullptr;
     }
+    // distributedOption?:DistributedOptions
+    if (GetNotificationRequestDistributedOptions(env, value, request) == nullptr) {
+        return nullptr;
+    }
     // template?: NotificationTemplate
     if (GetNotificationTemplate(env, value, request) == nullptr) {
         return nullptr;
@@ -2457,6 +2519,127 @@ napi_value Common::GetNotificationLargeIcon(const napi_env &env, const napi_valu
         }
         request.SetBigIcon(pixelMap);
     }
+
+    return NapiGetNull(env);
+}
+
+napi_value Common::GetNotificationRequestDistributedOptions(const napi_env &env,
+    const napi_value &value, NotificationRequest &request)
+{
+    ANS_LOGI("enter");
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+    bool hasProperty = false;
+
+    // distributedOption?: DistributedOptions
+    NAPI_CALL(env, napi_has_named_property(env, value, "distributedOption", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "distributedOption", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+
+        // isDistributed?: boolean
+        if (GetNotificationIsDistributed(env, result, request) == nullptr) {
+            return nullptr;
+        }
+
+        // supportDisplayDevices?: Array<string>
+        if (GetNotificationSupportDisplayDevices(env, result, request) == nullptr) {
+            return nullptr;
+        }
+
+        // supportOperateDevices?: Array<string>
+        if (GetNotificationSupportOperateDevices(env, result, request) == nullptr) {
+            return nullptr;
+        }
+    }
+
+    return NapiGetNull(env);
+}
+
+napi_value Common::GetNotificationIsDistributed(
+    const napi_env &env, const napi_value &value, NotificationRequest &request)
+{
+    ANS_LOGI("enter");
+
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+    bool hasProperty = false;
+    bool isDistributed = false;
+
+    NAPI_CALL(env, napi_has_named_property(env, value, "isDistributed", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "isDistributed", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
+        napi_get_value_bool(env, result, &isDistributed);
+        request.SetDistributed(isDistributed);
+    }
+
+    return NapiGetNull(env);
+}
+
+napi_value Common::GetNotificationSupportDisplayDevices(
+    const napi_env &env, const napi_value &value, NotificationRequest &request)
+{
+    ANS_LOGI("enter");
+
+    bool isArray = false;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value supportDisplayDevices = nullptr;
+    char str[STR_MAX_SIZE] = {0};
+    size_t strLen = 0;
+    uint32_t length = 0;
+
+    napi_get_named_property(env, value, "supportDisplayDevices", &supportDisplayDevices);
+    napi_is_array(env, supportDisplayDevices, &isArray);
+    NAPI_ASSERT(env, isArray, "Property supportDisplayDevices is expected to be an array.");
+
+    napi_get_array_length(env, supportDisplayDevices, &length);
+    NAPI_ASSERT(env, length > 0, "The array is empty.");
+    std::vector<std::string> devices;
+    for (size_t i = 0; i < length; i++) {
+        napi_value line = nullptr;
+        napi_get_element(env, supportDisplayDevices, i, &line);
+        NAPI_CALL(env, napi_typeof(env, line, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
+        devices.emplace_back(str);
+        ANS_LOGI("supportDisplayDevices = %{public}s", str);
+    }
+    request.SetDevicesSupportDisplay(devices);
+    return NapiGetNull(env);
+}
+
+napi_value Common::GetNotificationSupportOperateDevices(
+    const napi_env &env, const napi_value &value, NotificationRequest &request)
+{
+    ANS_LOGI("enter");
+
+    bool isArray = false;
+    napi_valuetype valuetype = napi_undefined;
+    napi_value supportOperateDevices = nullptr;
+    char str[STR_MAX_SIZE] = {0};
+    size_t strLen = 0;
+    uint32_t length = 0;
+
+    napi_get_named_property(env, value, "supportOperateDevices", &supportOperateDevices);
+    napi_is_array(env, supportOperateDevices, &isArray);
+    NAPI_ASSERT(env, isArray, "Property supportOperateDevices is expected to be an array.");
+
+    napi_get_array_length(env, supportOperateDevices, &length);
+    NAPI_ASSERT(env, length > 0, "The array is empty.");
+    std::vector<std::string> devices;
+    for (size_t i = 0; i < length; i++) {
+        napi_value line = nullptr;
+        napi_get_element(env, supportOperateDevices, i, &line);
+        NAPI_CALL(env, napi_typeof(env, line, &valuetype));
+        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+        NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
+        devices.emplace_back(str);
+        ANS_LOGI("supportOperateDevices = %{public}s", str);
+    }
+    request.SetDevicesSupportOperate(devices);
 
     return NapiGetNull(env);
 }

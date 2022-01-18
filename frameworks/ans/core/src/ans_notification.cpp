@@ -210,6 +210,9 @@ ErrCode AnsNotification::PublishNotification(const std::string &label, const Not
         ANS_LOGE("Failed to create NotificationRequest ptr");
         return ERR_ANS_NO_MEMORY;
     }
+    if (IsNonDistributedNotificationType(reqPtr->GetNotificationType())) {
+        reqPtr->SetDistributed(false);
+    }
     return ansManagerProxy_->Publish(label, reqPtr);
 }
 
@@ -217,6 +220,12 @@ ErrCode AnsNotification::PublishNotification(const NotificationRequest &request,
 {
     if (request.GetContent() == nullptr || request.GetNotificationType() == NotificationContent::Type::NONE) {
         ANS_LOGE("Refuse to publish the notification without valid content");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!deviceId.empty() &&
+        (IsNonDistributedNotificationType(request.GetNotificationType()))) {
+        ANS_LOGE("Refuse to publish the conversational and picture notification to the remote device");
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -361,6 +370,9 @@ ErrCode AnsNotification::PublishNotificationAsBundle(
     if (reqPtr == nullptr) {
         ANS_LOGE("Failed to create NotificationRequest ptr");
         return ERR_ANS_NO_MEMORY;
+    }
+    if (IsNonDistributedNotificationType(reqPtr->GetNotificationType())) {
+        reqPtr->SetDistributed(false);
     }
     return ansManagerProxy_->PublishAsBundle(reqPtr, representativeBundle);
 }
@@ -820,6 +832,23 @@ ErrCode AnsNotification::DoesSupportDoNotDisturbMode(bool &doesSupport)
 
 ErrCode AnsNotification::PublishContinuousTaskNotification(const NotificationRequest &request)
 {
+    if (request.GetContent() == nullptr || request.GetNotificationType() == NotificationContent::Type::NONE) {
+        ANS_LOGE("Refuse to publish the notification without valid content");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!CanPublishMediaContent(request)) {
+        ANS_LOGE("Refuse to publish the notification because the sequence numbers actions not match those assigned to "
+                 "added action buttons.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode checkErr = CheckImageSize(request);
+    if (checkErr != ERR_OK) {
+        ANS_LOGE("The size of one picture exceeds the limit");
+        return checkErr;
+    }
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
@@ -827,11 +856,14 @@ ErrCode AnsNotification::PublishContinuousTaskNotification(const NotificationReq
 
     auto pReq = new (std::nothrow) NotificationRequest(request);
     if (pReq == nullptr) {
-        ANS_LOGE("create NotificationRequest failed.");
+        ANS_LOGE("Failed to create NotificationRequest ptr.");
         return ERR_ANS_NO_MEMORY;
     }
 
     sptr<NotificationRequest> sptrReq(pReq);
+    if (IsNonDistributedNotificationType(sptrReq->GetNotificationType())) {
+        sptrReq->SetDistributed(false);
+    }
     return ansManagerProxy_->PublishContinuousTaskNotification(sptrReq);
 }
 
@@ -843,6 +875,58 @@ ErrCode AnsNotification::CancelContinuousTaskNotification(const std::string &lab
     }
 
     return ansManagerProxy_->CancelContinuousTaskNotification(label, notificationId);
+}
+
+ErrCode AnsNotification::IsDistributedEnabled(bool &enabled)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->IsDistributedEnabled(enabled);
+}
+
+ErrCode AnsNotification::EnableDistributed(const bool enabled)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->EnableDistributed(enabled);
+}
+
+ErrCode AnsNotification::EnableDistributedByBundle(const NotificationBundleOption &bundleOption, const bool enabled)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
+    return ansManagerProxy_->EnableDistributedByBundle(bo, enabled);
+}
+
+ErrCode AnsNotification::EnableDistributedSelf(const bool enabled)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->EnableDistributedSelf(enabled);
+}
+
+ErrCode AnsNotification::IsDistributedEnableByBundle(const NotificationBundleOption &bundleOption, bool &enabled)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
+    return ansManagerProxy_->IsDistributedEnableByBundle(bo, enabled);
 }
 
 void AnsNotification::ResetAnsManagerProxy()
@@ -1108,6 +1192,15 @@ ErrCode AnsNotification::IsSupportTemplate(const std::string &templateName, bool
     }
 
     return ansManagerProxy_->IsSupportTemplate(templateName, support);
+}
+
+bool AnsNotification::IsNonDistributedNotificationType(const NotificationContent::Type &type)
+{
+    if ((type == NotificationContent::Type::CONVERSATION) ||
+        (type == NotificationContent::Type::PICTURE)) {
+        return true;
+    }
+    return false;
 }
 }  // namespace Notification
 }  // namespace OHOS

@@ -25,7 +25,14 @@ Notification::Notification() {};
 Notification::Notification(const sptr<NotificationRequest> &request)
 {
     request_ = request;
-    key_ = GenerateNotificationKey(GetUid(), GetLabel(), GetId());
+    key_ = GenerateNotificationKey("", GetUid(), GetLabel(), GetId());
+}
+
+Notification::Notification(const std::string &deviceId, const sptr<NotificationRequest> &request)
+{
+    deviceId_ = deviceId;
+    request_ = request;
+    key_ = GenerateNotificationKey(deviceId, GetUid(), GetLabel(), GetId());
 }
 
 Notification::Notification(const Notification &other)
@@ -42,6 +49,7 @@ Notification::Notification(const Notification &other)
     vibrationStyle_ = other.vibrationStyle_;
     isRemoveAllowed_ = other.isRemoveAllowed_;
     sourceType_ = other.sourceType_;
+    deviceId_ = other.deviceId_;
 }
 
 Notification::~Notification()
@@ -182,6 +190,11 @@ NotificationConstant::SourceType Notification::GetSourceType() const
     return sourceType_;
 }
 
+std::string Notification::GetDeviceId() const
+{
+    return deviceId_;
+}
+
 int32_t Notification::GetUserId() const
 {
     if (request_ == nullptr) {
@@ -227,6 +240,11 @@ bool Notification::MarshallingString(Parcel &parcel) const
             ANS_LOGE("Can't write sound");
             return false;
         }
+    }
+
+    if (!parcel.WriteString(deviceId_)) {
+        ANS_LOGE("Can't wirte deviceId");
+        return false;
     }
 
     return true;
@@ -322,6 +340,9 @@ void Notification::ReadFromParcelString(Parcel &parcel)
     if (enableSound_) {
         sound_ = std::make_shared<Uri>(parcel.ReadString());
     }
+
+    // Read deviceId_
+    deviceId_ = parcel.ReadString();
 }
 
 void Notification::ReadFromParcelInt32(Parcel &parcel)
@@ -364,7 +385,7 @@ bool Notification::ReadFromParcel(Parcel &parcel)
 
 Notification *Notification::Unmarshalling(Parcel &parcel)
 {
-    Notification *n = new Notification();
+    Notification *n = new (std::nothrow) Notification();
     if (n && !n->ReadFromParcel(parcel)) {
         ANS_LOGE("Read from parcel error");
         delete n;
@@ -413,12 +434,13 @@ void Notification::SetVibrationStyle(const std::vector<int64_t> &style)
     vibrationStyle_ = style;
 }
 
-std::string Notification::GenerateNotificationKey(int32_t uid, const std::string &label, int32_t id)
+std::string Notification::GenerateNotificationKey(
+    const std::string &deviceId, int32_t uid, const std::string &label, int32_t id)
 {
     const char *KEY_SPLITER = "_";
 
     std::stringstream stream;
-    stream << uid << KEY_SPLITER << label << KEY_SPLITER << id;
+    stream << deviceId << KEY_SPLITER << uid << KEY_SPLITER << label << KEY_SPLITER << id;
 
     return stream.str();
 }
@@ -435,22 +457,23 @@ void Notification::SetSourceType(NotificationConstant::SourceType sourceType)
 
 std::string Notification::Dump() const
 {
-    std::string dump = "Notification{ key = " + key_ + ", ledLightColor = " + std::to_string(ledLightColor_) +
-                       ", lockscreenVisbleness = " + std::to_string(static_cast<int32_t>(lockscreenVisibleness_)) +
-                       ", isRemoveAllowed = " + (isRemoveAllowed_ ? "true" : "false") +
-                       ", sourceType = " + std::to_string(static_cast<int32_t>(sourceType_)) +
-                       ",request = ";
-    if (request_ == nullptr) {
-        dump += "nullptr";
-    } else {
-        dump += request_->Dump();
-    }
-    dump = dump + ",postTime = " + std::to_string(postTime_) + ",sound = " + sound_->ToString() + "vibrationStyle = ";
+    std::string vibrationStyle = "";
     for (auto &style : vibrationStyle_) {
-        dump += std::to_string(style);
-        dump += ",";
+        vibrationStyle += std::to_string(style);
+        vibrationStyle += ", ";
     }
-    return dump;
+    return "Notification{ "
+            "key = " + key_ +
+            ", ledLightColor = " + std::to_string(ledLightColor_) +
+            ", lockscreenVisbleness = " + std::to_string(static_cast<int32_t>(lockscreenVisibleness_)) +
+            ", isRemoveAllowed = " + (isRemoveAllowed_ ? "true" : "false") +
+            ", sourceType = " + std::to_string(static_cast<int32_t>(sourceType_)) +
+            ", deviceId = " + deviceId_ +
+            ", request = " + (request_ == nullptr ? "nullptr" : request_->Dump()) +
+            ", postTime = " + std::to_string(postTime_) +
+            ", sound = " + (sound_ == nullptr ? "nullptr" : sound_->ToString()) +
+            ", vibrationStyle = [" + vibrationStyle + "]" +
+            " }";
 }
 }  // namespace Notification
 }  // namespace OHOS
