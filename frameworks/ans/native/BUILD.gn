@@ -25,9 +25,6 @@ config("ans_innerkits_public_config") {
     "${interfaces_path}/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
-    "//third_party/json/single_include",
-    "//third_party/jsoncpp/include",
-    "//utils/system/safwk/native/include",
   ]
   configs = [ "${frameworks_path}/wantagent:wantagent_innerkits_public_config" ]
 }

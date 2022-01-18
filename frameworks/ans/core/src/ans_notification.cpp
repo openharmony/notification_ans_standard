@@ -210,8 +210,7 @@ ErrCode AnsNotification::PublishNotification(const std::string &label, const Not
         ANS_LOGE("Failed to create NotificationRequest ptr");
         return ERR_ANS_NO_MEMORY;
     }
-    if ((reqPtr->GetNotificationType() == NotificationContent::Type::CONVERSATION) ||
-        (reqPtr->GetNotificationType() == NotificationContent::Type::PICTURE)) {
+    if (IsNonDistributedNotificationType(reqPtr->GetNotificationType())) {
         reqPtr->SetDistributed(false);
     }
     return ansManagerProxy_->Publish(label, reqPtr);
@@ -225,8 +224,7 @@ ErrCode AnsNotification::PublishNotification(const NotificationRequest &request,
     }
 
     if (!deviceId.empty() &&
-        ((request.GetNotificationType() == NotificationContent::Type::CONVERSATION) ||
-        (request.GetNotificationType() == NotificationContent::Type::PICTURE))) {
+        (IsNonDistributedNotificationType(request.GetNotificationType()))) {
         ANS_LOGE("Refuse to publish the conversational and picture notification to the remote device");
         return ERR_ANS_INVALID_PARAM;
     }
@@ -373,8 +371,7 @@ ErrCode AnsNotification::PublishNotificationAsBundle(
         ANS_LOGE("Failed to create NotificationRequest ptr");
         return ERR_ANS_NO_MEMORY;
     }
-    if ((reqPtr->GetNotificationType() == NotificationContent::Type::CONVERSATION) ||
-        (reqPtr->GetNotificationType() == NotificationContent::Type::PICTURE)) {
+    if (IsNonDistributedNotificationType(reqPtr->GetNotificationType())) {
         reqPtr->SetDistributed(false);
     }
     return ansManagerProxy_->PublishAsBundle(reqPtr, representativeBundle);
@@ -864,8 +861,7 @@ ErrCode AnsNotification::PublishContinuousTaskNotification(const NotificationReq
     }
 
     sptr<NotificationRequest> sptrReq(pReq);
-    if ((sptrReq->GetNotificationType() == NotificationContent::Type::CONVERSATION) ||
-        (sptrReq->GetNotificationType() == NotificationContent::Type::PICTURE)) {
+    if (IsNonDistributedNotificationType(sptrReq->GetNotificationType())) {
         sptrReq->SetDistributed(false);
     }
     return ansManagerProxy_->PublishContinuousTaskNotification(sptrReq);
@@ -1196,6 +1192,15 @@ ErrCode AnsNotification::IsSupportTemplate(const std::string &templateName, bool
     }
 
     return ansManagerProxy_->IsSupportTemplate(templateName, support);
+}
+
+bool AnsNotification::IsNonDistributedNotificationType(const NotificationContent::Type &type)
+{
+    if ((type == NotificationContent::Type::CONVERSATION) ||
+        (type == NotificationContent::Type::PICTURE)) {
+        return true;
+    }
+    return false;
 }
 }  // namespace Notification
 }  // namespace OHOS
