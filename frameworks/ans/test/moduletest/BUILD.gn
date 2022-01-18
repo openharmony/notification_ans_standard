@@ -22,11 +22,10 @@ config("public_ans_config") {
     "${core_path}/common/include",
     "//utils/native/base/include",
     "${services_path}/ans/include",
-    "//foundation/appexecfwk/adapter/interfaces/innerkits/libeventhandler/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
     "${core_path}/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
+
+    #"//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content/",
   ]
 }
 
@@ -38,10 +37,7 @@ ohos_moduletest("ans_fw_module_test") {
     "${interfaces_path}/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/appexecfwk/standard/libs/libeventhandler/src",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy/include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "//base/notification/ans_standard/services/ans/include",
@@ -88,14 +84,6 @@ ohos_moduletest("ans_fw_module_test") {
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -109,11 +97,14 @@ ohos_moduletest("ans_fw_module_test") {
   external_deps = [
     "aafwk_standard:want",
     "appexecfwk_standard:appexecfwk_base",
+    "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -155,9 +146,14 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include/",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils/",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
+    "//foundation/multimedia/image_standard/interfaces/innerkits/include",
+    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
   ]
 
   sources = [
@@ -183,15 +179,6 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/base:base",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -203,13 +190,16 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
   }
 
   external_deps = [
+    "aafwk_standard:base",
     "aafwk_standard:want",
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -251,9 +241,13 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include/",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils/",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
+    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
   ]
 
   sources = [
@@ -276,14 +270,6 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -300,8 +286,10 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -343,9 +331,13 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include/",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils/",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log/",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
+    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
+    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
   ]
 
   sources = [
@@ -368,14 +360,6 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
-    "//foundation/aafwk/standard/interfaces/innerkits/want:want",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base:appexecfwk_base",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core:appexecfwk_core",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler:libeventhandler",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
-    "//foundation/distributedschedule/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "//foundation/distributedschedule/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -392,8 +376,10 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
