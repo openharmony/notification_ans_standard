@@ -87,6 +87,19 @@ public:
     std::string Dump() override;
 
     /**
+     * Converts a NotificationLongTextContent object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationLongTextContent object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationLongTextContent.
+     */
+    static NotificationLongTextContent *FromJson(const nlohmann::json &jsonObject);
+
+    /**
      * Marshal a object into a Parcel.
      * @param parcel the object into the parcel
      */

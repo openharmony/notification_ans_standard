@@ -99,7 +99,6 @@ void NotificationSubscriberManager::NotifyConsumed(
         ANS_LOGE("handler is nullptr");
         return;
     }
-
     AppExecFwk::EventHandler::Callback NotifyConsumedFunc =
         std::bind(&NotificationSubscriberManager::NotifyConsumedInner, this, notification, notificationMap);
 

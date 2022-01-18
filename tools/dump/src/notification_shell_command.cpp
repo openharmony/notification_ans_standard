@@ -140,6 +140,5 @@ ErrCode NotificationShellCommand::RunAsDumpCommand()
 
     return ret;
 }
-
 }  // namespace Notification
 }  // namespace OHOS

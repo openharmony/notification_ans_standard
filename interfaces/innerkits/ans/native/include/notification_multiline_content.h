@@ -84,6 +84,19 @@ public:
     std::string Dump() override;
 
     /**
+     * Converts a NotificationMultiLineContent object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    virtual bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationMultiLineContent object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationMultiLineContent.
+     */
+    static NotificationMultiLineContent *FromJson(const nlohmann::json &jsonObject);
+
+    /**
      * Marshal a object into a Parcel.
      * @param parcel the object into the parcel
      */

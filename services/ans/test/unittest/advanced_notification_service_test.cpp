@@ -35,7 +35,6 @@ using namespace OHOS::Media;
 
 namespace OHOS {
 namespace Notification {
-
 class AdvancedNotificationServiceTest : public testing::Test {
 public:
     static void SetUpTestCase();

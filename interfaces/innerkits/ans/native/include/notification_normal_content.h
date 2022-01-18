@@ -40,6 +40,19 @@ public:
     std::string Dump() override;
 
     /**
+     * Converts a NotificationNormalContent object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationNormalContent object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationNormalContent.
+     */
+    static NotificationNormalContent *FromJson(const nlohmann::json &jsonObject);
+
+    /**
      * Marshal a object into a Parcel.
      * @param parcel the object into the parcel
      */

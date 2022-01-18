@@ -65,6 +65,71 @@ std::string NotificationConversationalMessage::Dump()
             " }";
 }
 
+bool NotificationConversationalMessage::ToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["arrivedTime"] = arrivedTime_;
+    jsonObject["text"]        = text_;
+
+    nlohmann::json userObj;
+    if (!NotificationJsonConverter::ConvertToJosn(&sender_, userObj)) {
+        ANS_LOGE("Cannot convert sender to JSON");
+        return false;
+    }
+    jsonObject["sender"] = userObj;
+
+    jsonObject["uri"]      = uri_ ? uri_->ToString() : "";
+    jsonObject["mimeType"] = mimeType_;
+
+    return true;
+}
+
+NotificationConversationalMessage *NotificationConversationalMessage::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pMessage = new (std::nothrow) NotificationConversationalMessage();
+    if (pMessage == nullptr) {
+        ANS_LOGE("Failed to create conversationalMessage instance");
+        return nullptr;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("arrivedTime") != jsonEnd) {
+        pMessage->arrivedTime_ = jsonObject.at("arrivedTime").get<int64_t>();
+    }
+
+    if (jsonObject.find("text") != jsonEnd) {
+        pMessage->text_ = jsonObject.at("text").get<std::string>();
+    }
+
+    if (jsonObject.find("sender") != jsonEnd) {
+        auto userObj = jsonObject.at("sender");
+        auto pUser   = NotificationJsonConverter::ConvertFromJosn<MessageUser>(userObj);
+        if (pUser != nullptr) {
+            pMessage->sender_ = *pUser;
+
+            delete pUser;
+            pUser = nullptr;
+        }
+    }
+
+    if (jsonObject.find("uri") != jsonEnd) {
+        auto uriStr = jsonObject.at("uri").get<std::string>();
+        if (!uriStr.empty()) {
+            pMessage->uri_ = std::make_shared<Uri>(uriStr);
+        }
+    }
+
+    if (jsonObject.find("mimeType") != jsonEnd) {
+        pMessage->mimeType_ = jsonObject.at("mimeType").get<std::string>();
+    }
+
+    return pMessage;
+}
+
 bool NotificationConversationalMessage::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteInt64(arrivedTime_)) {

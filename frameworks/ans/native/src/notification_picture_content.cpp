@@ -14,6 +14,7 @@
  */
 
 #include "notification_picture_content.h"
+#include "ans_image_util.h"
 #include "ans_log_wrapper.h"
 
 namespace OHOS {
@@ -55,6 +56,52 @@ std::string NotificationPictureContent::Dump()
             ", expandedTitle = " + expandedTitle_ +
             ", bigPicture = " + (bigPicture_ ? "not null" : "null") +
             " }";
+}
+
+bool NotificationPictureContent::ToJson(nlohmann::json &jsonObject) const
+{
+    if (!NotificationBasicContent::ToJson(jsonObject)) {
+        ANS_LOGE("Cannot convert basicContent to JSON");
+        return false;
+    }
+
+    jsonObject["expandedTitle"] = expandedTitle_;
+    jsonObject["briefText"]     = briefText_;
+    jsonObject["bigPicture"]    = AnsImageUtil::PackImage(bigPicture_);
+
+    return true;
+}
+
+NotificationPictureContent *NotificationPictureContent::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pContent = new (std::nothrow) NotificationPictureContent();
+    if (pContent == nullptr) {
+        ANS_LOGE("Failed to create pictureContent instance");
+        return nullptr;
+    }
+
+    pContent->ReadFromJson(jsonObject);
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("expandedTitle") != jsonEnd) {
+        pContent->expandedTitle_ = jsonObject.at("expandedTitle").get<std::string>();
+    }
+
+    if (jsonObject.find("briefText") != jsonEnd) {
+        pContent->briefText_ = jsonObject.at("briefText").get<std::string>();
+    }
+
+    if (jsonObject.find("bigPicture") != jsonEnd) {
+        auto picStr           = jsonObject.at("bigPicture").get<std::string>();
+        pContent->bigPicture_ = AnsImageUtil::UnPackImage(picStr);
+    }
+
+    return pContent;
 }
 
 bool NotificationPictureContent::Marshalling(Parcel &parcel) const

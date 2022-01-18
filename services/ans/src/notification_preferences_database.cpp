@@ -145,7 +145,7 @@ OHOS::DistributedKv::Status NotificationPreferencesDatabase::GetKvStore()
     OHOS::DistributedKv::Options options = {
         .createIfMissing = true,
         .encrypt = false,
-        .autoSync = true,
+        .autoSync = false,
         .kvStoreType = OHOS::DistributedKv::KvStoreType::SINGLE_VERSION,
     };
     auto status = dataManager_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
@@ -1312,6 +1312,7 @@ std::string NotificationPreferencesDatabase::GenerateBundleLablel(
 {
     return bundleInfo.GetBundleName().append(std::to_string(bundleInfo.GetBundleUid()));
 }
+
 void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreferencesInfo &info, int userId)
 {
     std::string key =
@@ -1407,6 +1408,5 @@ void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPrefe
             }
         });
 }
-
 }  // namespace Notification
 }  // namespace OHOS
