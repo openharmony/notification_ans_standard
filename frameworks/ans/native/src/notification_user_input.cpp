@@ -16,6 +16,7 @@
 #include "notification_user_input.h"
 
 #include "ans_log_wrapper.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
@@ -225,6 +226,74 @@ std::string NotificationUserInput::Dump()
             ", permitMimeTypes = [" + permitMimeTypes + "]" +
             ", editType = " + std::to_string(static_cast<int32_t>(editType_)) +
             " }";
+}
+
+bool NotificationUserInput::ToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["inputKey"]            = inputKey_;
+    jsonObject["tag"]                 = tag_;
+    jsonObject["options"]             = nlohmann::json(options_);
+    jsonObject["permitFreeFormInput"] = permitFreeFormInput_;
+    jsonObject["permitMimeTypes"]     = nlohmann::json(permitMimeTypes_);
+    jsonObject["editType"]            = static_cast<int32_t>(editType_);
+    std::string additionalDataStr;
+    if (additionalData_) {
+        AAFwk::WantParamWrapper wWrapper(*additionalData_);
+        additionalDataStr = wWrapper.ToString();
+    }
+    jsonObject["additionalData"] = additionalDataStr;
+
+    return true;
+}
+
+NotificationUserInput *NotificationUserInput::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pUserInput = new (std::nothrow) NotificationUserInput();
+    if (pUserInput == nullptr) {
+        ANS_LOGE("Failed to create userInput instance");
+        return nullptr;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("inputKey") != jsonEnd) {
+        pUserInput->inputKey_ = jsonObject.at("inputKey").get<std::string>();
+    }
+
+    if (jsonObject.find("tag") != jsonEnd) {
+        pUserInput->tag_ = jsonObject.at("tag").get<std::string>();
+    }
+
+    if (jsonObject.find("options") != jsonEnd) {
+        pUserInput->options_ = jsonObject.at("options").get<std::vector<std::string>>();
+    }
+
+    if (jsonObject.find("permitFreeFormInput") != jsonEnd) {
+        pUserInput->permitFreeFormInput_ = jsonObject.at("permitFreeFormInput").get<bool>();
+    }
+
+    if (jsonObject.find("permitMimeTypes") != jsonEnd) {
+        pUserInput->permitMimeTypes_ = jsonObject.at("permitMimeTypes").get<std::set<std::string>>();
+    }
+
+    if (jsonObject.find("additionalData") != jsonEnd) {
+        auto additionalDataString = jsonObject.at("additionalData").get<std::string>();
+        if (!additionalDataString.empty()) {
+            AAFwk::WantParams params = AAFwk::WantParamWrapper::ParseWantParams(additionalDataString);
+            pUserInput->additionalData_ = std::make_shared<AAFwk::WantParams>(params);
+        }
+    }
+
+    if (jsonObject.find("editType") != jsonEnd) {
+        auto editTypeValue    = jsonObject.at("editType").get<int32_t>();
+        pUserInput->editType_ = static_cast<NotificationConstant::InputEditType>(editTypeValue);
+    }
+
+    return pUserInput;
 }
 
 bool NotificationUserInput::Marshalling(Parcel &parcel) const

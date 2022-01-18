@@ -70,7 +70,7 @@ bool NotificationBundleOption::Marshalling(Parcel &parcel) const
 
 NotificationBundleOption *NotificationBundleOption::Unmarshalling(Parcel &parcel)
 {
-    auto pbundleOption = new NotificationBundleOption();
+    auto pbundleOption = new (std::nothrow) NotificationBundleOption();
     if ((nullptr != pbundleOption) && !pbundleOption->ReadFromParcel(parcel)) {
         delete pbundleOption;
         pbundleOption = nullptr;

@@ -19,6 +19,7 @@
 #include "message_user.h"
 #include "notification_basic_content.h"
 #include "notification_conversational_message.h"
+#include "notification_json_convert.h"
 #include "parcel.h"
 
 namespace OHOS {
@@ -103,6 +104,19 @@ public:
      * @return a string representation of the object.
      */
     std::string Dump() override;
+
+    /**
+     * Converts a NotificationConversationalContent object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    virtual bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationConversationalContent object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationConversationalContent.
+     */
+    static NotificationConversationalContent *FromJson(const nlohmann::json &jsonObject);
 
     /**
      * Marshal a object into a Parcel.

@@ -100,7 +100,7 @@ void BundleManagerHelper::Disconnect()
     }
 }
 
-int BundleManagerHelper::GetDefaultUidByBundleName(const std::string& bundle)
+int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle)
 {
     int uid = -1;
 

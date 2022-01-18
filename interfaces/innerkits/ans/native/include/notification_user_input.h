@@ -17,13 +17,14 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_USER_INPUT_H
 
 #include "notification_constant.h"
+#include "notification_json_convert.h"
 #include "parcel.h"
 #include "uri.h"
 #include "want.h"
 
 namespace OHOS {
 namespace Notification {
-class NotificationUserInput : public Parcelable {
+class NotificationUserInput : public Parcelable, public NotificationJsonConvertionBase {
 public:
     /**
      * Sets the input source of this NotificationUserInput object.
@@ -212,6 +213,19 @@ public:
      * @return a string representation of the object.
      */
     std::string Dump();
+
+    /**
+     * Converts a NotificationUserInput object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationUserInput object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationUserInput.
+     */
+    static NotificationUserInput *FromJson(const nlohmann::json &jsonObject);
 
     /**
      * Marshal a object into a Parcel.

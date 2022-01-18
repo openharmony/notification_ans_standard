@@ -307,12 +307,12 @@ ErrCode NotificationHelper::RemoveGroupByBundle(
     return DelayedSingleton<AnsNotification>::GetInstance()->RemoveGroupByBundle(bundleOption, groupName);
 }
 
-ErrCode NotificationHelper::SetDoNotDisturbDate(const NotificationDoNotDisturbDate & doNotDisturbDate)
+ErrCode NotificationHelper::SetDoNotDisturbDate(const NotificationDoNotDisturbDate &doNotDisturbDate)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->SetDoNotDisturbDate(doNotDisturbDate);
 }
 
-ErrCode NotificationHelper::GetDoNotDisturbDate(NotificationDoNotDisturbDate & doNotDisturbDate)
+ErrCode NotificationHelper::GetDoNotDisturbDate(NotificationDoNotDisturbDate &doNotDisturbDate)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetDoNotDisturbDate(doNotDisturbDate);
 }
@@ -320,6 +320,31 @@ ErrCode NotificationHelper::GetDoNotDisturbDate(NotificationDoNotDisturbDate & d
 ErrCode NotificationHelper::DoesSupportDoNotDisturbMode(bool &doesSupport)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->DoesSupportDoNotDisturbMode(doesSupport);
+}
+
+ErrCode NotificationHelper::IsDistributedEnabled(bool &enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->IsDistributedEnabled(enabled);
+}
+
+ErrCode NotificationHelper::EnableDistributed(const bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->EnableDistributed(enabled);
+}
+
+ErrCode NotificationHelper::EnableDistributedByBundle(const NotificationBundleOption &bundleOption, const bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->EnableDistributedByBundle(bundleOption, enabled);
+}
+
+ErrCode NotificationHelper::EnableDistributedSelf(const bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->EnableDistributedSelf(enabled);
+}
+
+ErrCode NotificationHelper::IsDistributedEnableByBundle(const NotificationBundleOption &bundleOption, bool &enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->IsDistributedEnableByBundle(bundleOption, enabled);
 }
 
 ErrCode NotificationHelper::PublishContinuousTaskNotification(const NotificationRequest &request)

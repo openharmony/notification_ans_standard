@@ -14,13 +14,12 @@
  */
 
 #include "message_user.h"
+#include "ans_image_util.h"
 #include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
-
-MessageUser::MessageUser()
-    : uri_("")
+MessageUser::MessageUser() : uri_("")
 {}
 
 MessageUser::~MessageUser()
@@ -96,6 +95,60 @@ std::string MessageUser::Dump() const
             ", isMachine = " + (isMachine_ ? "true" : "false") +
             ", isUserImportant = " + (isUserImportant_ ? "true" : "false") +
             " }";
+}
+
+bool MessageUser::ToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["key"]             = key_;
+    jsonObject["name"]            = name_;
+    jsonObject["pixelMap"]        = AnsImageUtil::PackImage(pixelMap_);
+    jsonObject["uri"]             = uri_.ToString();
+    jsonObject["isMachine"]       = isMachine_;
+    jsonObject["isUserImportant"] = isUserImportant_;
+
+    return true;
+}
+
+MessageUser *MessageUser::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    MessageUser *messageUser = new (std::nothrow) MessageUser();
+    if (messageUser == nullptr) {
+        ANS_LOGE("Failed to create messageUse instance");
+        return nullptr;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("key") != jsonEnd) {
+        messageUser->key_ = jsonObject.at("key").get<std::string>();
+    }
+
+    if (jsonObject.find("name") != jsonEnd) {
+        messageUser->name_ = jsonObject.at("name").get<std::string>();
+    }
+
+    if (jsonObject.find("pixelMap") != jsonEnd) {
+        auto pmStr             = jsonObject.at("pixelMap").get<std::string>();
+        messageUser->pixelMap_ = AnsImageUtil::UnPackImage(pmStr);
+    }
+
+    if (jsonObject.find("uri") != jsonEnd) {
+        messageUser->uri_ = Uri(jsonObject.at("uri").get<std::string>());
+    }
+
+    if (jsonObject.find("isMachine") != jsonEnd) {
+        messageUser->isMachine_ = jsonObject.at("isMachine").get<bool>();
+    }
+
+    if (jsonObject.find("isUserImportant") != jsonEnd) {
+        messageUser->isUserImportant_ = jsonObject.at("isUserImportant").get<bool>();
+    }
+
+    return messageUser;
 }
 
 bool MessageUser::Marshalling(Parcel &parcel) const

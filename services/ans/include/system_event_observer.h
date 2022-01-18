@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Notification {
 class SystemEventObserver {
 public:
-    SystemEventObserver(const ISystemEvent& callbacks);
+    SystemEventObserver(const ISystemEvent &callbacks);
     ~SystemEventObserver();
 
 private:
