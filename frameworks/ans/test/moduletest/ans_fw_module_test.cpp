@@ -1994,6 +1994,254 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00200, Function | Me
     ASSERT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
     SleepForFC();
 }
+
+/**
+ *
+ * @tc.number    : ANS_Interface_MT_GetDeviceRemindType_00100
+ * @tc.name      : GetDeviceRemindType_00100
+ * @tc.desc      : Get device remind type.
+ */
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_GetDeviceRemindType_00100, Function | MediumTest | Level1)
+{
+    auto rType{NotificationConstant::RemindType::NONE};
+    EXPECT_EQ(NotificationHelper::GetDeviceRemindType(rType), ERR_OK);
+    ANS_LOGI("ANS_Interface_MT_GetDeviceRemindType_00100:: rType : %{public}d", static_cast<int32_t>(rType));
+
+    EXPECT_NE(rType, NotificationConstant::RemindType::NONE);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_ScreenStatusChange_00100
+ * @tc.name      : ScreenStatusChange_00100
+ * @tc.desc      : Receive local screen status from common event to kvstore.
+ */
+HWTEST_F(AnsFWModuleTest, ScreenStatusChange_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer({KVSTORE_APP_ID}, {KVSTORE_SCREEN_STATUS_STORE_ID});
+    DistributedKv::Key key("<localDeviceId>");
+    std::vector<DistributedKv::Entry> entries;
+
+    PublishCommonEventScreenStatus(false);
+    EXPECT_EQ(pointer->GetEntries(key, entries), DistributedKv::Status::SUCCESS);
+    EXPECT_EQ(entries.size(), std::size_t(1));
+    EXPECT_EQ(entries[0].value.ToString(), "off");
+    entries.clear();
+
+    PublishCommonEventScreenStatus(true);
+    EXPECT_EQ(pointer->GetEntries(key, entries), DistributedKv::Status::SUCCESS);
+    EXPECT_EQ(entries.size(), std::size_t(1));
+    EXPECT_EQ(entries[0].value.ToString(), "on");
+    entries.clear();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_DefaultRemindPolicy_00100
+ * @tc.name      : DefaultRemindPolicy_00100
+ * @tc.desc      : Publish a notification when local screen on and remote screen off.
+ */
+HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    PublishCommonEventScreenStatus(true);
+    SetDistributedScreenStatus(false);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+
+    EventParser parser;
+    parser.Parse(subscriber.GetEvents());
+    auto notificationList = parser.GetOnConsumedReq();
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND);
+
+    subscriber.ClearEvents();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_DefaultRemindPolicy_00200
+ * @tc.name      : DefaultRemindPolicy_00200
+ * @tc.desc      : Publish a notification when local screen on and remote screen on.
+ */
+HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00200, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    PublishCommonEventScreenStatus(true);
+    SetDistributedScreenStatus(true);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+
+    EventParser parser;
+    parser.Parse(subscriber.GetEvents());
+    auto notificationList = parser.GetOnConsumedReq();
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND);
+
+    subscriber.ClearEvents();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_DefaultRemindPolicy_00300
+ * @tc.name      : DefaultRemindPolicy_00300
+ * @tc.desc      : Publish a notification when local screen off and remote screen off.
+ */
+HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00300, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    PublishCommonEventScreenStatus(false);
+    SetDistributedScreenStatus(false);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+
+    EventParser parser;
+    parser.Parse(subscriber.GetEvents());
+    auto notificationList = parser.GetOnConsumedReq();
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_IDLE_REMIND);
+
+    subscriber.ClearEvents();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_DefaultRemindPolicy_00400
+ * @tc.name      : DefaultRemindPolicy_00400
+ * @tc.desc      : Publish a notification when local screen off and remote screen on.
+ */
+HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00400, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    PublishCommonEventScreenStatus(false);
+    SetDistributedScreenStatus(true);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+
+    EventParser parser;
+    parser.Parse(subscriber.GetEvents());
+    auto notificationList = parser.GetOnConsumedReq();
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_IDLE_DONOT_REMIND);
+
+    subscriber.ClearEvents();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_DefaultRemindPolicy_00500
+ * @tc.name      : DefaultRemindPolicy_00500
+ * @tc.desc      : Receive distributed notification when screen is on.
+ */
+HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00500, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+    request.SetOwnerBundleName(APP_NAME);
+    request.SetCreatorBundleName(APP_NAME);
+    request.SetDevicesSupportDisplay({"<localDeviceType>"});
+    std::string jsonString;
+    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+
+    PublishCommonEventScreenStatus(true);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer({KVSTORE_APP_ID}, {KVSTORE_NOTIFICATION_STORE_ID});
+
+    DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
+    DistributedKv::Value value(jsonString);
+    pointer->InsertDataToDoCallback(key, value);
+    SleepForFC();
+
+    EventParser parser;
+    parser.Parse(subscriber.GetEvents());
+    auto notificationList = parser.GetOnConsumedReq();
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND);
+
+    subscriber.ClearEvents();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_DefaultRemindPolicy_00600
+ * @tc.name      : DefaultRemindPolicy_00600
+ * @tc.desc      : Receive distributed notification when screen is off.
+ */
+HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00600, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+    request.SetOwnerBundleName(APP_NAME);
+    request.SetCreatorBundleName(APP_NAME);
+    request.SetDevicesSupportDisplay({"<localDeviceType>"});
+    std::string jsonString;
+    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+
+    PublishCommonEventScreenStatus(false);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer({KVSTORE_APP_ID}, {KVSTORE_NOTIFICATION_STORE_ID});
+
+    DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
+    DistributedKv::Value value(jsonString);
+    pointer->InsertDataToDoCallback(key, value);
+    SleepForFC();
+
+    EventParser parser;
+    parser.Parse(subscriber.GetEvents());
+    auto notificationList = parser.GetOnConsumedReq();
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_IDLE_DONOT_REMIND);
+
+    subscriber.ClearEvents();
+    EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+}
 #endif
 
 HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07100, Function | MediumTest | Level1)

@@ -25,6 +25,10 @@ namespace OHOS {
 namespace Notification {
 struct ISystemEvent {
     std::function<void(const sptr<NotificationBundleOption> &)> onBundleRemoved;
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    std::function<void()> onScreenOn;
+    std::function<void()> onScreenOff;
+#endif
 };
 }  // namespace Notification
 }  // namespace OHOS
