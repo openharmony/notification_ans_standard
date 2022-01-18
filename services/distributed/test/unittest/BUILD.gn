@@ -1,0 +1,79 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//base/notification/ans_standard/notification.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+group("ans_distributed_unit_test_target") {
+  testonly = true
+  deps = []
+
+  if (distributed_notification_supported) {
+    deps += [ ":ans_distributed_unit_test" ]
+  }
+}
+
+ohos_unittest("ans_distributed_unit_test") {
+  module_out_path = "ans_standard/unittest"
+  include_dirs = [
+    "/${services_path}/distributed/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "//base/hiviewdfx/hitrace/interfaces/native/innerkits/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/base/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
+    "//foundation/appexecfwk/standard/libs/libeventhandler/src",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
+    "//utils/native/base/include",
+  ]
+
+  sources = [
+    "${services_path}/distributed/src/distributed_database.cpp",
+    "${services_path}/distributed/src/distributed_database_callback.cpp",
+    "${services_path}/distributed/src/distributed_device_callback.cpp",
+    "${services_path}/distributed/src/distributed_flow_control.cpp",
+    "${services_path}/distributed/src/distributed_notification_manager.cpp",
+    "${services_path}/distributed/src/distributed_preferences.cpp",
+    "${services_path}/distributed/src/distributed_preferences_database.cpp",
+    "${services_path}/distributed/src/distributed_preferences_info.cpp",
+    "${services_path}/distributed/test/unittest/distributed_database_test.cpp",
+    "${services_path}/distributed/test/unittest/distributed_notification_manager_test.cpp",
+    "${services_path}/distributed/test/unittest/distributed_preferences_test.cpp",
+    "${services_path}/distributed/test/unittest/mock/ans_test_single_kv_store.cpp",
+    "${services_path}/distributed/test/unittest/mock/mock_blob.cpp",
+    "${services_path}/distributed/test/unittest/mock/mock_change_notification.cpp",
+    "${services_path}/distributed/test/unittest/mock/mock_distributed_kv_data_manager.cpp",
+    "${services_path}/distributed/test/unittest/mock/mock_event_handler.cpp",
+    "${services_path}/distributed/test/unittest/mock/mock_event_runner.cpp",
+    "${services_path}/distributed/test/unittest/mock/mock_inner_event.cpp",
+  ]
+
+  configs = [
+    "${services_path}/distributed/:ans_distributed_config",
+    "${core_path}:public_ans_core_config",
+    "${frameworks_path}/ans/native:ans_innerkits_public_config",
+  ]
+
+  deps = [
+    "${core_path}:ans_core",
+    "//third_party/googletest:gtest_main",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+
+  subsystem_name = "notification"
+  part_name = "ans_standard"
+}

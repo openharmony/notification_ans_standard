@@ -20,6 +20,8 @@
 #include "message_user.h"
 #include "notification_action_button.h"
 #include "notification_content.h"
+#include "notification_distributed_options.h"
+#include "notification_json_convert.h"
 #include "notification_template.h"
 #include "ohos/aafwk/content/want_params.h"
 #include "parcel.h"
@@ -28,7 +30,7 @@
 
 namespace OHOS {
 namespace Notification {
-class NotificationRequest : public Parcelable {
+class NotificationRequest : public Parcelable, public NotificationJsonConvertionBase {
 public:
     enum class BadgeStyle {
         /**
@@ -844,6 +846,30 @@ public:
     std::string GetLabel() const;
 
     /**
+     * Sets whether this notification is distributed.
+     * @param distribute Specifies whether a notification is displayed as a floating icon on top of the screen.
+     */
+    void SetDistributed(bool distribute);
+
+    /**
+     * Sets devices that support display.
+     * @param devices The devices that support display.
+     */
+    void SetDevicesSupportDisplay(const std::vector<std::string> &devices);
+
+    /**
+     * Sets devices that support operate.
+     * @param devices The devices that support operate.
+     */
+    void SetDevicesSupportOperate(const std::vector<std::string> &devices);
+
+    /**
+     * Obtains the distributed Options.
+     * @return the distributed Options.
+     */
+    NotificationDistributedOptions GetNotificationDistributedOptions() const;
+
+    /**
      * Sets the UserId of the notification creator.
      * @param userId the UserId of the notification creator.
      */
@@ -860,6 +886,19 @@ public:
      * @return a string representation of the object.
      */
     std::string Dump();
+
+    /**
+     * Converts a NotificationRequest object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationRequest object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationRequest.
+     */
+    static NotificationRequest *FromJson(const nlohmann::json &jsonObject);
 
     /**
      * Marshal a NotificationRequest object into a Parcel.
@@ -913,6 +952,21 @@ private:
      * @return the current system time in milliseconds.
      */
     int64_t GetNowSysTime();
+
+    void CopyBase(const NotificationRequest &other);
+    void CopyOther(const NotificationRequest &other);
+
+    bool ConvertObjectsToJson(nlohmann::json &jsonObject) const;
+
+    static void ConvertJsonToNum(NotificationRequest *target, const nlohmann::json &jsonObject);
+    static void ConvertJsonToString(NotificationRequest *target, const nlohmann::json &jsonObject);
+    static void ConvertJsonToEnum(NotificationRequest *target, const nlohmann::json &jsonObject);
+    static void ConvertJsonToBool(NotificationRequest *target, const nlohmann::json &jsonObject);
+    static void ConvertJsonToPixelMap(NotificationRequest *target, const nlohmann::json &jsonObject);
+    static bool ConvertJsonToNotificationContent(NotificationRequest *target, const nlohmann::json &jsonObject);
+    static bool ConvertJsonToNotificationActionButton(NotificationRequest *target, const nlohmann::json &jsonObject);
+    static bool ConvertJsonToNotificationDistributedOptions(
+        NotificationRequest *target, const nlohmann::json &jsonObject);
 
 private:
     int32_t notificationId_ {0};
@@ -971,6 +1025,9 @@ private:
     std::vector<std::shared_ptr<NotificationActionButton>> actionButtons_ {};
     std::vector<std::shared_ptr<MessageUser>> messageUsers_ {};
     std::vector<std::string> userInputHistory_ {};
+
+    NotificationDistributedOptions distributedOptions_;
+
     std::shared_ptr<NotificationTemplate> notificationTemplate_ {};
 };
 }  // namespace Notification

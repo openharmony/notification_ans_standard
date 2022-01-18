@@ -15,7 +15,10 @@
 
 #include "notification_action_button.h"
 
+#include "ans_image_util.h"
 #include "ans_log_wrapper.h"
+#include "want_agent_helper.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
@@ -73,6 +76,11 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
 std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(
     const std::shared_ptr<NotificationActionButton> &actionButton)
 {
+    if (!actionButton) {
+        ANS_LOGW("invalid input NotificationActionButton object");
+        return {};
+    }
+
     return NotificationActionButton::Create(actionButton->GetIcon(),
         actionButton->GetTitle(),
         actionButton->GetWantAgent(),
@@ -222,6 +230,61 @@ std::string NotificationActionButton::Dump()
             ", mimeTypeOnlyUserInputs = [" + mimeTypeOnlyUserInputs + "]" +
             ", userInputs = [" + userInputs + "]" +
             " }";
+}
+
+bool NotificationActionButton::ToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["icon"]      = AnsImageUtil::PackImage(icon_);
+    jsonObject["title"]     = title_;
+    jsonObject["wantAgent"] = wantAgent_ ? WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
+
+    std::string extrasStr;
+    if (extras_) {
+        AAFwk::WantParamWrapper wWrapper(*extras_);
+        extrasStr = wWrapper.ToString();
+    }
+    jsonObject["extras"] = extrasStr;
+
+    return true;
+}
+
+NotificationActionButton *NotificationActionButton::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pButton = new (std::nothrow) NotificationActionButton();
+    if (pButton == nullptr) {
+        ANS_LOGE("Failed to create actionButton instance");
+        return nullptr;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("icon") != jsonEnd) {
+        auto iconStr   = jsonObject.at("icon").get<std::string>();
+        pButton->icon_ = AnsImageUtil::UnPackImage(iconStr);
+    }
+
+    if (jsonObject.find("title") != jsonEnd) {
+        pButton->title_ = jsonObject.at("title").get<std::string>();
+    }
+
+    if (jsonObject.find("wantAgent") != jsonEnd) {
+        auto wantAgentValue = jsonObject.at("wantAgent").get<std::string>();
+        pButton->wantAgent_ = WantAgent::WantAgentHelper::FromString(wantAgentValue);
+    }
+
+    if (jsonObject.find("extras") != jsonEnd) {
+        auto extrasString = jsonObject.at("extras").get<std::string>();
+        if (!extrasString.empty()) {
+            AAFwk::WantParams params = AAFwk::WantParamWrapper::ParseWantParams(extrasString);
+            pButton->extras_ = std::make_shared<AAFwk::WantParams>(params);
+        }
+    }
+
+    return pButton;
 }
 
 bool NotificationActionButton::Marshalling(Parcel &parcel) const

@@ -15,7 +15,10 @@
 
 #include "notification_request.h"
 
+#include "ans_image_util.h"
 #include "ans_log_wrapper.h"
+#include "want_agent_helper.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
@@ -57,124 +60,14 @@ NotificationRequest::NotificationRequest(const std::shared_ptr<AppExecFwk::Conte
 
 NotificationRequest::NotificationRequest(const NotificationRequest &other)
 {
-    this->notificationId_ = other.notificationId_;
-    this->color_ = other.color_;
-    this->badgeNumber_ = other.badgeNumber_;
-    this->progressValue_ = other.progressValue_;
-    this->progressMax_ = other.progressMax_;
-    this->createTime_ = other.createTime_;
-    this->deliveryTime_ = other.deliveryTime_;
-    this->autoDeletedTime_ = other.autoDeletedTime_;
-
-    this->creatorPid_ = other.creatorPid_;
-    this->creatorUid_ = other.creatorUid_;
-
-    this->slotType_ = other.slotType_;
-    this->settingsText_ = other.settingsText_;
-    this->creatorBundleName_ = other.creatorBundleName_;
-    this->ownerBundleName_ = other.ownerBundleName_;
-    this->groupName_ = other.groupName_;
-    this->statusBarText_ = other.statusBarText_;
-    this->label_ = other.label_;
-    this->shortcutId_ = other.shortcutId_;
-    this->sortingKey_ = other.sortingKey_;
-    this->classification_ = other.classification_;
-
-    this->groupAlertType_ = other.groupAlertType_;
-    this->visiblenessType_ = other.visiblenessType_;
-    this->badgeStyle_ = other.badgeStyle_;
-    this->notificationContentType_ = other.notificationContentType_;
-
-    this->showDeliveryTime_ = other.showDeliveryTime_;
-    this->tapDismissed_ = other.tapDismissed_;
-    this->colorEnabled_ = other.colorEnabled_;
-    this->alertOneTime_ = other.alertOneTime_;
-    this->showStopwatch_ = other.showStopwatch_;
-    this->isCountdown_ = other.isCountdown_;
-    this->inProgress_ = other.inProgress_;
-    this->groupOverview_ = other.groupOverview_;
-    this->progressIndeterminate_ = other.progressIndeterminate_;
-    this->unremovable_ = other.unremovable_;
-    this->floatingIcon_ = other.floatingIcon_;
-    this->onlyLocal_ = other.onlyLocal_;
-    this->permitted_ = other.permitted_;
-
-    this->context_ = other.context_;
-    this->wantAgent_ = other.wantAgent_;
-    this->removalWantAgent_ = other.removalWantAgent_;
-    this->maxScreenWantAgent_ = other.maxScreenWantAgent_;
-    this->additionalParams_ = other.additionalParams_;
-    this->littleIcon_ = other.littleIcon_;
-    this->bigIcon_ = other.bigIcon_;
-    this->notificationContent_ = other.notificationContent_;
-    this->publicNotification_ = other.publicNotification_;
-
-    this->actionButtons_ = other.actionButtons_;
-    this->messageUsers_ = other.messageUsers_;
-    this->userInputHistory_ = other.userInputHistory_;
-
-    this->notificationTemplate_ = other.notificationTemplate_;
+    CopyBase(other);
+    CopyOther(other);
 }
 
 NotificationRequest &NotificationRequest::operator=(const NotificationRequest &other)
 {
-    this->notificationId_ = other.notificationId_;
-    this->color_ = other.color_;
-    this->badgeNumber_ = other.badgeNumber_;
-    this->progressValue_ = other.progressValue_;
-    this->progressMax_ = other.progressMax_;
-    this->createTime_ = other.createTime_;
-    this->deliveryTime_ = other.deliveryTime_;
-    this->autoDeletedTime_ = other.autoDeletedTime_;
-
-    this->creatorPid_ = other.creatorPid_;
-    this->creatorUid_ = other.creatorUid_;
-
-    this->slotType_ = other.slotType_;
-    this->settingsText_ = other.settingsText_;
-    this->creatorBundleName_ = other.creatorBundleName_;
-    this->ownerBundleName_ = other.ownerBundleName_;
-    this->groupName_ = other.groupName_;
-    this->statusBarText_ = other.statusBarText_;
-    this->label_ = other.label_;
-    this->shortcutId_ = other.shortcutId_;
-    this->sortingKey_ = other.sortingKey_;
-    this->classification_ = other.classification_;
-
-    this->groupAlertType_ = other.groupAlertType_;
-    this->visiblenessType_ = other.visiblenessType_;
-    this->badgeStyle_ = other.badgeStyle_;
-    this->notificationContentType_ = other.notificationContentType_;
-
-    this->showDeliveryTime_ = other.showDeliveryTime_;
-    this->tapDismissed_ = other.tapDismissed_;
-    this->colorEnabled_ = other.colorEnabled_;
-    this->alertOneTime_ = other.alertOneTime_;
-    this->showStopwatch_ = other.showStopwatch_;
-    this->isCountdown_ = other.isCountdown_;
-    this->inProgress_ = other.inProgress_;
-    this->groupOverview_ = other.groupOverview_;
-    this->progressIndeterminate_ = other.progressIndeterminate_;
-    this->unremovable_ = other.unremovable_;
-    this->floatingIcon_ = other.floatingIcon_;
-    this->onlyLocal_ = other.onlyLocal_;
-    this->permitted_ = other.permitted_;
-
-    this->context_ = other.context_;
-    this->wantAgent_ = other.wantAgent_;
-    this->removalWantAgent_ = other.removalWantAgent_;
-    this->maxScreenWantAgent_ = other.maxScreenWantAgent_;
-    this->additionalParams_ = other.additionalParams_;
-    this->littleIcon_ = other.littleIcon_;
-    this->bigIcon_ = other.bigIcon_;
-    this->notificationContent_ = other.notificationContent_;
-    this->publicNotification_ = other.publicNotification_;
-
-    this->actionButtons_ = other.actionButtons_;
-    this->messageUsers_ = other.messageUsers_;
-    this->userInputHistory_ = other.userInputHistory_;
-
-    this->notificationTemplate_ = other.notificationTemplate_;
+    CopyBase(other);
+    CopyOther(other);
 
     return *this;
 }
@@ -719,6 +612,26 @@ std::string NotificationRequest::GetLabel() const
     return label_;
 }
 
+void NotificationRequest::SetDistributed(bool distribute)
+{
+    distributedOptions_.SetDistributed(distribute);
+}
+
+void NotificationRequest::SetDevicesSupportDisplay(const std::vector<std::string> &devices)
+{
+    distributedOptions_.SetDevicesSupportDisplay(devices);
+}
+
+void NotificationRequest::SetDevicesSupportOperate(const std::vector<std::string> &devices)
+{
+    distributedOptions_.SetDevicesSupportOperate(devices);
+}
+
+NotificationDistributedOptions NotificationRequest::GetNotificationDistributedOptions() const
+{
+    return distributedOptions_;
+}
+
 void NotificationRequest::SetCreatorUserId(int32_t userId)
 {
     creatorUserId_ = userId;
@@ -773,7 +686,106 @@ std::string NotificationRequest::Dump()
             ", actionButtons = " + (!actionButtons_.empty() ? actionButtons_.at(0)->Dump() : "empty") +
             ", messageUsers = " + (!messageUsers_.empty() ? messageUsers_.at(0)->Dump() : "empty") +
             ", userInputHistory = " + (!userInputHistory_.empty() ? userInputHistory_.at(0) : "empty") +
+            ", distributedOptions = " + distributedOptions_.Dump() +
             " }";
+}
+
+bool NotificationRequest::ToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["version"]         = 1;
+
+    jsonObject["id"]              = notificationId_;
+    jsonObject["color"]           = color_;
+    jsonObject["deliveryTime"]    = deliveryTime_;
+    jsonObject["autoDeletedTime"] = autoDeletedTime_;
+
+    jsonObject["creatorBundleName"] = creatorBundleName_;
+    jsonObject["ownerBundleName"]   = ownerBundleName_;
+    jsonObject["groupName"]         = groupName_;
+    jsonObject["label"]             = label_;
+    jsonObject["classification"]    = classification_;
+
+    jsonObject["slotType"]       = static_cast<int32_t>(slotType_);
+    jsonObject["badgeIconStyle"] = static_cast<int32_t>(badgeStyle_);
+
+    jsonObject["showDeliveryTime"] = showDeliveryTime_;
+    jsonObject["tapDismissed"]     = tapDismissed_;
+    jsonObject["colorEnabled"]     = colorEnabled_;
+    jsonObject["isOngoing"]        = inProgress_;
+    jsonObject["isAlertOnce"]      = alertOneTime_;
+    jsonObject["isStopwatch"]      = showStopwatch_;
+    jsonObject["isCountdown"]      = isCountdown_;
+    jsonObject["isUnremovable"]    = unremovable_;
+    jsonObject["isFloatingIcon"]   = floatingIcon_;
+
+    if (!ConvertObjectsToJson(jsonObject)) {
+        ANS_LOGE("Cannot convert objects to JSON");
+        return false;
+    }
+
+    return true;
+}
+
+NotificationRequest *NotificationRequest::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pRequest = new (std::nothrow) NotificationRequest();
+    if (pRequest == nullptr) {
+        ANS_LOGE("Failed to create request instance");
+        return nullptr;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("version") != jsonEnd) {
+        jsonObject.at("version").get<int32_t>();
+    }
+
+    ConvertJsonToNum(pRequest, jsonObject);
+
+    ConvertJsonToString(pRequest, jsonObject);
+
+    ConvertJsonToEnum(pRequest, jsonObject);
+
+    ConvertJsonToBool(pRequest, jsonObject);
+
+    if (jsonObject.find("wantAgent") != jsonEnd) {
+        auto wantAgentValue  = jsonObject.at("wantAgent").get<std::string>();
+        pRequest->wantAgent_ = WantAgent::WantAgentHelper::FromString(wantAgentValue);
+    }
+
+    if (!ConvertJsonToNotificationContent(pRequest, jsonObject)) {
+        delete pRequest;
+        pRequest = nullptr;
+        return nullptr;
+    }
+
+    if (!ConvertJsonToNotificationActionButton(pRequest, jsonObject)) {
+        delete pRequest;
+        pRequest = nullptr;
+        return nullptr;
+    }
+
+    if (jsonObject.find("extraInfo") != jsonEnd) {
+        auto extraInfoStr = jsonObject.at("extraInfo").get<std::string>();
+        if (!extraInfoStr.empty()) {
+            AAFwk::WantParams params    = AAFwk::WantParamWrapper::ParseWantParams(extraInfoStr);
+            pRequest->additionalParams_ = std::make_shared<AAFwk::WantParams>(params);
+        }
+    }
+
+    ConvertJsonToPixelMap(pRequest, jsonObject);
+
+    if (!ConvertJsonToNotificationDistributedOptions(pRequest, jsonObject)) {
+        delete pRequest;
+        pRequest = nullptr;
+        return nullptr;
+    }
+
+    return pRequest;
 }
 
 bool NotificationRequest::Marshalling(Parcel &parcel) const
@@ -1105,6 +1117,11 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    if (!parcel.WriteParcelable(&distributedOptions_)) {
+        ANS_LOGE("Failed to write distributedOptions");
+        return false;
+    }
+
     valid = notificationTemplate_ ? true : false;
     if (!parcel.WriteBool(valid)) {
         ANS_LOGE("Failed to write the flag which indicate whether publicNotification is null");
@@ -1312,6 +1329,13 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
+    auto pOpt = parcel.ReadParcelable<NotificationDistributedOptions>();
+    if (pOpt == nullptr) {
+        ANS_LOGE("Failed to read distributedOptions");
+        return false;
+    }
+    distributedOptions_ = *pOpt;
+
     valid = parcel.ReadBool();
     if (valid) {
         notificationTemplate_ = std::shared_ptr<NotificationTemplate>(parcel.ReadParcelable<NotificationTemplate>());
@@ -1341,6 +1365,341 @@ void NotificationRequest::SetTemplate(const std::shared_ptr<NotificationTemplate
 std::shared_ptr<NotificationTemplate> NotificationRequest::GetTemplate() const
 {
     return notificationTemplate_;
+}
+
+void NotificationRequest::CopyBase(const NotificationRequest &other)
+{
+    this->notificationId_ = other.notificationId_;
+    this->color_ = other.color_;
+    this->badgeNumber_ = other.badgeNumber_;
+    this->progressValue_ = other.progressValue_;
+    this->progressMax_ = other.progressMax_;
+    this->createTime_ = other.createTime_;
+    this->deliveryTime_ = other.deliveryTime_;
+    this->autoDeletedTime_ = other.autoDeletedTime_;
+
+    this->creatorPid_ = other.creatorPid_;
+    this->creatorUid_ = other.creatorUid_;
+
+    this->slotType_ = other.slotType_;
+    this->settingsText_ = other.settingsText_;
+    this->creatorBundleName_ = other.creatorBundleName_;
+    this->ownerBundleName_ = other.ownerBundleName_;
+    this->groupName_ = other.groupName_;
+    this->statusBarText_ = other.statusBarText_;
+    this->label_ = other.label_;
+    this->shortcutId_ = other.shortcutId_;
+    this->sortingKey_ = other.sortingKey_;
+    this->classification_ = other.classification_;
+
+    this->groupAlertType_ = other.groupAlertType_;
+    this->visiblenessType_ = other.visiblenessType_;
+    this->badgeStyle_ = other.badgeStyle_;
+    this->notificationContentType_ = other.notificationContentType_;
+}
+
+void NotificationRequest::CopyOther(const NotificationRequest &other)
+{
+    this->showDeliveryTime_ = other.showDeliveryTime_;
+    this->tapDismissed_ = other.tapDismissed_;
+    this->colorEnabled_ = other.colorEnabled_;
+    this->alertOneTime_ = other.alertOneTime_;
+    this->showStopwatch_ = other.showStopwatch_;
+    this->isCountdown_ = other.isCountdown_;
+    this->inProgress_ = other.inProgress_;
+    this->groupOverview_ = other.groupOverview_;
+    this->progressIndeterminate_ = other.progressIndeterminate_;
+    this->unremovable_ = other.unremovable_;
+    this->floatingIcon_ = other.floatingIcon_;
+    this->onlyLocal_ = other.onlyLocal_;
+    this->permitted_ = other.permitted_;
+
+    this->context_ = other.context_;
+    this->wantAgent_ = other.wantAgent_;
+    this->removalWantAgent_ = other.removalWantAgent_;
+    this->maxScreenWantAgent_ = other.maxScreenWantAgent_;
+    this->additionalParams_ = other.additionalParams_;
+    this->littleIcon_ = other.littleIcon_;
+    this->bigIcon_ = other.bigIcon_;
+    this->notificationContent_ = other.notificationContent_;
+    this->publicNotification_ = other.publicNotification_;
+
+    this->actionButtons_ = other.actionButtons_;
+    this->messageUsers_ = other.messageUsers_;
+    this->userInputHistory_ = other.userInputHistory_;
+
+    this->distributedOptions_ = other.distributedOptions_;
+
+    this->notificationTemplate_ = other.notificationTemplate_;
+}
+
+bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
+{
+    jsonObject["wantAgent"] = wantAgent_ ? WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
+
+    nlohmann::json contentObj;
+    if (notificationContent_) {
+        if (!NotificationJsonConverter::ConvertToJosn(notificationContent_.get(), contentObj)) {
+            ANS_LOGE("Cannot convert notificationContent to JSON");
+            return false;
+        }
+    }
+    jsonObject["content"] = contentObj;
+
+    nlohmann::json buttonsArr = nlohmann::json::array();
+    for (auto &btn : actionButtons_) {
+        if (!btn) {
+            continue;
+        }
+
+        nlohmann::json btnObj;
+        if (!NotificationJsonConverter::ConvertToJosn(btn.get(), btnObj)) {
+            ANS_LOGE("Cannot convert actionButton to JSON");
+            return false;
+        }
+
+        buttonsArr.emplace_back(btnObj);
+    }
+    jsonObject["actionButtons"] = buttonsArr;
+
+    std::string extraInfoStr;
+    if (additionalParams_) {
+        AAFwk::WantParamWrapper wWrapper(*additionalParams_);
+        extraInfoStr = wWrapper.ToString();
+    }
+    jsonObject["extraInfo"] = extraInfoStr;
+
+    jsonObject["smallIcon"] = AnsImageUtil::PackImage(littleIcon_);
+    jsonObject["largeIcon"] = AnsImageUtil::PackImage(bigIcon_);
+
+    nlohmann::json optObj;
+    if (!NotificationJsonConverter::ConvertToJosn(&distributedOptions_, optObj)) {
+        ANS_LOGE("Cannot convert distributedOptions to JSON");
+        return false;
+    }
+    jsonObject["distributedOptions"] = optObj;
+
+    return true;
+}
+
+void NotificationRequest::ConvertJsonToNum(NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("id") != jsonEnd) {
+        target->notificationId_ = jsonObject.at("id").get<int32_t>();
+    }
+
+    if (jsonObject.find("color") != jsonEnd) {
+        target->color_ = jsonObject.at("color").get<uint32_t>();
+    }
+
+    if (jsonObject.find("deliveryTime") != jsonEnd) {
+        target->deliveryTime_ = jsonObject.at("deliveryTime").get<int64_t>();
+    }
+
+    if (jsonObject.find("autoDeletedTime") != jsonEnd) {
+        target->autoDeletedTime_ = jsonObject.at("autoDeletedTime").get<int64_t>();
+    }
+}
+
+void NotificationRequest::ConvertJsonToString(NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("creatorBundleName") != jsonEnd) {
+        target->creatorBundleName_ = jsonObject.at("creatorBundleName").get<std::string>();
+    }
+
+    if (jsonObject.find("ownerBundleName") != jsonEnd) {
+        target->ownerBundleName_ = jsonObject.at("ownerBundleName").get<std::string>();
+    }
+
+    if (jsonObject.find("groupName") != jsonEnd) {
+        target->groupName_ = jsonObject.at("groupName").get<std::string>();
+    }
+
+    if (jsonObject.find("label") != jsonEnd) {
+        target->label_ = jsonObject.at("label").get<std::string>();
+    }
+
+    if (jsonObject.find("classification") != jsonEnd) {
+        target->classification_ = jsonObject.at("classification").get<std::string>();
+    }
+}
+
+void NotificationRequest::ConvertJsonToEnum(NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("slotType") != jsonEnd) {
+        auto slotTypeValue  = jsonObject.at("slotType").get<int32_t>();
+        target->slotType_ = static_cast<NotificationConstant::SlotType>(slotTypeValue);
+    }
+
+    if (jsonObject.find("badgeIconStyle") != jsonEnd) {
+        auto badgeStyleValue  = jsonObject.at("badgeIconStyle").get<int32_t>();
+        target->badgeStyle_ = static_cast<NotificationRequest::BadgeStyle>(badgeStyleValue);
+    }
+}
+
+void NotificationRequest::ConvertJsonToBool(NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("showDeliveryTime") != jsonEnd) {
+        target->showDeliveryTime_ = jsonObject.at("showDeliveryTime").get<bool>();
+    }
+
+    if (jsonObject.find("tapDismissed") != jsonEnd) {
+        target->tapDismissed_ = jsonObject.at("tapDismissed").get<bool>();
+    }
+
+    if (jsonObject.find("colorEnabled") != jsonEnd) {
+        target->colorEnabled_ = jsonObject.at("colorEnabled").get<bool>();
+    }
+
+    if (jsonObject.find("isOngoing") != jsonEnd) {
+        target->inProgress_ = jsonObject.at("isOngoing").get<bool>();
+    }
+
+    if (jsonObject.find("isAlertOnce") != jsonEnd) {
+        target->alertOneTime_ = jsonObject.at("isAlertOnce").get<bool>();
+    }
+
+    if (jsonObject.find("isStopwatch") != jsonEnd) {
+        target->showStopwatch_ = jsonObject.at("isStopwatch").get<bool>();
+    }
+
+    if (jsonObject.find("isCountdown") != jsonEnd) {
+        target->isCountdown_ = jsonObject.at("isCountdown").get<bool>();
+    }
+
+    if (jsonObject.find("isUnremovable") != jsonEnd) {
+        target->unremovable_ = jsonObject.at("isUnremovable").get<bool>();
+    }
+
+    if (jsonObject.find("isFloatingIcon") != jsonEnd) {
+        target->floatingIcon_ = jsonObject.at("isFloatingIcon").get<bool>();
+    }
+}
+
+void NotificationRequest::ConvertJsonToPixelMap(NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("smallIcon") != jsonEnd) {
+        auto littleIconStr    = jsonObject.at("smallIcon").get<std::string>();
+        target->littleIcon_ = AnsImageUtil::UnPackImage(littleIconStr);
+    }
+
+    if (jsonObject.find("largeIcon") != jsonEnd) {
+        auto bigIconStr    = jsonObject.at("largeIcon").get<std::string>();
+        target->bigIcon_ = AnsImageUtil::UnPackImage(bigIconStr);
+    }
+}
+
+bool NotificationRequest::ConvertJsonToNotificationContent(
+    NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return false;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("content") != jsonEnd) {
+        auto contentObj = jsonObject.at("content");
+        if (!contentObj.is_null()) {
+            auto pContent = NotificationJsonConverter::ConvertFromJosn<NotificationContent>(contentObj);
+            if (pContent == nullptr) {
+                ANS_LOGE("Failed to parse notification content!");
+                return false;
+            }
+
+            target->notificationContent_ = std::shared_ptr<NotificationContent>(pContent);
+        }
+    }
+
+    return true;
+}
+
+bool NotificationRequest::ConvertJsonToNotificationActionButton(
+    NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return false;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("actionButtons") != jsonEnd) {
+        auto buttonArr = jsonObject.at("actionButtons");
+        for (auto &btnObj : buttonArr) {
+            auto pBtn = NotificationJsonConverter::ConvertFromJosn<NotificationActionButton>(btnObj);
+            if (pBtn == nullptr) {
+                ANS_LOGE("Failed to parse actionButton!");
+                return false;
+            }
+
+            target->actionButtons_.emplace_back(pBtn);
+        }
+    }
+
+    return true;
+}
+
+bool NotificationRequest::ConvertJsonToNotificationDistributedOptions(
+    NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return false;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("distributedOptions") != jsonEnd) {
+        auto optObj = jsonObject.at("distributedOptions");
+        if (!optObj.is_null()) {
+            auto pOpt = NotificationJsonConverter::ConvertFromJosn<NotificationDistributedOptions>(optObj);
+            if (pOpt == nullptr) {
+                ANS_LOGE("Failed to parse distributedOptions!");
+                return false;
+            }
+
+            target->distributedOptions_ = *pOpt;
+        }
+    }
+
+    return true;
 }
 }  // namespace Notification
 }  // namespace OHOS

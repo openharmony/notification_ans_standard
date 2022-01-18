@@ -39,6 +39,7 @@ ohos_shared_library("notification") {
     "include",
     "//third_party/node/src",
     "//third_party/libuv/include",
+    "//third_party/json/single_include",
     "//third_party/jsoncpp/include",
   ]
 
@@ -50,6 +51,7 @@ ohos_shared_library("notification") {
     "src/common.cpp",
     "src/constant.cpp",
     "src/display_badge.cpp",
+    "src/distributed.cpp",
     "src/disturb_mode.cpp",
     "src/enable_notification.cpp",
     "src/get_active.cpp",
