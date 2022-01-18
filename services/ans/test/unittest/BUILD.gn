@@ -45,6 +45,8 @@ ohos_unittest("ans_unit_test") {
     "//developtools/bytrace_standard/interfaces/innerkits/native/include",
   ]
 
+  defines = []
+
   sources = [
     "${services_path}/ans/src/advanced_notification_service.cpp",
     "${services_path}/ans/src/advanced_notification_service_ability.cpp",
@@ -90,6 +92,12 @@ ohos_unittest("ans_unit_test") {
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
+
+  if (distributed_notification_supported) {
+    defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
+    deps += [ "${services_path}/distributed:libans_distributed" ]
+    include_dirs += [ "${services_path}/distributed/include" ]
+  }
 
   external_deps = [
     "aafwk_standard:want",

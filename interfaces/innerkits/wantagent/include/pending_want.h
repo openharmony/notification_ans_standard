@@ -247,6 +247,8 @@ public:
 
     std::shared_ptr<AAFwk::Want> GetWant(const sptr<AAFwk::IWantSender> &target);
 
+    std::shared_ptr<AAFwk::WantSenderInfo> GetWantSenderInfo(const sptr<AAFwk::IWantSender> &target);
+
 private:
     std::mutex lock_object;
     sptr<AAFwk::IWantSender> target_;

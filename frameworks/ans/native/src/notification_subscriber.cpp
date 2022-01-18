@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Notification {
 NotificationSubscriber::NotificationSubscriber()
 {
-    impl_ = new SubscriberImpl(*this);
+    impl_ = new (std::nothrow) SubscriberImpl(*this);
 };
 
 NotificationSubscriber::~NotificationSubscriber()
@@ -35,7 +35,7 @@ const sptr<NotificationSubscriber::SubscriberImpl> NotificationSubscriber::GetIm
 
 NotificationSubscriber::SubscriberImpl::SubscriberImpl(NotificationSubscriber &subscriber) : subscriber_(subscriber)
 {
-    recipient_ = new DeathRecipient(*this);
+    recipient_ = new (std::nothrow) DeathRecipient(*this);
 };
 
 void NotificationSubscriber::SubscriberImpl::OnConnected()
