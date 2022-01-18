@@ -18,6 +18,7 @@
 #include "cancel.h"
 #include "constant.h"
 #include "display_badge.h"
+#include "distributed.h"
 #include "disturb_mode.h"
 #include "enable_notification.h"
 #include "get_active.h"
@@ -68,6 +69,11 @@ napi_value NotificationInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDoNotDisturbDate", GetDoNotDisturbDate),
         DECLARE_NAPI_FUNCTION("supportDoNotDisturbMode", SupportDoNotDisturbMode),
         DECLARE_NAPI_FUNCTION("isSupportTemplate", IsSupportTemplate),
+        DECLARE_NAPI_FUNCTION("isDistributedEnabled", IsDistributedEnabled),
+        DECLARE_NAPI_FUNCTION("enableDistributed", EnableDistributed),
+        DECLARE_NAPI_FUNCTION("enableDistributedByBundle", EnableDistributedByBundle),
+        DECLARE_NAPI_FUNCTION("enableDistributedSelf", EnableDistributedSelf),
+        DECLARE_NAPI_FUNCTION("isDistributedEnableByBundle", IsDistributedEnableByBundle),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));

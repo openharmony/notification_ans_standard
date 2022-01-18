@@ -593,7 +593,7 @@ public:
      * @param doNotDisturbDate Indicates the do not disturb time to set.
      * @return Returns set do not disturb time result.
      */
-    ErrCode SetDoNotDisturbDate(const NotificationDoNotDisturbDate & doNotDisturbDate);
+    ErrCode SetDoNotDisturbDate(const NotificationDoNotDisturbDate &doNotDisturbDate);
 
     /**
      * Obtains the do not disturb time.
@@ -602,7 +602,7 @@ public:
      * @param doNotDisturbDate Indicates the do not disturb time to get.
      * @return Returns set do not disturb time result.
      */
-    ErrCode GetDoNotDisturbDate(NotificationDoNotDisturbDate & doNotDisturbDate);
+    ErrCode GetDoNotDisturbDate(NotificationDoNotDisturbDate &doNotDisturbDate);
 
     /**
      * Obtains the flag that whether to support do not disturb mode.
@@ -611,6 +611,56 @@ public:
      * @return Returns check result.
      */
     ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport);
+
+    /**
+     * Check if the device supports distributed notification.
+     *
+     * @param enabled True if the device supports distributed notification; false otherwise.
+     * @return Returns is distributed enabled result.
+     */
+    ErrCode IsDistributedEnabled(bool &enabled);
+
+    /**
+     * Set whether the device supports distributed notifications.
+     *
+     * @param enable Specifies whether to enable the device to support distributed notification.
+     *               The value true indicates that the device is enabled to support distributed notifications, and
+     *               the value false indicates that the device is forbidden to support distributed notifications.
+     * @return Returns enable distributed result.
+     */
+    ErrCode EnableDistributed(const bool enabled);
+
+    /**
+     * Set whether an application supports distributed notifications.
+     *
+     * @param bundleOption Indicates the bundle name and uid of an application.
+     * @param enabled Specifies whether to enable an application to support distributed notification.
+     *                The value true indicates that the application is enabled to support distributed notifications,
+     *                and the value false indicates that the application is forbidden to support distributed
+     *                notifications.
+     * @return Returns enable distributed by bundle result.
+     */
+    ErrCode EnableDistributedByBundle(const NotificationBundleOption &bundleOption, const bool enabled);
+
+    /**
+     * Set whether this application supports distributed notifications.
+     *
+     * @param enabled Specifies whether to enable this application to support distributed notification.
+     *                The value true indicates that this application is enabled to support distributed notifications,
+     *                and the value false indicates that this application is forbidden to support distributed
+     *                notifications.
+     * @return Returns enable distributed self result.
+     */
+    ErrCode EnableDistributedSelf(const bool enabled);
+
+    /**
+     * Check whether an application supports distributed notifications.
+     *
+     * @param bundleOption Indicates the bundle name and uid of an application.
+     * @param enabled True if the application supports distributed notification; false otherwise.
+     * @return Returns is distributed enabled by bundle result.
+     */
+    ErrCode IsDistributedEnableByBundle(const NotificationBundleOption &bundleOption, bool &enabled);
 
     /**
      * Publishes a continuous task notification.
@@ -713,6 +763,13 @@ private:
      * @return the ErrCode.
      */
     ErrCode CheckImageSize(const NotificationRequest &request);
+
+    /**
+     * Check whether the notification doesn't support distribution
+     *
+     * @return Returns true if the notification doesn't support distribution; returns false otherwise.
+     */
+    bool IsNonDistributedNotificationType(const NotificationContent::Type &type);
 
 private:
     std::mutex mutex_;

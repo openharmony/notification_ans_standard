@@ -17,6 +17,7 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_ACTION_BUTTON_H
 
 #include "notification_constant.h"
+#include "notification_json_convert.h"
 #include "notification_user_input.h"
 #include "parcel.h"
 #include "pixel_map.h"
@@ -24,7 +25,7 @@
 
 namespace OHOS {
 namespace Notification {
-class NotificationActionButton : public Parcelable {
+class NotificationActionButton : public Parcelable, public NotificationJsonConvertionBase {
 public:
     /**
      * A static function used to create a NotificationActionButton instance with the input parameters passed.
@@ -171,6 +172,19 @@ public:
      * @return a string representation of the object.
      */
     std::string Dump();
+
+    /**
+     * Converts a NotificationActionButton object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationActionButton object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationActionButton.
+     */
+    static NotificationActionButton *FromJson(const nlohmann::json &jsonObject);
 
     /**
      * Marshal a object into a Parcel.

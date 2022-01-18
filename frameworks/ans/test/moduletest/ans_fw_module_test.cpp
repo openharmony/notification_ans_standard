@@ -26,9 +26,12 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_manager_proxy.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "mock_ipc_skeleton.h"
+#include "mock_single_kv_store.h"
 #include "notification_content.h"
 #include "notification_helper.h"
 #include "notification_long_text_content.h"
@@ -47,6 +50,11 @@ const std::string NOTIFICATION_LABEL_1 = "Label1";
 const std::string NOTIFICATION_LABEL_2 = "Label2";
 const std::string AN_NOT_EXIST_KEY = "AN_NOT_EXIST_KEY";
 const std::string KEY_SPLITER = "_";
+
+const std::string KVSTORE_APP_ID = "advanced_notification_service";
+const std::string KVSTORE_NOTIFICATION_STORE_ID = "distributed_notification";
+const std::string KVSTORE_PREFERENCES_STORE_ID = "distributed_preferences";
+const std::string KVSTORE_SCREEN_STATUS_STORE_ID = "distributed_screen_status";
 
 constexpr int UID = 1;
 constexpr int CANCEL_REASON_DELETE = 2;
@@ -326,6 +334,86 @@ public:
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+
+    const std::string DELIMITER = "|";
+    const std::string LOCAL_DEVICE_ID = "<localDeviceId>";
+    const std::string REMOTE_DEVICE_ID = "<remoteDeviceId>";
+    inline std::string GenerateDistributedKey(const NotificationRequest &req, const std::string &deviceId)
+    {
+        return std::string()
+            .append(deviceId)
+            .append(DELIMITER)
+            .append(APP_NAME)
+            .append(DELIMITER)
+            .append(req.GetLabel())
+            .append(DELIMITER)
+            .append(ToString(req.GetNotificationId()));
+    }
+
+    bool GetRequestInDistributedEntryList(
+        NotificationRequest &req, std::vector<DistributedKv::Entry> &entries, DistributedKv::Entry &outEntry)
+    {
+        std::string localDistributedKey = GenerateDistributedKey(req, LOCAL_DEVICE_ID);
+        for (auto entry : entries) {
+            if (entry.key.ToString() == localDistributedKey) {
+                outEntry = entry;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool GetRequestInNotificationList(NotificationRequest &req,
+        std::vector<std::shared_ptr<Notification>> &notificationList, std::shared_ptr<Notification> &outNotification)
+    {
+        for (auto notification : notificationList) {
+            if (notification->GetNotificationRequest().GetNotificationId() == req.GetNotificationId() &&
+                notification->GetNotificationRequest().GetLabel() == req.GetLabel()) {
+                outNotification = notification;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    NotificationRequest CreateDistributedRequest(std::string label)
+    {
+        int32_t notificationId = 1;
+        auto normalContent = std::make_shared<NotificationNormalContent>();
+        auto content = std::make_shared<NotificationContent>(normalContent);
+        NotificationRequest request(notificationId);
+        request.SetLabel(label);
+        request.SetContent(content);
+        request.SetDistributed(true);
+        std::vector<std::string> devices = {"<localDeviceType>"};
+        request.SetDevicesSupportDisplay(devices);
+        return request;
+    }
+
+    void PublishCommonEventScreenStatus(bool isScreenOn)
+    {
+        EventFwk::Want want;
+        EventFwk::CommonEventData data;
+        if (isScreenOn) {
+            data.SetWant(want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON));
+        } else {
+            data.SetWant(want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF));
+        }
+
+        EventFwk::CommonEventManager::PublishCommonEvent(data);
+    }
+
+    void SetDistributedScreenStatus(bool isScreenOn)
+    {
+        DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+        DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+        std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+            DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(
+                {KVSTORE_APP_ID}, {KVSTORE_SCREEN_STATUS_STORE_ID});
+        DistributedKv::Key key("<remoteDeviceId>" + DELIMITER + "screen_status");
+        DistributedKv::Value value(isScreenOn ? "on" : "off");
+        pointer->Put(key, value);
+    }
 };
 
 class EventParser {
@@ -550,7 +638,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | L
         int32_t notificationIdInt = i;
         if (i < MAX_ACTIVE_NUM_PERSECOND) {
             std::stringstream stream;
-            stream << UID << KEY_SPLITER << notificationLabel << KEY_SPLITER << notificationIdInt;
+            stream << KEY_SPLITER << UID << KEY_SPLITER << notificationLabel << KEY_SPLITER << notificationIdInt;
             std::string notificationKey = stream.str();
             NotificationSorting sorting;
             EXPECT_EQ(eventParser.GetOnConsumedReq()[i]->GetLabel().c_str(), notificationLabel);
@@ -606,7 +694,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00100, Function | M
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
     std::stringstream stream;
-    stream << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
+    stream << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
     std::string notificationKey = stream.str();
     NotificationSorting sorting;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey);
@@ -879,7 +967,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelNotificationById_00100, Function | Med
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 1);
     std::stringstream stream;
-    stream << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 1;
+    stream << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 1;
     std::string notificationKey = stream.str();
     NotificationSorting sorting;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey);
@@ -974,7 +1062,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelAllNotifications_00100, Function | Med
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
     std::stringstream stream0;
-    stream0 << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
+    stream0 << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
     std::string notificationKey0 = stream0.str();
     NotificationSorting sorting0;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey0);
@@ -986,7 +1074,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelAllNotifications_00100, Function | Med
     EXPECT_EQ(eventParser.GetOnConsumedReq()[1]->GetLabel().c_str(), NOTIFICATION_LABEL_1);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[1]->GetId(), 1);
     std::stringstream stream1;
-    stream1 << UID << KEY_SPLITER << NOTIFICATION_LABEL_1 << KEY_SPLITER << 1;
+    stream1 << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_1 << KEY_SPLITER << 1;
     std::string notificationKey1 = stream1.str();
     NotificationSorting sorting1;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[1]->GetKey(), notificationKey1);
@@ -1545,6 +1633,368 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_DoNotDisturb_07000, Function | Medium
 
     EXPECT_EQ(srcDate.GetDoNotDisturbType(), disDate.GetDoNotDisturbType());
 }
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_SetEnable_00100
+ * @tc.name      : DistributedNotification_SetEnable_00100
+ * @tc.desc      : Set distributed notification enable.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_SetEnable_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    bool enable;
+
+    ASSERT_EQ(NotificationHelper::EnableDistributed(false), ERR_OK);
+    ASSERT_EQ(NotificationHelper::IsDistributedEnabled(enable), ERR_OK);
+    ASSERT_EQ(enable, false);
+
+    ASSERT_EQ(NotificationHelper::EnableDistributed(true), ERR_OK);
+    ASSERT_EQ(NotificationHelper::IsDistributedEnabled(enable), ERR_OK);
+    ASSERT_EQ(enable, true);
+}
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_SetEnableByBundle_00100
+ * @tc.name      : DistributedNotification_SetEnableByBundle_00100
+ * @tc.desc      : Set distributed notification enable by bundle.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_SetEnableByBundle_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    bool enable;
+    NotificationBundleOption bundleOption(APP_NAME, UID);
+
+    ASSERT_EQ(NotificationHelper::EnableDistributedByBundle(bundleOption, false), ERR_OK);
+    ASSERT_EQ(NotificationHelper::IsDistributedEnableByBundle(bundleOption, enable), ERR_OK);
+    ASSERT_EQ(enable, false);
+
+    ASSERT_EQ(NotificationHelper::EnableDistributedByBundle(bundleOption, true), ERR_OK);
+    ASSERT_EQ(NotificationHelper::IsDistributedEnableByBundle(bundleOption, enable), ERR_OK);
+    ASSERT_EQ(enable, true);
+
+    ASSERT_EQ(NotificationHelper::EnableDistributedSelf(false), ERR_OK);
+    ASSERT_EQ(NotificationHelper::IsDistributedEnableByBundle(bundleOption, enable), ERR_OK);
+    ASSERT_EQ(enable, false);
+
+    ASSERT_EQ(NotificationHelper::EnableDistributedSelf(true), ERR_OK);
+    ASSERT_EQ(NotificationHelper::IsDistributedEnableByBundle(bundleOption, enable), ERR_OK);
+    ASSERT_EQ(enable, true);
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Publish_00100
+ * @tc.name      : DistributedNotification_Publish_00100
+ * @tc.desc      : publish a notification to distributed kvstore.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Publish_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Publish_00200
+ * @tc.name      : DistributedNotification_Publish_00200
+ * @tc.desc      : publish a local notification not use distributed kvstore.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Publish_00200, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+    request.SetDistributed(false);
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), false);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Cancel_00100
+ * @tc.name      : DistributedNotification_Cancel_00100
+ * @tc.desc      : cancel a notification to distributed kvstore ,use CancelNotification(label, id).
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Cancel_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    ASSERT_EQ(NotificationHelper::CancelNotification(request.GetLabel(), request.GetNotificationId()), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), false);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Cancel_00200
+ * @tc.name      : DistributedNotification_Cancel_00200
+ * @tc.desc      : cancel a notification to distributed kvstore ,use CancelAllNotifications().
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Cancel_00200, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    request.SetNotificationId(request.GetNotificationId() + 1);
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    ASSERT_EQ(NotificationHelper::CancelAllNotifications(), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(entries.size(), std::size_t(0));
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Remove_00100
+ * @tc.name      : DistributedNotification_Remove_00100
+ * @tc.desc      : remove a notification to distributed kvstore ,use RemoveNotification(bundleOption, id, label).
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Remove_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    NotificationBundleOption bundleOption(APP_NAME, UID);
+    ASSERT_EQ(
+        NotificationHelper::RemoveNotification(bundleOption, request.GetNotificationId(), request.GetLabel()), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), false);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Remove_00200
+ * @tc.name      : DistributedNotification_Remove_00200
+ * @tc.desc      : remove a notification to distributed kvstore ,use RemoveNotifications().
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Remove_00200, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    request.SetNotificationId(request.GetNotificationId() + 1);
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    ASSERT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(entries.size(), std::size_t(0));
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Remove_00300
+ * @tc.name      : DistributedNotification_Remove_00300
+ * @tc.desc      : remove a notification to distributed kvstore ,use RemoveNotificationsByBundle(bundleOption).
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Remove_00300, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    request.SetNotificationId(request.GetNotificationId() + 1);
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
+
+    NotificationBundleOption bundleOption(APP_NAME, UID);
+    ASSERT_EQ(NotificationHelper::RemoveNotificationsByBundle(bundleOption), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    ASSERT_EQ(entries.size(), std::size_t(0));
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Subscribe_00100
+ * @tc.name      : DistributedNotification_Subscribe_00100
+ * @tc.desc      : distributed kvstore callback data insert/update/delete.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00100, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+    std::string jsonString;
+    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    TestAnsSubscriber subscriber;
+    ASSERT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
+    DistributedKv::Value value(jsonString);
+    pointer->InsertDataToDoCallback(key, value);
+    SleepForFC();
+
+    EventParser parser1;
+    parser1.Parse(subscriber.GetEvents());
+    auto notificationList = parser1.GetOnConsumedReq();
+    EXPECT_NE(notificationList.size(), std::size_t(0));
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    subscriber.ClearEvents();
+
+    pointer->UpdateDataToDoCallback(key, value);
+    SleepForFC();
+
+    EventParser parser2;
+    parser2.Parse(subscriber.GetEvents());
+    notificationList = parser2.GetOnConsumedReq();
+    EXPECT_NE(notificationList.size(), std::size_t(0));
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    subscriber.ClearEvents();
+
+    pointer->DeleteDataToDoCallback(key);
+    SleepForFC();
+
+    EventParser parser3;
+    parser3.Parse(subscriber.GetEvents());
+    notificationList = parser3.GetOnCanceledReq();
+    EXPECT_NE(notificationList.size(), std::size_t(0));
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+    subscriber.ClearEvents();
+    ASSERT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Subscribe_00200
+ * @tc.name      : DistributedNotification_Subscribe_00200
+ * @tc.desc      : distributed kvstore callback data, delete notification after OnConsumed.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00200, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+    request.SetOwnerBundleName(APP_NAME);
+    request.SetCreatorBundleName(APP_NAME);
+    std::string jsonString;
+    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    TestAnsSubscriber subscriber;
+    ASSERT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
+    DistributedKv::Value value(jsonString);
+    pointer->InsertDataToDoCallback(key, value);
+    SleepForFC();
+
+    EventParser parser1;
+    parser1.Parse(subscriber.GetEvents());
+    auto notificationList = parser1.GetOnConsumedReq();
+    EXPECT_NE(notificationList.size(), std::size_t(0));
+    std::shared_ptr<Notification> outNotification;
+    EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
+
+    EXPECT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
+
+    EXPECT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    EXPECT_EQ(entries.size(), std::size_t(0));
+    subscriber.ClearEvents();
+    ASSERT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
+    SleepForFC();
+}
+#endif
 
 HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07100, Function | MediumTest | Level1)
 {

@@ -132,32 +132,7 @@ declare namespace wantAgent {
     /**
      * Indicates that the created WantAgent should be immutable.
      */
-    CONSTANT_FLAG,
-
-    /**
-     * Indicates that the current value of element can be replaced when the WantAgent is triggered.
-     */
-    REPLACE_ELEMENT,
-
-    /**
-     * Indicates that the current value of action can be replaced when the WantAgent is triggered.
-     */
-    REPLACE_ACTION,
-
-    /**
-     * Indicates that the current value of uri can be replaced when the WantAgent is triggered.
-     */
-    REPLACE_URI,
-
-    /**
-     * Indicates that the current value of entities can be replaced when the WantAgent is triggered.
-     */
-    REPLACE_ENTITIES,
-
-    /**
-     * Indicates that the current value of packageName can be replaced when the WantAgent is triggered.
-     */
-    REPLACE_BUNDLE
+    CONSTANT_FLAG
   }
 
   /**

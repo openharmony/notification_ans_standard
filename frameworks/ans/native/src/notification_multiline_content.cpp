@@ -72,6 +72,51 @@ std::string NotificationMultiLineContent::Dump()
             " }";
 }
 
+bool NotificationMultiLineContent::ToJson(nlohmann::json &jsonObject) const
+{
+    if (!NotificationBasicContent::ToJson(jsonObject)) {
+        ANS_LOGE("Cannot convert basicContent to JSON");
+        return false;
+    }
+
+    jsonObject["expandedTitle"] = expandedTitle_;
+    jsonObject["briefText"]     = briefText_;
+    jsonObject["allLines"]      = nlohmann::json(allLines_);
+
+    return true;
+}
+
+NotificationMultiLineContent *NotificationMultiLineContent::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pContent = new (std::nothrow) NotificationMultiLineContent();
+    if (pContent == nullptr) {
+        ANS_LOGE("Failed to create multiLineContent instance");
+        return nullptr;
+    }
+
+    pContent->ReadFromJson(jsonObject);
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("expandedTitle") != jsonEnd) {
+        pContent->expandedTitle_ = jsonObject.at("expandedTitle").get<std::string>();
+    }
+
+    if (jsonObject.find("briefText") != jsonEnd) {
+        pContent->briefText_ = jsonObject.at("briefText").get<std::string>();
+    }
+
+    if (jsonObject.find("allLines") != jsonEnd) {
+        pContent->allLines_ = jsonObject.at("allLines").get<std::vector<std::string>>();
+    }
+
+    return pContent;
+}
+
 bool NotificationMultiLineContent::Marshalling(Parcel &parcel) const
 {
     if (!NotificationBasicContent::Marshalling(parcel)) {

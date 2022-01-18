@@ -25,6 +25,7 @@
 #include "event_runner.h"
 #include "refbase.h"
 
+#include "ans_const_define.h"
 #include "ans_manager_stub.h"
 #include "distributed_kv_data_manager.h"
 #include "distributed_kvstore_death_recipient.h"
@@ -105,6 +106,12 @@ public:
     ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
 
+    ErrCode IsDistributedEnabled(bool &enabled) override;
+    ErrCode EnableDistributed(bool enabled) override;
+    ErrCode EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
+    ErrCode EnableDistributedSelf(bool enabled) override;
+    ErrCode IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
@@ -116,6 +123,10 @@ public:
 
     // SystemEvent
     void OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    void OnScreenOn();
+    void OnScreenOff();
+#endif
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();
@@ -134,6 +145,7 @@ private:
 
     void AddToNotificationList(const std::shared_ptr<NotificationRecord> &record);
     void UpdateInNotificationList(const std::shared_ptr<NotificationRecord> &record);
+    ErrCode AssignToNotificationList(const std::shared_ptr<NotificationRecord> &record);
     ErrCode RemoveFromNotificationList(const sptr<NotificationBundleOption> &bundleOption, const std::string &label,
         int notificationId, sptr<Notification> &notification, bool isCancel = false);
     ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification, bool isCancel = false);
@@ -161,6 +173,20 @@ private:
     ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
     bool GetActiveUserId(int& userId);
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    std::vector<std::string> GetLocalNotificationKeys(const sptr<NotificationBundleOption> &bundleOption);
+    ErrCode DoDistributedPublish(
+        const sptr<NotificationBundleOption> bundleOption, const std::shared_ptr<NotificationRecord> record);
+    ErrCode DoDistributedDelete(const std::string deviceId, const sptr<Notification> notification);
+    std::string GetNotificationDeviceId(const std::string &key);
+    void OnDistributedPublish(
+        const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request);
+    void OnDistributedUpdate(
+        const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request);
+    void OnDistributedDelete(
+        const std::string &deviceId, const std::string &bundleName, const std::string &label, int32_t id);
+#endif
 
 private:
     static sptr<AdvancedNotificationService> instance_;

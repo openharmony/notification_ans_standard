@@ -22,6 +22,7 @@
 #include "completed_callback.h"
 #include "completed_dispatcher.h"
 #include "event_handler.h"
+#include "nlohmann/json.hpp"
 #include "trigger_info.h"
 #include "want.h"
 #include "want_agent.h"
@@ -162,7 +163,23 @@ public:
      */
     static void UnregisterCancelListener(
         const std::shared_ptr<CancelListener> &cancelListener, const std::shared_ptr<WantAgent> &agent);
-        
+
+    /**
+     * Convert WantAgentInfo object to json string.
+     *
+     * @param jsonObject Json object.
+     * @return WantAgentInfo object's json string.
+     */
+    static std::string ToString(const std::shared_ptr<WantAgent> &agent);
+
+    /**
+     * Convert json string to WantAgentInfo object.
+     *
+     * @param jsonString Json string.
+     * @return WantAgentInfo object.
+     */
+    static std::shared_ptr<WantAgent> FromString(const std::string &jsonString);
+
 private:
     WantAgentHelper();
     virtual ~WantAgentHelper() = default;

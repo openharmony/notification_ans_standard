@@ -93,6 +93,87 @@ std::string NotificationConversationalContent::Dump()
             " }";
 }
 
+bool NotificationConversationalContent::ToJson(nlohmann::json &jsonObject) const
+{
+    if (!NotificationBasicContent::ToJson(jsonObject)) {
+        ANS_LOGE("Cannot convert basicContent to JSON");
+        return false;
+    }
+
+    nlohmann::json userObj;
+    if (!NotificationJsonConverter::ConvertToJosn(&messageUser_, userObj)) {
+        ANS_LOGE("Cannot convert messageUser to JSON");
+        return false;
+    }
+    jsonObject["messageUser"] = userObj;
+
+    jsonObject["conversationTitle"] = conversationTitle_;
+    jsonObject["isGroup"]           = isGroup_;
+
+    nlohmann::json msgsArr = nlohmann::json::array();
+    for (auto &msg : messages_) {
+        if (!msg) {
+            continue;
+        }
+
+        nlohmann::json msgObj;
+        if (!NotificationJsonConverter::ConvertToJosn(msg.get(), msgObj)) {
+            ANS_LOGE("Cannot convert conversationalMessage to JSON");
+            return false;
+        }
+        msgsArr.emplace_back(msgObj);
+    }
+    jsonObject["messages"] = msgsArr;
+
+    return true;
+}
+
+NotificationConversationalContent *NotificationConversationalContent::FromJson(const nlohmann::json &jsonObject)
+{
+    if (jsonObject.is_null() or !jsonObject.is_object()) {
+        ANS_LOGE("Invalid JSON object");
+        return nullptr;
+    }
+
+    auto pContent = new (std::nothrow) NotificationConversationalContent();
+    if (pContent == nullptr) {
+        ANS_LOGE("Failed to create conversationalContent instance");
+        return nullptr;
+    }
+
+    pContent->ReadFromJson(jsonObject);
+
+    const auto &jsonEnd = jsonObject.cend();
+    if (jsonObject.find("messageUser") != jsonEnd) {
+        auto userObj = jsonObject.at("messageUser");
+        auto pUser = NotificationJsonConverter::ConvertFromJosn<MessageUser>(userObj);
+        if (pUser != nullptr) {
+            pContent->messageUser_ = *pUser;
+
+            delete pUser;
+            pUser = nullptr;
+        }
+    }
+
+    if (jsonObject.find("messages") != jsonEnd) {
+        nlohmann::json msgsArr = jsonObject.at("messages");
+        for (auto &msgObj : msgsArr) {
+            auto pMsg = NotificationJsonConverter::ConvertFromJosn<NotificationConversationalMessage>(msgObj);
+            if (pMsg == nullptr) {
+                ANS_LOGE("Failed to parse message ");
+
+                delete pContent;
+                pContent = nullptr;
+                return nullptr;
+            }
+
+            pContent->messages_.emplace_back(pMsg);
+        }
+    }
+
+    return pContent;
+}
+
 bool NotificationConversationalContent::Marshalling(Parcel &parcel) const
 {
     if (!NotificationBasicContent::Marshalling(parcel)) {

@@ -98,6 +98,12 @@ public:
     ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
 
+    ErrCode IsDistributedEnabled(bool &enabled) override;
+    ErrCode EnableDistributed(bool enabled) override;
+    ErrCode EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
+    ErrCode EnableDistributedSelf(bool enabled) override;
+    ErrCode IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
