@@ -506,7 +506,7 @@ void AsyncCompleteCallbackGetDeviceRemindType(napi_env env, napi_status status, 
     if (asynccallbackinfo->info.errorCode != ERR_OK) {
         result = Common::NapiGetNull(env);
     } else {
-        enum DeviceRemindType outType = DeviceRemindType::IDLE_DONOT_REMIND;
+        DeviceRemindType outType = DeviceRemindType::IDLE_DONOT_REMIND;
         if (!Common::DeviceRemindTypeCToJS(asynccallbackinfo->remindType, outType)) {
             asynccallbackinfo->info.errorCode = ERROR;
             result = Common::NapiGetNull(env);

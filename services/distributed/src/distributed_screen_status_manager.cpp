@@ -41,9 +41,7 @@ DistributedScreenStatusManager::DistributedScreenStatusManager() : DistributedFl
 }
 
 DistributedScreenStatusManager::~DistributedScreenStatusManager()
-{
-
-}
+{}
 
 void DistributedScreenStatusManager::OnDeviceConnected(const std::string &deviceId)
 {
@@ -87,7 +85,6 @@ void DistributedScreenStatusManager::GetKvDataManager(void)
 {
     kvDataManager_ = std::make_unique<DistributedKv::DistributedKvDataManager>();
     if (kvDataManager_ != nullptr) {
-
         DistributedKv::Status status = kvDataManager_->StartWatchDeviceChange(deviceCb_);
         if (status != DistributedKv::Status::SUCCESS) {
             ANS_LOGW("kvDataManager StartWatchDeviceChange failed ret = 0x%{public}x", status);
@@ -124,10 +121,7 @@ void DistributedScreenStatusManager::GetKvStore(void)
 
     DistributedKv::AppId appId = {.appId = APP_ID};
     DistributedKv::StoreId storeId = {.storeId = STORE_ID};
-    status = kvDataManager_->GetSingleKvStore(options,
-        appId,
-        storeId,
-        kvStore_);
+    status = kvDataManager_->GetSingleKvStore(options, appId, storeId, kvStore_);
     if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("kvDataManager GetSingleKvStore failed ret = 0x%{public}x", status);
         kvStore_.reset();

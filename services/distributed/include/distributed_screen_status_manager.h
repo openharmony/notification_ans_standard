@@ -49,9 +49,9 @@ private:
     std::recursive_mutex mutex_;
     std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner_ = nullptr;
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ = nullptr;
-    std::unique_ptr<DistributedKv::DistributedKvDataManager> kvDataManager_{};
-    std::shared_ptr<DistributedKv::SingleKvStore> kvStore_{};
-    std::shared_ptr<DistributedDeviceCallback> deviceCb_{};
+    std::unique_ptr<DistributedKv::DistributedKvDataManager> kvDataManager_ = nullptr;
+    std::shared_ptr<DistributedKv::SingleKvStore> kvStore_ = nullptr;
+    std::shared_ptr<DistributedDeviceCallback> deviceCb_ = nullptr;
 
     bool localScreenOn_ = false;
 

@@ -28,7 +28,6 @@ napi_value EnableDistributedByBundle(napi_env env, napi_callback_info info);
 napi_value EnableDistributedSelf(napi_env env, napi_callback_info info);
 napi_value IsDistributedEnableByBundle(napi_env env, napi_callback_info info);
 napi_value GetDeviceRemindType(napi_env env, napi_callback_info info);
-
 }  // namespace NotificationNapi
 }  // namespace OHOS
 
