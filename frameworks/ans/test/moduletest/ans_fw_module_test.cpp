@@ -406,10 +406,9 @@ public:
     void SetDistributedScreenStatus(bool isScreenOn)
     {
         DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
-        DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+        DistributedKv::StoreId storeId = {.storeId = KVSTORE_SCREEN_STATUS_STORE_ID};
         std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
-            DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(
-                {KVSTORE_APP_ID}, {KVSTORE_SCREEN_STATUS_STORE_ID});
+            DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
         DistributedKv::Key key("<remoteDeviceId>" + DELIMITER + "screen_status");
         DistributedKv::Value value(isScreenOn ? "on" : "off");
         pointer->Put(key, value);
@@ -2003,7 +2002,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00200, Function | Me
  */
 HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_GetDeviceRemindType_00100, Function | MediumTest | Level1)
 {
-    auto rType{NotificationConstant::RemindType::NONE};
+    auto rType = NotificationConstant::RemindType::NONE;
     EXPECT_EQ(NotificationHelper::GetDeviceRemindType(rType), ERR_OK);
     ANS_LOGI("ANS_Interface_MT_GetDeviceRemindType_00100:: rType : %{public}d", static_cast<int32_t>(rType));
 
@@ -2019,8 +2018,10 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_GetDeviceRemindType_00100, Function |
 HWTEST_F(AnsFWModuleTest, ScreenStatusChange_00100, Function | MediumTest | Level1)
 {
     ANS_LOGI("%{public}s", test_info_->name());
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_SCREEN_STATUS_STORE_ID};
     std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
-        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer({KVSTORE_APP_ID}, {KVSTORE_SCREEN_STATUS_STORE_ID});
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
     DistributedKv::Key key("<localDeviceId>");
     std::vector<DistributedKv::Entry> entries;
 
@@ -2170,10 +2171,11 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00400, Function | MediumTest | Lev
 HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00500, Function | MediumTest | Level1)
 {
     ANS_LOGI("%{public}s", test_info_->name());
+    std::vector<std::string> devices = {"<localDeviceType>"};
     NotificationRequest request = CreateDistributedRequest(test_info_->name());
     request.SetOwnerBundleName(APP_NAME);
     request.SetCreatorBundleName(APP_NAME);
-    request.SetDevicesSupportDisplay({"<localDeviceType>"});
+    request.SetDevicesSupportDisplay(devices);
     std::string jsonString;
     NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
 
@@ -2181,9 +2183,10 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00500, Function | MediumTest | Lev
 
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
-
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_SCREEN_STATUS_STORE_ID};
     std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
-        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer({KVSTORE_APP_ID}, {KVSTORE_NOTIFICATION_STORE_ID});
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
 
     DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
     DistributedKv::Value value(jsonString);
@@ -2211,10 +2214,11 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00500, Function | MediumTest | Lev
 HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00600, Function | MediumTest | Level1)
 {
     ANS_LOGI("%{public}s", test_info_->name());
+    std::vector<std::string> devices = {"<localDeviceType>"};
     NotificationRequest request = CreateDistributedRequest(test_info_->name());
     request.SetOwnerBundleName(APP_NAME);
     request.SetCreatorBundleName(APP_NAME);
-    request.SetDevicesSupportDisplay({"<localDeviceType>"});
+    request.SetDevicesSupportDisplay(devices);
     std::string jsonString;
     NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
 
@@ -2222,9 +2226,10 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00600, Function | MediumTest | Lev
 
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
-
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_SCREEN_STATUS_STORE_ID};
     std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
-        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer({KVSTORE_APP_ID}, {KVSTORE_NOTIFICATION_STORE_ID});
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
 
     DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
     DistributedKv::Value value(jsonString);
