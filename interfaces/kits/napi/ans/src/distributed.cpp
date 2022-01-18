@@ -69,6 +69,13 @@ struct AsyncCallbackInfoIsEnabledByBundle {
     bool enable = false;
 };
 
+struct AsyncCallbackInfoGetRemindType {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    CallbackPromiseInfo info;
+    NotificationConstant::RemindType remindType = NotificationConstant::RemindType::NONE;
+};
+
 napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, EnabledParams &params)
 {
     ANS_LOGI("enter");
@@ -474,6 +481,82 @@ napi_value IsDistributedEnableByBundle(napi_env env, napi_callback_info info)
                 asynccallbackinfo->params.option, asynccallbackinfo->enable);
         },
         AsyncCompleteCallbackIsDistributedEnableByBundle,
+        (void *)asynccallbackinfo,
+        &asynccallbackinfo->asyncWork);
+
+    NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
+
+    if (asynccallbackinfo->info.isCallback) {
+        return Common::NapiGetNull(env);
+    } else {
+        return promise;
+    }
+}
+
+void AsyncCompleteCallbackGetDeviceRemindType(napi_env env, napi_status status, void *data)
+{
+    ANS_LOGI("enter");
+    if (!data) {
+        ANS_LOGE("Invalid async callback data");
+        return;
+    }
+    ANS_LOGI("GetDeviceRemindType napi_create_async_work end");
+    AsyncCallbackInfoGetRemindType *asynccallbackinfo = (AsyncCallbackInfoGetRemindType *)data;
+    napi_value result = nullptr;
+    if (asynccallbackinfo->info.errorCode != ERR_OK) {
+        result = Common::NapiGetNull(env);
+    } else {
+        DeviceRemindType outType = DeviceRemindType::IDLE_DONOT_REMIND;
+        if (!Common::DeviceRemindTypeCToJS(asynccallbackinfo->remindType, outType)) {
+            asynccallbackinfo->info.errorCode = ERROR;
+            result = Common::NapiGetNull(env);
+        }
+        napi_create_int32(env, (int32_t)outType, &result);
+    }
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    if (asynccallbackinfo) {
+        delete asynccallbackinfo;
+        asynccallbackinfo = nullptr;
+    }
+}
+
+napi_value GetDeviceRemindType(napi_env env, napi_callback_info info)
+{
+    ANS_LOGI("enter");
+
+    napi_ref callback = nullptr;
+    if (Common::ParseParaOnlyCallback(env, info, callback) == nullptr) {
+        return Common::NapiGetUndefined(env);
+    }
+
+    AsyncCallbackInfoGetRemindType *asynccallbackinfo =
+        new (std::nothrow) AsyncCallbackInfoGetRemindType {.env = env, .asyncWork = nullptr};
+    if (!asynccallbackinfo) {
+        return Common::JSParaError(env, callback);
+    }
+    napi_value promise = nullptr;
+    Common::PaddingCallbackPromiseInfo(env, callback, asynccallbackinfo->info, promise);
+
+    napi_value resourceName = nullptr;
+    napi_create_string_latin1(env, "getDeviceRemindType", NAPI_AUTO_LENGTH, &resourceName);
+    // Asynchronous function call
+    napi_create_async_work(
+        env,
+        nullptr,
+        resourceName,
+        [](napi_env env, void *data) {
+            ANS_LOGI("GetDeviceRemindType napi_create_async_work start");
+            AsyncCallbackInfoGetRemindType *asynccallbackinfo = (AsyncCallbackInfoGetRemindType *)data;
+            asynccallbackinfo->info.errorCode =
+                NotificationHelper::GetDeviceRemindType(asynccallbackinfo->remindType);
+        },
+        AsyncCompleteCallbackGetDeviceRemindType,
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
 

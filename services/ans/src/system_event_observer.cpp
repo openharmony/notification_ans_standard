@@ -25,6 +25,10 @@ SystemEventObserver::SystemEventObserver(const ISystemEvent &callbacks) : callba
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+#endif
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
 
     subscriber_ = std::make_shared<SystemEventSubscriber>(
@@ -50,6 +54,16 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
             sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
             callbacks_.onBundleRemoved(bundleOption);
         }
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        if (callbacks_.onScreenOn != nullptr) {
+            callbacks_.onScreenOn();
+        }
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (callbacks_.onScreenOff != nullptr) {
+            callbacks_.onScreenOff();
+        }
+#endif
     }
 }
 }  // namespace Notification
