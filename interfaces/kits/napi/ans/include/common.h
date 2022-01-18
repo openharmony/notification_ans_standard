@@ -113,6 +113,13 @@ enum class SourceType {
     TYPE_TIMER = 0x00000002
 };
 
+enum class DeviceRemindType {
+    IDLE_DONOT_REMIND,
+    IDLE_REMIND,
+    ACTIVE_DONOT_REMIND,
+    ACTIVE_REMIND
+};
+
 struct NotificationSubscribeInfo {
     std::vector<std::string> bundleNames;
     int userId = 0;
@@ -406,6 +413,8 @@ public:
     static bool DoNotDisturbTypeJSToC(const DoNotDisturbType &inType, NotificationConstant::DoNotDisturbType &outType);
 
     static bool DoNotDisturbTypeCToJS(const NotificationConstant::DoNotDisturbType &inType, DoNotDisturbType &outType);
+
+    static bool DeviceRemindTypeCToJS(const NotificationConstant::RemindType &inType, DeviceRemindType &outType);
 
     static bool SourceTypeCToJS(const NotificationConstant::SourceType &inType, SourceType &outType);
 

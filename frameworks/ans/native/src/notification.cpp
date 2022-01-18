@@ -43,6 +43,7 @@ Notification::Notification(const Notification &other)
     key_ = other.key_;
     ledLightColor_ = other.ledLightColor_;
     lockscreenVisibleness_ = other.lockscreenVisibleness_;
+    remindType_ = other.remindType_;
     request_ = other.request_;
     postTime_ = other.postTime_;
     sound_ = other.sound_;
@@ -180,6 +181,11 @@ bool Notification::IsFloatingIcon() const
     return request_->IsFloatingIcon();
 }
 
+NotificationConstant::RemindType Notification::GetRemindType() const
+{
+    return remindType_;
+}
+
 bool Notification::IsRemoveAllowed() const
 {
     return isRemoveAllowed_;
@@ -259,6 +265,11 @@ bool Notification::MarshallingInt32(Parcel &parcel) const
 
     if (!parcel.WriteInt32(static_cast<int32_t>(lockscreenVisibleness_))) {
         ANS_LOGE("Can't write visbleness");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(remindType_))) {
+        ANS_LOGE("Can't write remindType");
         return false;
     }
 
@@ -353,6 +364,9 @@ void Notification::ReadFromParcelInt32(Parcel &parcel)
     // Read lockscreenVisibleness_
     lockscreenVisibleness_ = static_cast<NotificationConstant::VisiblenessType>(parcel.ReadInt32());
 
+    // Read remindType_
+    remindType_ = static_cast<NotificationConstant::RemindType>(parcel.ReadInt32());
+
     // Read sourceType_
     sourceType_ = static_cast<NotificationConstant::SourceType>(parcel.ReadInt32());
 }
@@ -434,6 +448,11 @@ void Notification::SetVibrationStyle(const std::vector<int64_t> &style)
     vibrationStyle_ = style;
 }
 
+void Notification::SetRemindType(const NotificationConstant::RemindType &reminType)
+{
+    remindType_ = reminType;
+}
+
 std::string Notification::GenerateNotificationKey(
     const std::string &deviceId, int32_t uid, const std::string &label, int32_t id)
 {
@@ -466,6 +485,7 @@ std::string Notification::Dump() const
             "key = " + key_ +
             ", ledLightColor = " + std::to_string(ledLightColor_) +
             ", lockscreenVisbleness = " + std::to_string(static_cast<int32_t>(lockscreenVisibleness_)) +
+            ", remindType = " + std::to_string(static_cast<int32_t>(remindType_)) +
             ", isRemoveAllowed = " + (isRemoveAllowed_ ? "true" : "false") +
             ", sourceType = " + std::to_string(static_cast<int32_t>(sourceType_)) +
             ", deviceId = " + deviceId_ +

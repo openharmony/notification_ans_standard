@@ -110,6 +110,7 @@ public:
     virtual ErrCode EnableDistributedSelf(bool enabled) override;
     virtual ErrCode IsDistributedEnableByBundle(
         const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+    virtual ErrCode GetDeviceRemindType(NotificationConstant::RemindType &remindType) override;
 
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
@@ -183,6 +184,7 @@ private:
     ErrCode HandleSetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetDoNotDisturbDate(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleDoesSupportDoNotDisturbMode(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetDeviceRemindType(MessageParcel &data, MessageParcel &reply);
     ErrCode HandlePublishContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelContinuousTaskNotification(MessageParcel &data, MessageParcel &reply);
     ErrCode HandlePublishReminder(MessageParcel &data, MessageParcel &reply);
