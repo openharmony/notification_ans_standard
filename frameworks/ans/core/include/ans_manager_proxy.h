@@ -103,6 +103,7 @@ public:
     ErrCode EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
     ErrCode EnableDistributedSelf(bool enabled) override;
     ErrCode IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+    ErrCode GetDeviceRemindType(NotificationConstant::RemindType &remindType) override;
 
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;

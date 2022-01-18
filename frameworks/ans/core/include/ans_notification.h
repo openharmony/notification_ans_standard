@@ -663,6 +663,15 @@ public:
     ErrCode IsDistributedEnableByBundle(const NotificationBundleOption &bundleOption, bool &enabled);
 
     /**
+     * Obtains the device remind type.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param remindType Indicates the device remind type to get.
+     * @return Returns get device reminder type result.
+     */
+    ErrCode GetDeviceRemindType(NotificationConstant::RemindType &remindType);
+
+    /**
      * Publishes a continuous task notification.
      * @param request Indicates the NotificationRequest object for setting the notification content.
      *                This parameter must be specified.

@@ -40,6 +40,7 @@
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 #include "distributed_notification_manager.h"
 #include "distributed_preferences.h"
+#include "distributed_screen_status_manager.h"
 #endif
 
 namespace OHOS {
@@ -200,6 +201,10 @@ AdvancedNotificationService::AdvancedNotificationService()
 
     ISystemEvent iSystemEvent = {
         std::bind(&AdvancedNotificationService::OnBundleRemoved, this, std::placeholders::_1),
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+        std::bind(&AdvancedNotificationService::OnScreenOn, this),
+        std::bind(&AdvancedNotificationService::OnScreenOff, this),
+#endif
     };
     systemEventObserver_ = std::make_shared<SystemEventObserver>(iSystemEvent);
 
@@ -311,6 +316,7 @@ ErrCode AdvancedNotificationService::PublishPreparedNotification(
     record->request = request;
     record->notification = new Notification(request);
     record->bundleOption = bundleOption;
+    SetNotificationRemindType(record->notification, true);
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
@@ -1804,6 +1810,20 @@ void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleO
     }));
 }
 
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+void AdvancedNotificationService::OnScreenOn()
+{
+    localScreenOn_ = true;
+    DistributedScreenStatusManager::GetInstance()->SetLocalScreenStatus(true);
+}
+
+void AdvancedNotificationService::OnScreenOff()
+{
+    localScreenOn_ = false;
+    DistributedScreenStatusManager::GetInstance()->SetLocalScreenStatus(false);
+}
+#endif
+
 void AdvancedNotificationService::OnDistributedKvStoreDeathRecipient()
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
@@ -2429,6 +2449,36 @@ ErrCode AdvancedNotificationService::IsDistributedEnableByBundle(
 #endif
 }
 
+ErrCode AdvancedNotificationService::GetDeviceRemindType(NotificationConstant::RemindType &remindType)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    handler_->PostSyncTask(std::bind([&]() { remindType = GetRemindType(); }));
+    return ERR_OK;
+#else
+    return ERR_INVALID_OPERATION;
+#endif
+}
+
+ErrCode AdvancedNotificationService::SetNotificationRemindType(sptr<Notification> notification, bool isLocal)
+{
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    notification->SetRemindType(GetRemindType());
+#else
+    notification->SetRemindType(NotificationConstant::RemindType::NONE);
+#endif
+    return ERR_OK;
+}
+
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 std::vector<std::string> AdvancedNotificationService::GetLocalNotificationKeys(
     const sptr<NotificationBundleOption> &bundleOption)
@@ -2444,6 +2494,39 @@ std::vector<std::string> AdvancedNotificationService::GetLocalNotificationKeys(
     }
 
     return keys;
+}
+
+NotificationConstant::RemindType AdvancedNotificationService::GetRemindType()
+{
+    bool remind = localScreenOn_;
+    if (distributedReminderPolicy_ == NotificationConstant::DistributedReminderPolicy::DEFAULT) {
+        bool remoteUsing = false;
+        ErrCode result = DistributedScreenStatusManager::GetInstance()->CheckRemoteDevicesIsUsing(remoteUsing);
+        if (result != ERR_OK) {
+            remind = true;
+        }
+        if (!localScreenOn_ && !remoteUsing) {
+            remind = true;
+        }
+    } else if (distributedReminderPolicy_ == NotificationConstant::DistributedReminderPolicy::ALWAYS_REMIND) {
+        remind = true;
+    } else if (distributedReminderPolicy_ == NotificationConstant::DistributedReminderPolicy::DO_NOT_REMIND) {
+        remind = false;
+    }
+
+    if (localScreenOn_) {
+        if (remind) {
+            return NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND;
+        } else {
+            return NotificationConstant::RemindType::DEVICE_ACTIVE_DONOT_REMIND;
+        }
+    } else {
+        if (remind) {
+            return NotificationConstant::RemindType::DEVICE_IDLE_REMIND;
+        } else {
+            return NotificationConstant::RemindType::DEVICE_IDLE_DONOT_REMIND;
+        }
+    }
 }
 
 std::string AdvancedNotificationService::GetNotificationDeviceId(const std::string &key)
@@ -2538,6 +2621,7 @@ void AdvancedNotificationService::OnDistributedPublish(
         record->notification = new Notification(deviceId, request);
         record->bundleOption = bundleOption;
         record->deviceId = deviceId;
+        SetNotificationRemindType(record->notification, false);
 
         ErrCode result = AssignValidNotificationSlot(record);
         if (result != ERR_OK) {
@@ -2587,6 +2671,7 @@ void AdvancedNotificationService::OnDistributedUpdate(
         record->notification = new Notification(deviceId, request);
         record->bundleOption = bundleOption;
         record->deviceId = deviceId;
+        SetNotificationRemindType(record->notification, false);
 
         ErrCode result = AssignValidNotificationSlot(record);
         if (result != ERR_OK) {

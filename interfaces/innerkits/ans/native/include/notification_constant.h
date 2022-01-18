@@ -91,6 +91,20 @@ public:
         CLEARLY = 3,    // time period
     };
 
+    enum class RemindType {
+        NONE                       = -1,
+        DEVICE_IDLE_DONOT_REMIND   = 0, // The device is not in use, no reminder
+        DEVICE_IDLE_REMIND         = 1, // The device is not in use, remind
+        DEVICE_ACTIVE_DONOT_REMIND = 2, // The device is in use, no reminder
+        DEVICE_ACTIVE_REMIND       = 3, // The device is in use, reminder
+    };
+
+    enum class DistributedReminderPolicy {
+        DEFAULT,
+        ALWAYS_REMIND,
+        DO_NOT_REMIND,
+    };
+
     enum class SourceType {
         /**
          * general notification.
