@@ -116,6 +116,7 @@ public:
     virtual ErrCode EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) = 0;
     virtual ErrCode EnableDistributedSelf(bool enabled) = 0;
     virtual ErrCode IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) = 0;
+    virtual ErrCode GetDeviceRemindType(NotificationConstant::RemindType &remindType) = 0;
 
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) = 0;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) = 0;
@@ -186,6 +187,7 @@ protected:
         ENABLE_DISTRIBUTED_BY_BUNDLE,
         ENABLE_DISTRIBUTED_SELF,
         IS_DISTRIBUTED_ENABLED_BY_BUNDLE,
+        GET_DEVICE_REMIND_TYPE,
         SHELL_DUMP,
         PUBLISH_CONTINUOUS_TASK_NOTIFICATION,
         CANCEL_CONTINUOUS_TASK_NOTIFICATION,
