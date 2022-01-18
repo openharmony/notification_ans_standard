@@ -25,6 +25,12 @@ config("ans_innerkits_public_config") {
     "${interfaces_path}/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
+    "//foundation/aafwk/standard/frameworks/kits/content/cpp/src/ohos/aafwk/content/",
+    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
+    "//foundation/multimedia/image_standard/interfaces/innerkits/include",
+    "//third_party/json/single_include",
+    "//third_party/jsoncpp/include",
+    "//utils/system/safwk/native/include",
   ]
   configs = [ "${frameworks_path}/wantagent:wantagent_innerkits_public_config" ]
 }
@@ -47,6 +53,7 @@ ohos_shared_library("ans_innerkits") {
     "src/notification_content.cpp",
     "src/notification_conversational_content.cpp",
     "src/notification_conversational_message.cpp",
+    "src/notification_distributed_options.cpp",
     "src/notification_do_not_disturb_date.cpp",
     "src/notification_helper.cpp",
     "src/notification_long_text_content.cpp",

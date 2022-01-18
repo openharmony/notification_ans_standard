@@ -119,11 +119,6 @@ struct NotificationSubscribeInfo {
     bool hasSubscribeInfo = false;
 };
 
-struct BundleOption {
-    std::string bundle {};
-    int uid {};
-};
-
 struct NotificationKey {
     int id {};
     std::string label {};
@@ -185,6 +180,9 @@ public:
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
     static napi_value SetNotificationRequestByCustom(
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
+
+    static napi_value SetNotificationByDistributedOptions(
+        const napi_env &env, const OHOS::Notification::Notification *notification, napi_value &result);
 
     static napi_value SetNotificationSortingMap(
         const napi_env &env, const std::shared_ptr<NotificationSortingMap> &sortingMap, napi_value &result);
@@ -326,6 +324,15 @@ public:
     static napi_value GetNotificationSmallIcon(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
     static napi_value GetNotificationLargeIcon(
+        const napi_env &env, const napi_value &value, NotificationRequest &request);
+
+    static napi_value GetNotificationRequestDistributedOptions(
+        const napi_env &env, const napi_value &value, NotificationRequest &request);
+    static napi_value GetNotificationIsDistributed(
+        const napi_env &env, const napi_value &value, NotificationRequest &request);
+    static napi_value GetNotificationSupportDisplayDevices(
+        const napi_env &env, const napi_value &value, NotificationRequest &request);
+    static napi_value GetNotificationSupportOperateDevices(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
 
     static napi_value GetNotificationContentType(const napi_env &env, const napi_value &result, int32_t &type);

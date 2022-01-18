@@ -23,6 +23,7 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "notification_helper.h"
+#include "notification_json_convert.h"
 #include "mock_bundle_manager.h"
 #include "mock_ipc_skeleton.h"
 #include "system_ability_definition.h"
@@ -394,6 +395,7 @@ public:
     void WaitOnSubscribeResult();
     void WaitOnConsumed();
     void WaitOnUnsubscribeResult();
+    void CheckJsonConverter(const NotificationRequest *request);
 };
 
 void AnsInterfaceModulePublishTest::SetUpTestCase()
@@ -468,6 +470,42 @@ void AnsInterfaceModulePublishTest::WaitOnUnsubscribeResult()
             break;
         }
     }
+}
+
+void AnsInterfaceModulePublishTest::CheckJsonConverter(const NotificationRequest *request)
+{
+    nlohmann::json jsonObject;
+    auto ret0 = NotificationJsonConverter::ConvertToJosn(request, jsonObject);
+    EXPECT_EQ(ret0, true);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosn object dump ==========>" << jsonObject.dump();
+
+    std::string jsonString;
+    auto ret1 = NotificationJsonConverter::ConvertToJosnString(request, jsonString);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosnString ret1 ==========>"
+        << (ret1 ? "true" : "false");
+    EXPECT_EQ(ret1, true);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosnString string ==========>" << jsonString;
+
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::convert Json sleep start ==========>";
+    sleep(SLEEP_TIME);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::convert Json sleep end ==========>";
+
+    auto pRequest1 = NotificationJsonConverter::ConvertFromJosn<NotificationRequest>(jsonObject);
+    EXPECT_NE(pRequest1, nullptr);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertFromJosn jsonObject dump request ==========>"
+        << pRequest1->Dump();
+
+    auto pRequest2 = NotificationJsonConverter::ConvertFromJosnString<NotificationRequest>(jsonString);
+    EXPECT_NE(pRequest2, nullptr);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertFromJosnString jsonString dump request ==========>"
+        << pRequest2->Dump();
+
+    nlohmann::json jsonObject2;
+    auto ret2 = NotificationJsonConverter::ConvertToJosn(pRequest1, jsonObject2);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosn ret2 ==========>" << (ret2 ? "true" : "false");
+    EXPECT_EQ(ret2, true);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::FromJson -> ToJson object dump ==========>"
+        << jsonObject2.dump();
 }
 
 /**
@@ -1219,6 +1257,77 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_04000, Function
     g_unsubscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
     WaitOnUnsubscribeResult();
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_Publish_08000
+ * @tc.name      : Publish_08000
+ * @tc.desc      : .
+ * @tc.expected  : .
+ */
+HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::convert Json start ############==========>";
+
+    NotificationRequest req;
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
+    normalContent->SetTitle("normal_title");
+    normalContent->SetText("normal_text");
+    normalContent->SetAdditionalText("normal_additional_text");
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00800::normalContent::" << normalContent->Dump();
+
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
+
+    req.SetNotificationId(8000);
+    req.SetContent(content);
+    req.SetSlotType(NotificationConstant::CONTENT_INFORMATION);
+    req.SetClassification(NotificationRequest::CLASSIFICATION_ALARM);
+    req.SetLabel("label");
+    req.SetOwnerBundleName("owner");
+
+    auto wAgent1 = std::make_shared<WantAgent::WantAgent>();
+    req.SetWantAgent(wAgent1);
+
+    auto wAgent2 = std::make_shared<WantAgent::WantAgent>();
+    std::shared_ptr<Media::PixelMap> dummyIcon;
+    auto ab1 = NotificationActionButton::Create(dummyIcon, "ab1_title", wAgent2);
+
+    auto spUserInput3 = NotificationUserInput::Create("uikey3");
+    auto spUserInput2 = NotificationUserInput::Create("uikey2");
+    ab1->AddNotificationUserInput(spUserInput3);
+    ab1->AddNotificationUserInput(spUserInput2);
+
+    auto spOnlyUserInput1 = NotificationUserInput::Create("uionlykey1");
+    spOnlyUserInput1->SetPermitFreeFormInput(false);
+    spOnlyUserInput1->SetPermitMimeTypes("uionly", true);
+    auto spOnlyUserInput4 = NotificationUserInput::Create("uionlykey4");
+    spOnlyUserInput4->SetPermitFreeFormInput(false);
+    spOnlyUserInput4->SetPermitMimeTypes("uionly", true);
+
+    ab1->AddMimeTypeOnlyUserInput(spOnlyUserInput1);
+    ab1->AddMimeTypeOnlyUserInput(spOnlyUserInput4);
+
+    std::shared_ptr<WantAgent::WantAgent> dummyWantAgent;
+    auto ab2 = NotificationActionButton::Create(dummyIcon, "ab2_title", dummyWantAgent);
+
+    req.AddActionButton(ab1);
+    req.AddActionButton(ab2);
+
+    std::vector<std::string> history {"uihistory3", "uihistory2", "uihistory1"};
+    req.SetNotificationUserInputHistory(history);
+
+    auto msgUser1 = std::make_shared<MessageUser>();
+    msgUser1->SetKey("msgUser1_key");
+    msgUser1->SetName("msgUser1_name");
+    auto msgUser2 = std::make_shared<MessageUser>();
+    msgUser2->SetKey("msgUser2_key");
+    msgUser2->SetName("msgUser2_name");
+    req.AddMessageUser(msgUser2);
+    req.AddMessageUser(msgUser1);
+
+    CheckJsonConverter(&req);
 }
 }  // namespace Notification
 }  // namespace OHOS

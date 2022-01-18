@@ -18,6 +18,8 @@
 
 #include "refbase.h"
 
+#include <string>
+
 #include "notification.h"
 #include "notification_bundle_option.h"
 #include "notification_request.h"
@@ -30,6 +32,9 @@ struct NotificationRecord {
     sptr<NotificationRequest> request;
     sptr<Notification> notification;
     sptr<NotificationSlot> slot;
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    std::string deviceId;
+#endif  // DISTRIBUTED_NOTIFICATION_SUPPORTED
 };
 }  // namespace Notification
 }  // namespace OHOS

@@ -408,4 +408,11 @@ PendingWant *PendingWant::Unmarshalling(Parcel &parcel)
 
     return pendingWant;
 }
+
+std::shared_ptr<WantSenderInfo> PendingWant::GetWantSenderInfo(const sptr<AAFwk::IWantSender> &target)
+{
+    std::shared_ptr<WantSenderInfo> info = std::make_shared<WantSenderInfo>();
+    int ret = AbilityManagerClient::GetInstance()->GetWantSenderInfo(target, info);
+    return ret ? nullptr : info;
+}
 }  // namespace OHOS::Notification::WantAgent
