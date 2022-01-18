@@ -103,6 +103,14 @@ public:
     virtual ErrCode RemoveGroupByBundle(
         const sptr<NotificationBundleOption> &bundleOption, const std::string &groupName) override;
 
+    virtual ErrCode IsDistributedEnabled(bool &enabled) override;
+    virtual ErrCode EnableDistributed(bool enabled) override;
+    virtual ErrCode EnableDistributedByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
+    virtual ErrCode EnableDistributedSelf(bool enabled) override;
+    virtual ErrCode IsDistributedEnableByBundle(
+        const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+
     virtual ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     virtual ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
     virtual ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId) override;
@@ -164,6 +172,11 @@ private:
     ErrCode HandleGetCurrentAppSorting(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsAllowedNotify(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsDistributedEnabled(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleEnableDistributed(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleEnableDistributedByBundle(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleEnableDistributedSelf(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsDistributedEnableByBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleShellDump(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelGroup(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleRemoveGroupByBundle(MessageParcel &data, MessageParcel &reply);

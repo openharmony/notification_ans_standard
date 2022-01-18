@@ -32,6 +32,14 @@ public:
     Notification(const sptr<NotificationRequest> &request);
 
     /**
+     * A constructor used to create a Notification instance by existing NotificationRequest object.
+     *
+     * @param deviceId the device id.
+     * @param request the existing NotificationRequest object.
+     */
+    Notification(const std::string &deviceId, const sptr<NotificationRequest> &request);
+
+    /**
      * @brief A constructor used to create a Notification instance by copying parameters from an existing one.
      *
      * @param other Indicates the Notification object.
@@ -190,6 +198,13 @@ public:
     NotificationConstant::SourceType GetSourceType() const;
 
     /**
+     * @brief Gets the device id of the notification source.
+     *
+     * @return Return the device id.
+     */
+    std::string GetDeviceId() const;
+
+    /**
      * @brief Obtains the UserId of the notification creator.
      *
      * @return Return the UserId of the notification creator.
@@ -231,9 +246,10 @@ private:
     void SetPostTime(const int64_t &time);
     void SetSound(const Uri &sound);
     void SetVibrationStyle(const std::vector<int64_t> &style);
+    std::string GenerateNotificationKey(
+        const std::string &deviceId, int32_t uid, const std::string &label, int32_t id);
     void SetRemoveAllowed(bool removeAllowed);
     void SetSourceType(NotificationConstant::SourceType sourceType);
-    std::string GenerateNotificationKey(int32_t uid, const std::string &label, int32_t id);
     bool ReadFromParcel(Parcel &parcel);
     void ReadFromParcelBool(Parcel &parcel);
     void ReadFromParcelString(Parcel &parcel);
@@ -252,6 +268,7 @@ private:
     bool enableViration_ {false};
     bool isRemoveAllowed_ {true};
     std::string key_ {""};
+    std::string deviceId_ {""};
     int32_t ledLightColor_ {0};
     NotificationConstant::VisiblenessType lockscreenVisibleness_ {NotificationConstant::VisiblenessType::NO_OVERRIDE};
     NotificationConstant::SourceType sourceType_ {NotificationConstant::SourceType::TYPE_NORMAL};

@@ -57,6 +57,8 @@ ohos_shared_library("libans") {
     "//utils/native/base:utils_config",
   ]
 
+  defines = []
+
   deps = [
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
@@ -70,6 +72,12 @@ ohos_shared_library("libans") {
 
   if (is_double_framework) {
     cflags = [ "-DCONFIG_DUAL_FRAMEWORK" ]
+  }
+
+  if (distributed_notification_supported) {
+    defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
+    deps += [ "${services_path}/distributed:libans_distributed" ]
+    include_dirs += [ "${services_path}/distributed/include" ]
   }
 
   external_deps = [

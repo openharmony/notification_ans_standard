@@ -19,6 +19,7 @@
 #include "hilog_wrapper.h"
 #include "pending_want.h"
 #include "want_agent_log_wrapper.h"
+#include "want_params_wrapper.h"
 #include "want_sender_info.h"
 #include "want_sender_interface.h"
 
@@ -337,5 +338,102 @@ void WantAgentHelper::UnregisterCancelListener(
     }
 
     pendingWant->UnregisterCancelListener(cancelListener, pendingWant->GetTarget());
+}
+
+std::string WantAgentHelper::ToString(const std::shared_ptr<WantAgent> &agent)
+{
+    if (agent == nullptr) {
+        WANT_AGENT_LOGE("WantAgentHelper::ToString WantAgent invalid input param.");
+        return "";
+    }
+
+    std::shared_ptr<PendingWant> pendingWant = agent->GetPendingWant();
+    if (pendingWant == nullptr) {
+        WANT_AGENT_LOGE("WantAgentHelper::ToString PendingWant invalid input param.");
+        return "";
+    }
+
+    std::shared_ptr<WantSenderInfo> info = pendingWant->GetWantSenderInfo(pendingWant->GetTarget());
+    if (info == nullptr) {
+        WANT_AGENT_LOGE("WantAgentHelper::ToString WantSenderInfo invalid input param.");
+        return "";
+    }
+    nlohmann::json jsonObject;
+    jsonObject["requestCode"] = (*info.get()).requestCode;
+    jsonObject["operationType"] = (*info.get()).type;
+    jsonObject["flags"] = (*info.get()).flags;
+
+    nlohmann::json wants = nlohmann::json::array();
+    for (auto &wantInfo : (*info.get()).allWants) {
+        wants.emplace_back(wantInfo.want.ToString());
+    }
+    jsonObject["wants"] = wants;
+
+    if ((*info.get()).allWants.size() > 0) {
+        nlohmann::json paramsObj;
+        AAFwk::WantParamWrapper wWrapper((*info.get()).allWants[0].want.GetParams());
+        paramsObj["extraInfoValue"] = wWrapper.ToString();
+        jsonObject["extraInfo"] = paramsObj;
+    }
+
+    return jsonObject.dump();
+}
+
+std::shared_ptr<WantAgent> WantAgentHelper::FromString(const std::string &jsonString)
+{
+    if (jsonString.empty()) {
+        return nullptr;
+    }
+    nlohmann::json jsonObject = nlohmann::json::parse(jsonString);
+
+    int requestCode = -1;
+    if (jsonObject.contains("requestCode")) {
+        requestCode = jsonObject.at("requestCode").get<int>();
+    }
+
+    WantAgentConstant::OperationType operationType = WantAgentConstant::OperationType::UNKNOWN_TYPE;
+    if (jsonObject.contains("operationType")) {
+        operationType = static_cast<WantAgentConstant::OperationType>(jsonObject.at("operationType").get<int>());
+    }
+
+    int flags = -1;
+    std::vector<WantAgentConstant::Flags> flagsVec = {};
+    if (jsonObject.contains("flags")) {
+        flags = jsonObject.at("flags").get<int>();
+    }
+    if (flags | FLAG_ONE_SHOT) {
+        flagsVec.emplace_back(WantAgentConstant::Flags::ONE_TIME_FLAG);
+    } else if (flags | FLAG_NO_CREATE) {
+        flagsVec.emplace_back(WantAgentConstant::Flags::NO_BUILD_FLAG);
+    } else if (flags | FLAG_CANCEL_CURRENT) {
+        flagsVec.emplace_back(WantAgentConstant::Flags::CANCEL_PRESENT_FLAG);
+    } else if (flags | FLAG_UPDATE_CURRENT) {
+        flagsVec.emplace_back(WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
+    } else if (flags | FLAG_IMMUTABLE) {
+        flagsVec.emplace_back(WantAgentConstant::Flags::CONSTANT_FLAG);
+    }
+
+    std::vector<std::shared_ptr<AAFwk::Want>> wants = {};
+    if (jsonObject.contains("wants")) {
+        for (auto &wantObj : jsonObject.at("wants")) {
+            auto wantString = wantObj.get<std::string>();
+            wants.emplace_back(std::make_shared<AAFwk::Want>(*Want::FromString(wantString)));
+        }
+    }
+
+    std::shared_ptr<AAFwk::WantParams> extraInfo = nullptr;
+    if (jsonObject.contains("extraInfo")) {
+        auto extraInfoObj = jsonObject.at("extraInfo");
+        if (extraInfoObj.contains("extraInfoValue")) {
+            auto pwWrapper = AAFwk::WantParamWrapper::Parse(extraInfoObj.at("extraInfoValue").get<std::string>());
+            AAFwk::WantParams params;
+            if (pwWrapper->GetValue(params) == ERR_OK) {
+                extraInfo = std::make_shared<AAFwk::WantParams>(params);
+            }
+        }
+    }
+    WantAgentInfo info(requestCode, operationType, flagsVec, wants, extraInfo);
+
+    return GetWantAgent(info);
 }
 }  // namespace OHOS::Notification::WantAgent

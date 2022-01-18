@@ -18,6 +18,7 @@
 
 #include "notification_basic_content.h"
 #include "notification_conversational_content.h"
+#include "notification_json_convert.h"
 #include "notification_long_text_content.h"
 #include "notification_media_content.h"
 #include "notification_multiline_content.h"
@@ -27,7 +28,7 @@
 
 namespace OHOS {
 namespace Notification {
-class NotificationContent : public Parcelable {
+class NotificationContent : public Parcelable, public NotificationJsonConvertionBase {
 public:
     enum class Type {
         /**
@@ -146,6 +147,19 @@ public:
     std::string Dump();
 
     /**
+     * Converts a NotificationContent object into a Json.
+     * @param jsonObject Indicates the Json object.
+     */
+    bool ToJson(nlohmann::json &jsonObject) const override;
+
+    /**
+     * Creates a NotificationContent object from a Json.
+     * @param jsonObject Indicates the Json object.
+     * @return the NotificationContent.
+     */
+    static NotificationContent *FromJson(const nlohmann::json &jsonObject);
+
+    /**
      * Marshal a object into a Parcel.
      * @param parcel the object into the parcel
      */
@@ -169,6 +183,8 @@ private:
      * @return true if read success; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
+
+    static bool ConvertJsonToContent(NotificationContent *target, const nlohmann::json &jsonObject);
 
 private:
     NotificationContent::Type contentType_ {NotificationContent::Type::NONE};

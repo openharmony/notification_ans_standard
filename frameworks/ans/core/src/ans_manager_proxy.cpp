@@ -1842,6 +1842,171 @@ ErrCode AnsManagerProxy::DoesSupportDoNotDisturbMode(bool &doesSupport)
     return result;
 }
 
+ErrCode AnsManagerProxy::IsDistributedEnabled(bool &enabled)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[IsDistributedEnabled] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(IS_DISTRIBUTED_ENABLED, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[IsDistributedEnabled] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[IsDistributedEnabled] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(enabled)) {
+        ANS_LOGW("[IsDistributedEnabled] fail: read enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::EnableDistributed(bool enabled)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[EnableDistributed] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteBool(enabled)) {
+        ANS_LOGW("[EnableDistributed] fail: write enabled failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(ENABLE_DISTRIBUTED, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[EnableDistributed] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[EnableDistributed] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled)
+{
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[EnableDistributedByBundle] fail: bundle is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[EnableDistributedByBundle] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteParcelable(bundleOption)) {
+        ANS_LOGW("[EnableDistributedByBundle] fail:: write bundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteBool(enabled)) {
+        ANS_LOGW("[EnableDistributedByBundle] fail:: write enabled failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(ENABLE_DISTRIBUTED_BY_BUNDLE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[EnableDistributedByBundle] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[EnableDistributedByBundle] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::EnableDistributedSelf(bool enabled)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[EnableDistributedSelf] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteBool(enabled)) {
+        ANS_LOGW("[EnableDistributedSelf] fail: write enabled failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(ENABLE_DISTRIBUTED_SELF, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[EnableDistributedSelf] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[EnableDistributedSelf] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
+{
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[IsDistributedEnableByBundle] fail: bundle is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[IsDistributedEnableByBundle] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteParcelable(bundleOption)) {
+        ANS_LOGW("[IsDistributedEnableByBundle] fail: write bundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(IS_DISTRIBUTED_ENABLED_BY_BUNDLE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[IsDistributedEnableByBundle] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[IsDistributedEnableByBundle] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(enabled)) {
+        ANS_LOGW("[IsDistributedEnableByBundle] fail: read enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo)
 {
     MessageParcel data;

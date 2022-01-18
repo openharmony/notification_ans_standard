@@ -33,7 +33,7 @@ class BundleManagerHelper : public DelayedSingleton<BundleManagerHelper> {
 public:
     std::string GetBundleNameByUid(int uid);
     bool IsSystemApp(int uid);
-    int GetDefaultUidByBundleName(const std::string& bundle);
+    int GetDefaultUidByBundleName(const std::string &bundle);
 
 private:
     void Connect();

@@ -40,7 +40,7 @@ NotificationSorting::NotificationSorting(const NotificationSorting &sorting)
 void NotificationSorting::SetSlot(const sptr<NotificationSlot> &slot)
 {
     if (slot == nullptr) {
-        slot_ = new NotificationSlot(NotificationConstant::SlotType::OTHER);
+        slot_ = new (std::nothrow) NotificationSlot(NotificationConstant::SlotType::OTHER);
         return;
     }
     slot_ = slot;
