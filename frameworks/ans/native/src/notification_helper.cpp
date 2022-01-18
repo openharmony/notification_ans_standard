@@ -347,6 +347,11 @@ ErrCode NotificationHelper::IsDistributedEnableByBundle(const NotificationBundle
     return DelayedSingleton<AnsNotification>::GetInstance()->IsDistributedEnableByBundle(bundleOption, enabled);
 }
 
+ErrCode NotificationHelper::GetDeviceRemindType(NotificationConstant::RemindType &remindType)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetDeviceRemindType(remindType);
+}
+
 ErrCode NotificationHelper::PublishContinuousTaskNotification(const NotificationRequest &request)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->PublishContinuousTaskNotification(request);
