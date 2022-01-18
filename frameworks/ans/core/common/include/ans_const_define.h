@@ -46,6 +46,11 @@ const static std::vector<int64_t> DEFAULT_NOTIFICATION_VIBRATION = {200};
 
 // Default path for template
 const static std::string DEFAULT_TEMPLATE_PATH("/system/etc/external.json");
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+constexpr NotificationConstant::DistributedReminderPolicy DEFAULT_DISTRIBUTED_REMINDER_POLICY =
+    NotificationConstant::DistributedReminderPolicy::DEFAULT;
+#endif
 }  // namespace Notification
 }  // namespace OHOS
 
