@@ -929,6 +929,16 @@ ErrCode AnsNotification::IsDistributedEnableByBundle(const NotificationBundleOpt
     return ansManagerProxy_->IsDistributedEnableByBundle(bo, enabled);
 }
 
+ErrCode AnsNotification::GetDeviceRemindType(NotificationConstant::RemindType &remindType)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->GetDeviceRemindType(remindType);
+}
+
 void AnsNotification::ResetAnsManagerProxy()
 {
     ANS_LOGI("enter");

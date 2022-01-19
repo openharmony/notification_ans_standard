@@ -186,6 +186,12 @@ public:
     bool IsFloatingIcon() const;
 
     /**
+     * @brief Obtains the remind type of a notification.
+     * @return the remind type of a notification.
+     */
+    NotificationConstant::RemindType GetRemindType() const;
+
+    /**
      * Whether to support remove allowed.
      * @return Current remove allowed status.
      */
@@ -246,6 +252,7 @@ private:
     void SetPostTime(const int64_t &time);
     void SetSound(const Uri &sound);
     void SetVibrationStyle(const std::vector<int64_t> &style);
+    void SetRemindType(const NotificationConstant::RemindType &reminType);
     std::string GenerateNotificationKey(
         const std::string &deviceId, int32_t uid, const std::string &label, int32_t id);
     void SetRemoveAllowed(bool removeAllowed);
@@ -271,6 +278,7 @@ private:
     std::string deviceId_ {""};
     int32_t ledLightColor_ {0};
     NotificationConstant::VisiblenessType lockscreenVisibleness_ {NotificationConstant::VisiblenessType::NO_OVERRIDE};
+    NotificationConstant::RemindType remindType_ {NotificationConstant::RemindType::NONE};
     NotificationConstant::SourceType sourceType_ {NotificationConstant::SourceType::TYPE_NORMAL};
     sptr<NotificationRequest> request_ {nullptr};
     int64_t postTime_ {0};

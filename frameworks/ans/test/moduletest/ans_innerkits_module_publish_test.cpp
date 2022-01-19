@@ -1298,7 +1298,6 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function
     auto spUserInput2 = NotificationUserInput::Create("uikey2");
     ab1->AddNotificationUserInput(spUserInput3);
     ab1->AddNotificationUserInput(spUserInput2);
-
     auto spOnlyUserInput1 = NotificationUserInput::Create("uionlykey1");
     spOnlyUserInput1->SetPermitFreeFormInput(false);
     spOnlyUserInput1->SetPermitMimeTypes("uionly", true);

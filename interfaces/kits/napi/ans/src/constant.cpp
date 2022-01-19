@@ -240,6 +240,26 @@ napi_value DoNotDisturbTypeInit(napi_env env, napi_value exports)
     return exports;
 }
 
+napi_value DeviceRemindTypeInit(napi_env env, napi_value exports)
+{
+    ANS_LOGI("%{public}s, called", __func__);
+
+    napi_value obj = nullptr;
+    napi_create_object(env, &obj);
+
+    SetNamedPropertyByInteger(env, obj, (int32_t)DeviceRemindType::IDLE_DONOT_REMIND, "IDLE_DONOT_REMIND");
+    SetNamedPropertyByInteger(env, obj, (int32_t)DeviceRemindType::IDLE_REMIND, "IDLE_REMIND");
+    SetNamedPropertyByInteger(env, obj, (int32_t)DeviceRemindType::ACTIVE_DONOT_REMIND, "ACTIVE_DONOT_REMIND");
+    SetNamedPropertyByInteger(env, obj, (int32_t)DeviceRemindType::ACTIVE_REMIND, "ACTIVE_REMIND");
+
+    napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("DeviceRemindType", obj),
+    };
+
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    return exports;
+}
+
 napi_value SourceTypeInit(napi_env env, napi_value exports)
 {
     ANS_LOGI("%{public}s, called", __func__);
@@ -271,6 +291,7 @@ napi_value ConstantInit(napi_env env, napi_value exports)
     ContentTypeInit(env, exports);
     SourceTypeInit(env, exports);
     DoNotDisturbTypeInit(env, exports);
+    DeviceRemindTypeInit(env, exports);
     return exports;
 }
 }  // namespace NotificationNapi

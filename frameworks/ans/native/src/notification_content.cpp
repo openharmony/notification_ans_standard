@@ -137,7 +137,6 @@ NotificationContent *NotificationContent::FromJson(const nlohmann::json &jsonObj
         ANS_LOGE("Invalid JSON object");
         return nullptr;
     }
-
     const auto &jsonEnd = jsonObject.cend();
     if ((jsonObject.find("contentType") == jsonEnd) || (jsonObject.find("content") == jsonEnd)) {
         ANS_LOGE("Incomplete NotificationContent json object. Cannot convert content from JSON.");
