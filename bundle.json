@@ -44,8 +44,8 @@
     "adapted_system_type": [
       "standard"
     ],
-    "rom": "",
-    "ram": "",
+    "rom": "3000KB",
+    "ram": "16000KB",
     "deps": {
       "components": [
         "samgr_standard",
