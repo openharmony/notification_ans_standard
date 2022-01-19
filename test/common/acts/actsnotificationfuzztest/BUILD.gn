@@ -43,10 +43,10 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/appexecfwk/standard/kits/appkit/native/app/include/task",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/task_dispatcher/include/threading",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/task_dispatcher/include/dispatcher",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/task_dispatcher/include/task",
+    "//foundation/aafwk/standard/frameworks/kits/app/native/app/include/task",
+    "//foundation/aafwk/standard/common/task_dispatcher/include/threading",
+    "//foundation/aafwk/standard/common/task_dispatcher/include/dispatcher",
+    "//foundation/aafwk/standard/common/task_dispatcher/include/task",
   ]
 
   cflags = []
@@ -63,10 +63,10 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "//base/notification/ans_standard/services/ans:ans_targets",
     "//base/notification/ces_standard/frameworks/common:libevent_common",
     "//base/notification/ces_standard/frameworks/native:cesfwk_innerkits",
+    "//foundation/aafwk/standard/common/task_dispatcher:appkit_dispatcher_td",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/task_dispatcher:appkit_dispatcher_td",
-    "//foundation/appexecfwk/standard/kits:appkit_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -77,9 +77,10 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "LOG_DOMAIN = 0xD002200",
   ]
   external_deps = [
-    "aafwk_standard:ability_manager",
-    "aafwk_standard:base",
-    "aafwk_standard:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "ability_runtime:base",
+    "ability_runtime:want",
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
