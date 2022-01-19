@@ -201,6 +201,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::IS_DISTRIBUTED_ENABLED_BY_BUNDLE,
             std::bind(&AnsManagerStub::HandleIsDistributedEnableByBundle, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
+        {AnsManagerStub::GET_DEVICE_REMIND_TYPE,
+            std::bind(&AnsManagerStub::HandleGetDeviceRemindType, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::SHELL_DUMP,
             std::bind(
                 &AnsManagerStub::HandleShellDump, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
@@ -1359,6 +1362,23 @@ ErrCode AnsManagerStub::HandleIsDistributedEnableByBundle(MessageParcel &data, M
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleGetDeviceRemindType(MessageParcel &data, MessageParcel &reply)
+{
+    auto rType {NotificationConstant::RemindType::NONE};
+    ErrCode result = GetDeviceRemindType(rType);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleGetDeviceRemindType] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteInt32(static_cast<int32_t>(rType))) {
+        ANS_LOGW("[HandleGetDeviceRemindType] fail: write remind type failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleShellDump(MessageParcel &data, MessageParcel &reply)
 {
     std::string dumpOption;
@@ -1882,6 +1902,12 @@ ErrCode AnsManagerStub::EnableDistributedSelf(bool enabled)
 ErrCode AnsManagerStub::IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
 {
     ANS_LOGW("AnsManagerStub::IsDistributedEnableByBundle called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::GetDeviceRemindType(NotificationConstant::RemindType &remindType)
+{
+    ANS_LOGW("AnsManagerStub::GetDeviceRemindType called!");
     return ERR_INVALID_OPERATION;
 }
 
