@@ -41,7 +41,7 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[IS_TEMPLATE_MAX_PARA] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_ASSERT(env, argc < IS_TEMPLATE_MAX_PARA, "Wrong number of arguments");
+    NAPI_ASSERT(env, argc <= IS_TEMPLATE_MAX_PARA, "Wrong number of arguments");
 
     napi_valuetype valuetype = napi_undefined;
     // argv[0]: name: string
@@ -89,7 +89,7 @@ napi_value IsSupportTemplate(napi_env env, napi_callback_info info)
             ANS_LOGI("IsSupportTemplate napi_create_async_work start");
             AsyncCallbackInfoTemplate *asyncCallbackinfo = (AsyncCallbackInfoTemplate *)data;
 
-            asyncCallbackinfo->info.errorCode = NotificationHelper::CancelNotification(
+            asyncCallbackinfo->info.errorCode = NotificationHelper::IsSupportTemplate(
                 asyncCallbackinfo->params.templateName, asyncCallbackinfo->params.support);
         },
         [](napi_env env, napi_status status, void *data) {
@@ -105,7 +105,7 @@ napi_value IsSupportTemplate(napi_env env, napi_callback_info info)
             }
 
             napi_delete_async_work(env, asyncCallbackinfo->asyncWork);
-            if (asyncCallbackinfo) {
+            if (asyncCallbackinfo != nullptr) {
                 delete asyncCallbackinfo;
                 asyncCallbackinfo = nullptr;
             }
