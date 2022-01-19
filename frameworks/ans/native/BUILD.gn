@@ -27,6 +27,7 @@ config("ans_innerkits_public_config") {
     "${frameworks_path}/ans/core/include",
     "//foundation/aafwk/standard/frameworks/kits/content/cpp/src/ohos/aafwk/content/",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
     "//foundation/multimedia/image_standard/interfaces/innerkits/include",
     "//third_party/json/single_include",
     "//third_party/jsoncpp/include",

@@ -28,6 +28,7 @@ config("public_ans_core_config") {
     "${interfaces_path}/innerkits/ans/native/include",
     "${interfaces_path}/innerkits/wantAgent/include",
     "//foundation/aafwk/standard/frameworks/kits/content/cpp/src/ohos/aafwk/content/",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
     "//foundation/multimedia/image_standard/interfaces/innerkits/include",
     "//utils/native/base/include",
     "//third_party/json/single_include",

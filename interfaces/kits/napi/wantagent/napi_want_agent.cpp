@@ -790,8 +790,7 @@ auto NAPI_TriggerWrapExecuteCallBack = [](napi_env env, void *data) {
     AsyncTriggerCallbackInfo *asyncCallbackInfo = static_cast<AsyncTriggerCallbackInfo *>(data);
     asyncCallbackInfo->triggerObj->SetCallbackInfo(env, asyncCallbackInfo->callback[0]);
     asyncCallbackInfo->triggerObj->SetWantAgentInstance(asyncCallbackInfo->wantAgent);
-    WantAgentHelper::TriggerWantAgent(asyncCallbackInfo->context,
-        asyncCallbackInfo->wantAgent,
+    WantAgentHelper::TriggerWantAgent(asyncCallbackInfo->wantAgent,
         asyncCallbackInfo->triggerObj,
         asyncCallbackInfo->triggerInfo);
 };
@@ -892,15 +891,6 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
 
-    // Get context
-    napi_value global = nullptr;
-    NAPI_CALL(env, napi_get_global(env, &global));
-    napi_value abilityObj = nullptr;
-    NAPI_CALL(env, napi_get_named_property(env, global, "ability", &abilityObj));
-    Ability *ability = nullptr;
-    NAPI_CALL(env, napi_get_value_external(env, abilityObj, (void **)&ability));
-    std::shared_ptr<OHOS::AppExecFwk::Context> context = ability->GetContext();
-
     bool callBackMode = false;
     if (argc >= NUMBER_OF_PARAMETERS_THREE) {
         napi_valuetype valuetype;
@@ -924,7 +914,6 @@ napi_value NAPI_Trigger(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
     asyncCallbackInfo->wantAgent = std::make_shared<Notification::WantAgent::WantAgent>(*pWantAgent);
-    asyncCallbackInfo->context = context;
     asyncCallbackInfo->triggerInfo = triggerInfo;
     asyncCallbackInfo->triggerObj = nullptr;
     if (callBackMode) {
@@ -1296,15 +1285,6 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
         return NapiGetNull(env);
     }
 
-    // Get context
-    napi_value global = 0;
-    NAPI_CALL(env, napi_get_global(env, &global));
-    napi_value abilityObj = 0;
-    NAPI_CALL(env, napi_get_named_property(env, global, "ability", &abilityObj));
-    Ability *ability = nullptr;
-    NAPI_CALL(env, napi_get_value_external(env, abilityObj, (void **)&ability));
-    std::shared_ptr<OHOS::AppExecFwk::Context> context = ability->GetContext();
-
     bool callBackMode = false;
     if (argc >= NUMBER_OF_PARAMETERS_TWO) {
         napi_valuetype valuetype;
@@ -1327,7 +1307,7 @@ napi_value NAPI_GetWantAgent(napi_env env, napi_callback_info info)
     asyncCallbackInfo->requestCode = requestCode;
     asyncCallbackInfo->wantAgentFlags = wantAgentFlags;
     asyncCallbackInfo->extraInfo.reset(new (std::nothrow) AAFwk::WantParams(extraInfo));
-    asyncCallbackInfo->context = context;
+    asyncCallbackInfo->context = OHOS::AbilityRuntime::Context::GetApplicationContext();
 
     if (callBackMode) {
         napi_create_reference(env, argv[1], 1, &asyncCallbackInfo->callback[0]);

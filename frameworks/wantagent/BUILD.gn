@@ -34,6 +34,7 @@ config("wantagent_innerkits_public_config") {
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/aafwk/standard/frameworks/kits/appkit/native/app/include",
+    "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime",
     "//third_party/icu/icu4c/source/common",
   ]
 }
@@ -61,6 +62,7 @@ ohos_shared_library("wantagent_innerkits") {
 
   deps = [
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:app_context",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//utils/native/base:utils",

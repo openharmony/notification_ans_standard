@@ -40,12 +40,14 @@ WantAgentConstant::OperationType PendingWant::GetType(const sptr<AAFwk::IWantSen
 }
 
 std::shared_ptr<PendingWant> PendingWant::GetAbility(
-    const std::shared_ptr<Context> &context, int requestCode, const std::shared_ptr<Want> &want, unsigned int flags)
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
+    int requestCode, const std::shared_ptr<Want> &want, unsigned int flags)
 {
     return GetAbility(context, requestCode, want, flags, nullptr);
 }
 
-std::shared_ptr<PendingWant> PendingWant::GetAbility(const std::shared_ptr<Context> &context, int requestCode,
+std::shared_ptr<PendingWant> PendingWant::GetAbility(
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context, int requestCode,
     const std::shared_ptr<Want> &want, unsigned int flags, const std::shared_ptr<WantParams> &options)
 {
     WANT_AGENT_LOGI("PendingWant::GetAbility begin.");
@@ -74,20 +76,21 @@ std::shared_ptr<PendingWant> PendingWant::GetAbility(const std::shared_ptr<Conte
     return std::make_shared<PendingWant>(target);
 }
 
-std::shared_ptr<PendingWant> PendingWant::GetAbilities(const std::shared_ptr<Context> &context, int requestCode,
-    std::vector<std::shared_ptr<Want>> &wants, unsigned int flags)
+std::shared_ptr<PendingWant> PendingWant::GetAbilities(const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
+    int requestCode, std::vector<std::shared_ptr<Want>> &wants, unsigned int flags)
 {
     return GetAbilities(context, requestCode, wants, flags, nullptr);
 }
 
-std::shared_ptr<PendingWant> PendingWant::GetAbilities(const std::shared_ptr<Context> &context, int requestCode,
-    std::vector<std::shared_ptr<Want>> &wants, unsigned int flags, const std::shared_ptr<WantParams> &options)
+std::shared_ptr<PendingWant> PendingWant::GetAbilities(const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
+    int requestCode, std::vector<std::shared_ptr<Want>> &wants,
+    unsigned int flags, const std::shared_ptr<WantParams> &options)
 {
     if (context == nullptr) {
         WANT_AGENT_LOGE("PendingWant::GetAbilities invalid input param.");
         return nullptr;
     }
-
+    
     WantSenderInfo wantSenderInfo;
     wantSenderInfo.type = (int32_t)WantAgentConstant::OperationType::START_ABILITIES;
     wantSenderInfo.bundleName = context->GetBundleName();
@@ -111,13 +114,15 @@ std::shared_ptr<PendingWant> PendingWant::GetAbilities(const std::shared_ptr<Con
 }
 
 std::shared_ptr<PendingWant> PendingWant::GetCommonEvent(
-    const std::shared_ptr<Context> &context, int requestCode, const std::shared_ptr<Want> &want, unsigned int flags)
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
+    int requestCode, const std::shared_ptr<Want> &want, unsigned int flags)
 {
     return GetCommonEventAsUser(context, requestCode, want, flags, 0);
 }
 
-std::shared_ptr<PendingWant> PendingWant::GetCommonEventAsUser(const std::shared_ptr<Context> &context, int requestCode,
-    const std::shared_ptr<Want> &want, unsigned int flags, int uid)
+std::shared_ptr<PendingWant> PendingWant::GetCommonEventAsUser(
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
+    int requestCode, const std::shared_ptr<Want> &want, unsigned int flags, int uid)
 {
     if (context == nullptr) {
         WANT_AGENT_LOGE("PendingWant::GetCommonEventAsUser invalid input param.");
@@ -143,21 +148,25 @@ std::shared_ptr<PendingWant> PendingWant::GetCommonEventAsUser(const std::shared
 }
 
 std::shared_ptr<PendingWant> PendingWant::GetService(
-    const std::shared_ptr<Context> &context, int requestCode, const std::shared_ptr<Want> &want, unsigned int flags)
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
+    int requestCode, const std::shared_ptr<Want> &want, unsigned int flags)
 {
-    return BuildServicePendingWant(context, requestCode, want, flags, WantAgentConstant::OperationType::START_SERVICE);
+    return BuildServicePendingWant(context, requestCode, want, flags,
+        WantAgentConstant::OperationType::START_SERVICE);
 }
 
 std::shared_ptr<PendingWant> PendingWant::GetForegroundService(
-    const std::shared_ptr<Context> &context, int requestCode, const std::shared_ptr<Want> &want, unsigned int flags)
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context, int requestCode,
+    const std::shared_ptr<Want> &want, unsigned int flags)
 {
     return BuildServicePendingWant(
         context, requestCode, want, flags, WantAgentConstant::OperationType::START_FOREGROUND_SERVICE);
 }
 
-std::shared_ptr<PendingWant> PendingWant::BuildServicePendingWant(const std::shared_ptr<Context> &context,
-    int requestCode, const std::shared_ptr<Want> &want, unsigned int flags,
-    WantAgentConstant::OperationType serviceKind)
+std::shared_ptr<PendingWant> PendingWant::BuildServicePendingWant(
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
+    int requestCode, const std::shared_ptr<Want> &want,
+    unsigned int flags, WantAgentConstant::OperationType serviceKind)
 {
     if (context == nullptr) {
         WANT_AGENT_LOGE("PendingWant::BuildServicePendingWant invalid input param.");
@@ -189,59 +198,54 @@ void PendingWant::Cancel(const sptr<AAFwk::IWantSender> &target)
 
 void PendingWant::Send(const sptr<AAFwk::IWantSender> &target)
 {
-    Send(nullptr, 0, nullptr, nullptr, "", nullptr, target);
+    Send(0, nullptr, nullptr, "", nullptr, target);
 }
 
 void PendingWant::Send(int resultCode, const sptr<AAFwk::IWantSender> &target)
 {
-    Send(nullptr, resultCode, nullptr, nullptr, "", nullptr, target);
+    Send(resultCode, nullptr, nullptr, "", nullptr, target);
 }
 
-void PendingWant::Send(const std::shared_ptr<Context> &context, int resultCode, const std::shared_ptr<Want> &want,
+void PendingWant::Send(int resultCode, const std::shared_ptr<Want> &want,
     const sptr<AAFwk::IWantSender> &target)
 {
-    Send(context, resultCode, want, nullptr, "", nullptr, target);
+    Send(resultCode, want, nullptr, "", nullptr, target);
 }
 
 void PendingWant::Send(
     int resultCode, const sptr<CompletedDispatcher> &onCompleted, const sptr<AAFwk::IWantSender> &target)
 {
-    Send(nullptr, resultCode, nullptr, onCompleted, "", nullptr, target);
+    Send(resultCode, nullptr, onCompleted, "", nullptr, target);
 }
 
-void PendingWant::Send(const std::shared_ptr<Context> &context, int resultCode, const std::shared_ptr<Want> &want,
+void PendingWant::Send(int resultCode, const std::shared_ptr<Want> &want,
     const sptr<CompletedDispatcher> &onCompleted, const sptr<AAFwk::IWantSender> &target)
 {
-    Send(context, resultCode, want, onCompleted, "", nullptr, target);
+    Send(resultCode, want, onCompleted, "", nullptr, target);
 }
 
-void PendingWant::Send(const std::shared_ptr<Context> &context, int resultCode, const std::shared_ptr<Want> &want,
+void PendingWant::Send(int resultCode, const std::shared_ptr<Want> &want,
     const sptr<CompletedDispatcher> &onCompleted, const std::string &requiredPermission,
     const sptr<AAFwk::IWantSender> &target)
 {
-    Send(context, resultCode, want, onCompleted, requiredPermission, nullptr, target);
+    Send(resultCode, want, onCompleted, requiredPermission, nullptr, target);
 }
 
-void PendingWant::Send(const std::shared_ptr<Context> &context, int resultCode, const std::shared_ptr<Want> &want,
+void PendingWant::Send(int resultCode, const std::shared_ptr<Want> &want,
     const sptr<CompletedDispatcher> &onCompleted, const std::string &requiredPermission,
     const std::shared_ptr<WantParams> &options, const sptr<AAFwk::IWantSender> &target)
 {
     HILOG_INFO("%{public}s:begin.", __func__);
-    if (SendAndReturnResult(context, resultCode, want, onCompleted, requiredPermission, options, target) != 0) {
+    if (SendAndReturnResult(resultCode, want, onCompleted, requiredPermission, options, target) != 0) {
         WANT_AGENT_LOGE("PendingWant::SendAndReturnResult failed.");
     }
 }
 
-int PendingWant::SendAndReturnResult(const std::shared_ptr<Context> &context, int resultCode,
-    const std::shared_ptr<Want> &want, const sptr<CompletedDispatcher> &onCompleted,
-    const std::string &requiredPermission, const std::shared_ptr<WantParams> &options,
-    const sptr<AAFwk::IWantSender> &target)
+int PendingWant::SendAndReturnResult(int resultCode, const std::shared_ptr<Want> &want,
+    const sptr<CompletedDispatcher> &onCompleted, const std::string &requiredPermission,
+    const std::shared_ptr<WantParams> &options, const sptr<AAFwk::IWantSender> &target)
 {
     HILOG_INFO("%{public}s:begin.", __func__);
-    if (context == nullptr) {
-        WANT_AGENT_LOGE("PendingWant::SendAndReturnResult invalid input param.");
-        return 1;
-    }
 
     SenderInfo senderInfo;
     senderInfo.resolvedType = want != nullptr ? want->GetType() : "";

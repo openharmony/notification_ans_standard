@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 #include "ability_context.h"
 #include "completed_callback.h"
-#include "context.h"
 #include "context_container.h"
 #include "element_name.h"
 #include "event_handler.h"

@@ -23,7 +23,7 @@
 
 #include "ability.h"
 #include "completed_callback.h"
-#include "context.h"
+#include "context/context.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 #include "trigger_info.h"
@@ -60,7 +60,7 @@ struct AsyncGetWantAgentCallbackInfo {
     int32_t requestCode = -1;
     std::vector<Notification::WantAgent::WantAgentConstant::Flags> wantAgentFlags;
     std::shared_ptr<AAFwk::WantParams> extraInfo;
-    std::shared_ptr<AppExecFwk::Context> context;
+    std::shared_ptr<AbilityRuntime::Context> context;
     std::shared_ptr<Notification::WantAgent::WantAgent> wantAgent;
 };
 
@@ -116,7 +116,6 @@ struct AsyncTriggerCallbackInfo {
     napi_ref callback[2] = {0};
     bool callBackMode = false;
     std::shared_ptr<TriggerCompleteCallBack> triggerObj;
-    std::shared_ptr<AppExecFwk::Context> context;
     std::shared_ptr<Notification::WantAgent::WantAgent> wantAgent;
     Notification::WantAgent::TriggerInfo triggerInfo;
 };

@@ -18,7 +18,6 @@
 #include "ans_inner_errors.h"
 #include "ans_manager_proxy.h"
 #include "advanced_notification_service.h"
-#include "context.h"
 #include "datetime_ex.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"

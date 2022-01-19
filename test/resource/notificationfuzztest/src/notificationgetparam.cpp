@@ -449,11 +449,6 @@ std::shared_ptr<OHOS::AppExecFwk::Ability> GetParamAbility()
     return make_shared<OHOS::AppExecFwk::Ability>();
 }
 
-std::shared_ptr<OHOS::AppExecFwk::Context> GetParamContext()
-{
-    return make_shared<OHOS::AppExecFwk::Ability>();
-}
-
 std::shared_ptr<OHOS::AAFwk::WantParams> GetParamWantParams()
 {
     return make_shared<OHOS::AAFwk::WantParams>();
