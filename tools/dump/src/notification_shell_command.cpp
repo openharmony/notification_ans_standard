@@ -31,6 +31,9 @@ static const struct option OPTIONS[] = {
     {"help", no_argument, nullptr, 'h'},
     {"active", no_argument, nullptr, 'A'},
     {"recent", no_argument, nullptr, 'R'},
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    {"distributed", no_argument, nullptr, 'D'},
+#endif
     {"setRecentCount", required_argument, nullptr, 0},
     {0, 0, 0, 0},
 };
@@ -45,6 +48,9 @@ static const std::string DUMP_HELP_MSG =
     "  --help, -h                   help menu\n"
     "  --active, -A                 list all active notifications\n"
     "  --recent, -R                 list recent notifications\n"
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    "  --distributed, -D            list all distributed notifications by remote device\n"
+#endif
     "  --setRecentCount <N>         set the max count of recent notification keeping in memory\n";
 }  // namespace
 
@@ -92,7 +98,11 @@ ErrCode NotificationShellCommand::RunAsHelpCommand()
 ErrCode NotificationShellCommand::RunAsDumpCommand()
 {
     int ind = 0;
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    int option = getopt_long(argc_, argv_, "hARD", OPTIONS, &ind);
+#else
     int option = getopt_long(argc_, argv_, "hAR", OPTIONS, &ind);
+#endif
 
     ErrCode ret = ERR_OK;
     std::vector<std::string> infos;
@@ -117,6 +127,16 @@ ErrCode NotificationShellCommand::RunAsDumpCommand()
                 ret = ERR_ANS_SERVICE_NOT_CONNECTED;
             }
             break;
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+        case 'D':
+            if (ans_ != nullptr) {
+                ret = ans_->ShellDump("distributed", infos);
+                resultReceiver_.append("Total:" + std::to_string(infos.size()) + "\n");
+            } else {
+                ret = ERR_ANS_SERVICE_NOT_CONNECTED;
+            }
+            break;
+#endif
         case 0:
             if (ans_ != nullptr) {
                 ret = ans_->ShellDump(std::string(OPTIONS[ind].name) + " " + std::string(optarg), infos);
