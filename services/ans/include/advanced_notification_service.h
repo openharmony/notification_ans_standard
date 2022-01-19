@@ -173,6 +173,7 @@ private:
     bool CheckPermission(const std::string &bundleName);
     ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
     bool GetActiveUserId(int& userId);
+    void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
 
     ErrCode SetNotificationRemindType(sptr<Notification> notification, bool isLocal);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
