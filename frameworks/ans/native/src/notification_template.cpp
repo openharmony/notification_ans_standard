@@ -57,6 +57,13 @@ bool NotificationTemplate::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    if (valid) {
+        if (!parcel.WriteParcelable(templateData_.get())) {
+            ANS_LOGE("Failed to write templateData");
+            return false;
+        }
+    }
+
     return true;
 }
 

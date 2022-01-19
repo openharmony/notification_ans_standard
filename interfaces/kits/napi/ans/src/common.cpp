@@ -3970,7 +3970,7 @@ napi_value Common::GetNotificationTemplate(const napi_env &env, const napi_value
             ANS_LOGE("template is null");
             return nullptr;
         }
-        if (GetNotificationTemplateInfo(env, value, templ) == nullptr) {
+        if (GetNotificationTemplateInfo(env, result, templ) == nullptr) {
             return nullptr;
         }
 

@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "ability_context.h"
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
@@ -33,6 +34,8 @@
 #include "os_account_manager.h"
 #include "permission_filter.h"
 #include "reminder_data_manager.h"
+#include "trigger_info.h"
+#include "want_agent_helper.h"
 
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 #include "distributed_notification_manager.h"
@@ -1105,6 +1108,10 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(const sptr<Notif
                 return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
             }
             notification = record->notification;
+            // delete or delete all, call the function
+            if (!isCancel) {
+                TriggerRemoveWantAgent(record->request);
+            }
             notificationList_.remove(record);
             return ERR_OK;
         }
@@ -1874,6 +1881,8 @@ ErrCode AdvancedNotificationService::RemoveNotification(
 
     handler_->PostSyncTask(std::bind([&]() {
         sptr<Notification> notification = nullptr;
+        sptr<NotificationRequest> notificationRequest = nullptr;
+
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
         std::string deviceId;
 #endif
@@ -1892,6 +1901,7 @@ ErrCode AdvancedNotificationService::RemoveNotification(
                 deviceId = record->deviceId;
 #endif
                 notification = record->notification;
+                notificationRequest = record->request;
                 notificationList_.remove(record);
                 result = ERR_OK;
                 break;
@@ -1907,6 +1917,8 @@ ErrCode AdvancedNotificationService::RemoveNotification(
             DoDistributedDelete(deviceId, notification);
 #endif
         }
+
+        TriggerRemoveWantAgent(notificationRequest);
     }));
 
     return result;
@@ -1957,6 +1969,8 @@ ErrCode AdvancedNotificationService::RemoveAllNotifications(const sptr<Notificat
                 DoDistributedDelete(record->deviceId, record->notification);
 #endif
             }
+
+            TriggerRemoveWantAgent(record->request);
         }
     }));
 
@@ -2664,6 +2678,7 @@ ErrCode AdvancedNotificationService::IsSupportTemplate(const std::string& templa
     }));
     return result;
 }
+
 bool AdvancedNotificationService::GetActiveUserId(int& userId)
 {
     std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
@@ -2676,6 +2691,19 @@ bool AdvancedNotificationService::GetActiveUserId(int& userId)
         }
     }
     return false;
+}
+
+void AdvancedNotificationService::TriggerRemoveWantAgent(const sptr<NotificationRequest> &request)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (request == nullptr || request->GetRemovalWantAgent() == nullptr) {
+        return;
+    }
+    OHOS::Notification::WantAgent::TriggerInfo triggerInfo;
+    std::shared_ptr<AppExecFwk::Context> context = std::make_shared<OHOS::AppExecFwk::AbilityContext>();
+    std::shared_ptr<WantAgent::WantAgent> agent = request->GetRemovalWantAgent();
+    WantAgent::WantAgentHelper::TriggerWantAgent(context, agent, nullptr, triggerInfo);
 }
 }  // namespace Notification
 }  // namespace OHOS
