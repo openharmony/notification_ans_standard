@@ -87,7 +87,7 @@ ohos_shared_library("ans_innerkits") {
   ]
 
   external_deps = [
-    "aafwk_standard:want",
+    "ability_runtime:want",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

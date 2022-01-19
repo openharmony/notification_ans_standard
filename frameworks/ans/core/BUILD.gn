@@ -86,14 +86,14 @@ ohos_shared_library("ans_core") {
   deps = [
     "${frameworks_path}/wantagent:wantagent_innerkits",
     "//base/miscservices/time/services:time_service",
-    "//foundation/appexecfwk/standard/kits:appkit_native",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "aafwk_standard:want",
+    "ability_runtime:want",
     "appexecfwk_standard:appexecfwk_base",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
