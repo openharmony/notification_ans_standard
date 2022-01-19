@@ -30,10 +30,10 @@ config("wantagent_innerkits_public_config") {
     "//foundation/aafwk/standard/frameworks/kits/content/cpp/src/ohos/aafwk/content/",
     "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/aafwk/standard/services/abilitymgr/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/appmgr",
+    "//foundation/aafwk/standard/interfaces/innerkits/app_manager/include/appmgr",
     "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
-    "//foundation/appexecfwk/standard/kits/appkit/native/app/include",
+    "//foundation/aafwk/standard/frameworks/kits/appkit/native/app/include",
     "//third_party/icu/icu4c/source/common",
   ]
 }
@@ -61,14 +61,15 @@ ohos_shared_library("wantagent_innerkits") {
 
   deps = [
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-    "//foundation/appexecfwk/standard/kits:appkit_native",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "aafwk_standard:ability_manager",
-    "aafwk_standard:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "ability_runtime:want",
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "ces_standard:cesfwk_core",
