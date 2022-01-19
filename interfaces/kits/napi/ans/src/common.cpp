@@ -205,6 +205,14 @@ napi_value Common::SetNotificationByDistributedOptions(
     }
     napi_set_named_property(env, result, "supportOperateDevices", arrSupportOperateDevices);
 
+    // readonly remindType?: number
+    enum DeviceRemindType outType = DeviceRemindType::IDLE_DONOT_REMIND;
+    if (!DeviceRemindTypeCToJS(notification->GetRemindType(), outType)) {
+        return NapiGetBoolean(env, false);
+    }
+    napi_create_int32(env, (int32_t)outType, &value);
+    napi_set_named_property(env, result, "remindType", value);
+
     return NapiGetBoolean(env, true);
 }
 
@@ -3882,6 +3890,28 @@ bool Common::DoNotDisturbTypeCToJS(const NotificationConstant::DoNotDisturbType 
             break;
         default:
             ANS_LOGE("DoNotDisturbType %{public}d is an invalid value", inType);
+            return false;
+    }
+    return true;
+}
+
+bool Common::DeviceRemindTypeCToJS(const NotificationConstant::RemindType &inType, DeviceRemindType &outType)
+{
+    switch (inType) {
+        case NotificationConstant::RemindType::DEVICE_IDLE_DONOT_REMIND:
+            outType = DeviceRemindType::IDLE_DONOT_REMIND;
+            break;
+        case NotificationConstant::RemindType::DEVICE_IDLE_REMIND:
+            outType = DeviceRemindType::IDLE_REMIND;
+            break;
+        case NotificationConstant::RemindType::DEVICE_ACTIVE_DONOT_REMIND:
+            outType = DeviceRemindType::ACTIVE_DONOT_REMIND;
+            break;
+        case NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND:
+            outType = DeviceRemindType::ACTIVE_REMIND;
+            break;
+        default:
+            ANS_LOGE("DeviceRemindType %{public}d is an invalid value", inType);
             return false;
     }
     return true;

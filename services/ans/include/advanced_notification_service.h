@@ -111,6 +111,7 @@ public:
     ErrCode EnableDistributedByBundle(const sptr<NotificationBundleOption> &bundleOption, bool enabled) override;
     ErrCode EnableDistributedSelf(bool enabled) override;
     ErrCode IsDistributedEnableByBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled) override;
+    ErrCode GetDeviceRemindType(NotificationConstant::RemindType &remindType) override;
 
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo) override;
     ErrCode PublishContinuousTaskNotification(const sptr<NotificationRequest> &request) override;
@@ -174,8 +175,10 @@ private:
     bool GetActiveUserId(int& userId);
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
 
+    ErrCode SetNotificationRemindType(sptr<Notification> notification, bool isLocal);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
     std::vector<std::string> GetLocalNotificationKeys(const sptr<NotificationBundleOption> &bundleOption);
+    NotificationConstant::RemindType GetRemindType();
     ErrCode DoDistributedPublish(
         const sptr<NotificationBundleOption> bundleOption, const std::shared_ptr<NotificationRecord> record);
     ErrCode DoDistributedDelete(const std::string deviceId, const sptr<Notification> notification);
@@ -200,6 +203,10 @@ private:
     std::shared_ptr<DistributedKvStoreDeathRecipient> distributedKvStoreDeathRecipient_ = nullptr;
     std::shared_ptr<SystemEventObserver> systemEventObserver_ = nullptr;
     DistributedKv::DistributedKvDataManager dataManager_;
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    NotificationConstant::DistributedReminderPolicy distributedReminderPolicy_ = DEFAULT_DISTRIBUTED_REMINDER_POLICY;
+    bool localScreenOn_ = true;
+#endif
 };
 }  // namespace Notification
 }  // namespace OHOS

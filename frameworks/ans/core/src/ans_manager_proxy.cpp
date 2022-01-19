@@ -2007,6 +2007,40 @@ ErrCode AnsManagerProxy::IsDistributedEnableByBundle(const sptr<NotificationBund
     return result;
 }
 
+ErrCode AnsManagerProxy::GetDeviceRemindType(NotificationConstant::RemindType &remindType)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[GetDeviceRemindType] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(GET_DEVICE_REMIND_TYPE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[GetDeviceRemindType] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[GetDeviceRemindType] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (result == ERR_OK) {
+        int32_t rType {-1};
+        if (!reply.ReadInt32(rType)) {
+            ANS_LOGW("[GetDeviceRemindType] fail: read remind type failed.");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+
+        remindType = static_cast<NotificationConstant::RemindType>(rType);
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo)
 {
     MessageParcel data;
