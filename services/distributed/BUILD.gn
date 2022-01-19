@@ -31,6 +31,7 @@ ohos_shared_library("libans_distributed") {
     "src/distributed_preferences.cpp",
     "src/distributed_preferences_database.cpp",
     "src/distributed_preferences_info.cpp",
+    "src/distributed_screen_status_manager.cpp",
   ]
 
   include_dirs = [ "include" ]
