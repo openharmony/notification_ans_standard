@@ -64,7 +64,7 @@ unsigned int WantAgentHelper::FlagsTransformer(const std::vector<WantAgentConsta
 }
 
 std::shared_ptr<WantAgent> WantAgentHelper::GetWantAgent(
-    const std::shared_ptr<Context> &context, const WantAgentInfo &paramsInfo)
+    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context, const WantAgentInfo &paramsInfo)
 {
     WANT_AGENT_LOGI("WantAgentHelper::GetWantAgent begin.");
     if (context == nullptr) {
@@ -175,11 +175,11 @@ WantAgentConstant::OperationType WantAgentHelper::GetType(const std::shared_ptr<
     return agent->GetPendingWant()->GetType(agent->GetPendingWant()->GetTarget());
 }
 
-void WantAgentHelper::TriggerWantAgent(const std::shared_ptr<Context> &context, const std::shared_ptr<WantAgent> &agent,
+void WantAgentHelper::TriggerWantAgent(const std::shared_ptr<WantAgent> &agent,
     const std::shared_ptr<CompletedCallback> &callback, const TriggerInfo &paramsInfo)
 {
     HILOG_INFO("%{public}s:begin.", __func__);
-    if ((context == nullptr) || (agent == nullptr)) {
+    if (agent == nullptr) {
         WANT_AGENT_LOGE("WantAgentHelper::TriggerWantAgent invalid input param.");
         return;
     }
@@ -191,20 +191,19 @@ void WantAgentHelper::TriggerWantAgent(const std::shared_ptr<Context> &context, 
         dispatcher = new (std::nothrow) CompletedDispatcher(pendingWant, callback, nullptr);
     }
 
-    Send(context, pendingWant, type, dispatcher, paramsInfo);
+    Send(pendingWant, type, dispatcher, paramsInfo);
 }
 
-void WantAgentHelper::Send(const std::shared_ptr<Context> &context, const std::shared_ptr<PendingWant> &pendingWant,
+void WantAgentHelper::Send(const std::shared_ptr<PendingWant> &pendingWant,
     WantAgentConstant::OperationType type, const sptr<CompletedDispatcher> &callBack, const TriggerInfo &paramsInfo)
 {
     HILOG_INFO("%{public}s:begin.", __func__);
-    if ((context == nullptr) || (pendingWant == nullptr)) {
+    if (pendingWant == nullptr) {
         WANT_AGENT_LOGE("WantAgentHelper::Send invalid input param.");
         return;
     }
 
-    pendingWant->Send(context,
-        paramsInfo.GetResultCode(),
+    pendingWant->Send(paramsInfo.GetResultCode(),
         paramsInfo.GetWant(),
         callBack,
         paramsInfo.GetPermission(),

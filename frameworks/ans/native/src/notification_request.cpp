@@ -51,13 +51,6 @@ NotificationRequest::NotificationRequest(int32_t notificationId) : notificationI
     deliveryTime_ = GetNowSysTime();
 }
 
-NotificationRequest::NotificationRequest(const std::shared_ptr<AppExecFwk::Context> &context, int32_t notificationId)
-    : notificationId_(notificationId), context_(context)
-{
-    createTime_ = GetNowSysTime();
-    deliveryTime_ = GetNowSysTime();
-}
-
 NotificationRequest::NotificationRequest(const NotificationRequest &other)
 {
     CopyBase(other);
@@ -674,7 +667,6 @@ std::string NotificationRequest::Dump()
             ", unremovable = " + (unremovable_ ? "true" : "false") +
             ", floatingIcon = " + (floatingIcon_ ? "true" : "false") +
             ", onlyLocal = " + (onlyLocal_ ? "true" : "false") + ", permitted = " + (permitted_ ? "true" : "false") +
-            ", context = " + (context_ ? "not null" : "null") + ", wantAgent = " + (wantAgent_ ? "not null" : "null") +
             ", removalWantAgent = " + (removalWantAgent_ ? "not null" : "null") +
             ", maxScreenWantAgent = " + (maxScreenWantAgent_ ? "not null" : "null") +
             ", additionalParams = " + (additionalParams_ ? "not null" : "null") +
@@ -1414,7 +1406,6 @@ void NotificationRequest::CopyOther(const NotificationRequest &other)
     this->onlyLocal_ = other.onlyLocal_;
     this->permitted_ = other.permitted_;
 
-    this->context_ = other.context_;
     this->wantAgent_ = other.wantAgent_;
     this->removalWantAgent_ = other.removalWantAgent_;
     this->maxScreenWantAgent_ = other.maxScreenWantAgent_;

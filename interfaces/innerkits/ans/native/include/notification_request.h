@@ -16,7 +16,6 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 
-#include "context.h"
 #include "message_user.h"
 #include "notification_action_button.h"
 #include "notification_content.h"
@@ -148,14 +147,6 @@ public:
      * @param notificationId notification ID
      */
     explicit NotificationRequest(int32_t notificationId);
-
-    /**
-     * A constructor used to create a NotificationRequest instance based on the specified context and notification ID.
-     * To publish a notification with a custom view, you must call such a constructor with the Context specified.
-     * @param context the specified context
-     * @param notificationId notification ID
-     */
-    NotificationRequest(const std::shared_ptr<AppExecFwk::Context> &context, int32_t notificationId);
 
     /**
      * A constructor used to create a NotificationRequest instance by copying parameters from an existing one.
@@ -1012,7 +1003,6 @@ private:
     bool onlyLocal_ {false};
     bool permitted_ {true};
 
-    std::shared_ptr<AppExecFwk::Context> context_ {};
     std::shared_ptr<WantAgent::WantAgent> wantAgent_ {};
     std::shared_ptr<WantAgent::WantAgent> removalWantAgent_ {};
     std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent_ {};

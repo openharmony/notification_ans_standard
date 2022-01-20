@@ -16,6 +16,7 @@
 #include "ans_log_wrapper.h"
 #include "ans_notification.h"
 #include "application_env_impl.h"
+#include "bundle_mgr_interface.h"
 #include "iservice_registry.h"
 #include "notification_helper.h"
 #include "singleton.h"
