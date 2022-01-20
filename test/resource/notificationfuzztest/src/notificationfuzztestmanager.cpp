@@ -510,7 +510,7 @@ void NotificationFuzzTestManager::RegisterNotificationSubscriber()
 void NotificationFuzzTestManager::RegisterWantAgentHelper()
 {
     callFunctionMap_.emplace("WantAgentHelperGetWantAgentAppExecFwkparamsInfo", []() {
-        const std::shared_ptr<OHOS::AppExecFwk::Context> context = GetParamContext();
+        std::shared_ptr<AbilityRuntime::Context> context = OHOS::AbilityRuntime::Context::GetApplicationContext();
         const OHOS::Notification::WantAgent::WantAgentInfo paramsInfo = *GetParamWantAgentInfo();
         OHOS::Notification::WantAgent::WantAgentHelper::GetWantAgent(context, paramsInfo);
     });
@@ -526,11 +526,10 @@ void NotificationFuzzTestManager::RegisterWantAgentHelper()
     });
 
     callFunctionMap_.emplace("WantAgentHelperTriggerWantAgent", []() {
-        const std::shared_ptr<AppExecFwk::Context> context;
         const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
         const std::shared_ptr<OHOS::Notification::WantAgent::CompletedCallback> callback = GetParamCompletedCallback();
         OHOS::Notification::WantAgent::TriggerInfo paramsInfo(*GetParamTriggerInfo());
-        OHOS::Notification::WantAgent::WantAgentHelper::TriggerWantAgent(context, agent, callback, paramsInfo);
+        OHOS::Notification::WantAgent::WantAgentHelper::TriggerWantAgent(agent, callback, paramsInfo);
     });
 
     callFunctionMap_.emplace("WantAgentHelperCancel", []() {
@@ -684,105 +683,6 @@ void NotificationFuzzTestManager::RegisterAbilityContext()
     });
 }
 
-// RegisterContext
-void NotificationFuzzTestManager::RegisterContext()
-{
-    callFunctionMap_.emplace("ContextVerifyPermission", []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const std::string permission = GetStringParam();
-        int pid = GetIntParam();
-        int uid = GetIntParam();
-        temp->VerifyPermission(permission, pid, uid);
-    });
-
-    callFunctionMap_.emplace("ContextVerifyCallingPermission", []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const std::string permission = GetStringParam();
-        temp->VerifyCallingPermission(permission);
-    });
-
-    callFunctionMap_.emplace("ContextVerifySelfPermission", []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const std::string permission = GetStringParam();
-        temp->VerifySelfPermission(permission);
-    });
-
-    callFunctionMap_.emplace("ContextVerifyCallingOrSelfPermission", []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        temp->VerifyCallingOrSelfPermission(GetStringParam());
-    });
-
-    callFunctionMap_["ContextCanRequestPermission"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const std::string permission = GetStringParam();
-        temp->CanRequestPermission(permission);
-    };
-
-    callFunctionMap_["ContextRequestPermissionsFromUser"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        std::vector<std::string> permissions = GetStringVectorParam();
-        int requestCode = GetIntParam();
-        temp->RequestPermissionsFromUser(permissions, requestCode);
-    };
-
-    callFunctionMap_["ContextMoveMissionToEnd"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        bool nonFirst = GetBoolParam();
-        temp->MoveMissionToEnd(nonFirst);
-    };
-
-    callFunctionMap_["ContextSetMissionInformation"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const MissionInformation missionInformation = GetParamMissionInformation();
-        temp->SetMissionInformation(missionInformation);
-    };
-
-    callFunctionMap_["ContextSetLockMission"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        temp->LockMission();
-    };
-
-    callFunctionMap_["ContextUnlockMission"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        temp->UnlockMission();
-    };
-
-    callFunctionMap_["ContextGetMissionId"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        temp->GetMissionId();
-    };
-
-    callFunctionMap_["ContextGetUITaskDispatcher"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        temp->GetUITaskDispatcher();
-    };
-
-    callFunctionMap_["ContextGetMainTaskDispatcher"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        temp->GetMainTaskDispatcher();
-    };
-
-    callFunctionMap_["ContextCreateParallelTaskDispatcher"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const std::string name = GetStringParam();
-        const TaskPriority priority = GetParamTaskPriority();
-        temp->CreateParallelTaskDispatcher(name, priority);
-    };
-
-    callFunctionMap_["ContextCreateSerialTaskDispatcher"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const std::string name = GetStringParam();
-        const TaskPriority priority = GetParamTaskPriority();
-        temp->CreateSerialTaskDispatcher(name, priority);
-    };
-
-    callFunctionMap_["ContextGetGlobalTaskDispatcher"] = []() {
-        std::shared_ptr<OHOS::AppExecFwk::Context> temp = GetParamContext();
-        const TaskPriority priority = GetParamTaskPriority();
-        temp->GetGlobalTaskDispatcher(priority);
-    };
-}
-
 // RegisterAbilityLifecycleCallbacks
 void NotificationFuzzTestManager::RegisterAbilityLifecycleCallbacks()
 {
@@ -876,7 +776,7 @@ void NotificationFuzzTestManager::StartFuzzTest()
             it = remainderMap_.erase(it);
         } else {
             index.push_back(it->first);
-            it++;
+            ++it;
         }
     }
 

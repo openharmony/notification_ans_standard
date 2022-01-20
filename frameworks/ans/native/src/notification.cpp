@@ -15,6 +15,7 @@
 
 #include "notification.h"
 
+#include <sstream>
 
 #include "ans_log_wrapper.h"
 

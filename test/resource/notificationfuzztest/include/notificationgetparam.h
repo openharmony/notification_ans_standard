@@ -88,7 +88,6 @@ sptr<IRemoteObject> GetParamSptrRemote();
 std::shared_ptr<OHOS::AppExecFwk::EventRunner> GetParamEventRunner();
 std::shared_ptr<OHOS::AppExecFwk::Ability> GetParamAbility();
 std::shared_ptr<OHOS::AAFwk::WantParams> GetParamWantParams();
-std::shared_ptr<OHOS::AppExecFwk::Context> GetParamContext();
 OHOS::AppExecFwk::ApplicationFlag GetParamApplicationFlag();
 OHOS::AppExecFwk::ApplicationInfo GetParamApplicationInfo();
 OHOS::AppExecFwk::AbilityInfo GetParamAbilityInfo();

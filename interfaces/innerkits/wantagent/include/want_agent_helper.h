@@ -18,7 +18,7 @@
 
 #include <string>
 #include <memory>
-#include "context.h"
+#include "context/context.h"
 #include "completed_callback.h"
 #include "completed_dispatcher.h"
 #include "event_handler.h"
@@ -55,7 +55,7 @@ public:
      * @return Returns the created WantAgent object.
      */
     static std::shared_ptr<WantAgent> GetWantAgent(
-        const std::shared_ptr<OHOS::AppExecFwk::Context> &context, const WantAgentInfo &paramsInfo);
+        const std::shared_ptr<OHOS::AbilityRuntime::Context> &context, const WantAgentInfo &paramsInfo);
 
     /**
      * Obtains an WantAgent object.
@@ -92,8 +92,8 @@ public:
      * the current process.
      * @param paramsInfo Indicates the TriggerInfo object that contains triggering parameters.
      */
-    static void TriggerWantAgent(const std::shared_ptr<AppExecFwk::Context> &context,
-        const std::shared_ptr<WantAgent> &agent, const std::shared_ptr<CompletedCallback> &callback,
+    static void TriggerWantAgent(const std::shared_ptr<WantAgent> &agent,
+        const std::shared_ptr<CompletedCallback> &callback,
         const TriggerInfo &paramsInfo);
 
     /**
@@ -185,9 +185,10 @@ private:
     virtual ~WantAgentHelper() = default;
 
 private:
-    static void Send(const std::shared_ptr<AppExecFwk::Context> &context,
-        const std::shared_ptr<PendingWant> &pendingWant, WantAgentConstant::OperationType type,
-        const sptr<CompletedDispatcher> &callBack, const TriggerInfo &paramsInfo);
+    static void Send(const std::shared_ptr<PendingWant> &pendingWant,
+        WantAgentConstant::OperationType type,
+        const sptr<CompletedDispatcher> &callBack,
+        const TriggerInfo &paramsInfo);
 
     static unsigned int FlagsTransformer(const std::vector<WantAgentConstant::Flags> &flags);
 };

@@ -2786,9 +2786,8 @@ void AdvancedNotificationService::TriggerRemoveWantAgent(const sptr<Notification
         return;
     }
     OHOS::Notification::WantAgent::TriggerInfo triggerInfo;
-    std::shared_ptr<AppExecFwk::Context> context = std::make_shared<OHOS::AppExecFwk::AbilityContext>();
     std::shared_ptr<WantAgent::WantAgent> agent = request->GetRemovalWantAgent();
-    WantAgent::WantAgentHelper::TriggerWantAgent(context, agent, nullptr, triggerInfo);
+    WantAgent::WantAgentHelper::TriggerWantAgent(agent, nullptr, triggerInfo);
 }
 }  // namespace Notification
 }  // namespace OHOS
