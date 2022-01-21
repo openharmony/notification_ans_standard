@@ -48,6 +48,9 @@ namespace Notification {
 namespace {
 static const std::string ACTIVE_NOTIFICATION_OPTION = "active";
 static const std::string RECENT_NOTIFICATION_OPTION = "recent";
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+static const std::string DISTRIBUTED_NOTIFICATION_OPTION = "distributed";
+#endif
 static const std::string SET_RECENT_COUNT_OPTION = "setRecentCount";
 
 static const int32_t NOTIFICATION_MIN_COUNT = 0;
@@ -1455,6 +1458,10 @@ ErrCode AdvancedNotificationService::ShellDump(const std::string &dumpOption, st
             result = ActiveNotificationDump(dumpInfo);
         } else if (dumpOption == RECENT_NOTIFICATION_OPTION) {
             result = RecentNotificationDump(dumpInfo);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+        } else if (dumpOption == DISTRIBUTED_NOTIFICATION_OPTION) {
+            result = DistributedNotificationDump(dumpInfo);
+#endif
         } else if (dumpOption.substr(0, dumpOption.find_first_of(" ", 0)) == SET_RECENT_COUNT_OPTION) {
             result = SetRecentNotificationCount(dumpOption.substr(dumpOption.find_first_of(" ", 0) + 1));
         } else {
@@ -1650,6 +1657,34 @@ ErrCode AdvancedNotificationService::RecentNotificationDump(std::vector<std::str
     }
     return ERR_OK;
 }
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+ErrCode AdvancedNotificationService::DistributedNotificationDump(std::vector<std::string> &dumpInfo)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    std::stringstream stream;
+    for (auto record : notificationList_) {
+        if (record->deviceId.empty()) {
+            continue;
+        }
+        stream.clear();
+        stream << "\tDeviceId: " << record->deviceId << "\n";
+        stream << "\tBundleName: " << record->notification->GetBundleName() << "\n";
+
+        stream << "\tCreateTime: " << TimeToString(record->notification->GetNotificationRequest().GetCreateTime())
+               << "\n";
+
+        stream << "\tNotification:\n";
+        stream << "\t\tId: " << record->notification->GetId() << "\n";
+        stream << "\t\tLabel: " << record->notification->GetLabel() << "\n";
+        stream << "\t\tClassification: " << record->notification->GetNotificationRequest().GetClassification() << "\n";
+
+        dumpInfo.push_back(stream.str());
+    }
+
+    return ERR_OK;
+}
+#endif
 
 ErrCode AdvancedNotificationService::SetRecentNotificationCount(const std::string arg)
 {
