@@ -35,6 +35,14 @@ private:
     ErrCode RunAsHelpCommand();
     ErrCode RunAsDumpCommand();
 
+    ErrCode RunHelp();
+    ErrCode RunActive();
+    ErrCode RunRecent();
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    ErrCode RunDistributed();
+#endif
+    ErrCode RunSetRecentCount();
+
 private:
     std::shared_ptr<AnsNotification> ans_;
 };

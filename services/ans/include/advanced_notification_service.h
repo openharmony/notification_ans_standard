@@ -166,6 +166,9 @@ private:
     int64_t GetNowSysTime();
     ErrCode ActiveNotificationDump(std::vector<std::string> &dumpInfo);
     ErrCode RecentNotificationDump(std::vector<std::string> &dumpInfo);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    ErrCode DistributedNotificationDump(std::vector<std::string> &dumpInfo);
+#endif
     ErrCode SetRecentNotificationCount(const std::string arg);
     void UpdateRecentNotification(sptr<Notification> &notification, bool isDelete, int reason);
 
