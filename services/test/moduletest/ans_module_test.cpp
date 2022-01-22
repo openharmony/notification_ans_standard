@@ -1492,7 +1492,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0100, Function | SmallTest | Level1)
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->consumedCb_ = [&agent](const std::shared_ptr<Notification> notification,
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>
                                       sortingMap) { passed = true; };
 
@@ -1535,7 +1535,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0101, Function | SmallTest | Level1)
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->consumedCb_ = [&agent](const std::shared_ptr<Notification> notification,
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>
                                       sortingMap) { passed = true; };
 
@@ -1566,7 +1566,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0102, Function | SmallTest | Level1)
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->consumedCb_ = [&agent](const std::shared_ptr<Notification> notification,
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>
                                       sortingMap) { passed = true; };
 
@@ -1597,7 +1597,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0103, Function | SmallTest | Level1)
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("a");
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
-    subscriber->consumedCb_ = [&agent](const std::shared_ptr<Notification> notification,
+    subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>
                                       sortingMap) { passed = true; };
 
