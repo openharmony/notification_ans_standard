@@ -31,7 +31,6 @@ ohos_systemtest("ActsNotificationFuzzTest") {
 
   include_dirs = [
     "//utils/native/base/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//base/notification/ans_standard/frameworks/ans/core/include",
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
     "//base/notification/ans_standard/services/ans/include",
@@ -39,7 +38,6 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "//foundation/appexecfwk/standard/kits/appkit/native/app/include",
     "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
@@ -64,7 +62,6 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "//base/notification/ces_standard/frameworks/common:libevent_common",
     "//base/notification/ces_standard/frameworks/native:cesfwk_innerkits",
     "//foundation/aafwk/standard/common/task_dispatcher:appkit_dispatcher_td",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
@@ -78,6 +75,7 @@ ohos_systemtest("ActsNotificationFuzzTest") {
   ]
   external_deps = [
     "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:base",
     "ability_runtime:want",

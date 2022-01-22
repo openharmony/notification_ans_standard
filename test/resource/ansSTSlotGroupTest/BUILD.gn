@@ -27,7 +27,6 @@ config("ansSTSlotGroupTestConfig") {
   include_dirs = [
     "${SUBDEMOSYSTEM_DIR}/include",
     "//foundation/aafwk/standard/frameworks/kits/appkit/native/app",
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//foundation/appexecfwk/standard/services/bundlemgr/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/appexecfwk/standard/common/log/include",
@@ -50,7 +49,6 @@ ohos_shared_library("libraryAnsSTSlotGroupTest") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/appexecfwk/standard/common:libappexecfwk_common",
     "//foundation/appexecfwk/standard/services/bundlemgr:libbms",
@@ -58,6 +56,7 @@ ohos_shared_library("libraryAnsSTSlotGroupTest") {
   ]
 
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:want",
     "appexecfwk_standard:appexecfwk_base",
