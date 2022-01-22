@@ -19,9 +19,7 @@
 #include <iostream>
 
 #include "ans_inner_errors.h"
-#include "iservice_registry.h"
 #include "singleton.h"
-#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace Notification {

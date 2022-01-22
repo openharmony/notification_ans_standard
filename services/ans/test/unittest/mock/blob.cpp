@@ -17,7 +17,6 @@
 
 #include "blob.h"
 #include <securec.h>
-#include "log_print.h"
 
 namespace OHOS {
 namespace DistributedKv {
@@ -111,7 +110,6 @@ bool Blob::Empty() const
 uint8_t Blob::operator[](size_t n) const
 {
     if (n >= Size()) {
-        ZLOGE("Trying to get a out-of-range Blob member.");
         return 0;
     }
     return blob_[n];

@@ -17,8 +17,8 @@
 
 #include "ans_image_util.h"
 #include "ans_log_wrapper.h"
+#include "ohos/aafwk/content/want_params_wrapper.h"
 #include "want_agent_helper.h"
-#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Notification {

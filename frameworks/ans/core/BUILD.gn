@@ -27,9 +27,6 @@ config("public_ans_core_config") {
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
     "${interfaces_path}/innerkits/wantAgent/include",
-    "//foundation/aafwk/standard/frameworks/kits/content/cpp/src/ohos/aafwk/content/",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_core/include/bundlemgr",
-    "//foundation/multimedia/image_standard/interfaces/innerkits/include",
     "//utils/native/base/include",
     "//third_party/json/single_include",
     "//third_party/jsoncpp/include",
@@ -86,9 +83,7 @@ ohos_shared_library("ans_core") {
 
   deps = [
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//base/miscservices/time/services:time_service",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
@@ -101,6 +96,7 @@ ohos_shared_library("ans_core") {
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "samgr_standard:samgr_proxy",
+    "time_native:time_service",
   ]
 
   part_name = "ans_standard"

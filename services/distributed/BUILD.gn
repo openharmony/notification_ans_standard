@@ -51,6 +51,7 @@ ohos_shared_library("libans_distributed") {
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "multimedia_image_standard:image_native",
     "utils_base:utils",
   ]
 

@@ -19,10 +19,7 @@ module_output_path = "ans_standard/wantagent"
 
 ohos_unittest("want_agent_info_test") {
   module_out_path = module_output_path
-  include_dirs = [
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include",
-    "//foundation/aafwk/standard/services/abilitymgr/include",
-  ]
+  include_dirs = [ "//foundation/aafwk/standard/services/abilitymgr/include" ]
 
   sources = [ "want_agent_info_test.cpp" ]
 
@@ -34,7 +31,6 @@ ohos_unittest("want_agent_info_test") {
   deps = [
     "${core_path}:ans_core",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//third_party/googletest:gmock_main",
@@ -44,6 +40,7 @@ ohos_unittest("want_agent_info_test") {
 
   external_deps = [
     "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:base",
     "ability_runtime:want",

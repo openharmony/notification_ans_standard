@@ -17,9 +17,9 @@
 
 #include "ability_manager_client.h"
 #include "hilog_wrapper.h"
+#include "ohos/aafwk/content/want_params_wrapper.h"
 #include "pending_want.h"
 #include "want_agent_log_wrapper.h"
-#include "want_params_wrapper.h"
 #include "want_sender_info.h"
 #include "want_sender_interface.h"
 
