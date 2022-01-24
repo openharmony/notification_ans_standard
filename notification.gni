@@ -32,9 +32,9 @@ aafwk_path = "//foundation/aafwk/standard"
 ans_standard_external_deps = [
   "ability_runtime:base",
   "ability_runtime:want",
-  "appexecfwk_standard:appexecfwk_base",
-  "appexecfwk_standard:appexecfwk_core",
   "appexecfwk_standard:libeventhandler",
+  "bundle_framework:appexecfwk_base",
+  "bundle_framework:appexecfwk_core",
   "ces_standard:cesfwk_innerkits",
   "dmsfwk_standard:zuri",
   "hiviewdfx_hilog_native:libhilog",
