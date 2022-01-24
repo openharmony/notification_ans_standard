@@ -17,13 +17,11 @@
 #define BASE_NOTIFICATION_ANS_STANDARD_TOOLS_DUMP_INCLUDE_NOTIFICATION_SHELL_COMMAND_H
 
 #include "shell_command.h"
-
-#include "ans_manager_interface.h"
 #include "ans_notification.h"
 
 namespace OHOS {
 namespace Notification {
-class NotificationShellCommand : public OHOS::AAFwk::ShellCommand {
+class NotificationShellCommand : public OHOS::Notification::ShellCommand {
 public:
     NotificationShellCommand(int argc, char *argv[]);
     ~NotificationShellCommand() override {};

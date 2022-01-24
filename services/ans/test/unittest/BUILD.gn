@@ -22,25 +22,10 @@ ohos_unittest("ans_unit_test") {
   include_dirs = [
     ".",
     "include",
-    "//base/miscservices/time/interfaces/innerkits/include",
-    "//base/miscservices/time/services/time_manager/include",
-    "//base/miscservices/time/utils/native/include",
-    "//foundation/appexecfwk/standard/libs/libeventhandler/src",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "/${services_path}/ans/include",
     "${services_path}/ans/test/unittest/mock/include",
-    "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
-    "//base/account/os_account/frameworks/common/database/include/",
-    "//base/account/os_account/frameworks/common/account_error/include",
-    "//base/account/os_account/frameworks/common/log/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/autils",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/log",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata/include",
-    "//foundation/distributeddatamgr/distributeddatamgr/frameworks/innerkitsimpl/distributeddatafwk/src",
-    "//foundation/distributeddatamgr/distributeddatamgr/services/distributeddataservice/adapter/include/dfx",
-    "//developtools/bytrace_standard/interfaces/innerkits/native/include",
   ]
 
   defines = []
@@ -79,11 +64,6 @@ ohos_unittest("ans_unit_test") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
-    "//base/miscservices/time/services:time_service",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/distributeddatamgr/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -95,19 +75,23 @@ ohos_unittest("ans_unit_test") {
   }
 
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:want",
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ces_standard:cesfwk_innerkits",
+    "distributeddatamgr:distributeddata_inner",
     "dmsfwk_standard:zuri",
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "os_account_standard:os_account_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "time_native:time_service",
   ]
 
   subsystem_name = "notification"

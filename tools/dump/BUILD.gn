@@ -22,9 +22,9 @@ ohos_executable("anm") {
   include_dirs = [ "${tools_path}/dump/include" ]
 
   sources = [
-    "${aafwk_path}/tools/aa/src/shell_command.cpp",
     "src/main.cpp",
     "src/notification_shell_command.cpp",
+    "src/shell_command.cpp",
   ]
 
   cflags = []
@@ -40,8 +40,6 @@ ohos_executable("anm") {
   configs = [
     "${core_path}:public_ans_core_config",
     "${frameworks_path}/wantagent:wantagent_innerkits_public_config",
-    "${aafwk_path}/tools/aa:ability_command_config",
-    "${aafwk_path}/services/common:common_config",
   ]
 
   defines = []
@@ -49,7 +47,10 @@ ohos_executable("anm") {
     defines += [ "DISTRIBUTED_NOTIFICATION_SUPPORTED" ]
   }
 
-  external_deps = []
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "multimedia_image_standard:image_native",
+  ]
   external_deps += ans_standard_external_deps
 
   install_enable = true

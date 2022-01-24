@@ -15,8 +15,6 @@
 
 #include "event_handler.h"
 
-#include "event_handler_utils.h"
-
 namespace OHOS {
 namespace AppExecFwk {
 std::shared_ptr<EventHandler> EventHandler::Current()

@@ -67,7 +67,6 @@ ohos_shared_library("notification") {
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common:napi_common",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//third_party/jsoncpp:jsoncpp",
@@ -76,6 +75,7 @@ ohos_shared_library("notification") {
   ]
 
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "ability_runtime:base",
     "ability_runtime:want",
     "appexecfwk_standard:appexecfwk_base",
