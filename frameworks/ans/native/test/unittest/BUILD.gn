@@ -48,9 +48,9 @@ ohos_unittest("ans_reminder_unit_test") {
   external_deps = [
     "ability_runtime:app_manager",
     "ability_runtime:want",
+    "appexecfwk_standard:libeventhandler",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
-    "appexecfwk_standard:libeventhandler",
     "bytrace_standard:bytrace_core",
     "ces_standard:cesfwk_innerkits",
     "distributeddatamgr:distributeddata_inner",
