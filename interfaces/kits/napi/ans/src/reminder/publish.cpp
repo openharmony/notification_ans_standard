@@ -206,10 +206,8 @@ napi_value CancelReminder(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
             ANSR_LOGI("Cancel napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
@@ -262,10 +260,8 @@ napi_value CancelAllReminders(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
             ANSR_LOGD("CancelAll napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
@@ -568,10 +564,8 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -631,10 +625,8 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
             ANSR_LOGI("Publish napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
