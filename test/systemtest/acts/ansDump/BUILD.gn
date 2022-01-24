@@ -21,7 +21,6 @@ ohos_systemtest("AnsDumpTest") {
   sources = [ "ansDumpTest.cpp" ]
 
   include_dirs = [
-    "//foundation/aafwk/standard/interfaces/innerkits/want/include/ohos/aafwk/content",
     "//third_party/json/single_include",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",

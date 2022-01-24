@@ -16,7 +16,6 @@
 #define LOG_TAG "DistributedKvDataManager"
 
 #include "distributed_kv_data_manager.h"
-#include "constant.h"
 #include "mock_single_kv_store.h"
 #include "types.h"
 
@@ -31,7 +30,7 @@ DistributedKvDataManager::~DistributedKvDataManager()
 Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const AppId &appId, const StoreId &storeId,
                                                   std::shared_ptr<SingleKvStore> &kvStore)
 {
-    std::string storeIdTmp = Constant::TrimCopy<std::string>(storeId.storeId);
+    std::string storeIdTmp = storeId.storeId;
     kvStore = std::make_shared<AnsTestSingleKvStore>();
     AnsTestSingleKvStore::InsertMockKvStore(appId, storeId, kvStore);
     return Status::SUCCESS;

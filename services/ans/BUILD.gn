@@ -19,14 +19,7 @@ group("ans_targets") {
 }
 
 config("public_ans_config") {
-  include_dirs = [
-    "${services_path}/ans/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//base/account/os_account/interfaces/innerkits/osaccount/native/include",
-    "//base/account/os_account/frameworks/common/database/include/",
-    "//base/account/os_account/frameworks/common/account_error/include",
-    "//base/account/os_account/frameworks/common/log/include",
-  ]
+  include_dirs = [ "${services_path}/ans/include" ]
   defines = [
     "APP_LOG_TAG = \"Ans\"",
     "LOG_DOMAIN = 0xD002200",
@@ -63,11 +56,6 @@ ohos_shared_library("libans") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
-    "//base/account/os_account/frameworks/osaccount/native:os_account_innerkits",
-    "//base/miscservices/time/services:time_service",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/services/abilitymgr:abilityms",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr:distributedschedsvr",
     "//utils/native/base:utils",
   ]
 
@@ -82,8 +70,11 @@ ohos_shared_library("libans") {
   }
 
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "distributeddatamgr:distributeddata_inner",
     "multimedia_image_standard:image_native",
+    "os_account_standard:os_account_innerkits",
+    "time_native:time_service",
   ]
   external_deps += ans_standard_external_deps
 
