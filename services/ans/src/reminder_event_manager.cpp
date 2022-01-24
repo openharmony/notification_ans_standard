@@ -14,9 +14,14 @@
  */
 
 #include "ans_log_wrapper.h"
+#include "appmgr/app_mgr_constants.h"
+#include "bundle_mgr_interface.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "bundle_constants.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
 #include "reminder_event_manager.h"
 
@@ -32,7 +37,9 @@ void ReminderEventManager::init(std::shared_ptr<ReminderDataManager> &reminderDa
 {
     MatchingSkills matchingSkills;
     matchingSkills.AddEvent(ReminderRequest::REMINDER_EVENT_ALARM_ALERT);
+    matchingSkills.AddEvent(ReminderRequest::REMINDER_EVENT_ALERT_TIMEOUT);
     matchingSkills.AddEvent(ReminderRequest::REMINDER_EVENT_CLOSE_ALERT);
+    matchingSkills.AddEvent(ReminderRequest::REMINDER_EVENT_SNOOZE_ALERT);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_PACKAGE_RESTARTED);
@@ -58,13 +65,21 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
 {
     Want want = data.GetWant();
     std::string action = want.GetAction();
-    ANSR_LOGD("Recieved common event:%{public}s", action.c_str());
+    ANSR_LOGI("Recieved common event:%{public}s", action.c_str());
     if (action == ReminderRequest::REMINDER_EVENT_ALARM_ALERT) {
-        reminderDataManager_->ShowReminder(false);
+        reminderDataManager_->ShowActiveReminder();
+        return;
+    }
+    if (action == ReminderRequest::REMINDER_EVENT_ALERT_TIMEOUT) {
+        reminderDataManager_->TerminateAlerting(want);
         return;
     }
     if (action == ReminderRequest::REMINDER_EVENT_CLOSE_ALERT) {
         reminderDataManager_->CloseReminder(want, true);
+        return;
+    }
+    if (action == ReminderRequest::REMINDER_EVENT_SNOOZE_ALERT) {
+        reminderDataManager_->SnoozeReminder(want);
         return;
     }
     if (action == ReminderRequest::REMINDER_EVENT_REMOVE_NOTIFICATION) {
@@ -72,20 +87,15 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
         return;
     }
     if (action == CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
-        OHOS::AppExecFwk::ElementName ele = want.GetElement();
-        std::string bundleName = ele.GetBundleName();
-        int uid = want.GetIntParam(OHOS::AppExecFwk::Constants::UID, -1);
-        ANSR_LOGD("bundleName=%{public}s, uid=%{public}d", bundleName.c_str(), uid);
-        sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
-        reminderDataManager_->CancelAllReminders(bundleOption);
+        HandlePackageRemove(want);
         return;
     }
     if (action == CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
-        // todo
+        HandlePackageRemove(want);
         return;
     }
     if (action == CommonEventSupport::COMMON_EVENT_PACKAGE_RESTARTED) {
-        // todo
+        HandleProcessDied(want);
         return;
     }
     if (action == CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED) {
@@ -96,6 +106,44 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
         reminderDataManager_->RefreshRemindersDueToSysTimeChange(ReminderDataManager::DATE_TIME_CHANGE);
         return;
     }
+}
+
+void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(OHOS::EventFwk::Want &want) const
+{
+    sptr<NotificationBundleOption> bundleOption = GetBundleOption(want);
+    reminderDataManager_->CancelAllReminders(bundleOption);
+}
+
+void ReminderEventManager::ReminderEventSubscriber::HandleProcessDied(OHOS::EventFwk::Want &want) const
+{
+    sptr<NotificationBundleOption> bundleOption = GetBundleOption(want);
+    reminderDataManager_->OnProcessDiedLocked(bundleOption);
+}
+
+sptr<NotificationBundleOption> ReminderEventManager::ReminderEventSubscriber::GetBundleOption(
+    const OHOS::EventFwk::Want &want) const
+{
+    OHOS::AppExecFwk::ElementName ele = want.GetElement();
+    std::string bundleName = ele.GetBundleName();
+    int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
+    int32_t uid = GetUid(userId, bundleName);
+    ANSR_LOGD("bundleName=%{public}s, uid=%{public}d", bundleName.c_str(), uid);
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
+    return bundleOption;
+}
+
+int32_t ReminderEventManager::ReminderEventSubscriber::GetUid(const int userId, const std::string bundleName) const
+{
+    AppExecFwk::ApplicationInfo info;
+    OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager
+        = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    OHOS::sptr<OHOS::IRemoteObject> remoteObject
+        = systemAbilityManager->GetSystemAbility(OHOS::BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    OHOS::sptr<OHOS::AppExecFwk::IBundleMgr> bundleMgr
+        = OHOS::iface_cast<OHOS::AppExecFwk::IBundleMgr>(remoteObject);
+    bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO,
+        static_cast<int32_t>(userId), info);
+    return static_cast<int32_t>(info.uid);
 }
 }  // namespace OHOS
 }  // namespace Notification

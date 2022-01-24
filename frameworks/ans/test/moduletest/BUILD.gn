@@ -346,5 +346,6 @@ group("moduletest") {
     ":ans_innerkits_module_publish_test",
     ":ans_innerkits_module_setting_test",
     ":ans_innerkits_module_slot_test",
+    ":ReminderAgentTest",
   ]
 }

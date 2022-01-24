@@ -51,11 +51,17 @@ napi_value ConstantInit(napi_env env, napi_value exports)
     if (napi_create_int32(env, static_cast<int32_t>(ReminderRequest::ReminderType::ALARM), &prop) == napi_ok) {
         napi_set_named_property(env, objReminderType, "REMINDER_TYPE_ALARM", prop);
     }
+    if (napi_create_int32(env, static_cast<int32_t>(ReminderRequest::ReminderType::CALENDAR), &prop) == napi_ok) {
+        napi_set_named_property(env, objReminderType, "REMINDER_TYPE_CALENDAR", prop);
+    }
 
     napi_value objButtonType = nullptr;
     napi_create_object(env, &objButtonType);
     if (napi_create_int32(env, static_cast<int32_t>(ReminderRequest::ActionButtonType::CLOSE), &prop) == napi_ok) {
         napi_set_named_property(env, objButtonType, "ACTION_BUTTON_TYPE_CLOSE", prop);
+    }
+    if (napi_create_int32(env, static_cast<int32_t>(ReminderRequest::ActionButtonType::SNOOZE), &prop) == napi_ok) {
+        napi_set_named_property(env, objButtonType, "ACTION_BUTTON_TYPE_SNOOZE", prop);
     }
 
     napi_property_descriptor exportFuncs[] = {

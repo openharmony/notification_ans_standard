@@ -62,7 +62,7 @@ public:
     bool ReadFromParcel(Parcel &parcel) override;
 
 protected:
-    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const override;
+    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
 
 private:
     ReminderRequestTimer() {};
