@@ -56,7 +56,7 @@ HWTEST_F(ReminderRequestTest, CanRemove_00100, Function | SmallTest | Level1)
 HWTEST_F(ReminderRequestTest, CanRemove_00200, Function | SmallTest | Level1)
 {
     auto rrc = std::make_shared<ReminderRequestChild>();
-    rrc->OnShow(false, true);
+    rrc->OnShow(false, false, true);
     EXPECT_FALSE(rrc->CanRemove()) << "When shown, canRemove should be false";
 }
 
@@ -68,7 +68,7 @@ HWTEST_F(ReminderRequestTest, CanRemove_00200, Function | SmallTest | Level1)
 HWTEST_F(ReminderRequestTest, CanRemove_00300, Function | SmallTest | Level1)
 {
     auto rrc = std::make_shared<ReminderRequestChild>();
-    rrc->OnShow(false, true);
+    rrc->OnShow(false, false, true);
     rrc->OnClose(false);
     EXPECT_TRUE(rrc->CanRemove()) << "When reminder is expired and closed, can remove should be false";
 }
@@ -81,7 +81,7 @@ HWTEST_F(ReminderRequestTest, CanRemove_00300, Function | SmallTest | Level1)
 HWTEST_F(ReminderRequestTest, CanRemove_00400, Function | SmallTest | Level1)
 {
     auto rrc = std::make_shared<ReminderRequestChild>();
-    rrc->OnShow(false, true);
+    rrc->OnShow(false, false, true);
     rrc->OnSameNotificationIdCovered();
     EXPECT_TRUE(rrc->CanRemove()) << "When reminder is expired and covered by \
         sameNotification id, can remove should be true";
@@ -142,7 +142,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00400, Function | SmallTest | Level1)
 HWTEST_F(ReminderRequestTest, StateCheck_00500, Function | SmallTest | Level1)
 {
     auto rrc = std::make_shared<ReminderRequestChild>();
-    rrc->OnShow(true, true);
+    rrc->OnShow(false, true, true);
     EXPECT_TRUE((rrc->GetState() & ReminderRequestTest::REMINDER_STATUS_SHOWING) != 0);
 }
 
@@ -154,7 +154,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00500, Function | SmallTest | Level1)
 HWTEST_F(ReminderRequestTest, StateCheck_00600, Function | SmallTest | Level1)
 {
     auto rrc = std::make_shared<ReminderRequestChild>();
-    rrc->OnShow(false, true);
+    rrc->OnShow(false, false, true);
     EXPECT_TRUE((rrc->GetState() & ReminderRequestTest::REMINDER_STATUS_SHOWING) != 0);
 }
 
@@ -167,7 +167,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00700, Function | SmallTest | Level1)
 {
     auto rrc = std::make_shared<ReminderRequestChild>();
     uint8_t stateBefore = rrc->GetState();
-    rrc->OnShow(true, false);
+    rrc->OnShow(false, true, false);
     EXPECT_EQ(rrc->GetState(), stateBefore);
 }
 
@@ -180,7 +180,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00800, Function | SmallTest | Level1)
 {
     auto rrc = std::make_shared<ReminderRequestChild>();
     uint8_t stateBefore = rrc->GetState();
-    rrc->OnShow(false, false);
+    rrc->OnShow(false, false, false);
     EXPECT_EQ(rrc->GetState(), stateBefore);
 }
 

@@ -21,6 +21,7 @@
 #include "message_parcel.h"
 #include "parcel.h"
 #include "reminder_request_alarm.h"
+#include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
 
 namespace OHOS {
@@ -1417,6 +1418,9 @@ ErrCode AnsManagerStub::HandlePublishReminder(MessageParcel &data, MessageParcel
     } else if (ReminderRequest::ReminderType::TIMER == reminderType) {
         ANSR_LOGD("Publish timer");
         reminder = data.ReadParcelable<ReminderRequestTimer>();
+    } else if (ReminderRequest::ReminderType::CALENDAR == reminderType) {
+        ANSR_LOGD("Publish calendar");
+        reminder = data.ReadParcelable<ReminderRequestCalendar>();
     } else {
         ANSR_LOGE("Reminder type invalid");
         return ERR_ANS_INVALID_PARAM;

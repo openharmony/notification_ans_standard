@@ -71,8 +71,10 @@ ohos_shared_library("libans") {
 
   external_deps = [
     "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
     "distributeddatamgr:distributeddata_inner",
     "multimedia_image_standard:image_native",
+    "multimedia_media_standard:media_client",
     "os_account_standard:os_account_innerkits",
     "time_native:time_service",
   ]

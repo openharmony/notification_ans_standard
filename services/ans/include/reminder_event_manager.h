@@ -40,6 +40,10 @@ public:
     virtual void OnReceiveEvent(const EventFwk::CommonEventData &data);
 
 private:
+    sptr<NotificationBundleOption> GetBundleOption(const OHOS::EventFwk::Want &want) const;
+    void HandlePackageRemove(OHOS::EventFwk::Want &want) const;
+    void HandleProcessDied(OHOS::EventFwk::Want &want) const;
+    int32_t GetUid(const int userId, const std::string bundleName) const;
     std::shared_ptr<ReminderDataManager> reminderDataManager_;
 };
 };

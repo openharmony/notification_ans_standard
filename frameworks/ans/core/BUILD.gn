@@ -74,6 +74,7 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/ans/native/src/reminder_helper.cpp",
     "${frameworks_path}/ans/native/src/reminder_request.cpp",
     "${frameworks_path}/ans/native/src/reminder_request_alarm.cpp",
+    "${frameworks_path}/ans/native/src/reminder_request_calendar.cpp",
     "${frameworks_path}/ans/native/src/reminder_request_timer.cpp",
   ]
 

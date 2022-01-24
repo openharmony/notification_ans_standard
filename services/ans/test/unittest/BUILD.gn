@@ -88,6 +88,7 @@ ohos_unittest("ans_unit_test") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "multimedia_media_standard:media_client",
     "os_account_standard:os_account_innerkits",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

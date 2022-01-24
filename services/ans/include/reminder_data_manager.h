@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "advanced_notification_service.h"
+#include "player.h"
 #include "reminder_request.h"
 #include "reminder_timer_info.h"
 
@@ -79,6 +80,13 @@ public:
         const sptr<NotificationBundleOption> bundleOption, std::vector<sptr<ReminderRequest>> &reminders);
 
     /**
+     * @brief Triggered when third party application died.
+     *
+     * @param bundleOption Indicates the bundleOption of third party application.
+     */
+    void OnProcessDiedLocked(const sptr<NotificationBundleOption> bundleOption);
+
+    /**
      * Publishs a scheduled reminder.
      *
      * @param reminder Indicates the reminder.
@@ -105,18 +113,60 @@ public:
      *
      * @param isSysTimeChanged Indicates it is triggered as dateTime changed by user or not.
      */
-    void ShowReminder(bool isSysTimeChanged);
+    void ShowActiveReminder();
+
+    /**
+     * @brief Snooze the reminder by manual.
+     * 1) Snooze the trigger time to the next.
+     * 2) Update the notification(Update notification lable/content...; Stop audio player and vibrator)
+     * 3) Show the notification dialog in the SystemUI
+     * 4) Start a new reminder, which is recent one now.
+     *
+     * @param want Which contains the given reminder.
+     */
+    void SnoozeReminder(const OHOS::EventFwk::Want &want);
+
+    /**
+     * @brief Terminate the alerting reminder.
+     *
+     * 1. Stop sound and vibrate.
+     * 2. Stop the alerting timer.
+     * 3. Update the reminder state.
+     * 4. Update the display content of the notification.
+     *
+     * @param want Which contains the given reminder.
+     */
+    void TerminateAlerting(const OHOS::EventFwk::Want &want);
 
     static const uint8_t TIME_ZONE_CHANGE;
     static const uint8_t DATE_TIME_CHANGE;
 
 private:
+    enum class TimerType : uint8_t {
+        TRIGGER_TIMER,
+        ALERTING_TIMER
+    };
+
+    /**
+     * Add default slot to the reminder if no slot set by user.
+     *
+     * @param reminder Indicates the reminder.
+     */
+    void AddDefaultSlotIfNeeded(sptr<ReminderRequest> &reminder);
+
+    /**
+     * Add reminder to showed reminder vector.
+     *
+     * @param reminder Indicates the showed reminder.
+     */
+    void AddToShowedReminders(const sptr<ReminderRequest> &reminder);
+
     /**
      * Cancels the notification relative to the reminder.
      *
      * @param reminder Indicates the reminder.
      */
-    void CancelNotification(sptr<ReminderRequest> &reminder) const;
+    void CancelNotification(const sptr<ReminderRequest> &reminder) const;
 
     /**
      * Check whether the number limit of reminders if exceeded.
@@ -125,15 +175,17 @@ private:
      * @return true if number limit is exceeded.
      */
     bool CheckReminderLimitExceededLocked(const std::string &bundleName) const;
-
-    void CloseReminder(const int32_t &reminderId, bool cancelNotification);
+    void CloseReminder(const sptr<ReminderRequest> &reminder, bool cancelNotification);
 
     /**
      * Create a information for timer, such as timer type, repeat policy, interval and want agent.
      *
+     * @param type Indicates the timer type.
      * @return pointer of ReminderTimerInfo.
      */
-    std::shared_ptr<ReminderTimerInfo> CreateTimerInfo() const;
+    std::shared_ptr<ReminderTimerInfo> CreateTimerInfo(TimerType type) const;
+
+    std::string GetSoundUri(const sptr<ReminderRequest> &reminder);
 
     /**
      * Find the reminder from reminderVector_ by reminder id.
@@ -159,7 +211,7 @@ private:
      * @param reminderId Indicates the reminder id.
      * @return pointer of NotificationBundleOption or nullptr.
      */
-    sptr<NotificationBundleOption> FindNotificationBundleOption(const int32_t &reminderId);
+    sptr<NotificationBundleOption> FindNotificationBundleOption(const int32_t &reminderId) const;
 
     /**
      * Obtains the recent reminder which is not expired from reminder vector.
@@ -197,6 +249,8 @@ private:
      */
     void HandleSameNotificationIdShowing(const sptr<ReminderRequest> reminder);
 
+    bool HandleSysTimeChange(const sptr<ReminderRequest> reminder) const;
+
     /**
      * Judge the two reminders is belong to the same application or not.
      *
@@ -207,6 +261,18 @@ private:
      */
     bool IsBelongToSameApp(
         const sptr<ReminderRequest> reminder, const std::string otherPkgName, const int otherUserId);
+
+    void PlaySoundAndVibrationLocked(const sptr<ReminderRequest> &reminder);
+    void PlaySoundAndVibration(const sptr<ReminderRequest> &reminder);
+    void StopSoundAndVibrationLocked(const sptr<ReminderRequest> &reminder);
+    void StopSoundAndVibration(const sptr<ReminderRequest> &reminder);
+
+    /**
+     * Remove from showed reminder vector.
+     *
+     * @param reminder Indicates the reminder need to remove.
+     */
+    void RemoveFromShowedReminders(const sptr<ReminderRequest> &reminder);
 
     /**
      * @brief Refresh the all reminders due to date/time or timeZone change by user.
@@ -227,12 +293,30 @@ private:
 
     /**
      * Resets timer status.
-     * 1. Sets timerId_ with 0.
-     * 2. Sets activeReminderId_ with -1.
+     * 1. Sets timerId_ or timerIdAlerting_ with 0.
+     * 2. Sets activeReminderId_ or alertingReminderId with -1.
+     *
+     * @param type Indicates the timer type.
      */
-    void ResetStates();
+    void ResetStates(TimerType type);
 
-    void ShowDesignatedReminderLocked(sptr<ReminderRequest> &reminder, bool isSysTimeChanged);
+    void SetActiveReminder(const sptr<ReminderRequest> &reminder);
+    void SetAlertingReminder(const sptr<ReminderRequest> &reminder);
+    void ShowActiveReminderExtendLocked(sptr<ReminderRequest> &reminder);
+
+    /**
+     * @brief Show the reminder on SystemUI.
+     *
+     * @param reminder Indicates the reminder to show.
+     * @param isNeedToPlaySound Indicates whether need to play sound.
+     * @param isNeedToStartNext Indicates whether need to start next reminder.
+     * @param isSysTimeChanged Indicates whether it is triggerred as system time changed by user.
+     * @param needScheduleTimeout Indicates whether need to control the ring duration.
+     */
+    void ShowReminder(const sptr<ReminderRequest> &reminder, const bool &isNeedToPlaySound,
+        const bool &isNeedToStartNext, const bool &isSysTimeChanged, const bool &needScheduleTimeout);
+
+    void SnoozeReminderImpl(sptr<ReminderRequest> &reminder);
 
     /**
      * Starts the recent reminder timing.
@@ -243,18 +327,42 @@ private:
      * Starts timing actually.
      *
      * @param reminderRequest Indicates the reminder.
+     * @param type Indicates the timer type.
      */
-    void StartTimerLocked(sptr<ReminderRequest> &reminderRequest);
+    void StartTimerLocked(const sptr<ReminderRequest> &reminderRequest, TimerType type);
+    void StartTimer(const sptr<ReminderRequest> &reminderRequest, TimerType type);
+
+    /**
+     * @brief Stop the alerting timer and update reminder information.
+     *
+     * 1. Stop sound and vibrate.
+     * 2. Stop the alerting timer.
+     *
+     * @param reminder Indicates the target reminder.
+     */
+    void StopAlertingReminder(const sptr<ReminderRequest> &reminder);
 
     /**
      * Stops timing.
+     *
+     * @param type Indicates the timer type.
      */
-    void StopTimer();
+    void StopTimer(TimerType type);
+    void StopTimerLocked(TimerType type);
 
     /**
-     * Stops timing.
+     * @brief Terminate the alerting reminder.
+     *
+     * 1. Stop sound and vibrate.
+     * 2. Stop the alerting timer.
+     * 3. Update the reminder state.
+     * 4. Update the display content of the notification.
+     *
+     * @param reminder Indicates the reminder.
+     * @param reason Indicates the description information.
      */
-    void StopTimerLocked();
+    void TerminateAlerting(const sptr<ReminderRequest> &reminder, const std::string &reason);
+    void TerminateAlerting(const uint16_t waitInMilli, const sptr<ReminderRequest> &reminder);
 
     /**
      * @brief Assign unique reminder id and save reminder in memory.
@@ -264,6 +372,8 @@ private:
      */
     void UpdateAndSaveReminderLocked(
         const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption);
+
+    void UpdateNotification(const sptr<ReminderRequest> &reminder);
 
     static bool cmp(sptr<ReminderRequest> &reminderRequest, sptr<ReminderRequest> &other);
 
@@ -276,6 +386,8 @@ private:
      * Used for multi-thread syncronise.
      */
     static std::mutex MUTEX;
+    static std::mutex SHOW_MUTEX;
+    static std::mutex ALERT_MUTEX;
 
     /**
      * Max number of reminders limit for the whole system.
@@ -287,12 +399,15 @@ private:
      */
     static const int16_t MAX_NUM_REMINDER_LIMIT_APP;
 
-    static const uint16_t SAME_TIME_DISTINGUISH_MILLISECONDS;
-
     /**
      * Vector used to record all the reminders in system.
      */
     std::vector<sptr<ReminderRequest>> reminderVector_;
+
+    /**
+     * Vector used to record all the reminders which has been shown on panel.
+     */
+    std::vector<sptr<ReminderRequest>> shownReminderVector_;
 
     /**
      * Map used to record all the bundle information of the reminders in system.
@@ -300,14 +415,28 @@ private:
     std::map<int32_t, sptr<NotificationBundleOption>> notificationBundleOptionMap_;
 
     /**
-     * Indicates the id of the timer that has called StartTimerLocked.
+     * This timer is used to control the triggerTime of next reminder.
      */
     uint64_t timerId_ {0};
 
     /**
+     * This timer is used to control the ringDuration of the alerting reminder.
+     */
+    uint64_t timerIdAlerting_ {0};
+
+    /**
      * Indicates the active reminder that timing is taking effect.
      */
-    int32_t activeReminderId_ {-1};
+    int32_t activeReminderId_ = -1;
+    sptr<ReminderRequest> activeReminder_ = nullptr;
+
+    /**
+     * Indicates the reminder which is playing sound or vibration.
+     */
+    int32_t alertingReminderId_ = -1;
+    sptr<ReminderRequest> alertingReminder_ = nullptr;
+
+    std::shared_ptr<Media::Player> soundPlayer_ = nullptr;
 
     /**
      * Indicates the total count of reminders in system.
@@ -317,5 +446,4 @@ private:
 };
 }  // namespace OHOS
 }  // namespace Nofitifcation
-
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_CORE_INCLUDE_REMINDER_DATA_MANAGER_H
