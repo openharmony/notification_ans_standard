@@ -1141,6 +1141,10 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(
                 return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
             }
             notification = record->notification;
+            // delete or delete all, call the function
+            if (!isCancel) {
+                TriggerRemoveWantAgent(record->request);
+            }
             notificationList_.remove(record);
             return ERR_OK;
         }
