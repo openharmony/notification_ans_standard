@@ -429,6 +429,9 @@ public:
     static napi_value SetNotificationTemplateInfo(
         const napi_env &env, const std::shared_ptr<NotificationTemplate> &templ, napi_value &result);
 
+    static napi_value SetNotificationFlags(
+        const napi_env &env, const std::shared_ptr<NotificationFlags> &flags, napi_value &result);
+
 private:
     static const int ARGS_ONE = 1;
     static const int ARGS_TWO = 2;
