@@ -18,8 +18,6 @@
 
 #include "reminder_request.h"
 
-#include <time.h>
-
 namespace OHOS {
 namespace Notification {
 class ReminderRequestCalendar : public ReminderRequest {

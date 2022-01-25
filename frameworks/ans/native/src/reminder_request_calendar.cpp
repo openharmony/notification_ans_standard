@@ -26,8 +26,8 @@ const uint8_t ReminderRequestCalendar::DECEMBER = 12;
 const uint8_t ReminderRequestCalendar::DEFAULT_SNOOZE_TIMES = 3;
 
 ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
-    const std::vector<uint8_t> &repeatMonths, const std::vector<uint8_t> &repeatDays) :
-    ReminderRequest(ReminderRequest::ReminderType::CALENDAR)
+    const std::vector<uint8_t> &repeatMonths, const std::vector<uint8_t> &repeatDays)
+    : ReminderRequest(ReminderRequest::ReminderType::CALENDAR)
 {
     // 1. record the infomation which designated by user at first time.
     firstDesignateYear_ = GetActualTime(TimeTransferType::YEAR, dateTime.tm_year);
@@ -44,7 +44,11 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
     uint64_t nextTriggerTime = INVALID_LONG_LONG_VALUE;
     if ((nextTriggerTime = GetNextTriggerTime()) != INVALID_LONG_LONG_VALUE) {
         time_t target = static_cast<time_t>(nextTriggerTime / MILLI_SECONDS);
-        dateTime_ = *(localtime(&target));
+        tm *tar =localtime(&target);
+        if (tar == nullptr) {
+            throw std::invalid_argument("Get localtime error");
+        }
+        dateTime_ = *tar;
     } else {
         ANSR_LOGW("Not exist next trigger time, please check the param of ReminderRequestCalendar constructor.");
         throw std::invalid_argument(
@@ -82,8 +86,12 @@ uint8_t ReminderRequestCalendar::GetDaysOfMonth(const uint16_t &year, const uint
     uint8_t february = 2;
     uint8_t leapMonth = 29;
     uint8_t nonLeapMonth = 28;
+    uint16_t solarYear = 400;
+    uint8_t leapParam1 = 4;
+    uint8_t leapParam2 = 100;
     if (month == february) {
-        days = ((((0 == year % 4) && (0 != year % 100)) || (0 == year % 400)) ? leapMonth : nonLeapMonth);
+        days = ((((0 == year % leapParam1) && (0 != year % leapParam2)) || (0 == year % solarYear))
+            ? leapMonth : nonLeapMonth);
     } else {
         days = daysArray[month - 1];
     }
@@ -128,8 +136,13 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTime() const
 {
     uint64_t triggerTimeInMilli = INVALID_LONG_LONG_VALUE;
     time_t now;
-    time(&now);  // unit is seconds.
-    struct tm nowTime = *(localtime(&now));
+    (void)time(&now);  // unit is seconds.
+    tm *nowTmp = localtime(&now);
+    if (nowTmp == nullptr) {
+        ANSR_LOGW("Get local time fail.");
+        return triggerTimeInMilli;
+    }
+    struct tm nowTime = *nowTmp;
     nowTime.tm_sec = 0;
     struct tm tarTime;
     tarTime.tm_year = GetCTime(TimeTransferType::YEAR, firstDesignateYear_);
@@ -232,7 +245,8 @@ bool ReminderRequestCalendar::IsRepeatMonth(uint8_t month) const
     return (repeatMonth_ & (1 << (month - 1))) > 0;
 }
 
-bool ReminderRequestCalendar::IsRepeatDay(uint8_t day) const{
+bool ReminderRequestCalendar::IsRepeatDay(uint8_t day) const
+{
     return (repeatDay_ & (1 << (day - 1))) > 0;
 }
 
@@ -289,7 +303,7 @@ void ReminderRequestCalendar::SetRepeatDaysOfMonth(const std::vector<uint8_t> &r
 std::vector<uint8_t> ReminderRequestCalendar::GetRepeatMonths() const
 {
     std::vector<uint8_t> repeatMonths;
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < MAX_MONTHS_OF_YEAR; i++) {
         if (IsRepeatMonth(i + 1)) {
             repeatMonths.push_back(i + 1);
         }
@@ -300,7 +314,7 @@ std::vector<uint8_t> ReminderRequestCalendar::GetRepeatMonths() const
 std::vector<uint8_t> ReminderRequestCalendar::GetRepeatDays() const
 {
     std::vector<uint8_t> repeatDays;
-    for (int i = 0; i < 31; i++) {
+    for (int i = 0; i < MAX_DAYS_OF_MONTH; i++) {
         if (IsRepeatDay(i + 1)) {
             repeatDays.push_back(i + 1);
         }

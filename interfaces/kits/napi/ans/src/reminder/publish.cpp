@@ -387,7 +387,6 @@ void ParseActionButtons(const napi_env &env, ReminderRequest &reminder, napi_val
     int index = 0;
     for (std::map<ReminderRequest::ActionButtonType, ReminderRequest::ActionButtonInfo>::iterator it
         = actionButtonsMap.begin(); it != actionButtonsMap.end(); ++it) {
-
         // create obj
         napi_value actionButton = nullptr;
         napi_create_object(env, &actionButton);
