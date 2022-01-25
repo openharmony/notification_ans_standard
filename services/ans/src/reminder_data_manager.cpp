@@ -501,8 +501,8 @@ void ReminderDataManager::ShowActiveReminderExtendLocked(sptr<ReminderRequest> &
 void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, const bool &isNeedToPlaySound,
     const bool &isNeedToStartNext, const bool &isSysTimeChanged, const bool &needScheduleTimeout)
 {
-    ANSR_LOGD("Show the reminder(Play sound: %{public}d), %{public}s"
-        , static_cast<int32_t>(isNeedToPlaySound), reminder->Dump().c_str());
+    ANSR_LOGD("Show the reminder(Play sound: %{public}d), %{public}s",
+        static_cast<int32_t>(isNeedToPlaySound), reminder->Dump().c_str());
     int32_t reminderId = reminder->GetReminderId();
     sptr<NotificationBundleOption> bundleOption = FindNotificationBundleOption(reminderId);
     sptr<NotificationRequest> notificationRequest = reminder->GetNotificationRequest();

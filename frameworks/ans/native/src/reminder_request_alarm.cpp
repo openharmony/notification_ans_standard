@@ -103,6 +103,17 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     time_t now;
     (void)time(&now);  // unit is seconds.
     struct tm *nowTime = localtime(&now);
+    if (nowTime == nullptr) {
+        ANSR_LOGW("Get local time fail.");
+        return 0;
+    }
+
+    ANSR_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
+        "min=%{public}d, sec=%{public}d, week=%{public}d, \n Target: tar_hour=%{public}d, tar_min=%{public}d",
+        GetActualTime(TimeTransferType::YEAR, nowTime->tm_year),
+        GetActualTime(TimeTransferType::MONTH, nowTime->tm_mon),
+        nowTime->tm_mday, nowTime->tm_hour, nowTime->tm_min, nowTime->tm_sec,
+        GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday), hour_, minute_);
 
     struct tm tar;
     tar.tm_year = nowTime->tm_year;
@@ -111,13 +122,6 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     tar.tm_hour = hour_;
     tar.tm_min = minute_;
     tar.tm_sec = 0;
-
-    ANSR_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
-        "min=%{public}d, sec=%{public}d, week=%{public}d, \n Target: tar_hour=%{public}d, tar_min=%{public}d",
-        GetActualTime(TimeTransferType::YEAR, nowTime->tm_year),
-        GetActualTime(TimeTransferType::MONTH, nowTime->tm_mon),
-        nowTime->tm_mday, nowTime->tm_hour, nowTime->tm_min, nowTime->tm_sec,
-        GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday), hour_, minute_);
 
     const time_t target = mktime(&tar);
     int8_t nextDayInterval = GetNextAlarm(now, target);
@@ -134,6 +138,9 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
         nextTriggerTime = target + nextDayInterval * HOURS_PER_DAY * SECONDS_PER_HOUR;
     }
     struct tm *test = localtime(&nextTriggerTime);
+    if (test == nullptr) {
+        return 0;
+    }
     ANSR_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld",
         GetActualTime(TimeTransferType::YEAR, test->tm_year),
@@ -223,16 +230,15 @@ bool ReminderRequestAlarm::UpdateNextReminder()
                 ANSR_LOGI("No need to update next triggerTime");
                 SetExpired(true);
                 return false;
+            }
+            uint64_t nextTriggerTime = GetNextTriggerTime(true);
+            if (nextTriggerTime != INVALID_LONG_LONG_VALUE) {
+                ANSR_LOGI("Set next trigger time successful, reset dynamic snoozeTimes");
+                SetTriggerTimeInMilli(nextTriggerTime);
             } else {
-                uint64_t nextTriggerTime = GetNextTriggerTime(true);
-                if (nextTriggerTime != INVALID_LONG_LONG_VALUE) {
-                    ANSR_LOGI("Set next trigger time successful, reset dynamic snoozeTimes");
-                    SetTriggerTimeInMilli(nextTriggerTime);
-                } else {
-                    ANSR_LOGW("Set reminder to expired");
-                    SetExpired(true);
-                    return false;
-                }
+                ANSR_LOGW("Set reminder to expired");
+                SetExpired(true);
+                return false;
             }
         }
         return true;

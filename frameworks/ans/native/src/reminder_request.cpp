@@ -107,17 +107,13 @@ bool ReminderRequest::CanShow() const
 
 std::string ReminderRequest::Dump() const
 {
-    struct tm *timeInfo;
-    const time_t nextTriggerTime = static_cast<time_t>(triggerTimeInMilli_ / 1000);
-    timeInfo = localtime(&nextTriggerTime);
-    uint8_t dateTimeLen = 80;
-    char dateTimeBuffer[dateTimeLen];
-    (void)strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", timeInfo);
+    const time_t nextTriggerTime = static_cast<time_t>(triggerTimeInMilli_ / MILLI_SECONDS);
+    std::string dateTimeInfo = GetTimeInfoInner(nextTriggerTime, TimeFormat::YMDHMS);
     return "Reminder["
            "reminderId=" + std::to_string(reminderId_) +
            ", type=" + std::to_string(static_cast<uint8_t>(reminderType_)) +
            ", state=" + GetState(state_) +
-           ", nextTriggerTime=" + dateTimeBuffer +
+           ", nextTriggerTime=" + dateTimeInfo.c_str() +
            "]";
 }
 
@@ -231,7 +227,8 @@ bool ReminderRequest::HandleSysTimeChange(uint64_t oriTriggerTime, uint64_t optT
     return showImmediately;
 }
 
-bool ReminderRequest::HandleTimeZoneChange(uint64_t oldZoneTriggerTime, uint64_t newZoneTriggerTime, uint64_t optTriggerTime)
+bool ReminderRequest::HandleTimeZoneChange(
+    uint64_t oldZoneTriggerTime, uint64_t newZoneTriggerTime, uint64_t optTriggerTime)
 {
     if (isExpired_) {
         return false;
@@ -449,8 +446,8 @@ bool ReminderRequest::ShouldShowImmediately() const
     return true;
 }
 
-std::map<ReminderRequest::ActionButtonType,
-    ReminderRequest::ActionButtonInfo> ReminderRequest::GetActionButtons() const
+std::map<ReminderRequest::ActionButtonType, ReminderRequest::ActionButtonInfo> ReminderRequest::GetActionButtons(
+    ) const
 {
     return actionButtonMap_;
 }
@@ -573,7 +570,7 @@ bool ReminderRequest::UpdateNextReminder()
 
 void ReminderRequest::UpdateNotificationRequest(UpdateNotificationType type, std::string extra)
 {
-    switch(type) {
+    switch (type) {
         case UpdateNotificationType::COMMON: {
             ANSR_LOGI("UpdateNotification common information");
             UpdateNotificationCommon();
@@ -861,13 +858,7 @@ bool ReminderRequest::IsAlerting() const
 
 std::string ReminderRequest::GetDateTimeInfo(const time_t &timeInSecond) const
 {
-    struct tm *timeInfo;
-    timeInfo = localtime(&timeInSecond);
-    uint8_t dateTimeLen = 80;
-    char dateTimeBuffer[dateTimeLen];
-    strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", timeInfo);
-    std::string dateTimeInfo(dateTimeBuffer);
-    return dateTimeInfo;
+    return GetTimeInfoInner(timeInSecond, TimeFormat::YMDHMS);
 }
 
 uint64_t ReminderRequest::GetNowInstantMilli() const
@@ -886,15 +877,37 @@ std::string ReminderRequest::GetShowTime(const uint64_t showTime) const
     if (reminderType_ == ReminderType::TIMER) {
         return "";
     } else {
-        struct tm *timeInfo;
-        const time_t showTimeInSecond = static_cast<time_t>(showTime / 1000);
-        timeInfo = localtime(&showTimeInSecond);
-        uint8_t dateTimeLen = 80;
-        char dateTimeBuffer[dateTimeLen];
-        strftime(dateTimeBuffer, dateTimeLen, "%H:%M", timeInfo);
-        std::string time = dateTimeBuffer;
-        return time;
+        const time_t showTimeInSecond = static_cast<time_t>(showTime / MILLI_SECONDS);
+        return GetTimeInfoInner(showTimeInSecond, TimeFormat::HM);
     }
+}
+
+std::string ReminderRequest::GetTimeInfoInner(const time_t &timeInSecond, const TimeFormat &format) const
+{
+    uint8_t dateTimeLen = 80;
+    char dateTimeBuffer[dateTimeLen];
+    struct tm *timeInfo;
+    timeInfo = localtime(&timeInSecond);
+    if (timeInfo == nullptr) {
+        ANSR_LOGW("GetTimeInfoInner fail.");
+    } else {
+        switch (format) {
+            case TimeFormat::YMDHMS: {
+                (void)strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", timeInfo);
+                break;
+            }
+            case TimeFormat::HM: {
+                (void)strftime(dateTimeBuffer, dateTimeLen, "%H:%M", timeInfo);
+                break;
+            }
+            default: {
+                ANSR_LOGW("Time format not support.");
+                break;
+            }
+        }
+    }
+    std::string dateTimeInfo(dateTimeBuffer);
+    return dateTimeInfo;
 }
 
 std::string ReminderRequest::GetState(const uint8_t state) const

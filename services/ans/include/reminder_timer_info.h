@@ -31,7 +31,8 @@ public:
     ReminderTimerInfo(ReminderTimerInfo &other) = delete;
     ReminderTimerInfo& operator = (const ReminderTimerInfo &other) = delete;
 
-    inline void SetAction(const std::string &action) {
+    inline void SetAction(const std::string &action)
+    {
         action_ = action;
     }
 

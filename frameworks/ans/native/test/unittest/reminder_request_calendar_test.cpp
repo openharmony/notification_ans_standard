@@ -35,10 +35,15 @@ public:
         ReminderHelper::CancelAllReminders();
     }
 
-    std::shared_ptr<ReminderRequestCalendar> CreateCalendar(tm &nowTime) {
+    std::shared_ptr<ReminderRequestCalendar> CreateCalendar(tm &nowTime)
+    {
         time_t now;
         time(&now);  // unit is seconds.
-        nowTime = *(localtime(&now));
+        tm *tmp = localtime(&now);
+        if (tmp == nullptr) {
+            return nullptr;
+        }
+        nowTime = *tmp;
         nowTime.tm_year = 0;
         nowTime.tm_mon = 0;
         nowTime.tm_mday = 1;
@@ -52,7 +57,8 @@ public:
         return calendar;
     }
 
-    bool IsVectorEqual(std::vector<uint8_t> &vectorA, std::vector<uint8_t> &vectorB) {
+    bool IsVectorEqual(std::vector<uint8_t> &vectorA, std::vector<uint8_t> &vectorB)
+    {
         if (vectorA.size() != vectorB.size()) {
             return false;
         }
@@ -81,6 +87,9 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00100, Function | SmallTest |
 {
     struct tm nowTime;
     auto calendar = ReminderRequestCalendarTest::CreateCalendar(nowTime);
+    if (calendar == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
     int firstDesignateYear = calendar->GetActualTime(ReminderRequest::TimeTransferType::YEAR, nowTime.tm_year);
     EXPECT_TRUE(firstDesignateYear == calendar->GetFirstDesignateYear()) << "Set first designate year error.";
 }
@@ -94,6 +103,9 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00200, Function | SmallTest |
 {
     struct tm nowTime;
     auto calendar = ReminderRequestCalendarTest::CreateCalendar(nowTime);
+    if (calendar == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
     int firstDesignateMonth = calendar->GetActualTime(ReminderRequest::TimeTransferType::MONTH, nowTime.tm_mon);
     EXPECT_TRUE(firstDesignateMonth == calendar->GetFirstDesignageMonth()) << "Set first designate month error.";
 }
@@ -107,6 +119,9 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00300, Function | SmallTest |
 {
     struct tm nowTime;
     auto calendar = ReminderRequestCalendarTest::CreateCalendar(nowTime);
+    if (calendar == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
     int firstDesignateDay = nowTime.tm_mday;
     EXPECT_TRUE(firstDesignateDay == calendar->GetFirstDesignateDay()) << "Set first designate day error.";
 }
@@ -120,7 +135,12 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00400, Function | SmallTest |
 {
     time_t now;
     time(&now);  // unit is seconds.
-    struct tm nowTime = *(localtime(&now));
+    tm *tmp = localtime(&now);
+    if (tmp == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
+    struct tm nowTime = *tmp;
+
     std::vector<uint8_t> repeatMonths;
     std::vector<uint8_t> repeatDays;
     repeatMonths.push_back(1);
@@ -156,7 +176,11 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00500, Function | SmallTest |
 {
     time_t now;
     time(&now);  // unit is seconds.
-    struct tm nowTime = *(localtime(&now));
+    tm *tmp = localtime(&now);
+    if (tmp == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
+    tm nowTime = *tmp;
     nowTime.tm_year += 1;
     std::vector<uint8_t> repeatMonths;
     std::vector<uint8_t> repeatDays;
@@ -193,7 +217,11 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00600, Function | SmallTest |
 {
     time_t now;
     time(&now);  // unit is seconds.
-    struct tm nowTime = *(localtime(&now));
+    tm *tmp = localtime(&now);
+    if (tmp == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
+    tm nowTime = *tmp;
     std::vector<uint8_t> repeatMonths;
     std::vector<uint8_t> repeatDays;
     repeatMonths.push_back(1);
@@ -229,7 +257,11 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00700, Function | SmallTest |
 {
     time_t now;
     time(&now);  // unit is seconds.
-    struct tm nowTime = *(localtime(&now));
+    tm *tmp = localtime(&now);
+    if (tmp == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
+    tm nowTime = *tmp;
     nowTime.tm_year += 1;
     std::vector<uint8_t> repeatMonths;
     std::vector<uint8_t> repeatDays;
@@ -267,6 +299,9 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00800, Function | SmallTest |
 {
     struct tm nowTime;
     auto calendar = ReminderRequestCalendarTest::CreateCalendar(nowTime);
+    if (calendar == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
     EXPECT_TRUE(1 == calendar->GetHour()) << "Set hour error.";
 }
 
@@ -279,6 +314,9 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00900, Function | SmallTest |
 {
     struct tm nowTime;
     auto calendar = ReminderRequestCalendarTest::CreateCalendar(nowTime);
+    if (calendar == nullptr) {
+        EXPECT_TRUE(false) << "calendar is null";
+    }
     EXPECT_TRUE(1 == calendar->GetMinute()) << "Set minute error.";
     EXPECT_TRUE(0 == calendar->GetSecond()) << "Set seconds error.";
 }
