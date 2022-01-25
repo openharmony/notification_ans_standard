@@ -2593,29 +2593,33 @@ napi_value Common::GetNotificationSupportDisplayDevices(
     ANS_LOGI("enter");
 
     bool isArray = false;
+    bool hasProperty = false;
     napi_valuetype valuetype = napi_undefined;
     napi_value supportDisplayDevices = nullptr;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
     uint32_t length = 0;
 
-    napi_get_named_property(env, value, "supportDisplayDevices", &supportDisplayDevices);
-    napi_is_array(env, supportDisplayDevices, &isArray);
-    NAPI_ASSERT(env, isArray, "Property supportDisplayDevices is expected to be an array.");
+    NAPI_CALL(env, napi_has_named_property(env, value, "supportDisplayDevices", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "supportDisplayDevices", &supportDisplayDevices);
+        napi_is_array(env, supportDisplayDevices, &isArray);
+        NAPI_ASSERT(env, isArray, "Property supportDisplayDevices is expected to be an array.");
 
-    napi_get_array_length(env, supportDisplayDevices, &length);
-    NAPI_ASSERT(env, length > 0, "The array is empty.");
-    std::vector<std::string> devices;
-    for (size_t i = 0; i < length; i++) {
-        napi_value line = nullptr;
-        napi_get_element(env, supportDisplayDevices, i, &line);
-        NAPI_CALL(env, napi_typeof(env, line, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-        NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
-        devices.emplace_back(str);
-        ANS_LOGI("supportDisplayDevices = %{public}s", str);
+        napi_get_array_length(env, supportDisplayDevices, &length);
+        NAPI_ASSERT(env, length > 0, "The array is empty.");
+        std::vector<std::string> devices;
+        for (size_t i = 0; i < length; i++) {
+            napi_value line = nullptr;
+            napi_get_element(env, supportDisplayDevices, i, &line);
+            NAPI_CALL(env, napi_typeof(env, line, &valuetype));
+            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+            NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
+            devices.emplace_back(str);
+            ANS_LOGI("supportDisplayDevices = %{public}s", str);
+        }
+        request.SetDevicesSupportDisplay(devices);
     }
-    request.SetDevicesSupportDisplay(devices);
     return NapiGetNull(env);
 }
 
@@ -2625,29 +2629,33 @@ napi_value Common::GetNotificationSupportOperateDevices(
     ANS_LOGI("enter");
 
     bool isArray = false;
+    bool hasProperty = false;
     napi_valuetype valuetype = napi_undefined;
     napi_value supportOperateDevices = nullptr;
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
     uint32_t length = 0;
 
-    napi_get_named_property(env, value, "supportOperateDevices", &supportOperateDevices);
-    napi_is_array(env, supportOperateDevices, &isArray);
-    NAPI_ASSERT(env, isArray, "Property supportOperateDevices is expected to be an array.");
+    NAPI_CALL(env, napi_has_named_property(env, value, "supportOperateDevices", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "supportOperateDevices", &supportOperateDevices);
+        napi_is_array(env, supportOperateDevices, &isArray);
+        NAPI_ASSERT(env, isArray, "Property supportOperateDevices is expected to be an array.");
 
-    napi_get_array_length(env, supportOperateDevices, &length);
-    NAPI_ASSERT(env, length > 0, "The array is empty.");
-    std::vector<std::string> devices;
-    for (size_t i = 0; i < length; i++) {
-        napi_value line = nullptr;
-        napi_get_element(env, supportOperateDevices, i, &line);
-        NAPI_CALL(env, napi_typeof(env, line, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
-        NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
-        devices.emplace_back(str);
-        ANS_LOGI("supportOperateDevices = %{public}s", str);
+        napi_get_array_length(env, supportOperateDevices, &length);
+        NAPI_ASSERT(env, length > 0, "The array is empty.");
+        std::vector<std::string> devices;
+        for (size_t i = 0; i < length; i++) {
+            napi_value line = nullptr;
+            napi_get_element(env, supportOperateDevices, i, &line);
+            NAPI_CALL(env, napi_typeof(env, line, &valuetype));
+            NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+            NAPI_CALL(env, napi_get_value_string_utf8(env, line, str, STR_MAX_SIZE - 1, &strLen));
+            devices.emplace_back(str);
+            ANS_LOGI("supportOperateDevices = %{public}s", str);
+        }
+        request.SetDevicesSupportOperate(devices);
     }
-    request.SetDevicesSupportOperate(devices);
 
     return NapiGetNull(env);
 }
