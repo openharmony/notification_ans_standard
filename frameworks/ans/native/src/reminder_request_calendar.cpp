@@ -44,7 +44,7 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
     uint64_t nextTriggerTime = INVALID_LONG_LONG_VALUE;
     if ((nextTriggerTime = GetNextTriggerTime()) != INVALID_LONG_LONG_VALUE) {
         time_t target = static_cast<time_t>(nextTriggerTime / MILLI_SECONDS);
-        tm *tar =localtime(&target);
+        tm *tar = localtime(&target);
         if (tar == nullptr) {
             throw std::invalid_argument("Get localtime error");
         }

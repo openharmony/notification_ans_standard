@@ -38,7 +38,7 @@ public:
     std::shared_ptr<ReminderRequestCalendar> CreateCalendar(tm &nowTime)
     {
         time_t now;
-        time(&now);  // unit is seconds.
+        (void)time(&now);  // unit is seconds.
         tm *tmp = localtime(&now);
         if (tmp == nullptr) {
             return nullptr;
@@ -134,7 +134,7 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00300, Function | SmallTest |
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00400, Function | SmallTest | Level1)
 {
     time_t now;
-    time(&now);  // unit is seconds.
+    (void)time(&now);  // unit is seconds.
     tm *tmp = localtime(&now);
     if (tmp == nullptr) {
         EXPECT_TRUE(false) << "calendar is null";
@@ -216,7 +216,7 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00500, Function | SmallTest |
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00600, Function | SmallTest | Level1)
 {
     time_t now;
-    time(&now);  // unit is seconds.
+    (void)time(&now);  // unit is seconds.
     tm *tmp = localtime(&now);
     if (tmp == nullptr) {
         EXPECT_TRUE(false) << "calendar is null";
@@ -256,7 +256,7 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00600, Function | SmallTest |
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00700, Function | SmallTest | Level1)
 {
     time_t now;
-    time(&now);  // unit is seconds.
+    (void)time(&now);  // unit is seconds.
     tm *tmp = localtime(&now);
     if (tmp == nullptr) {
         EXPECT_TRUE(false) << "calendar is null";
