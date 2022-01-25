@@ -246,7 +246,7 @@ bool ReminderRequest::HandleTimeZoneChange(
     } else {
         // case2. timezone change to larger
         time_t now;
-        time(&now);  // unit is seconds.
+        (void)time(&now);  // unit is seconds.
         if (static_cast<int64_t>(now) < 0) {
             ANSR_LOGE("Get now time error");
             return false;
@@ -864,7 +864,7 @@ std::string ReminderRequest::GetDateTimeInfo(const time_t &timeInSecond) const
 uint64_t ReminderRequest::GetNowInstantMilli() const
 {
     time_t now;
-    time(&now);  // unit is seconds.
+    (void)time(&now);  // unit is seconds.
     if (static_cast<int64_t>(now) < 0) {
         ANSR_LOGE("Get now time error");
         return 0;
@@ -886,8 +886,7 @@ std::string ReminderRequest::GetTimeInfoInner(const time_t &timeInSecond, const 
 {
     uint8_t dateTimeLen = 80;
     char dateTimeBuffer[dateTimeLen];
-    struct tm *timeInfo;
-    timeInfo = localtime(&timeInSecond);
+    struct tm *timeInfo = localtime(&timeInSecond);
     if (timeInfo == nullptr) {
         ANSR_LOGW("GetTimeInfoInner fail.");
     } else {
