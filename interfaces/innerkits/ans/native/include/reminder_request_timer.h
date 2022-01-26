@@ -40,7 +40,7 @@ public:
      */
     explicit ReminderRequestTimer(const ReminderRequestTimer &other);
     ReminderRequestTimer& operator = (const ReminderRequestTimer &other);
-    ~ReminderRequestTimer() {};
+    ~ReminderRequestTimer() override {};
 
     uint64_t GetInitInfo() const;
     virtual bool OnDateTimeChange() override;

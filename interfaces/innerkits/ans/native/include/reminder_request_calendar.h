@@ -54,7 +54,7 @@ public:
 
     explicit ReminderRequestCalendar(const ReminderRequestCalendar &other);
     ReminderRequestCalendar& operator = (const ReminderRequestCalendar &other);
-    ~ReminderRequestCalendar() {}
+    ~ReminderRequestCalendar() override {}
 
     inline uint16_t GetYear() const
     {

@@ -47,7 +47,7 @@ public:
      */
     explicit ReminderRequestAlarm(const ReminderRequestAlarm &other);
     ReminderRequestAlarm& operator = (const ReminderRequestAlarm &other);
-    ~ReminderRequestAlarm() {};
+    ~ReminderRequestAlarm() override {};
 
     /**
      * Obtains the repeat days vector.
