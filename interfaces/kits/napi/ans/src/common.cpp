@@ -3621,10 +3621,16 @@ napi_value Common::GetBundleOption(const napi_env &env, const napi_value &value,
     size_t strLen = 0;
     // bundle: string
     NAPI_CALL(env, napi_has_named_property(env, value, "bundle", &hasProperty));
-    NAPI_ASSERT(env, hasProperty, "Property bundle expected.");
+    if (!hasProperty) {
+        ANS_LOGE("Property bundle expected.");
+        return nullptr;
+    }
     napi_get_named_property(env, value, "bundle", &result);
     NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+    if (valuetype != napi_string) {
+        ANS_LOGE("Wrong argument type. String expected.");
+        return nullptr;
+    }
     NAPI_CALL(env, napi_get_value_string_utf8(env, result, str, STR_MAX_SIZE - 1, &strLen));
     option.SetBundleName(str);
 
@@ -3634,7 +3640,10 @@ napi_value Common::GetBundleOption(const napi_env &env, const napi_value &value,
         int32_t uid = 0;
         napi_get_named_property(env, value, "uid", &result);
         NAPI_CALL(env, napi_typeof(env, result, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+        if (valuetype != napi_number) {
+            ANS_LOGE("Wrong argument type. Number expected.");
+            return nullptr;
+        }
         napi_get_value_int32(env, result, &uid);
         option.SetUid(uid);
     }
