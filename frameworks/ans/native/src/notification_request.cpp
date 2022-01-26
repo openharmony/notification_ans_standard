@@ -679,6 +679,7 @@ std::string NotificationRequest::Dump()
             ", messageUsers = " + (!messageUsers_.empty() ? messageUsers_.at(0)->Dump() : "empty") +
             ", userInputHistory = " + (!userInputHistory_.empty() ? userInputHistory_.at(0) : "empty") +
             ", distributedOptions = " + distributedOptions_.Dump() +
+            ", notificationFlags = " + (notificationFlags_ ? "not null" : "null") +
             " }";
 }
 
@@ -772,6 +773,12 @@ NotificationRequest *NotificationRequest::FromJson(const nlohmann::json &jsonObj
     ConvertJsonToPixelMap(pRequest, jsonObject);
 
     if (!ConvertJsonToNotificationDistributedOptions(pRequest, jsonObject)) {
+        delete pRequest;
+        pRequest = nullptr;
+        return nullptr;
+    }
+
+    if (!ConvertJsonToNotificationFlags(pRequest, jsonObject)) {
         delete pRequest;
         pRequest = nullptr;
         return nullptr;
@@ -1127,6 +1134,19 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         }
     }
 
+    valid = notificationFlags_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write flags for the notification");
+        return false;
+    }
+
+    if (valid) {
+        if (!parcel.WriteParcelable(notificationFlags_.get())) {
+            ANS_LOGE("Failed to write notification flags");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1337,6 +1357,15 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
         }
     }
 
+    valid = parcel.ReadBool();
+    if (valid) {
+        notificationFlags_ = std::shared_ptr<NotificationFlags>(parcel.ReadParcelable<NotificationFlags>());
+        if (!notificationFlags_) {
+            ANS_LOGE("Failed to read notificationFlags");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1357,6 +1386,16 @@ void NotificationRequest::SetTemplate(const std::shared_ptr<NotificationTemplate
 std::shared_ptr<NotificationTemplate> NotificationRequest::GetTemplate() const
 {
     return notificationTemplate_;
+}
+
+void NotificationRequest::SetFlags(const std::shared_ptr<NotificationFlags> &flags)
+{
+    notificationFlags_ = flags;
+}
+
+std::shared_ptr<NotificationFlags> NotificationRequest::GetFlags() const
+{
+    return notificationFlags_;
 }
 
 void NotificationRequest::CopyBase(const NotificationRequest &other)
@@ -1422,6 +1461,7 @@ void NotificationRequest::CopyOther(const NotificationRequest &other)
     this->distributedOptions_ = other.distributedOptions_;
 
     this->notificationTemplate_ = other.notificationTemplate_;
+    this->notificationFlags_ = other.notificationFlags_;
 }
 
 bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
@@ -1469,6 +1509,13 @@ bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
         return false;
     }
     jsonObject["distributedOptions"] = optObj;
+
+    nlohmann::json flagsObj;
+    if (!NotificationJsonConverter::ConvertToJosn(notificationFlags_.get(), flagsObj)) {
+        ANS_LOGE("Cannot convert notificationFlags to JSON");
+        return false;
+    }
+    jsonObject["notificationFlags"] = flagsObj;
 
     return true;
 }
@@ -1687,6 +1734,32 @@ bool NotificationRequest::ConvertJsonToNotificationDistributedOptions(
             }
 
             target->distributedOptions_ = *pOpt;
+        }
+    }
+
+    return true;
+}
+
+bool NotificationRequest::ConvertJsonToNotificationFlags(
+    NotificationRequest *target, const nlohmann::json &jsonObject)
+{
+    if (target == nullptr) {
+        ANS_LOGE("Invalid input parameter");
+        return false;
+    }
+
+    const auto &jsonEnd = jsonObject.cend();
+
+    if (jsonObject.find("notificationFlags") != jsonEnd) {
+        auto flagsObj = jsonObject.at("notificationFlags");
+        if (!flagsObj.is_null()) {
+            auto pFlags = NotificationJsonConverter::ConvertFromJosn<NotificationFlags>(flagsObj);
+            if (pFlags == nullptr) {
+                ANS_LOGE("Failed to parse notificationFlags!");
+                return false;
+            }
+
+            target->notificationFlags_ = std::shared_ptr<NotificationFlags>(pFlags);
         }
     }
 

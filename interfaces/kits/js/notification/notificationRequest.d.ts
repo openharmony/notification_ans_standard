@@ -19,6 +19,7 @@ import { WantAgent } from '../@ohos.wantAgent';
 import { NotificationContent } from './notificationContent';
 import { NotificationActionButton } from './notificationActionButton';
 import { NotificationTemplate } from './notificationTemplate';
+import { NotificationFlags } from './notificationFlags';
 
 /**
  * Defines a NotificationRequest instance.
@@ -197,4 +198,11 @@ export interface NotificationRequest {
    * @since 8
    */
   template?: NotificationTemplate;
+
+  /**
+   * Obtains the set of identifiers for the notification.
+   *
+   * @since 8
+   */
+   readonly notificationFlags?: NotificationFlags;
 }
