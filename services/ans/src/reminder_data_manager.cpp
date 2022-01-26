@@ -874,6 +874,8 @@ void ReminderDataManager::StopSoundAndVibration(const sptr<ReminderRequest> &rem
     }
     ANSR_LOGD("Stop sound and vibration, reminderId=%{public}d", reminder->GetReminderId());
     soundPlayer_->Stop();
+    soundPlayer_->Release();
+    soundPlayer_ = nullptr;
     sptr<ReminderRequest> nullReminder = nullptr;
     SetAlertingReminder(nullReminder);
 }

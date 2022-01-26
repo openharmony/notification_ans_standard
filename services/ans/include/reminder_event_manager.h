@@ -44,7 +44,7 @@ private:
     void HandlePackageRemove(OHOS::EventFwk::Want &want) const;
     void HandleProcessDied(OHOS::EventFwk::Want &want) const;
     int32_t GetUid(const int userId, const std::string bundleName) const;
-    std::shared_ptr<ReminderDataManager> reminderDataManager_;
+    std::shared_ptr<ReminderDataManager> reminderDataManager_ = nullptr;
 };
 };
 }  // namespace OHOS
