@@ -56,12 +56,18 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[ENABLE_NOTIFICATION_MAX_PARA] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_ASSERT(env, argc >= ENABLE_NOTIFICATION_MIN_PARA, "Wrong number of arguments");
+    if (argc < ENABLE_NOTIFICATION_MIN_PARA) {
+        ANS_LOGW("Wrong number of arguments.");
+        return nullptr;
+    }
 
     // argv[0]: bundle
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    if (valuetype != napi_object) {
+        ANS_LOGW("Wrong argument type. Object expected.");
+        return nullptr;
+    }
     auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
     if (retValue == nullptr) {
         ANS_LOGE("GetBundleOption failed.");
@@ -70,13 +76,19 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
 
     // argv[1]: enable
     NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_boolean, "Wrong argument type. Bool expected.");
+    if (valuetype != napi_boolean) {
+        ANS_LOGW("Wrong argument type. Bool expected.");
+        return nullptr;
+    }
     napi_get_value_bool(env, argv[PARAM1], &params.enable);
 
     // argv[2]:callback
     if (argc >= ENABLE_NOTIFICATION_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGW("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, argv[PARAM2], 1, &params.callback);
     }
 
@@ -99,9 +111,10 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     // argv[0]: bundle / callback
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env,
-        (valuetype == napi_function) || (valuetype == napi_object),
-        "Wrong argument type. Function or object expected.");
+    if ((valuetype != napi_function) && (valuetype != napi_object)) {
+        ANS_LOGW("Wrong argument type. Function or object expected.");
+        return nullptr;
+    }
     if (valuetype == napi_object) {
         auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
         if (retValue == nullptr) {
@@ -116,7 +129,10 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     // argv[1]:callback
     if (argc >= IS_NOTIFICATION_ENABLE_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGW("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, argv[PARAM1], 1, &params.callback);
     }
 
