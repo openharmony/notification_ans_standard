@@ -46,17 +46,18 @@
 namespace OHOS {
 namespace Notification {
 namespace {
-static const std::string ACTIVE_NOTIFICATION_OPTION = "active";
-static const std::string RECENT_NOTIFICATION_OPTION = "recent";
+constexpr char ACTIVE_NOTIFICATION_OPTION[] = "active";
+constexpr char RECENT_NOTIFICATION_OPTION[] = "recent";
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
-static const std::string DISTRIBUTED_NOTIFICATION_OPTION = "distributed";
+constexpr char DISTRIBUTED_NOTIFICATION_OPTION[] = "distributed";
 #endif
-static const std::string SET_RECENT_COUNT_OPTION = "setRecentCount";
+constexpr char SET_RECENT_COUNT_OPTION[] = "setRecentCount";
+constexpr char FOUNDATION_BUNDLE_NAME[] = "ohos.global.systemres";
 
-static const int32_t NOTIFICATION_MIN_COUNT = 0;
-static const int32_t NOTIFICATION_MAX_COUNT = 1024;
+constexpr int32_t NOTIFICATION_MIN_COUNT = 0;
+constexpr int32_t NOTIFICATION_MAX_COUNT = 1024;
 
-static const int32_t DEFAULT_RECENT_COUNT = 16;
+constexpr int32_t DEFAULT_RECENT_COUNT = 16;
 
 constexpr int HOURS_IN_ONE_DAY = 24;
 
@@ -170,7 +171,7 @@ ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &request)
     int pid = IPCSkeleton::GetCallingPid();
     request->SetCreatorUid(uid);
     request->SetCreatorPid(pid);
-    
+
     int userId = SUBSCRIBE_USER_INIT;
     OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
     if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
@@ -1485,6 +1486,14 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
         return ERR_ANS_NOT_SYSTEM_SERVICE;
     }
 
+    if (request->GetCreatorBundleName().empty()) {
+        request->SetCreatorBundleName(FOUNDATION_BUNDLE_NAME);
+    }
+
+    if (request->GetOwnerBundleName().empty()) {
+        request->SetOwnerBundleName(FOUNDATION_BUNDLE_NAME);
+    }
+
     sptr<NotificationBundleOption> bundleOption = nullptr;
     bundleOption = new NotificationBundleOption(std::string(), uid);
     if (bundleOption == nullptr) {
@@ -2293,7 +2302,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    
+
     handler_->PostSyncTask(std::bind([&]() {
         result = NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption, newConfig);
         if (result == ERR_OK) {
@@ -2366,6 +2375,9 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
 bool AdvancedNotificationService::CheckPermission(const std::string &bundleName)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
+    if (IPCSkeleton::GetCallingUid() == SYSTEM_SERVICE_UID) {
+        return true;
+    }
     if (bundleName.empty()) {
         ANS_LOGE("Bundle name is empty.");
         return false;
