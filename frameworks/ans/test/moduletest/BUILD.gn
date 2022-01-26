@@ -329,7 +329,7 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
   part_name = "ans_standard"
 }
 
-ohos_js_unittest("ReminderAgentTest") {
+ohos_js_unittest("ReminderAgentJsTest") {
   module_out_path = module_output_path
 
   hap_profile = "./config.json"
@@ -341,11 +341,10 @@ group("moduletest") {
   deps = []
 
   deps += [
-    ":ReminderAgentTest",
-    ":ReminderAgentTest",
     ":ans_fw_module_test",
     ":ans_innerkits_module_publish_test",
     ":ans_innerkits_module_setting_test",
     ":ans_innerkits_module_slot_test",
+    ":ReminderAgentJsTest",
   ]
 }

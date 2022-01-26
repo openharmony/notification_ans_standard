@@ -145,19 +145,13 @@ describe("ReminderHelperTest", function () {
      */
     it("testReminderHelper005", 0, async function (done) {
         let mySlot = {
-            type: 3
+            type: 2
         }
         reminderAgent.addNotificationSlot(mySlot).then(() => {
-            expect(true).assertTrue();
-            setTimeout(() => {
-                done();
-            }, 500);
-        }, (error) => {
-            expect(false).assertTrue();
-            setTimeout(() => {
-                done();
-            }, 500);
+            let i = 0;
+            expect(i).assertEqual(0);
         });
+        done();
     })
 
     /*
@@ -167,36 +161,11 @@ describe("ReminderHelperTest", function () {
      * @tc.require:
      */
     it("testReminderHelper006", 0, async function (done) {
-        let mySlot0 = {
-            type: 0
-        }
-        let mySlot1 = {
-            type: 1
-        }
-        let mySlot2 = {
-            type: 2
-        }
-        let mySlot3 = {
-            type: 3
-        }
-        let mySlot4 = {
-            type: 4
-        }
-        function reminderCallback(err, data){
-            if (err) {
-                expect(true).assertTrue();
-            } else {
-                expect(false).assertTrue();
-            }
-            setTimeout(() => {
-                done();
-            }, 500);
-        }
-        reminderAgent.addNotificationSlot(mySlot0, reminderCallback);
-        reminderAgent.addNotificationSlot(mySlot1, reminderCallback);
-        reminderAgent.addNotificationSlot(mySlot2, reminderCallback);
-        reminderAgent.addNotificationSlot(mySlot3, reminderCallback);
-        reminderAgent.addNotificationSlot(mySlot4, reminderCallback);
+        reminderAgent.addNotificationSlot(3, (err, data) => {
+            let i = 0;
+            expect(i).assertEqual(0);
+        });
+        done();
     })
 
     /*
@@ -210,16 +179,25 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 100
         }
-        reminderAgent.publishReminder(timer).then((reminderId) => {
-            reminderAgent.getValidReminders().then((reminders) => {});
-            setTimeout(() => {
-                reminderAgent.cancelAllReminders().then(() => {
-                    reminderAgent.getValidReminders().then((reminders) => {
-                        expect(0).assertEqual(reminders.length);
-                    });
+        let calendar = {
+            reminderType: reminderAgent.ReminderType.REMINDER_TYPE_CALENDAR,
+            dateTime : {
+                year: 2025,
+                month: 10,
+                day: 10,
+                hour: 23,
+                minute: 30
+            }
+        }
+        reminderAgent.publishReminder(timer).then((reminderId) => {});
+        reminderAgent.publishReminder(calendar).then((reminderId) => {});
+        setTimeout(() => {
+            reminderAgent.cancelAllReminders().then(() => {
+                reminderAgent.getValidReminders().then((reminders) => {
+                    expect(reminders.length === 0).assertEqual(true);
                 });
-            }, 1000);
-        });
+            });
+        }, 5000);
         done();
     })
 
@@ -234,16 +212,25 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 100
         }
-        reminderAgent.publishReminder(timer, (error, reminderId) => {
-            reminderAgent.getValidReminders((err, reminders) => {});
-            setTimeout(() => {
-                reminderAgent.cancelAllReminders((err, data) => {
-                    reminderAgent.getValidReminders().then((reminders) => {
-                        expect(0).assertEqual(reminders.length);
-                    });
+        let calendar = {
+            reminderType: reminderAgent.ReminderType.REMINDER_TYPE_CALENDAR,
+            dateTime : {
+                year: 2025,
+                month: 10,
+                day: 10,
+                hour: 23,
+                minute: 30
+            }
+        }
+        reminderAgent.publishReminder(timer).then((reminderId) => {});
+        reminderAgent.publishReminder(calendar).then((reminderId) => {});
+        setTimeout(() => {
+            reminderAgent.cancelAllReminders((err, data) => {
+                reminderAgent.getValidReminders().then((reminders) => {
+                    expect(reminders.length === 0).assertEqual(true);
                 });
-            }, 1000);
-        });
+            });
+        }, 5000);
         done();
     })
 
@@ -256,7 +243,7 @@ describe("ReminderHelperTest", function () {
     it("testReminderHelper009", 0, async function (done) {
         let timer = {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
-            triggerTimeInSeconds: 100
+            triggerTimeInSeconds: 3
         }
         let id = 1;
         let publishlength = -1;
@@ -265,18 +252,14 @@ describe("ReminderHelperTest", function () {
         reminderAgent.publishReminder(timer).then(() => {
             reminderAgent.getValidReminders().then((reminders) => {
                 publishlength=reminders.length
-            });
-            setTimeout(() => {
                 reminderAgent.cancelReminder(id).then(() => {
                     reminderAgent.getValidReminders().then((reminders) => {
                         cancellength = reminders.length
-                        firstdiff = publishlength-cancellength;
-                        if (firstdiff === 0) {
-                            expect(0).assertEqual(firstdiff);
-                        }
+                        firstdiff = publishlength - cancellength;
+                        expect(0).assertEqual(firstdiff);
                     });
                 });
-            }, 1000);
+            });
         });
         done();
     })
@@ -290,33 +273,27 @@ describe("ReminderHelperTest", function () {
     it("testReminderHelper010", 0, async function (done) {
         let timer = {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
-            triggerTimeInSeconds: 100
+            triggerTimeInSeconds: 3
         }
-        let id = 1;
         let publishlength = -1;
         let cancellength = -1;
         let firstdiff = -1;
         reminderAgent.publishReminder(timer).then(() => {
             reminderAgent.getValidReminders((err, reminders) => {
                 publishlength = reminders.length;
-            });
-            setTimeout(() => {
-                reminderAgent.cancelReminder(id,(err,data)=>{
+                reminderAgent.cancelReminder(0, (err, data)=>{
                     reminderAgent.getValidReminders((err, reminders) => {
                         cancellength = reminders.length;
-                        firstdiff = publishlength-cancellength;
-                        if (firstdiff === 0) {
-                            expect(0).assertEqual(firstdiff);
-                        }
+                        firstdiff = publishlength - cancellength;
+                        expect(0).assertEqual(firstdiff);
                     });
                 });
-            }, 1000);
+            });
         });
         done();
     })
 
-
-    /*
+        /*
      * @tc.name: testReminderHelper011
      * @tc.desc: test cancelReminder with exist reminder.
      * @tc.type: FUNC
@@ -410,16 +387,15 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 100
         }
-        reminderAgent.publishReminder(timer, (error, reminderId) => {});
-        reminderAgent.publishReminder(alarm, (error, reminderId) => {});
-        setTimeout(() => {
-            reminderAgent.getValidReminders().then((reminders) => {
-                if (reminders.length >= 2) {
-                    let i = 0;
-                    expect(0).assertEqual(i);
-                }
-            });
-        }, 1000);
+        reminderAgent.cancelAllReminders((err, data) => {
+            reminderAgent.publishReminder(timer, (error, reminderId) => {});
+            reminderAgent.publishReminder(alarm, (error, reminderId) => {});
+            setTimeout(() => {
+                reminderAgent.getValidReminders().then((reminders) => {
+                    expect(reminders.length).assertEqual(2);
+                });
+            }, 1000);
+        })
         done();
     })
 
@@ -441,16 +417,15 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 100
         }
-        reminderAgent.publishReminder(timer, (error, reminderId) => {});
-        reminderAgent.publishReminder(alarm, (error, reminderId) => {});
-        setTimeout(() => {
-            reminderAgent.getValidReminders((err, reminders) => {
-                if (reminders.length >= 2) {
-                    let i = 0;
-                    expect(0).assertEqual(i);
-                }
-            });
-        }, 1000);
+        reminderAgent.cancelAllReminders((err, data) => {
+            reminderAgent.publishReminder(timer, (error, reminderId) => {});
+            reminderAgent.publishReminder(alarm, (error, reminderId) => {});
+            setTimeout(() => {
+                reminderAgent.getValidReminders((err, reminders) => {
+                    expect(reminders.length).assertEqual(2);
+                });
+            }, 1000);
+        })
         done();
     })
 
@@ -461,12 +436,12 @@ describe("ReminderHelperTest", function () {
      * @tc.require:
      */
     it("testReminderHelper015", 0, function (done) {
-       function reminderCallback(err, data){
-           let i = 0;
-           expect(0).assertEqual(i);
-       }
-       reminderAgent.removeNotificationSlot(0, reminderCallback);
-       done();
+        function reminderCallback(err, data){
+            let i = 0;
+            expect(0).assertEqual(i);
+        }
+        reminderAgent.removeNotificationSlot(0, reminderCallback);
+        done();
     })
 
     /*
@@ -502,7 +477,7 @@ describe("ReminderHelperTest", function () {
         }
         reminderAgent.addNotificationSlot(tarRemoveSlot.type, (err, data) => {
             reminderAgent.removeNotificationSlot(tarRemoveSlot.type, (err, data) => {
-                    expect(0).assertEqual(err.code);
+                expect(0).assertEqual(err.code);
             });
         });
         done();
@@ -520,7 +495,8 @@ describe("ReminderHelperTest", function () {
         }
         reminderAgent.addNotificationSlot(tarRemoveSlot.type, (err, data) => {
             reminderAgent.removeNotificationSlot(tarRemoveSlot.type).then(() => {
-                    expect(0).assertEqual(err.code);
+                let i = 0;
+                expect(0).assertEqual(i);
             });
         });
         done();
@@ -537,10 +513,10 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 3
         }
-        reminderAgent.publishReminder(timer).then((reminderId) => {});
+        reminderAgent.publishReminder(timer).then((reminderId) => { });
         setTimeout(() => {
             reminderAgent.getValidReminders().then((reminders) => {
-                expect(0).assertEqual(reminders.length);
+                expect(reminders.length === 0).assertEqual(true);
             });
         }, 5000);
         done();
@@ -557,10 +533,10 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 3
         }
-        reminderAgent.publishReminder(timer).then((reminderId) => {});
+        reminderAgent.publishReminder(timer, (err, data) => { });
         setTimeout(() => {
             reminderAgent.getValidReminders((err, reminders) => {
-                expect(0).assertEqual(reminders.length);
+                expect(reminders.length === 0).assertEqual(true);
             });
         }, 5000);
         done();
@@ -576,13 +552,13 @@ describe("ReminderHelperTest", function () {
         let alarm = {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_ALARM,
             hour: 21,
-            minute: 14
+            minute: 14,
+            title: "this is title",
+            content: "this is content"
         }
         reminderAgent.publishReminder(alarm).then((reminderId) => {
-            if (reminderId) {
-                let i = 0;
-                expect(0).assertEqual(i);
-            }
+            let i = 0;
+            expect(i).assertEqual(0);
         });
         done();
     })
@@ -597,13 +573,13 @@ describe("ReminderHelperTest", function () {
         let alarm = {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_ALARM,
             hour: 21,
-            minute: 14
+            minute: 14,
+            title: "this is title",
+            content: "this is content"
         }
         function reminderCallback (err, reminderId) {
-            if (reminderId) {
-                let i = 0;
-             expect(0).assertEqual(i);
-            }
+            let i = 0;
+            expect(i).assertEqual(0);
         }
         reminderAgent.publishReminder(alarm, reminderCallback);
         done();
@@ -611,11 +587,277 @@ describe("ReminderHelperTest", function () {
 
     /*
      * @tc.name: testReminderHelper023
+     * @tc.desc: test publishReminder
+     * @tc.type: FUNC
+     * @tc.require:
+     */
+    it("testReminderHelper023", 0, function (done) {
+        let calendar = {
+            reminderType: reminderAgent.ReminderType.REMINDER_TYPE_CALENDAR,
+            dateTime : {
+                year: 2025,
+                month: 10,
+                day: 10,
+                hour: 23,
+                minute: 30
+            },
+            repeatMonths:[2],
+            repeatDays:[2],
+            actionButton:[
+                {
+                    title:"close",
+                    type:0
+                },
+                {
+                    title:"snooze",
+                    type:1
+                }
+            ],
+            wantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            maxScreenWantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            ringDuration:5,
+            snoozeTimes:2,
+            timeInterval:5,
+            title:"this is title",
+            content:"this is content",
+            expiredContent:"this reminder has expired",
+            snoozeContent:"remind later",
+            notificationId:100,
+            slotType:3
+        }
+        reminderAgent.publishReminder(calendar).then((reminderId) => {
+            reminderAgent.getValidReminders().then((reminders) => {
+                for (let i = 0; i < reminders.length; i++) {
+                    console.log("getValidReminders = " + JSON.stringify(reminders[i]));
+                    console.log("getValidReminders, reminderType = " + reminders[i].reminderType);
+                    for (let j = 0; j < reminders[i].actionButton.length; j++) {
+                        console.log("getValidReminders, actionButton.title = " + reminders[i].actionButton[j].title);
+                        console.log("getValidReminders, actionButton.type = " + reminders[i].actionButton[j].type);
+                    }
+                    console.log("getValidReminders, wantAgent.pkgName = " + reminders[i].wantAgent.pkgName);
+                    console.log("getValidReminders, wantAgent.abilityName = " + reminders[i].wantAgent.abilityName);
+                    console.log("getValidReminders, maxScreenWantAgent.pkgName = " + reminders[i].maxScreenWantAgent.pkgName);
+                    console.log("getValidReminders, maxScreenWantAgent.abilityName = " + reminders[i].maxScreenWantAgent.abilityName);
+                    expect(reminders[i].ringDuration).assertEqual(5);
+                    console.log("getValidReminders, ringDuration = " + reminders[i].ringDuration);
+                    expect(reminders[i].snoozeTimes).assertEqual(2);
+                    console.log("getValidReminders, snoozeTimes = " + reminders[i].snoozeTimes);
+                    console.log("getValidReminders, timeInterval = " + reminders[i].timeInterval);
+                    expect(reminders[i].title).assertEqual("this is title");
+                    console.log("getValidReminders, title = " + reminders[i].title);
+                    expect(reminders[i].content).assertEqual("this is content");
+                    console.log("getValidReminders, content = " + reminders[i].content);
+                    expect(reminders[i].expiredContent).assertEqual("this reminder has expired");
+                    console.log("getValidReminders, expiredContent = " + reminders[i].expiredContent);
+                    expect(reminders[i].snoozeContent).assertEqual("remind later");
+                    console.log("getValidReminders, snoozeContent = " + reminders[i].snoozeContent);
+                    expect(reminders[i].notificationId).assertEqual(100);
+                    console.log("getValidReminders, notificationId = " + reminders[i].notificationId);
+                    console.log("getValidReminders, slotType = " + reminders[i].slotType);
+                }
+            })
+        });
+        done();
+    })
+
+    /*
+     * @tc.name: testReminderHelper024
+     * @tc.desc: test publishReminder
+     * @tc.type: FUNC
+     * @tc.require:
+     */
+    it("testReminderHelper024", 0, async function (done) {
+        let calendar = {
+            reminderType: reminderAgent.ReminderType.REMINDER_TYPE_CALENDAR,
+            dateTime : {
+                year: 2025,
+                month: 10,
+                day: 10,
+                hour: 23,
+                minute: 30
+            },
+            repeatMonths:[2],
+            repeatDays:[2],
+            actionButton:[
+                {
+                    title:"close",
+                    type:0
+                },
+                {
+                    title:"snooze",
+                    type:1
+                }
+            ],
+            wantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            maxScreenWantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            ringDuration:5,
+            snoozeTimes:2,
+            timeInterval:5,
+            title:"this is title",
+            content:"this is content",
+            expiredContent:"this reminder has expired",
+            snoozeContent:"remind later",
+            notificationId:100,
+            slotType:3
+        }
+        reminderAgent.publishReminder(calendar, (err,reminderId) => {
+            reminderAgent.getValidReminders().then((reminders) => {
+                for (let i = 0; i < reminders.length; i++) {
+                    console.log("getValidReminders = " + JSON.stringify(reminders[i]));
+                    console.log("getValidReminders, reminderType = " + reminders[i].reminderType);
+                    for (let j = 0; j < reminders[i].actionButton.length; j++) {
+                        console.log("getValidReminders, actionButton.title = " + reminders[i].actionButton[j].title);
+                        console.log("getValidReminders, actionButton.type = " + reminders[i].actionButton[j].type);
+                    }
+                    console.log("getValidReminders, wantAgent.pkgName = " + reminders[i].wantAgent.pkgName);
+                    console.log("getValidReminders, wantAgent.abilityName = " + reminders[i].wantAgent.abilityName);
+                    console.log("getValidReminders, maxScreenWantAgent.pkgName = " + reminders[i].maxScreenWantAgent.pkgName);
+                    console.log("getValidReminders, maxScreenWantAgent.abilityName = " + reminders[i].maxScreenWantAgent.abilityName);
+                    expect(reminders[i].ringDuration).assertEqual(5);
+                    console.log("getValidReminders, ringDuration = " + reminders[i].ringDuration);
+                    expect(reminders[i].snoozeTimes).assertEqual(2);
+                    console.log("getValidReminders, snoozeTimes = " + reminders[i].snoozeTimes);
+                    console.log("getValidReminders, timeInterval = " + reminders[i].timeInterval);
+                    expect(reminders[i].title).assertEqual("this is title");
+                    console.log("getValidReminders, title = " + reminders[i].title);
+                    expect(reminders[i].content).assertEqual("this is content");
+                    console.log("getValidReminders, content = " + reminders[i].content);
+                    expect(reminders[i].expiredContent).assertEqual("this reminder has expired");
+                    console.log("getValidReminders, expiredContent = " + reminders[i].expiredContent);
+                    expect(reminders[i].snoozeContent).assertEqual("remind later");
+                    console.log("getValidReminders, snoozeContent = " + reminders[i].snoozeContent);
+                    expect(reminders[i].notificationId).assertEqual(100);
+                    console.log("getValidReminders, notificationId = " + reminders[i].notificationId);
+                    console.log("getValidReminders, slotType = " + reminders[i].slotType);
+                }
+            })
+        });
+        done();
+    })
+
+    /*
+     * @tc.name: testReminderHelper025
+     * @tc.desc: test publishReminder
+     * @tc.type: FUNC
+     * @tc.require:
+     */
+    it("testReminderHelper025", 0, async function (done) {
+        let calendar = {
+            reminderType: reminderAgent.ReminderType.REMINDER_TYPE_CALENDAR,
+            dateTime : {
+                year: 2025,
+                month: 10,
+                day: 10,
+                hour: 23,
+                minute: 30
+            },
+            repeatMonths:[2],
+            repeatDays:[2],
+            actionButton:[
+                {
+                    title:"close",
+                    type:0
+                },
+                {
+                    title:"snooze",
+                    type:1
+                }
+            ],
+            wantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            maxScreenWantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            ringDuration:5,
+            snoozeTimes:2,
+            timeInterval:5,
+            title:"this is title",
+            content:"this is content",
+            expiredContent:"this reminder has expired",
+            snoozeContent:"remind later",
+            notificationId:100,
+            slotType:3
+        }
+        reminderAgent.publishReminder(calendar, (err, reminderId) => {
+            expect(typeof(reminderId) === 'number').assertEqual(true);
+        });
+        done();
+    })
+
+    /*
+     * @tc.name: testReminderHelper026
+     * @tc.desc: test publishReminder
+     * @tc.type: FUNC
+     * @tc.require:
+     */
+    it("testReminderHelper026", 0, async function (done) {
+        let calendar = {
+            reminderType: reminderAgent.ReminderType.REMINDER_TYPE_CALENDAR,
+            dateTime : {
+                year: 2025,
+                month: 10,
+                day: 10,
+                hour: 23,
+                minute: 30
+            },
+            repeatMonths:[2],
+            repeatDays:[2],
+            actionButton:[
+                {
+                    title:"close",
+                    type:0
+                },
+                {
+                    title:"snooze",
+                    type:1
+                }
+            ],
+            wantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            maxScreenWantAgent:{
+                pkgName:"com.huawei.phone",
+                abilityName:"com.huawei.phone.MainAbility"
+            },
+            ringDuration:5,
+            snoozeTimes:2,
+            timeInterval:5,
+            title:"this is title",
+            content:"this is content",
+            expiredContent:"this reminder has expired",
+            snoozeContent:"remind later",
+            notificationId:100,
+            slotType:3
+        }
+        reminderAgent.publishReminder(calendar).then((reminderId) => {
+            expect(typeof(reminderId)).assertEqual('number');
+        });
+        done();
+    })
+
+    /*
+     * @tc.name: testReminderHelper027
      * @tc.desc: test publishReminder (max number limit of each application)
      * @tc.type: FUNC
      * @tc.require:
      */
-    it("testReminderHelper023", 0, async function (done) {
+    it("testReminderHelper027", 0, async function (done) {
         let timer = {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 100
@@ -623,9 +865,10 @@ describe("ReminderHelperTest", function () {
         let maxLimitNumsOfApp = 30;
         let firstId = 0;
         let secondId = 0;
-        let diffId = 0
+        let diffId = 0;
         for (let i = 0; i < maxLimitNumsOfApp; i++) {
             (function (i) {
+                var i = i;
                 setTimeout(function () {
                     reminderAgent.publishReminder(timer).then((reminderId) => {
                         if (i === 0) {
@@ -635,6 +878,7 @@ describe("ReminderHelperTest", function () {
                             secondId = reminderId
                             diffId = secondId - firstId
                             expect(29).assertEqual(diffId);
+                            i = null
                         }
                     });
                 }, 500 * i);
