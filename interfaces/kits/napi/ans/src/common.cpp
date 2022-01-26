@@ -548,7 +548,7 @@ napi_value Common::SetNotificationRequestByCustom(
     }
     napi_set_named_property(env, result, "actionButtons", arr);
 
-    // template?: NotificationTemplate;
+    // template?: NotificationTemplate
     std::shared_ptr<NotificationTemplate> templ = request->GetTemplate();
     if (templ) {
         napi_value templateResult = nullptr;
@@ -558,6 +558,18 @@ napi_value Common::SetNotificationRequestByCustom(
             return NapiGetBoolean(env, false);
         }
         napi_set_named_property(env, result, "template", templateResult);
+    }
+
+    // readonly notificationFlags?: NotificationFlags
+    std::shared_ptr<NotificationFlags> flags = request->GetFlags();
+    if (flags) {
+        napi_value flagsResult = nullptr;
+        napi_create_object(env, &flagsResult);
+        if (!SetNotificationFlags(env, flags, flagsResult)) {
+            ANS_LOGE("SetNotificationFlags call failed");
+            return NapiGetBoolean(env, false);
+        }
+        napi_set_named_property(env, result, "notificationFlags", flagsResult);
     }
 
     return NapiGetBoolean(env, true);
@@ -4088,6 +4100,29 @@ napi_value Common::SetNotificationTemplateInfo(
         value = OHOS::AppExecFwk::WrapWantParams(env, *data);
         napi_set_named_property(env, result, "data", value);
     }
+
+    return NapiGetBoolean(env, true);
+}
+
+napi_value Common::SetNotificationFlags(
+    const napi_env &env, const std::shared_ptr<NotificationFlags> &flags, napi_value &result)
+{
+    ANS_LOGI("enter");
+
+    if (flags == nullptr) {
+        ANS_LOGE("flags is null");
+        return NapiGetBoolean(env, false);
+    }
+
+    napi_value value = nullptr;
+
+    // readonly soundEnabled?: boolean
+    napi_get_boolean(env, flags->IsSoundEnabled(), &value);
+    napi_set_named_property(env, result, "soundEnabled", value);
+
+    // readonly vibrationEnabled?: boolean
+    napi_get_boolean(env, flags->IsVibrationEnabled(), &value);
+    napi_set_named_property(env, result, "vibrationEnabled", value);
 
     return NapiGetBoolean(env, true);
 }

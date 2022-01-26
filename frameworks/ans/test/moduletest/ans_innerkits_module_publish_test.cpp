@@ -55,6 +55,7 @@ const int32_t CASE_ELEVEN = 11;
 const int32_t CASE_TWELVE = 12;
 const int32_t CASE_THIRTEEN = 13;
 const int32_t CASE_FOURTEEN = 14;
+const int32_t CASE_FIFTEEN = 15;
 const int32_t CALLING_UID = 9999;
 
 const int32_t PIXEL_MAP_TEST_WIDTH = 32;
@@ -136,6 +137,8 @@ public:
             EXPECT_EQ(true, notificationRequest.IsGroupOverview());
         } else if (CASE_FOURTEEN == notificationRequest.GetNotificationId()) {
             CheckCaseFourteenResult(notificationRequest);
+        } else if (CASE_FIFTEEN == notificationRequest.GetNotificationId()) {
+            CheckCaseFifteenResult(notificationRequest);
         } else {
             GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish::OnConsumed do nothing!!!!!";
         }
@@ -368,6 +371,15 @@ private:
             EXPECT_EQ(20, value); // 20 test input
         }
         EXPECT_EQ(NotificationConstant::OTHER, notificationRequest.GetSlotType());
+    }
+
+    void CheckCaseFifteenResult(NotificationRequest notificationRequest)
+    {
+        std::shared_ptr<NotificationFlags> notiFlags = notificationRequest.GetFlags();
+        if (notiFlags != nullptr) {
+            EXPECT_EQ(false, notiFlags->IsSoundEnabled());
+            EXPECT_EQ(true, notiFlags->IsVibrationEnabled());
+        }
     }
 };
 
@@ -1326,6 +1338,45 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function
     req.AddMessageUser(msgUser1);
 
     CheckJsonConverter(&req);
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_Publish_05000
+ * @tc.name      : Publish_05000
+ * @tc.desc      : Add notification slot(type is OTHER), make a subscriber and publish a flags notification.
+ * @tc.expected  : Add notification slot success, make a subscriber and publish a flags notification success.
+ */
+HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_05000, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::OTHER);
+    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
+    auto subscriber = TestAnsSubscriber();
+    NotificationSubscribeInfo info = NotificationSubscribeInfo();
+    info.AddAppName("bundleName");
+    g_subscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
+    WaitOnSubscribeResult();
+
+    std::shared_ptr<NotificationFlags> notiFlags = std::make_shared<NotificationFlags>();
+    EXPECT_NE(notiFlags, nullptr);
+    notiFlags->SetSoundEnabled(false);
+    notiFlags->SetVibrationEnabled(true);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_04000::flags::" << notiFlags->Dump();
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
+    NotificationRequest req;
+    req.SetContent(content);
+    req.SetFlags(notiFlags);
+    req.SetSlotType(NotificationConstant::OTHER);
+    req.SetNotificationId(CASE_FIFTEEN);
+    g_consumed_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+    WaitOnConsumed();
+    g_unsubscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
+    WaitOnUnsubscribeResult();
 }
 }  // namespace Notification
 }  // namespace OHOS

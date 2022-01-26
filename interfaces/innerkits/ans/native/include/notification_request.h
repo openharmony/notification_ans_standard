@@ -20,6 +20,7 @@
 #include "notification_action_button.h"
 #include "notification_content.h"
 #include "notification_distributed_options.h"
+#include "notification_flags.h"
 #include "notification_json_convert.h"
 #include "notification_template.h"
 #include "ohos/aafwk/content/want_params.h"
@@ -915,6 +916,18 @@ public:
      */
     std::shared_ptr<NotificationTemplate> GetTemplate() const;
 
+    /**
+     * Sets the flags of this notification.
+     * @param flags the flags of this notification.
+     */
+    void SetFlags(const std::shared_ptr<NotificationFlags> &flags);
+
+    /**
+     * Obtains the flags of the notification.
+     * @return the flags of the notification.
+     */
+    std::shared_ptr<NotificationFlags> GetFlags() const;
+
 private:
     /**
      * Indicates the color mask, used for calculation with the ARGB value set by setColor(int32_t).
@@ -958,6 +971,7 @@ private:
     static bool ConvertJsonToNotificationActionButton(NotificationRequest *target, const nlohmann::json &jsonObject);
     static bool ConvertJsonToNotificationDistributedOptions(
         NotificationRequest *target, const nlohmann::json &jsonObject);
+    static bool ConvertJsonToNotificationFlags(NotificationRequest *target, const nlohmann::json &jsonObject);
 
 private:
     int32_t notificationId_ {0};
@@ -1019,6 +1033,7 @@ private:
     NotificationDistributedOptions distributedOptions_;
 
     std::shared_ptr<NotificationTemplate> notificationTemplate_ {};
+    std::shared_ptr<NotificationFlags> notificationFlags_ {};
 };
 }  // namespace Notification
 }  // namespace OHOS
