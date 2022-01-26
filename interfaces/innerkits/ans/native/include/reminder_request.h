@@ -89,7 +89,6 @@ public:
 
     /**
      * @brief Enumerates the Time format for print.
-     *
      */
     enum class TimeFormat : uint8_t {
         YMDHMS,
@@ -131,7 +130,7 @@ public:
      */
     explicit ReminderRequest(const ReminderRequest &other);
     ReminderRequest& operator = (const ReminderRequest &other);
-    virtual ~ReminderRequest() {};
+    virtual ~ReminderRequest() override {};
 
     /**
      * @brief Marshal a NotificationRequest object into a Parcel.
@@ -153,7 +152,7 @@ public:
      *
      * @return true if it can be removed automatically.
      */
-    bool CanRemove();
+    bool CanRemove() const;
 
     bool CanShow() const;
 
@@ -292,7 +291,10 @@ public:
     bool IsShowing() const;
 
     /**
-     * @brief Close the reminder by manual.
+     * @brief Closes the reminder by manual.
+     *
+     * 1) Resets the state of "Alering/Showing/Snooze"
+     * 2) Resets snoozeTimesDynamic_ if update to next trigger time, otherwise set reminder to expired.
      *
      * @param updateNext Whether to update to next reminder.
      */
@@ -312,17 +314,50 @@ public:
     void OnSameNotificationIdCovered();
 
     /**
-     * @brief Show the reminder on panel. TriggerTime will be updated to next.
+     * @brief Shows the reminder on panel. TriggerTime will be updated to next.
      *
      * @param isPlaySoundOrVibration true means it is play sound or vibration.
      * @param isSysTimeChanged true means it is called when the system time is changed by user, otherwise false.
      * @param allowToNotify true means that the notification will be shown as normal, otherwise false.
      */
     void OnShow(bool isPlaySoundOrVibration, bool isSysTimeChanged, bool allowToNotify);
+
+    /**
+     * @brief Reset the state of "Showing" when the reminder is shown failed.
+     */
     void OnShowFail();
+
+    /**
+     * @brief Snooze the reminder by manual.
+     *
+     * 1) Updates the trigger time to the next one.
+     * 2) Updates the notification content for "Snooze".
+     * 3) Switchs the state from "Showing[, Alerting]" to "Snooze".
+     */
     bool OnSnooze();
+
+    /**
+     * @brief Starts the reminder
+     *
+     * Sets the state from "Inactive" to "Active".
+     */
     void OnStart();
+
+    /**
+     * @brief Stops the reminder.
+     *
+     * Sets the state from "Active" to "Inactive".
+     */
     void OnStop();
+
+    /**
+     * @brief Terminate the alerting reminder, which is executed when the ring duration is over.
+     *
+     * 1) Disables the state of "Alerting".
+     * 2) Updates the notification content for "Alert".
+     *
+     * @return false if alerting state has already been set false before calling the method.
+     */
     bool OnTerminate();
 
     /**
@@ -592,5 +627,4 @@ private:
 };
 }  // namespace Reminder
 }  // namespace OHOS
-
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_FRAMEWORKS_ANS_CORE_INCLUDE_REMINDER_REQUEST_H

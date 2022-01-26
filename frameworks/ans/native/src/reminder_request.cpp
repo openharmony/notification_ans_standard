@@ -82,7 +82,7 @@ ReminderRequest::ReminderRequest(ReminderType reminderType)
         maxScreenWantAgentInfo_ == nullptr ? std::make_shared<MaxScreenAgentInfo>() : maxScreenWantAgentInfo_;
 }
 
-bool ReminderRequest::CanRemove()
+bool ReminderRequest::CanRemove() const
 {
     if ((state_ & (REMINDER_STATUS_SHOWING | REMINDER_STATUS_ALERTING | REMINDER_STATUS_ACTIVE)) == 0) {
         return true;
