@@ -553,6 +553,58 @@ declare namespace notification {
   function isSupportTemplate(templateName: string): Promise<boolean>;
 
   /**
+   * Sets whether the device supports distributed notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  function enableDistributed(enable: boolean, callback: AsyncCallback<void>): void;
+  function enableDistributed(enable: boolean): Promise<void>;
+
+  /**
+   * Obtains whether the device supports distributed notification.
+   *
+   * @since 8
+   */
+  function isDistributedEnabled(callback: AsyncCallback<boolean>): void;
+  function isDistributedEnabled(): Promise<boolean>;
+
+  /**
+   * Sets whether an application supports distributed notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  function enableDistributedByBundle(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
+  function enableDistributedByBundle(bundle: BundleOption, enable: boolean): Promise<void>;
+
+  /**
+   * Sets whether the application supports distributed notification.
+   *
+   * @since 8
+   */
+  function enableDistributedSelf(enable: boolean, callback: AsyncCallback<void>): void;
+  function enableDistributedSelf(enable: boolean): Promise<void>;
+
+  /**
+   * Obtains whether an application supports distributed notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  function isDistributedEnabledByBundle(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
+  function isDistributedEnabledByBundle(bundle: BundleOption): Promise<boolean>;
+
+  /**
+   * Obtains the remind modes of the notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  function getDeviceRemindType(callback: AsyncCallback<DeviceRemindType>): void;
+  function getDeviceRemindType(): Promise<DeviceRemindType>;
+
+  /**
    * Describes a BundleOption.
    */
   export interface BundleOption {
@@ -724,6 +776,34 @@ declare namespace notification {
      * Scheduled notification
      */
     TYPE_TIMER = 0x00000002,
+  }
+
+  /**
+   * The remind type of the nofication.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  export enum DeviceRemindType {
+    /**
+     * The device is not in use, no reminder
+     */
+    IDLE_DONOT_REMIND = 0,
+
+    /**
+     * The device is not in use, remind
+     */
+    IDLE_REMIND = 1,
+
+    /**
+     * The device is in use, no reminder
+     */
+    ACTIVE_DONOT_REMIND = 2,
+
+    /**
+     * The device is in use, reminder
+     */
+    ACTIVE_REMIND = 3,
   }
 }
 
