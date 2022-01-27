@@ -99,10 +99,9 @@ ErrCode NotificationShellCommand::RunHelp()
     return ERR_OK;
 }
 
-ErrCode NotificationShellCommand::RunActive()
+ErrCode NotificationShellCommand::RunActive(std::vector<std::string> &infos)
 {
     ErrCode ret = ERR_OK;
-    std::vector<std::string> infos;
     if (ans_ != nullptr) {
         ret = ans_->ShellDump("active", infos);
         resultReceiver_.append("Total:" + std::to_string(infos.size()) + "\n");
@@ -112,10 +111,9 @@ ErrCode NotificationShellCommand::RunActive()
     return ret;
 }
 
-ErrCode NotificationShellCommand::RunRecent()
+ErrCode NotificationShellCommand::RunRecent(std::vector<std::string> &infos)
 {
     ErrCode ret = ERR_OK;
-    std::vector<std::string> infos;
     if (ans_ != nullptr) {
         ret = ans_->ShellDump("recent", infos);
         resultReceiver_.append("Total:" + std::to_string(infos.size()) + "\n");
@@ -126,10 +124,9 @@ ErrCode NotificationShellCommand::RunRecent()
 }
 
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
-ErrCode NotificationShellCommand::RunDistributed()
+ErrCode NotificationShellCommand::RunDistributed(std::vector<std::string> &infos)
 {
     ErrCode ret = ERR_OK;
-    std::vector<std::string> infos;
     if (ans_ != nullptr) {
         ret = ans_->ShellDump("distributed", infos);
         resultReceiver_.append("Total:" + std::to_string(infos.size()) + "\n");
@@ -157,14 +154,14 @@ ErrCode NotificationShellCommand::RunAsDumpCommand()
             ret = RunHelp();
             break;
         case 'A':
-            ret = RunActive();
+            ret = RunActive(infos);
             break;
         case 'R':
-            ret = RunRecent();
+            ret = RunRecent(infos);
             break;
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
         case 'D':
-            ret = RunDistributed();
+            ret = RunDistributed(infos);
             break;
 #endif
         case 0:
