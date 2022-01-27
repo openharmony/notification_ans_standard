@@ -34,12 +34,11 @@ private:
     ErrCode RunAsDumpCommand();
 
     ErrCode RunHelp();
-    ErrCode RunActive();
-    ErrCode RunRecent();
+    ErrCode RunActive(std::vector<std::string> &infos);
+    ErrCode RunRecent(std::vector<std::string> &infos);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
-    ErrCode RunDistributed();
+    ErrCode RunDistributed(std::vector<std::string> &infos);
 #endif
-    ErrCode RunSetRecentCount();
 
 private:
     std::shared_ptr<AnsNotification> ans_;
