@@ -1839,6 +1839,7 @@ void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleO
             ANS_LOGW("NotificationPreferences::RemoveNotificationForBundle failed: %{public}d", result);
         }
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+        DistributedPreferences::GetInstance()->DeleteDistributedBundleInfo(bundleOption);
         std::vector<std::string> keys = GetLocalNotificationKeys(bundleOption);
 #else
         std::vector<std::string> keys = GetNotificationKeys(bundleOption);
@@ -1866,12 +1867,14 @@ void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleO
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 void AdvancedNotificationService::OnScreenOn()
 {
+    ANS_LOGI("%{public}s", __FUNCTION__);
     localScreenOn_ = true;
     DistributedScreenStatusManager::GetInstance()->SetLocalScreenStatus(true);
 }
 
 void AdvancedNotificationService::OnScreenOff()
 {
+    ANS_LOGI("%{public}s", __FUNCTION__);
     localScreenOn_ = false;
     DistributedScreenStatusManager::GetInstance()->SetLocalScreenStatus(false);
 }
@@ -2445,6 +2448,13 @@ ErrCode AdvancedNotificationService::EnableDistributedByBundle(
         return ERR_ANS_PERMISSION_DENIED;
     }
 
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    if (!appInfoEnable) {
+        ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         result = DistributedPreferences::GetInstance()->SetDistributedBundleEnable(bundleOption, enabled);
@@ -2468,6 +2478,13 @@ ErrCode AdvancedNotificationService::EnableDistributedSelf(const bool enabled)
         return ERR_ANS_INVALID_BUNDLE;
     }
 
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    if (!appInfoEnable) {
+        ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind(
         [&]() { result = DistributedPreferences::GetInstance()->SetDistributedBundleEnable(bundleOption, enabled); }));
@@ -2489,6 +2506,14 @@ ErrCode AdvancedNotificationService::IsDistributedEnableByBundle(
 
     if (!CheckPermission(GetClientBundleName())) {
         return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    if (!appInfoEnable) {
+        ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
+        enabled = appInfoEnable;
+        return ERR_OK;
     }
 
     ErrCode result = ERR_OK;
@@ -2598,6 +2623,12 @@ std::string AdvancedNotificationService::GetNotificationDeviceId(const std::stri
 ErrCode AdvancedNotificationService::DoDistributedPublish(
     const sptr<NotificationBundleOption> bundleOption, const std::shared_ptr<NotificationRecord> record)
 {
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    if (!appInfoEnable) {
+        return ERR_OK;
+    }
+
     if (!record->request->GetNotificationDistributedOptions().IsDistributed()) {
         return ERR_OK;
     }
@@ -2795,6 +2826,22 @@ void AdvancedNotificationService::OnDistributedDelete(
             NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
         }
     }));
+}
+
+ErrCode AdvancedNotificationService::GetDistributedEnableInApplicationInfo(
+    const sptr<NotificationBundleOption> bundleOption, bool &enable)
+{
+    int userId = SUBSCRIBE_USER_INIT;
+    OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), userId);
+
+    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
+        enable = true;
+    } else {
+        enable = BundleManagerHelper::GetInstance()->GetDistributedNotificationEnabled(
+            bundleOption->GetBundleName(), userId);
+    }
+
+    return ERR_OK;
 }
 #endif
 

@@ -39,6 +39,7 @@ public:
     bool PutToDistributedDB(const std::string &key, const std::string &value);
     bool GetFromDistributedDB(const std::string &key, std::string &value);
     bool GetEntriesFromDistributedDB(const std::string &prefixKey, std::vector<Entry> &entries);
+    bool DeleteToDistributedDB(const std::string &key);
     bool ClearDatabase(void);
 
 private:
