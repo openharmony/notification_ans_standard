@@ -21,6 +21,7 @@
 #include "message_parcel.h"
 #include "parcel.h"
 #include "reminder_request_alarm.h"
+#include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
 
 namespace OHOS {
@@ -2271,6 +2272,9 @@ ErrCode AnsManagerProxy::ReadReminders(
         } else if (ReminderRequest::ReminderType::TIMER == reminderType) {
             ANSR_LOGD("[GetValidReminders] timer");
             reminder = reply.ReadParcelable<ReminderRequestTimer>();
+        } else if (ReminderRequest::ReminderType::CALENDAR == reminderType) {
+            ANSR_LOGD("[GetValidReminders] calendar");
+            reminder = reply.ReadParcelable<ReminderRequestCalendar>();
         } else {
             ANSR_LOGW("[GetValidReminders] type=%{public}d", typeInfo);
             return ERR_ANS_INVALID_PARAM;

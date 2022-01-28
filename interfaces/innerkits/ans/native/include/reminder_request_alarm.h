@@ -47,7 +47,7 @@ public:
      */
     explicit ReminderRequestAlarm(const ReminderRequestAlarm &other);
     ReminderRequestAlarm& operator = (const ReminderRequestAlarm &other);
-    ~ReminderRequestAlarm() {};
+    ~ReminderRequestAlarm() override {};
 
     /**
      * Obtains the repeat days vector.
@@ -98,7 +98,7 @@ public:
     bool ReadFromParcel(Parcel &parcel) override;
 
 protected:
-    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const override;
+    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
 
 private:
     ReminderRequestAlarm() : ReminderRequest() {};
@@ -124,6 +124,7 @@ private:
      * @return true if it is a repeat day.
      */
     bool IsRepeatDay(int day) const;
+    bool IsRepeatReminder() const;
     void SetDaysOfWeek(bool set, std::vector<uint8_t> daysOfWeek);
 
     /**
@@ -142,6 +143,7 @@ private:
     static const uint16_t SECONDS_PER_HOUR;
     static const uint8_t MINUTES_PER_HOUR;
     static const int8_t INVALID_INT_VALUE;
+    static const int8_t DEFAULT_SNOOZE_TIMES;
 
     uint8_t hour_ = {0};
     uint8_t minute_ = {0};
