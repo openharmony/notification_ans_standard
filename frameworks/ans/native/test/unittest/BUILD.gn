@@ -31,6 +31,7 @@ ohos_unittest("ans_reminder_unit_test") {
 
   sources = [
     "${native_path}/test/unittest/reminder_request_alarm_test.cpp",
+    "${native_path}/test/unittest/reminder_request_calendar_test.cpp",
     "${native_path}/test/unittest/reminder_request_test.cpp",
     "${native_path}/test/unittest/reminder_request_timer_test.cpp",
   ]

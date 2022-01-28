@@ -131,6 +131,8 @@ public:
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();
+    ErrCode CancelPreparedNotification(
+        int notificationId, const std::string &label, const sptr<NotificationBundleOption> &bundleOption);
     ErrCode PrepareNotificationInfo(
         const sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
     ErrCode PublishPreparedNotification(

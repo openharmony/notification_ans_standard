@@ -16,6 +16,7 @@
 #include "ans_log_wrapper.h"
 #include "common.h"
 #include "reminder_request_alarm.h"
+#include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
 
 #include "reminder/publish.h"
@@ -105,8 +106,7 @@ napi_value ParseCanCelParameter(const napi_env &env, const napi_callback_info &i
 
     // argv[0]: reminder id
     int32_t reminderId = -1;
-    if (!ReminderCommon::GetInt32(env, argv[0], nullptr, reminderId)) {
-        ANSR_LOGW("Param id of cancels Reminder should be a number.");
+    if (!ReminderCommon::GetInt32(env, argv[0], nullptr, reminderId, true)) {
         return nullptr;
     }
     if (reminderId < 0) {
@@ -206,10 +206,8 @@ napi_value CancelReminder(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
             ANSR_LOGI("Cancel napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
@@ -262,10 +260,8 @@ napi_value CancelAllReminders(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
             ANSR_LOGD("CancelAll napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
@@ -279,42 +275,99 @@ napi_value CancelAllReminders(napi_env env, napi_callback_info info)
     }
 }
 
+void ParseReminderTimer(const napi_env &env, ReminderRequest &reminder, napi_value &result)
+{
+    napi_value value = nullptr;
+    ReminderRequestTimer& timer = (ReminderRequestTimer&)reminder;
+    napi_create_uint32(env, timer.GetInitInfo(), &value);
+    napi_set_named_property(env, result, TIMER_COUNT_DOWN_TIME, value);
+}
+
+void ParseReminderAlarm(const napi_env &env, ReminderRequest &reminder, napi_value &result)
+{
+    // hour
+    napi_value value = nullptr;
+    ReminderRequestAlarm& alarm = (ReminderRequestAlarm&)reminder;
+    napi_create_uint32(env, static_cast<uint32_t>(alarm.GetHour()), &value);
+    napi_set_named_property(env, result, ALARM_HOUR, value);
+
+    // minute
+    napi_create_uint32(env, static_cast<uint32_t>(alarm.GetMinute()), &value);
+    napi_set_named_property(env, result, ALARM_MINUTE, value);
+
+    // daysOfWeek
+    napi_create_array(env, &value);
+    napi_set_named_property(env, result, ALARM_DAYS_OF_WEEK, value);
+    int count = 0;
+    for (auto day : alarm.GetDaysOfWeek()) {
+        if (day) {
+            napi_value napiDay = nullptr;
+            napi_create_int32(env, day, &napiDay);
+            napi_set_element(env, value, count, napiDay);
+            count++;
+        }
+    }
+}
+
+void ParseReminderCalendar(const napi_env &env, ReminderRequest &reminder, napi_value &result)
+{
+    // dateTime
+    napi_value value = nullptr;
+    ReminderRequestCalendar& calender = (ReminderRequestCalendar&)reminder;
+    napi_value dateTime = nullptr;
+    napi_create_object(env, &dateTime);
+    napi_set_named_property(env, result, CALENDAR_DATE_TIME, dateTime);
+
+    napi_create_uint32(env, static_cast<uint32_t>(calender.GetYear()), &value);
+    napi_set_named_property(env, dateTime, CALENDAR_YEAR, value);
+    napi_create_uint32(env, static_cast<uint32_t>(calender.GetMonth()), &value);
+    napi_set_named_property(env, dateTime, CALENDAR_MONTH, value);
+    napi_create_uint32(env, static_cast<uint32_t>(calender.GetDay()), &value);
+    napi_set_named_property(env, dateTime, CALENDAR_DAY, value);
+    napi_create_uint32(env, static_cast<uint32_t>(calender.GetHour()), &value);
+    napi_set_named_property(env, dateTime, CALENDAR_HOUR, value);
+    napi_create_uint32(env, static_cast<uint32_t>(calender.GetMinute()), &value);
+    napi_set_named_property(env, dateTime, CALENDAR_MINUTE, value);
+    napi_create_uint32(env, static_cast<uint32_t>(calender.GetSecond()), &value);
+    napi_set_named_property(env, dateTime, CALENDAR_SECOND, value);
+
+    // repeatMonths
+    napi_create_array(env, &value);
+    napi_set_named_property(env, result, CALENDAR_REPEAT_MONTHS, value);
+    int count = 0;
+    for (auto month : calender.GetRepeatMonths()) {
+        napi_value napiDay = nullptr;
+        napi_create_int32(env, month, &napiDay);
+        napi_set_element(env, value, count, napiDay);
+        count++;
+    }
+
+    // repeatDays
+    napi_create_array(env, &value);
+    napi_set_named_property(env, result, CALENDAR_REPEAT_DAYS, value);
+    count = 0;
+    for (auto day : calender.GetRepeatDays()) {
+        napi_value napiDay = nullptr;
+        napi_create_int32(env, day, &napiDay);
+        napi_set_element(env, value, count, napiDay);
+        count++;
+    }
+}
+
 void ParseReminder(
     const napi_env &env, ReminderRequest::ReminderType &type, ReminderRequest &reminder, napi_value &result)
 {
-    napi_value value = nullptr;
     switch (type) {
         case ReminderRequest::ReminderType::TIMER: {
-            ReminderRequestTimer& timer = (ReminderRequestTimer&)reminder;
-            napi_create_uint32(env, timer.GetInitInfo(), &value);
-            napi_set_named_property(env, result, TIMER_COUNT_DOWN_TIME, value);
+            ParseReminderTimer(env, reminder, result);
             break;
         }
         case ReminderRequest::ReminderType::ALARM: {
-            ANSR_LOGD("Parse alarm info");
-
-            // hour
-            ReminderRequestAlarm& alarm = (ReminderRequestAlarm&)reminder;
-            napi_create_uint32(env, static_cast<uint32_t>(alarm.GetHour()), &value);
-
-            // minute
-            napi_set_named_property(env, result, ALARM_HOUR, value);
-            napi_create_uint32(env, static_cast<uint32_t>(alarm.GetMinute()), &value);
-            napi_set_named_property(env, result, ALARM_MINUTE, value);
-
-            // daysOfWeek
-            napi_create_array(env, &value);
-            napi_set_named_property(env, result, ALARM_DAYS_OF_WEEK, value);
-            int count = 0;
-            for (auto day : alarm.GetDaysOfWeek()) {
-                if (day) {
-                    napi_value napiDay = nullptr;
-                    napi_create_int32(env, day, &napiDay);
-                    napi_set_element(env, value, count, napiDay);
-                    count++;
-                }
-            }
-            ANSR_LOGD("Parse alarm info end");
+            ParseReminderAlarm(env, reminder, result);
+            break;
+        }
+        case ReminderRequest::ReminderType::CALENDAR: {
+            ParseReminderCalendar(env, reminder, result);
             break;
         }
         default: {
@@ -364,6 +417,20 @@ void ParseWantAgent(const napi_env &env, ReminderRequest &reminder, napi_value &
     napi_set_named_property(env, wantAgentInfo, WANT_AGENT_ABILITY, info);
 }
 
+void ParseMaxScreenWantAgent(const napi_env &env, ReminderRequest &reminder, napi_value &result)
+{
+    // create obj
+    napi_value maxScreenWantAgentInfo = nullptr;
+    napi_create_object(env, &maxScreenWantAgentInfo);
+    napi_set_named_property(env, result, MAX_SCREEN_WANT_AGENT, maxScreenWantAgentInfo);
+
+    napi_value info = nullptr;
+    napi_create_string_utf8(env, (reminder.GetMaxScreenWantAgentInfo()->pkgName).c_str(), NAPI_AUTO_LENGTH, &info);
+    napi_set_named_property(env, maxScreenWantAgentInfo, MAX_SCREEN_WANT_AGENT_PKG, info);
+    napi_create_string_utf8(env, (reminder.GetMaxScreenWantAgentInfo()->abilityName).c_str(), NAPI_AUTO_LENGTH, &info);
+    napi_set_named_property(env, maxScreenWantAgentInfo, MAX_SCREEN_WANT_AGENT_ABILITY, info);
+}
+
 napi_value SetValidReminder(const napi_env &env, ReminderRequest &reminder, napi_value &result)
 {
     ANSR_LOGI("enter");
@@ -392,9 +459,25 @@ napi_value SetValidReminder(const napi_env &env, ReminderRequest &reminder, napi
     napi_create_string_utf8(env, reminder.GetExpiredContent().c_str(), NAPI_AUTO_LENGTH, &value);
     napi_set_named_property(env, result, EXPIRED_CONTENT, value);
 
+    // snoozeContent
+    napi_create_string_utf8(env, reminder.GetSnoozeContent().c_str(), NAPI_AUTO_LENGTH, &value);
+    napi_set_named_property(env, result, SNOOZE_CONTENT, value);
+
+    // ringDuration
+    napi_create_int64(env, reminder.GetRingDuration(), &value);
+    napi_set_named_property(env, result, RING_DURATION, value);
+
+    // timeInterval
+    napi_create_int64(env, reminder.GetTimeInterval(), &value);
+    napi_set_named_property(env, result, TIME_INTERVAL, value);
+
     // notificationId
     napi_create_int32(env, reminder.GetNotificationId(), &value);
     napi_set_named_property(env, result, NOTIFICATION_ID, value);
+
+    // snoozeTimes
+    napi_create_int32(env, reminder.GetSnoozeTimes(), &value);
+    napi_set_named_property(env, result, SNOOZE_TIMES, value);
 
     // slotType
     NotificationNapi::SlotType jsSlotType;
@@ -405,9 +488,11 @@ napi_value SetValidReminder(const napi_env &env, ReminderRequest &reminder, napi
     // wantAgent
     ParseWantAgent(env, reminder, result);
 
+    // maxScreenWantAgent
+    ParseMaxScreenWantAgent(env, reminder, result);
+
     // actionButtons
     ParseActionButtons(env, reminder, result);
-
     return NotificationNapi::Common::NapiGetBoolean(env, true);
 }
 
@@ -478,10 +563,8 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -541,10 +624,8 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
             ANSR_LOGI("Publish napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,

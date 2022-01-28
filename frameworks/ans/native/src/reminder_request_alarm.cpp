@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "reminder_request_alarm.h"
 #include "ans_log_wrapper.h"
+
+#include "reminder_request_alarm.h"
 
 namespace OHOS {
 namespace Notification {
@@ -25,10 +26,12 @@ const uint8_t ReminderRequestAlarm::HOURS_PER_DAY = 24;
 const uint16_t ReminderRequestAlarm::SECONDS_PER_HOUR = 3600;
 const uint8_t ReminderRequestAlarm::MINUTES_PER_HOUR = 60;
 const int8_t ReminderRequestAlarm::INVALID_INT_VALUE = -1;
+const int8_t ReminderRequestAlarm::DEFAULT_SNOOZE_TIMES = 3;
 
 ReminderRequestAlarm::ReminderRequestAlarm(uint8_t hour, uint8_t minute, const std::vector<uint8_t> daysOfWeek)
     : ReminderRequest(ReminderRequest::ReminderType::ALARM)
 {
+    SetSnoozeTimes(DEFAULT_SNOOZE_TIMES);
     hour_ = hour;
     minute_ = minute;
     CheckParamValid();
@@ -56,6 +59,15 @@ void ReminderRequestAlarm::CheckParamValid() const
     }
 }
 
+bool ReminderRequestAlarm::IsRepeatReminder() const
+{
+    if ((repeatDays_ != 0) || ((GetTimeInterval() > 0) && (GetSnoozeTimes() > 0))) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void ReminderRequestAlarm::SetDaysOfWeek(bool set, std::vector<uint8_t> daysOfWeek)
 {
     if (daysOfWeek.size() == 0) {
@@ -77,9 +89,13 @@ void ReminderRequestAlarm::SetDaysOfWeek(bool set, std::vector<uint8_t> daysOfWe
     }
 }
 
-uint64_t ReminderRequestAlarm::PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const
+uint64_t ReminderRequestAlarm::PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const
 {
-    return GetNextTriggerTime(false);
+    if (ignoreRepeat || (repeatDays_)) {
+        return GetNextTriggerTime(forceToGetNext);
+    } else {
+        return INVALID_LONG_LONG_VALUE;
+    }
 }
 
 uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
@@ -87,6 +103,17 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     time_t now;
     (void)time(&now);  // unit is seconds.
     struct tm *nowTime = localtime(&now);
+    if (nowTime == nullptr) {
+        ANSR_LOGW("Get local time fail.");
+        return 0;
+    }
+
+    ANSR_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
+        "min=%{public}d, sec=%{public}d, week=%{public}d, \n Target: tar_hour=%{public}d, tar_min=%{public}d",
+        GetActualTime(TimeTransferType::YEAR, nowTime->tm_year),
+        GetActualTime(TimeTransferType::MONTH, nowTime->tm_mon),
+        nowTime->tm_mday, nowTime->tm_hour, nowTime->tm_min, nowTime->tm_sec,
+        GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday), hour_, minute_);
 
     struct tm tar;
     tar.tm_year = nowTime->tm_year;
@@ -95,13 +122,6 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     tar.tm_hour = hour_;
     tar.tm_min = minute_;
     tar.tm_sec = 0;
-    ANSR_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
-        "min=%{public}d, sec=%{public}d, week=%{public}d, tar_hour=%{public}d, tar_min=%{public}d",
-        nowTime->tm_year, nowTime->tm_mon, nowTime->tm_mday, nowTime->tm_hour,
-        nowTime->tm_min, nowTime->tm_sec, nowTime->tm_wday, hour_, minute_);
-    ANSR_LOGD("Tar: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
-        "min=%{public}d, sec=%{public}d, week=%{public}d",
-        tar.tm_year, tar.tm_mon, tar.tm_mday, tar.tm_hour, tar.tm_min, tar.tm_sec, tar.tm_wday);
 
     const time_t target = mktime(&tar);
     int8_t nextDayInterval = GetNextAlarm(now, target);
@@ -118,10 +138,15 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
         nextTriggerTime = target + nextDayInterval * HOURS_PER_DAY * SECONDS_PER_HOUR;
     }
     struct tm *test = localtime(&nextTriggerTime);
+    if (test == nullptr) {
+        return 0;
+    }
     ANSR_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld",
-        test->tm_year, test->tm_mon, test->tm_mday, test->tm_hour, test->tm_min, test->tm_sec,
-        test->tm_wday, (long long)nextTriggerTime);
+        GetActualTime(TimeTransferType::YEAR, test->tm_year),
+        GetActualTime(TimeTransferType::MONTH, test->tm_mon),
+        test->tm_mday, test->tm_hour, test->tm_min, test->tm_sec,
+        GetActualTime(TimeTransferType::WEEK, test->tm_wday), (long long)nextTriggerTime);
 
     if (static_cast<int64_t>(nextTriggerTime) <= 0) {
         return 0;
@@ -192,18 +217,34 @@ bool ReminderRequestAlarm::OnTimeZoneChange()
 
 bool ReminderRequestAlarm::UpdateNextReminder()
 {
-    if (repeatDays_ == 0) {
-        ANSR_LOGD("Set reminder to expired");
-        SetExpired(true);
-        return false;
-    }
-    uint64_t nextTriggerTime = GetNextTriggerTime(true);
-    if (nextTriggerTime != 0) {
-        ANSR_LOGI("Set next trigger time=%{public}llu", (unsigned long long)nextTriggerTime);
-        SetTriggerTimeInMilli(nextTriggerTime);
+    ANSR_LOGD("UpdateNextReminder alarm time");
+    if (IsRepeatReminder()) {
+        uint8_t letfSnoozeTimes = GetSnoozeTimesDynamic();
+        if ((letfSnoozeTimes > 0) && (GetTimeInterval() > 0)) {
+            ANSR_LOGI("Left times: %{public}d, update next triggerTime", GetSnoozeTimesDynamic());
+            SetTriggerTimeInMilli(GetTriggerTimeInMilli() + GetTimeInterval() * MILLI_SECONDS);
+            SetSnoozeTimesDynamic(--letfSnoozeTimes);
+        } else {
+            SetSnoozeTimesDynamic(GetSnoozeTimes());
+            if (repeatDays_ == 0) {
+                ANSR_LOGI("No need to update next triggerTime");
+                SetExpired(true);
+                return false;
+            }
+            uint64_t nextTriggerTime = GetNextTriggerTime(true);
+            if (nextTriggerTime != INVALID_LONG_LONG_VALUE) {
+                ANSR_LOGI("Set next trigger time successful, reset dynamic snoozeTimes");
+                SetTriggerTimeInMilli(nextTriggerTime);
+            } else {
+                ANSR_LOGW("Set reminder to expired");
+                SetExpired(true);
+                return false;
+            }
+        }
         return true;
     } else {
-        ANSR_LOGD("Set reminder to expired");
+        ANSR_LOGD("Single time reminder, not need to update next trigger time");
+        SetSnoozeTimesDynamic(GetSnoozeTimes());
         SetExpired(true);
         return false;
     }
@@ -226,13 +267,11 @@ bool ReminderRequestAlarm::Marshalling(Parcel &parcel) const
         ANSR_LOGE("Failed to write daysOfWeek");
         return false;
     }
-
     return true;
 }
 
 ReminderRequestAlarm *ReminderRequestAlarm::Unmarshalling(Parcel &parcel)
 {
-    std::vector<uint8_t> daysOfWeek;
     ANSR_LOGD("New alarm");
     auto objptr = new ReminderRequestAlarm();
     if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {

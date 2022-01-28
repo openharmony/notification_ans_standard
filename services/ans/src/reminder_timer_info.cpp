@@ -44,19 +44,7 @@ void ReminderTimerInfo::SetWantAgent(std::shared_ptr<OHOS::Notification::WantAge
 
 void ReminderTimerInfo::OnTrigger()
 {
-    ANSR_LOGI("ReminderTimer is triggerred");
-    PublishCommonEvent(ReminderRequest::REMINDER_EVENT_ALARM_ALERT);
-}
-
-bool ReminderTimerInfo::PublishCommonEvent(const std::string &action) const
-{
-    Want want;
-    want.SetAction(action);
-    CommonEventData data;
-    data.SetWant(want);
-    CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(false);
-    return CommonEventManager::PublishCommonEvent(data, publishInfo);
+    ANSR_LOGI("Timing is arrivelled.");
 }
 }
 }

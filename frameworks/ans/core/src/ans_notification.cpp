@@ -19,6 +19,7 @@
 #include "ans_log_wrapper.h"
 #include "iservice_registry.h"
 #include "reminder_request_alarm.h"
+#include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
 #include "system_ability_definition.h"
 
@@ -964,19 +965,30 @@ ErrCode AnsNotification::PublishReminder(ReminderRequest &reminder)
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
-
     sptr<ReminderRequest> tarReminder;
-    if (reminder.GetReminderType() == ReminderRequest::ReminderType::ALARM) {
-        ANSR_LOGI("Publish alarm");
-        ReminderRequestAlarm &alarm = (ReminderRequestAlarm &)reminder;
-        tarReminder = new (std::nothrow) ReminderRequestAlarm(alarm);
-    } else if (reminder.GetReminderType() == ReminderRequest::ReminderType::TIMER) {
-        ANSR_LOGI("Publish timer");
-        ReminderRequestTimer &timer = (ReminderRequestTimer &)reminder;
-        tarReminder = new (std::nothrow) ReminderRequestTimer(timer);
-    } else {
-        ANSR_LOGW("PublishReminder fail.");
-        return ERR_ANS_INVALID_PARAM;
+    switch (reminder.GetReminderType()) {
+        case (ReminderRequest::ReminderType::TIMER): {
+            ANSR_LOGI("Publish timer");
+            ReminderRequestTimer &timer = (ReminderRequestTimer &)reminder;
+            tarReminder = new (std::nothrow) ReminderRequestTimer(timer);
+            break;
+        }
+        case (ReminderRequest::ReminderType::ALARM): {
+            ANSR_LOGI("Publish alarm");
+            ReminderRequestAlarm &alarm = (ReminderRequestAlarm &)reminder;
+            tarReminder = new (std::nothrow) ReminderRequestAlarm(alarm);
+            break;
+        }
+        case (ReminderRequest::ReminderType::CALENDAR): {
+            ANSR_LOGI("Publish calendar");
+            ReminderRequestCalendar &calendar = (ReminderRequestCalendar &)reminder;
+            tarReminder = new (std::nothrow) ReminderRequestCalendar(calendar);
+            break;
+        }
+        default: {
+            ANSR_LOGW("PublishReminder fail.");
+            return ERR_ANS_INVALID_PARAM;
+        }
     }
     ErrCode code = ansManagerProxy_->PublishReminder(tarReminder);
     reminder.SetReminderId(tarReminder->GetReminderId());

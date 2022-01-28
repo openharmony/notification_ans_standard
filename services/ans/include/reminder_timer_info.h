@@ -31,6 +31,11 @@ public:
     ReminderTimerInfo(ReminderTimerInfo &other) = delete;
     ReminderTimerInfo& operator = (const ReminderTimerInfo &other) = delete;
 
+    inline void SetAction(const std::string &action)
+    {
+        action_ = action;
+    }
+
     /**
      * When timing is up, this function will execute as call back.
      */
@@ -56,10 +61,8 @@ public:
      */
     void SetWantAgent(std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> wantAgent) override;
 
-    /**
-     * Publish common event.
-     */
-    bool PublishCommonEvent(const std::string &action) const;
+private:
+    std::string action_;
 };
 } // namespace OHOS
 } // namespace Notification

@@ -293,6 +293,33 @@ ErrCode AdvancedNotificationService::AssignToNotificationList(const std::shared_
     return result;
 }
 
+ErrCode AdvancedNotificationService::CancelPreparedNotification(
+    int notificationId, const std::string &label, const sptr<NotificationBundleOption> &bundleOption)
+{
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<Notification> notification = nullptr;
+        result = RemoveFromNotificationList(bundleOption, label, notificationId, notification, true);
+        if (result != ERR_OK) {
+            return;
+        }
+
+        if (notification != nullptr) {
+            int reason = NotificationConstant::APP_CANCEL_REASON_DELETE;
+            UpdateRecentNotification(notification, true, reason);
+            sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+            NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+            DoDistributedDelete("", notification);
+#endif
+        }
+    }));
+    return result;
+}
+
 ErrCode AdvancedNotificationService::PrepareNotificationInfo(
     const sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption)
 {
@@ -455,29 +482,7 @@ ErrCode AdvancedNotificationService::Cancel(int notificationId, const std::strin
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
-    }
-
-    ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind([&]() {
-        sptr<Notification> notification = nullptr;
-        result = RemoveFromNotificationList(bundleOption, label, notificationId, notification, true);
-        if (result != ERR_OK) {
-            return;
-        }
-
-        if (notification != nullptr) {
-            int reason = NotificationConstant::APP_CANCEL_REASON_DELETE;
-            UpdateRecentNotification(notification, true, reason);
-            sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
-            NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
-#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
-            DoDistributedDelete("", notification);
-#endif
-        }
-    }));
-    return result;
+    return CancelPreparedNotification(notificationId, label, bundleOption);
 }
 
 ErrCode AdvancedNotificationService::CancelAll()
