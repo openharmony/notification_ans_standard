@@ -51,5 +51,12 @@ void BundleManagerHelper::Connect()
 
 void BundleManagerHelper::Disconnect()
 {}
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+bool BundleManagerHelper::GetDistributedNotificationEnabled(const std::string &bundleName, const int userId)
+{
+    return true;
+}
+#endif
 }  // namespace Notification
 }  // namespace OHOS

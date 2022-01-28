@@ -194,6 +194,7 @@ private:
         const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request);
     void OnDistributedDelete(
         const std::string &deviceId, const std::string &bundleName, const std::string &label, int32_t id);
+    ErrCode GetDistributedEnableInApplicationInfo(const sptr<NotificationBundleOption> bundleOption, bool &enable);
 #endif
 
 private:
