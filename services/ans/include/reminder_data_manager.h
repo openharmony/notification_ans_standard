@@ -407,7 +407,7 @@ private:
     /**
      * Vector used to record all the reminders which has been shown on panel.
      */
-    std::vector<sptr<ReminderRequest>> shownReminderVector_;
+    std::vector<sptr<ReminderRequest>> showedReminderVector_;
 
     /**
      * Map used to record all the bundle information of the reminders in system.

@@ -176,14 +176,14 @@ void ReminderDataManager::GetValidReminders(
 void ReminderDataManager::AddToShowedReminders(const sptr<ReminderRequest> &reminder)
 {
     std::lock_guard<std::mutex> lock(ReminderDataManager::SHOW_MUTEX);
-    for (auto it = shownReminderVector_.begin(); it != shownReminderVector_.end(); ++it) {
+    for (auto it = showedReminderVector_.begin(); it != showedReminderVector_.end(); ++it) {
         if (reminder->GetReminderId() == (*it)->GetReminderId()) {
             ANSR_LOGD("Showed reminder is already exist");
             return;
         }
     }
     ANSR_LOGD("Containers(shownVector) add. reminderId=%{public}d", reminder->GetReminderId());
-    shownReminderVector_.push_back(reminder);
+    showedReminderVector_.push_back(reminder);
 }
 
 void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOption> bundleOption)
@@ -192,7 +192,7 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
     int32_t uid = bundleOption->GetUid();
     ANSR_LOGI("OnProcessDiedLocked, bundleName=%{public}s, uid=%{public}d", bundleName.c_str(), uid);
     std::lock_guard<std::mutex> lock(ReminderDataManager::SHOW_MUTEX);
-    for (auto it = shownReminderVector_.begin(); it != shownReminderVector_.end(); ++it) {
+    for (auto it = showedReminderVector_.begin(); it != showedReminderVector_.end(); ++it) {
         int32_t reminderId = (*it)->GetReminderId();
         auto mit = notificationBundleOptionMap_.find(reminderId);
         if (mit == notificationBundleOptionMap_.end()) {
@@ -208,7 +208,7 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
             CancelNotification(*it);
             (*it)->OnClose(false);
             ANSR_LOGD("Containers(shownVector) remove. reminderId=%{public}d", reminderId);
-            shownReminderVector_.erase(it);
+            showedReminderVector_.erase(it);
             --it;
         }
     }
@@ -883,10 +883,10 @@ void ReminderDataManager::StopSoundAndVibration(const sptr<ReminderRequest> &rem
 void ReminderDataManager::RemoveFromShowedReminders(const sptr<ReminderRequest> &reminder)
 {
     std::lock_guard<std::mutex> lock(ReminderDataManager::SHOW_MUTEX);
-    for (auto it = shownReminderVector_.begin(); it != shownReminderVector_.end(); ++it) {
+    for (auto it = showedReminderVector_.begin(); it != showedReminderVector_.end(); ++it) {
         if ((*it)->GetReminderId() == reminder->GetReminderId()) {
             ANSR_LOGD("Containers(shownVector) remove. reminderId=%{public}d", reminder->GetReminderId());
-            shownReminderVector_.erase(it);
+            showedReminderVector_.erase(it);
             break;
         }
     }
