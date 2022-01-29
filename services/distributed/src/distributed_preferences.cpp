@@ -179,6 +179,27 @@ ErrCode DistributedPreferences::GetDistributedBundleEnable(
     return ERR_OK;
 }
 
+ErrCode DistributedPreferences::DeleteDistributedBundleInfo(const sptr<NotificationBundleOption> &bundleOption)
+{
+    ANS_LOGI("%{public}s start", __FUNCTION__);
+    if (bundleOption == nullptr) {
+        ANS_LOGE("bundleOption is nullptr.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    std::string key;
+    GetDistributedBundleKey(bundleOption, key);
+
+    if (!database_->DeleteToDistributedDB(key)) {
+        ANS_LOGE("delete to distributed DB failed. key:%{public}s", key.c_str());
+        return ERR_ANS_DISTRIBUTED_OPERATION_FAILED;
+    }
+
+    preferencesInfo_->DeleteDistributedBundleInfo(bundleOption->GetBundleName(), bundleOption->GetUid());
+
+    return ERR_OK;
+}
+
 ErrCode DistributedPreferences::ClearDataInRestoreFactorySettings()
 {
     if (!database_->ClearDatabase()) {

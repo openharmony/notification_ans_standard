@@ -101,5 +101,16 @@ HWTEST_F(DistributedPreferencesTest, ClearDataInRestoreFactorySettings_00100, Fu
 {
     EXPECT_EQ(distributedPreferences_->ClearDataInRestoreFactorySettings(), ERR_OK);
 }
+
+/**
+ * @tc.name      : DistributedPreferences_DeleteDistributedBundleInfo_00100
+ * @tc.number    : DeleteDistributedBundleInfo_00100
+ * @tc.desc      : Clear bundle info with distributed notification enable state.
+ */
+HWTEST_F(DistributedPreferencesTest, DeleteDistributedBundleInfo_00100, Function | SmallTest | Level1)
+{
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption("<bundleName>", 783);
+    EXPECT_EQ(distributedPreferences_->DeleteDistributedBundleInfo(bundleOption), ERR_OK);
+}
 }  // namespace Notification
 }  // namespace OHOS
