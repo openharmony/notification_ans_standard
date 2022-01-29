@@ -2448,8 +2448,13 @@ ErrCode AdvancedNotificationService::EnableDistributedByBundle(
         return ERR_ANS_PERMISSION_DENIED;
     }
 
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
     bool appInfoEnable = true;
-    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    GetDistributedEnableInApplicationInfo(bundle, appInfoEnable);
     if (!appInfoEnable) {
         ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
         return ERR_ANS_PERMISSION_DENIED;
@@ -2457,7 +2462,7 @@ ErrCode AdvancedNotificationService::EnableDistributedByBundle(
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
-        result = DistributedPreferences::GetInstance()->SetDistributedBundleEnable(bundleOption, enabled);
+        result = DistributedPreferences::GetInstance()->SetDistributedBundleEnable(bundle, enabled);
         if (result != ERR_OK) {
             result = ERR_OK;
             enabled = false;
@@ -2508,8 +2513,13 @@ ErrCode AdvancedNotificationService::IsDistributedEnableByBundle(
         return ERR_ANS_PERMISSION_DENIED;
     }
 
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
     bool appInfoEnable = true;
-    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    GetDistributedEnableInApplicationInfo(bundle, appInfoEnable);
     if (!appInfoEnable) {
         ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
         enabled = appInfoEnable;
@@ -2518,7 +2528,7 @@ ErrCode AdvancedNotificationService::IsDistributedEnableByBundle(
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
-        result = DistributedPreferences::GetInstance()->GetDistributedBundleEnable(bundleOption, enabled);
+        result = DistributedPreferences::GetInstance()->GetDistributedBundleEnable(bundle, enabled);
         if (result != ERR_OK) {
             result = ERR_OK;
             enabled = false;
