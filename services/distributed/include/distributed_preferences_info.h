@@ -29,6 +29,7 @@ public:
     bool GetDistributedEnable(void);
     void SetDistributedBundleEnable(const std::string &bundleName, int32_t uid, bool enable);
     bool GetDistributedBundleEnable(const std::string &bundleName, int32_t uid);
+    void DeleteDistributedBundleInfo(const std::string &bundleName, int32_t uid);
 
 private:
     bool distributedEnable_ = true;

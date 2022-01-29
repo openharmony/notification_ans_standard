@@ -38,6 +38,12 @@
 #include "notification_subscriber.h"
 #include "system_ability_definition.h"
 
+namespace OHOS {
+namespace AppExecFwk {
+void MockSetDistributedNotificationEnabled(bool enable);
+}  // AppExecFwk
+}  // namespace OHOS
+
 using namespace testing::ext;
 using namespace OHOS::Media;
 
@@ -1729,6 +1735,33 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Publish_00200, Function | Medi
     ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
     DistributedKv::Entry outEntry;
     ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), false);
+    SleepForFC();
+}
+
+/**
+ *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Publish_00300
+ * @tc.name      : DistributedNotification_Publish_00300 MockSetDistributedNotificationEnabled
+ * @tc.desc      : publish a distributed notification when DistributedNotificationEnabled is false in application info.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Publish_00300, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+    request.SetDistributed(true);
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    AppExecFwk::MockSetDistributedNotificationEnabled(false);
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), false);
+    AppExecFwk::MockSetDistributedNotificationEnabled(true);
     SleepForFC();
 }
 

@@ -50,6 +50,7 @@ const static std::string DEFAULT_TEMPLATE_PATH("/system/etc/NotificationTemplate
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 constexpr NotificationConstant::DistributedReminderPolicy DEFAULT_DISTRIBUTED_REMINDER_POLICY =
     NotificationConstant::DistributedReminderPolicy::DEFAULT;
+constexpr bool DEFAULT_DISTRIBUTED_ENABLE_IN_APPLICATION_INFO = false;
 #endif
 }  // namespace Notification
 }  // namespace OHOS
