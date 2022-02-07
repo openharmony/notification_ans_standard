@@ -161,6 +161,14 @@ pid_t Notification::GetPid() const
     return request_->GetCreatorPid();
 }
 
+bool Notification::IsUnremovable() const
+{
+    if (request_ == nullptr) {
+        return false;
+    }
+    return request_->IsUnremovable();
+}
+
 std::vector<int64_t> Notification::GetVibrationStyle() const
 {
     return vibrationStyle_;
