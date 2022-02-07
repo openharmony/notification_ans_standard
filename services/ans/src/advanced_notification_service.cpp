@@ -1108,9 +1108,6 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(const sptr<Notif
     const std::string &label, int notificationId, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
-        if (!record->notification->IsRemoveAllowed()) {
-            continue;
-        }
         if ((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
             (record->bundleOption->GetUid() == bundleOption->GetUid()) &&
             (record->notification->GetLabel() == label) &&
@@ -1119,8 +1116,8 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(const sptr<Notif
             && record->deviceId.empty()
 #endif
         ) {
-            if (!isCancel && record->request->IsUnremovable()) {
-                return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+            if (!isCancel && !record->notification->IsRemoveAllowed()) {
+                return ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
             }
             notification = record->notification;
             // delete or delete all, call the function
@@ -1139,12 +1136,9 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(
     const std::string &key, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
-        if (!record->notification->IsRemoveAllowed() && isCancel) {
-            continue;
-        }
         if (record->notification->GetKey() == key) {
-            if (!isCancel && record->request->IsUnremovable()) {
-                return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+            if (!isCancel && !record->notification->IsRemoveAllowed()) {
+                return ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
             }
             notification = record->notification;
             // delete or delete all, call the function
@@ -1163,10 +1157,10 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationListForDeleteAll(
     const std::string &key, sptr<Notification> &notification)
 {
     for (auto record : notificationList_) {
-        if (!record->notification->IsRemoveAllowed()) {
-            continue;
-        }
         if (record->notification->GetKey() == key) {
+            if (!record->notification->IsRemoveAllowed()) {
+                return ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
+            }
             if (record->request->IsUnremovable()) {
                 return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
             }
@@ -1509,14 +1503,13 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
     if (result != ERR_OK) {
         return result;
     }
-
+    request->SetUnremovable(true);
     std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
     record->request = request;
     record->bundleOption = bundleOption;
     record->notification = new Notification(request);
     if (record->notification != nullptr) {
         record->notification->SetSourceType(NotificationConstant::SourceType::TYPE_CONTINUOUS);
-        record->notification->SetRemoveAllowed(false);
     }
 
     handler_->PostSyncTask(std::bind([&]() {
@@ -1969,8 +1962,8 @@ ErrCode AdvancedNotificationService::RemoveNotification(
                 (record->deviceId.empty()) &&
 #endif
                 (record->notification->GetId() == notificationId) && (record->notification->GetLabel() == label)) {
-                if (record->request->IsUnremovable()) {
-                    result = ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+                if (!record->notification->IsRemoveAllowed()) {
+                    result = ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
                     break;
                 }
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
@@ -2152,6 +2145,9 @@ ErrCode AdvancedNotificationService::RemoveGroupByBundle(
     handler_->PostSyncTask(std::bind([&]() {
         std::vector<std::shared_ptr<NotificationRecord>> removeList;
         for (auto record : notificationList_) {
+            if (!record->notification->IsRemoveAllowed()) {
+                continue;
+            }
             if ((record->bundleOption->GetBundleName() == bundle->GetBundleName()) &&
                 (record->bundleOption->GetUid() == bundle->GetUid()) && !record->request->IsUnremovable() &&
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
