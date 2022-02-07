@@ -30,7 +30,7 @@ declare namespace reminderAgent {
    * Publishes a scheduled reminder.
    *
    * @since 7
-   * @sysCap Publishes an agent-powered reminder.
+   * @sysCap Agent-Powered Reminder.
    * @permission ohos.permission.PUBLISH_AGENT_REMINDER
    * @param reminderReq Indicates the reminder instance to publish.
    * @param callback Indicates the callback function.
@@ -43,7 +43,7 @@ declare namespace reminderAgent {
    * Cancels a reminder.
    *
    * @since 7
-   * @sysCap Cancels the reminder with the specified ID.
+   * @sysCap Agent-Powered Reminder.
    * @param reminderId Indicates the reminder id.
    * @param callback Indicates the callback function.
    */
@@ -54,7 +54,7 @@ declare namespace reminderAgent {
    * Obtains all the valid reminders of current application.
    *
    * @since 7
-   * @sysCap Obtains all valid (not yet expired) remindeers set by the current application.
+   * @sysCap Agent-Powered Reminder.
    * @param callback Indicates the callback function.
    */
   function getValidReminders(callback: AsyncCallback<Array<ReminderRequest>>): void;
@@ -64,7 +64,7 @@ declare namespace reminderAgent {
    * Cancels all the reminders of current application.
    *
    * @since 7
-   * @sysCap Cancels all the reminders set by the current application.
+   * @sysCap Agent-Powered Reminder.
    * @param callback Indicates the callback function.
    */
   function cancelAllReminders(callback: AsyncCallback<void>): void;
@@ -74,7 +74,7 @@ declare namespace reminderAgent {
    * Add notification slot.
    *
    * @since 7
-   * @sysCap Adds a reminder notification slot.
+   * @sysCap Agent-Powered Reminder.
    * @param slot Indicates the slot.
    * @param callback Indicates the callback function.
    */
@@ -85,7 +85,7 @@ declare namespace reminderAgent {
    * Deletes a created notification slot based on the slot type.
    *
    * @since 7
-   * @sysCap Removes a notification slot instance of a specified type.
+   * @sysCap Agent-Powered Reminder.
    * @param slotType Indicates the type of the slot.
    * @param callback Indicates the callback function.
    */
@@ -96,7 +96,7 @@ declare namespace reminderAgent {
    * Declares action button type.
    *
    * @since 7
-   * @sysCap Define action button type.
+   * @sysCap Agent-Powered Reminder.
    */
   export enum ActionButtonType {
     /**
@@ -118,7 +118,7 @@ declare namespace reminderAgent {
    * Declares reminder type.
    *
    * @since 7
-   * @sysCap Define reminder type.
+   * @sysCap Agent-Powered Reminder.
    */
   export enum ReminderType {
     /**
@@ -147,7 +147,7 @@ declare namespace reminderAgent {
    * Action button information. The button will show on displayed reminder.
    *
    * @since 7
-   * @sysCap Define action button object.
+   * @sysCap Agent-Powered Reminder.
    */
   interface ActionButton {
     /**
@@ -170,7 +170,7 @@ declare namespace reminderAgent {
    * It will switch to target ability when you click the displayed reminder.
    *
    * @since 7
-   * @sysCap Define want agent object.
+   * @sysCap Agent-Powered Reminder.
    */
   interface WantAgent {
     /**
@@ -192,13 +192,13 @@ declare namespace reminderAgent {
    * Reminder Common information.
    *
    * @since 7
-   * @sysCap Define reminder request object.
+   * @sysCap Agent-Powered Reminder.
    */
   interface ReminderRequest {
     /**
      * Type of the reminder.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     reminderType: ReminderType;
 
@@ -206,49 +206,49 @@ declare namespace reminderAgent {
      * Action button displayed on the reminder notification.
      * (The parameter is optional. Up to two buttons are supported).
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     actionButton?: [ActionButton?, ActionButton?];
 
     /**
      * Information about the ability that is redirected to when the notification is clicked.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     wantAgent?: WantAgent;
 
     /**
      * Reminder title.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     title?: string;
 
     /**
      * Reminder content.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     content?: string;
 
     /**
      * Content to be displayed when the reminder is snoozing.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     expiredContent?: string;
 
     /**
      * notification id. If there are reminders with the same ID, the later one will overwrite the earlier one.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     notificationId?: number;
 
     /**
      * Type of the slot used by the reminder.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     slotType?: notification.SlotType;
   }
@@ -263,21 +263,21 @@ declare namespace reminderAgent {
     /**
      * Hour portion of the reminder time.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     hour: number;
 
     /**
      * minute portion of the remidner time.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     minute: number;
 
     /**
      * Days of a week when the reminder repeates.
      * @since 7
-     * @sysCap Agent-Powered Reminder
+     * @sysCap Agent-Powered Reminder.
      */
     daysOfWeek?: Array<number>;
   }
@@ -286,7 +286,7 @@ declare namespace reminderAgent {
    * CountDown reminder information.
    *
    * @since 7
-   * @sysCap Define count down timer reminder object.
+   * @sysCap Agent-Powered Reminder.
    */
   interface ReminderRequestTimer extends ReminderRequest {
     triggerTimeInSeconds: number;
