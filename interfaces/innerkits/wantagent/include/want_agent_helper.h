@@ -41,6 +41,7 @@ static const int FLAG_NO_CREATE = 1 << 29;
 static const int FLAG_CANCEL_CURRENT = 1 << 28;
 static const int FLAG_UPDATE_CURRENT = 1 << 27;
 static const int FLAG_IMMUTABLE = 1 << 26;
+static const int INVLID_WANT_AGENT_USER_ID = -1;
 
 class WantAgentHelper final : public std::enable_shared_from_this<WantAgentHelper> {
 public:
@@ -65,9 +66,11 @@ public:
      *
      * @param paramsInfo Indicates the WantAgentInfo object that contains parameters of the
      * WantAgent object to create.
+     * @param userId Indicates the user id for this wantagent info, default is INVLID_WANT_AGENT_USER_ID(-1).
      * @return Returns the created WantAgent object.
      */
-    static std::shared_ptr<WantAgent> GetWantAgent(const WantAgentInfo &paramsInfo);
+    static std::shared_ptr<WantAgent> GetWantAgent(const WantAgentInfo &paramsInfo,
+        int32_t userId = INVLID_WANT_AGENT_USER_ID);
 
     /**
      * Obtains an WantAgent object operation type.
