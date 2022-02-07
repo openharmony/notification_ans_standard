@@ -124,7 +124,7 @@ std::shared_ptr<WantAgent> WantAgentHelper::GetWantAgent(
     return agent;
 }
 
-std::shared_ptr<WantAgent> WantAgentHelper::GetWantAgent(const WantAgentInfo &paramsInfo)
+std::shared_ptr<WantAgent> WantAgentHelper::GetWantAgent(const WantAgentInfo &paramsInfo, int32_t userId)
 {
     std::vector<std::shared_ptr<Want>> wants = paramsInfo.GetWants();
     if (wants.empty()) {
@@ -155,6 +155,7 @@ std::shared_ptr<WantAgent> WantAgentHelper::GetWantAgent(const WantAgentInfo &pa
     wantSenderInfo.bundleName = want->GetOperation().GetBundleName();
     wantSenderInfo.flags = FlagsTransformer(paramsInfo.GetFlags());
     wantSenderInfo.type = (int32_t)paramsInfo.GetOperationType();
+    wantSenderInfo.userId = userId;
 
     sptr<IWantSender> target = AbilityManagerClient::GetInstance()->GetWantSender(wantSenderInfo, nullptr);
     if (target == nullptr) {
