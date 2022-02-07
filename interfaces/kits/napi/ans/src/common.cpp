@@ -1710,7 +1710,7 @@ napi_value Common::GetNotificationtapDismissed(
     napi_valuetype valuetype = napi_undefined;
     napi_value result = nullptr;
     bool hasProperty = false;
-    bool tapDismissed = false;
+    bool tapDismissed = true;
 
     NAPI_CALL(env, napi_has_named_property(env, value, "tapDismissed", &hasProperty));
     if (hasProperty) {
