@@ -110,6 +110,32 @@ inline bool IsSystemApp()
     return isSystemApp;
 }
 
+inline int64_t ResetSeconds(int64_t date)
+{
+    auto milliseconds = std::chrono::milliseconds(date);
+    auto tp = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(milliseconds);
+    auto tp_minutes = std::chrono::time_point_cast<std::chrono::minutes>(tp);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(tp_minutes.time_since_epoch());
+    return duration.count();
+}
+
+inline int64_t GetCurrentTime()
+{
+    auto now = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    return duration.count();
+}
+
+inline tm GetLocalTime(time_t time)
+{
+    tm result = {0};
+    tm *lt = localtime(&time);
+    if (lt != nullptr) {
+        result = *lt;
+    }
+    return result;
+}
+
 inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRecord> &record)
 {
     sptr<NotificationSlot> slot;
@@ -179,6 +205,10 @@ ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &request)
     }
     request->SetCreatorUserId(userId);
     ErrCode result = CheckPictureSize(request);
+
+    if (request->GetDeliveryTime() <= 0) {
+        request->SetDeliveryTime(GetCurrentTime());
+    }
 
     return result;
 }
@@ -2170,32 +2200,6 @@ ErrCode AdvancedNotificationService::RemoveGroupByBundle(
     }));
 
     return ERR_OK;
-}
-
-inline int64_t ResetSeconds(int64_t date)
-{
-    auto milliseconds = std::chrono::milliseconds(date);
-    auto tp = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(milliseconds);
-    auto tp_minutes = std::chrono::time_point_cast<std::chrono::minutes>(tp);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(tp_minutes.time_since_epoch());
-    return duration.count();
-}
-
-inline int64_t GetCurrentTime()
-{
-    auto now = std::chrono::system_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    return duration.count();
-}
-
-inline tm GetLocalTime(time_t time)
-{
-    tm result = {0};
-    tm *lt = localtime(&time);
-    if (lt != nullptr) {
-        result = *lt;
-    }
-    return result;
 }
 
 void AdvancedNotificationService::AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate)
