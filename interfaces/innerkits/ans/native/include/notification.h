@@ -165,6 +165,12 @@ public:
     pid_t GetPid() const;
 
     /**
+     * Checks whether this notification is unremovable.
+     * @return true if this notification is unremovable; returns false otherwise.
+     */
+    bool IsUnremovable() const;
+
+    /**
      * @brief Obtains the vibration style for this notifications. if
      *
      * @return Return the vibration style.
