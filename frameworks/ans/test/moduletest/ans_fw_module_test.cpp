@@ -2451,7 +2451,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07600, Function
 
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
-    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->IsRemoveAllowed(), false);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->IsUnremovable(), true);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetSourceType(), NotificationConstant::SourceType::TYPE_CONTINUOUS);
 
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);
