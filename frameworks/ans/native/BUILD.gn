@@ -22,7 +22,7 @@ config("ans_innerkits_public_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${interfaces_path}/ans/native/include",
+    "${interfaces_path}/innerkits/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
     "//third_party/json/single_include",
@@ -34,7 +34,7 @@ config("ans_innerkits_public_config") {
 
 ohos_shared_library("ans_innerkits") {
   include_dirs = [
-    "${interfaces_path}/ans/native/include",
+    "${interfaces_path}/innerkits/ans/native/include",
     "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
   ]
