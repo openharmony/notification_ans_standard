@@ -19,9 +19,6 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "bundle_constants.h"
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
 
 #include "reminder_event_manager.h"
 
@@ -110,8 +107,11 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
 
 void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(OHOS::EventFwk::Want &want) const
 {
-    sptr<NotificationBundleOption> bundleOption = GetBundleOption(want);
-    reminderDataManager_->CancelAllReminders(bundleOption);
+    OHOS::AppExecFwk::ElementName ele = want.GetElement();
+    std::string bundleName = ele.GetBundleName();
+    int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, -1);
+    reminderDataManager_->CancelAllReminders(bundleOption, userId);
 }
 
 void ReminderEventManager::ReminderEventSubscriber::HandleProcessDied(OHOS::EventFwk::Want &want) const
@@ -126,24 +126,10 @@ sptr<NotificationBundleOption> ReminderEventManager::ReminderEventSubscriber::Ge
     OHOS::AppExecFwk::ElementName ele = want.GetElement();
     std::string bundleName = ele.GetBundleName();
     int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
-    int32_t uid = GetUid(userId, bundleName);
-    ANSR_LOGD("bundleName=%{public}s, uid=%{public}d", bundleName.c_str(), uid);
+    int32_t uid = ReminderRequest::GetUid(userId, bundleName);
+    ANSR_LOGD("bundleName=%{public}s, userId=%{public}d, uid=%{public}d", bundleName.c_str(), userId, uid);
     sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
     return bundleOption;
-}
-
-int32_t ReminderEventManager::ReminderEventSubscriber::GetUid(const int userId, const std::string bundleName) const
-{
-    AppExecFwk::ApplicationInfo info;
-    OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager
-        = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    OHOS::sptr<OHOS::IRemoteObject> remoteObject
-        = systemAbilityManager->GetSystemAbility(OHOS::BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    OHOS::sptr<OHOS::AppExecFwk::IBundleMgr> bundleMgr
-        = OHOS::iface_cast<OHOS::AppExecFwk::IBundleMgr>(remoteObject);
-    bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO,
-        static_cast<int32_t>(userId), info);
-    return static_cast<int32_t>(info.uid);
 }
 }  // namespace OHOS
 }  // namespace Notification
