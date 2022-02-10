@@ -26,8 +26,7 @@ import { NotificationFlags } from './notificationFlags';
  *
  * @name NotificationRequest
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @permission N/A
  */
 export interface NotificationRequest {

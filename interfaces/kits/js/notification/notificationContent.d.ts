@@ -22,8 +22,7 @@ import { MessageUser } from './notificationMessageUser';
  *
  * @name NotificationBasicContent
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @permission N/A
  */
 export interface NotificationBasicContent {
@@ -48,8 +47,7 @@ export interface NotificationBasicContent {
  *
  * @name NotificationLongTextContent
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @permission N/A
  */
 export interface NotificationLongTextContent extends NotificationBasicContent {
@@ -74,8 +72,7 @@ export interface NotificationLongTextContent extends NotificationBasicContent {
  *
  * @name NotificationMultiLineContent
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @permission N/A
  */
 export interface NotificationMultiLineContent extends NotificationBasicContent {
@@ -100,8 +97,7 @@ export interface NotificationMultiLineContent extends NotificationBasicContent {
  *
  * @name NotificationPictureContent
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @permission N/A
  */
 export interface NotificationPictureContent extends NotificationBasicContent {
@@ -188,8 +184,7 @@ export interface ConversationalMessage {
  *
  * @name NotificationContent
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @permission N/A
  */
 export interface NotificationContent {
