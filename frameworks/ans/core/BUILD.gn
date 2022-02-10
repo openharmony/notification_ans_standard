@@ -97,6 +97,7 @@ ohos_shared_library("ans_core") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "os_account_standard:os_account_innerkits",
     "samgr_standard:samgr_proxy",
     "time_native:time_service",
   ]

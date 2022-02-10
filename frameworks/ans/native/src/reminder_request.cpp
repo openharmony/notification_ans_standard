@@ -14,6 +14,11 @@
  */
 
 #include "ans_log_wrapper.h"
+#include "bundle_mgr_interface.h"
+#include "if_system_ability_manager.h"
+#include "iservice_registry.h"
+#include "os_account_manager.h"
+#include "system_ability_definition.h"
 #include "want_agent_helper.h"
 
 #include "reminder_request.h"
@@ -159,6 +164,10 @@ void ReminderRequest::InitReminderId()
     ANSR_LOGI("reminderId_=%{public}d", reminderId_);
 }
 
+void ReminderRequest::InitUserId(const int& userId)
+{
+    userId_ = userId;
+}
 bool ReminderRequest::IsExpired() const
 {
     return isExpired_;
@@ -978,7 +987,7 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
             nullptr
         );
         std::shared_ptr<WantAgent::WantAgent> buttonWantAgent =
-            WantAgent::WantAgentHelper::GetWantAgent(buttonWantAgentInfo);
+            WantAgent::WantAgentHelper::GetWantAgent(buttonWantAgentInfo, userId_);
         std::shared_ptr<NotificationActionButton> actionButton
             = NotificationActionButton::Create(nullptr, title, buttonWantAgent);
         notificationRequest_->AddActionButton(actionButton);
@@ -1002,7 +1011,8 @@ void ReminderRequest::AddRemovalWantAgent()
         wants,
         nullptr
     );
-    std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo);
+    std::shared_ptr<WantAgent::WantAgent> wantAgent
+        = WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
     notificationRequest_->SetRemovalWantAgent(wantAgent);
 }
 
@@ -1022,7 +1032,7 @@ std::shared_ptr<WantAgent::WantAgent> ReminderRequest::CreateWantAgent(AppExecFw
         wants,
         nullptr
     );
-    return WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo);
+    return WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
 }
 
 void ReminderRequest::SetMaxScreenWantAgent(AppExecFwk::ElementName &element)
@@ -1179,6 +1189,27 @@ int ReminderRequest::GetCTime(const TimeTransferType &type, int actualTime)
         default:
             return -1;
     }
+}
+
+int32_t ReminderRequest::GetUid(const int &userId, const std::string &bundleName)
+{
+    AppExecFwk::ApplicationInfo info;
+    OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager
+        = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    OHOS::sptr<OHOS::IRemoteObject> remoteObject
+        = systemAbilityManager->GetSystemAbility(OHOS::BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    OHOS::sptr<OHOS::AppExecFwk::IBundleMgr> bundleMgr
+        = OHOS::iface_cast<OHOS::AppExecFwk::IBundleMgr>(remoteObject);
+    bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO,
+        static_cast<int32_t>(userId), info);
+    return static_cast<int32_t>(info.uid);
+}
+
+int ReminderRequest::GetUserId(const int &uid)
+{
+    int userId = -1;
+    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+    return userId;
 }
 }
 }
