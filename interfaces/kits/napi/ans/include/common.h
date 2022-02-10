@@ -427,7 +427,8 @@ public:
 
     static bool SourceTypeCToJS(const NotificationConstant::SourceType &inType, SourceType &outType);
 
-    static napi_value CreateWantAgentByJS(const napi_env &env, const std::shared_ptr<WantAgent::WantAgent> &agent);
+    static napi_value CreateWantAgentByJS(const napi_env &env,
+        const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &agent);
 
     static napi_value GetNotificationTemplate(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
@@ -446,7 +447,7 @@ private:
     static const int ARGS_TWO = 2;
     static const int ONLY_CALLBACK_MAX_PARA = 1;
     static const int ONLY_CALLBACK_MIN_PARA = 0;
-    static std::set<std::shared_ptr<WantAgent::WantAgent>> wantAgent_;
+    static std::set<std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>> wantAgent_;
 };
 }  // namespace NotificationNapi
 }  // namespace OHOS

@@ -15,6 +15,5 @@ group("frameworks_target") {
   deps = [
     "ans/core:ans_core_target",
     "ans/native:native_targets",
-    "wantagent:native_wantagent",
   ]
 }
