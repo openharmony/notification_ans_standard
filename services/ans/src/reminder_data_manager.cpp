@@ -199,8 +199,8 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
         int32_t reminderId = (*it)->GetReminderId();
         auto mit = notificationBundleOptionMap_.find(reminderId);
         if (mit == notificationBundleOptionMap_.end()) {
-            ANSR_LOGD("Not get bundle option, the reminder may has been cancelled, reminderId=%{public}d"
-                , reminderId);
+            ANSR_LOGD(
+                "Not get bundle option, the reminder may has been cancelled, reminderId=%{public}d", reminderId);
             CancelNotification(*it);
             showedReminderVector_.erase(it);
             --it;
