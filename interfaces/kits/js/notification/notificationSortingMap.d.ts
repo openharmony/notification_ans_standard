@@ -20,8 +20,7 @@ import { NotificationSorting } from './notificationSorting';
  *
  * @name NotificationSortingMap
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @permission N/A
  * @systemapi Hide this for inner system use.
  */
