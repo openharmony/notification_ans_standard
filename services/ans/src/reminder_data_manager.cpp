@@ -946,6 +946,10 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
     time_t now;
     (void)time(&now);  // unit is seconds.
+    if (now < 0) {
+        ANSR_LOGE("Get now time error");
+        return;
+    }
     uint64_t triggerTime = 0;
     switch (type) {
         case TimerType::TRIGGER_TIMER: {
@@ -965,7 +969,7 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
                 ANSR_LOGE("Alerting time out timer has already started.");
                 break;
             }
-            triggerTime = now * ReminderRequest::MILLI_SECONDS
+            triggerTime = static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS
                 + static_cast<uint64_t>(reminderRequest->GetRingDuration() * ReminderRequest::MILLI_SECONDS);
             timerIdAlerting_ = timer->CreateTimer(REMINDER_DATA_MANAGER->CreateTimerInfo(type));
             timer->StartTimer(timerIdAlerting_, triggerTime);
@@ -981,8 +985,9 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
     if (triggerTime == 0) {
         ANSR_LOGW("Start timer fail");
     } else {
-        ANSR_LOGD("Timing info: now:(%{public}lld), tar:(%{public}llu)",
-            (long long)(now * ReminderRequest::MILLI_SECONDS), (unsigned long long)(triggerTime));
+        ANSR_LOGD("Timing info: now:(%{public}llu), tar:(%{public}llu)",
+            (unsigned long long)(static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS),
+            (unsigned long long)(triggerTime));
     }
 }
 

@@ -878,7 +878,7 @@ uint64_t ReminderRequest::GetNowInstantMilli() const
         ANSR_LOGE("Get now time error");
         return 0;
     }
-    return static_cast<uint64_t>(now * MILLI_SECONDS);
+    return static_cast<uint64_t>(now) * MILLI_SECONDS;
 }
 
 std::string ReminderRequest::GetShowTime(const uint64_t showTime) const
@@ -1114,7 +1114,7 @@ void ReminderRequest::UpdateNotificationCommon()
     }
     time_t now;
     (void)time(&now);  // unit is seconds.
-    notificationRequest_->SetDeliveryTime(static_cast<int64_t>(now * MILLI_SECONDS));
+    notificationRequest_->SetDeliveryTime(static_cast<int64_t>(now) * MILLI_SECONDS);
 }
 
 void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
