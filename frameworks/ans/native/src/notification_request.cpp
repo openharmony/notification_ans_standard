@@ -108,32 +108,32 @@ int32_t NotificationRequest::GetNotificationId() const
     return notificationId_;
 }
 
-void NotificationRequest::SetWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent)
+void NotificationRequest::SetWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent)
 {
     wantAgent_ = wantAgent;
 }
 
-const std::shared_ptr<WantAgent::WantAgent> NotificationRequest::GetWantAgent() const
+const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> NotificationRequest::GetWantAgent() const
 {
     return wantAgent_;
 }
 
-void NotificationRequest::SetRemovalWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent)
+void NotificationRequest::SetRemovalWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent)
 {
     removalWantAgent_ = wantAgent;
 }
 
-const std::shared_ptr<WantAgent::WantAgent> NotificationRequest::GetRemovalWantAgent() const
+const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> NotificationRequest::GetRemovalWantAgent() const
 {
     return removalWantAgent_;
 }
 
-void NotificationRequest::SetMaxScreenWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent)
+void NotificationRequest::SetMaxScreenWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent)
 {
     maxScreenWantAgent_ = wantAgent;
 }
 
-const std::shared_ptr<WantAgent::WantAgent> NotificationRequest::GetMaxScreenWantAgent() const
+const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> NotificationRequest::GetMaxScreenWantAgent() const
 {
     return maxScreenWantAgent_;
 }
@@ -755,7 +755,7 @@ NotificationRequest *NotificationRequest::FromJson(const nlohmann::json &jsonObj
 
     if (jsonObject.find("wantAgent") != jsonEnd) {
         auto wantAgentValue  = jsonObject.at("wantAgent").get<std::string>();
-        pRequest->wantAgent_ = WantAgent::WantAgentHelper::FromString(wantAgentValue);
+        pRequest->wantAgent_ = AbilityRuntime::WantAgent::WantAgentHelper::FromString(wantAgentValue);
     }
 
     if (!ConvertJsonToNotificationContent(pRequest, jsonObject)) {
@@ -1264,7 +1264,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        wantAgent_ = std::shared_ptr<WantAgent::WantAgent>(parcel.ReadParcelable<WantAgent::WantAgent>());
+        wantAgent_ = std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>(
+            parcel.ReadParcelable<AbilityRuntime::WantAgent::WantAgent>());
         if (!wantAgent_) {
             ANS_LOGE("Failed to read wantAgent");
             return false;
@@ -1273,7 +1274,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        removalWantAgent_ = std::shared_ptr<WantAgent::WantAgent>(parcel.ReadParcelable<WantAgent::WantAgent>());
+        removalWantAgent_ = std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>(
+            parcel.ReadParcelable<AbilityRuntime::WantAgent::WantAgent>());
         if (!removalWantAgent_) {
             ANS_LOGE("Failed to read removalWantAgent");
             return false;
@@ -1282,7 +1284,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        maxScreenWantAgent_ = std::shared_ptr<WantAgent::WantAgent>(parcel.ReadParcelable<WantAgent::WantAgent>());
+        maxScreenWantAgent_ = std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>(
+            parcel.ReadParcelable<AbilityRuntime::WantAgent::WantAgent>());
         if (!maxScreenWantAgent_) {
             ANS_LOGE("Failed to read maxScreenWantAgent");
             return false;
@@ -1498,7 +1501,7 @@ void NotificationRequest::CopyOther(const NotificationRequest &other)
 
 bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
 {
-    jsonObject["wantAgent"] = wantAgent_ ? WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
+    jsonObject["wantAgent"] = wantAgent_ ? AbilityRuntime::WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
 
     nlohmann::json contentObj;
     if (notificationContent_) {

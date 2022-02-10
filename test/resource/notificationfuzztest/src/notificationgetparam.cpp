@@ -693,98 +693,98 @@ std::shared_ptr<OHOS::Notification::NotificationSubscribeInfo> GetParamNotificat
     return std::make_shared<OHOS::Notification::NotificationSubscribeInfo>();
 }
 
-std::shared_ptr<OHOS::Notification::WantAgent::WantAgentInfo> GetParamWantAgentInfo()
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::WantAgentInfo> GetParamWantAgentInfo()
 {
     switch (GetIntParam() % INDEX_THREE) {
         case INDEX_ZERO:
-            return std::make_shared<OHOS::Notification::WantAgent::WantAgentInfo>();
+            return std::make_shared<OHOS::AbilityRuntime::WantAgent::WantAgentInfo>();
             break;
         case INDEX_ONE: {
             std::vector<std::shared_ptr<Want>> param = GetParamWantVector();
-            return std::make_shared<OHOS::Notification::WantAgent::WantAgentInfo>(
+            return std::make_shared<OHOS::AbilityRuntime::WantAgent::WantAgentInfo>(
                 GetIntParam(), GetParamOperationType(), GetParamFlags(), param, GetParamWantParams());
         }    break;
         case INDEX_TWO: {
             std::vector<std::shared_ptr<Want>> param = GetParamWantVector();
-            return std::make_shared<OHOS::Notification::WantAgent::WantAgentInfo>(
+            return std::make_shared<OHOS::AbilityRuntime::WantAgent::WantAgentInfo>(
                 GetIntParam(), GetParamOperationType(), GetParamFlagsVector(), param, GetParamWantParams());
         }    break;
         default:
-            return std::make_shared<OHOS::Notification::WantAgent::WantAgentInfo>();
+            return std::make_shared<OHOS::AbilityRuntime::WantAgent::WantAgentInfo>();
             break;
     }
 }
 
-OHOS::Notification::WantAgent::WantAgentConstant::OperationType GetParamOperationType()
+OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType GetParamOperationType()
 {
     switch (GetIntParam() % INDEX_SIX) {
         case INDEX_ZERO:
-            return OHOS::Notification::WantAgent::WantAgentConstant::OperationType::UNKNOWN_TYPE;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType::UNKNOWN_TYPE;
             break;
         case INDEX_ONE:
-            return OHOS::Notification::WantAgent::WantAgentConstant::OperationType::START_ABILITY;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType::START_ABILITY;
             break;
         case INDEX_TWO:
-            return OHOS::Notification::WantAgent::WantAgentConstant::OperationType::START_ABILITIES;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType::START_ABILITIES;
             break;
         case INDEX_THREE:
-            return OHOS::Notification::WantAgent::WantAgentConstant::OperationType::START_SERVICE;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType::START_SERVICE;
             break;
         case INDEX_FOUR:
-            return OHOS::Notification::WantAgent::WantAgentConstant::OperationType::SEND_COMMON_EVENT;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType::SEND_COMMON_EVENT;
             break;
         case INDEX_FIVE:
-            return OHOS::Notification::WantAgent::WantAgentConstant::OperationType::START_FOREGROUND_SERVICE;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType::START_FOREGROUND_SERVICE;
             break;
         default:
-            return OHOS::Notification::WantAgent::WantAgentConstant::OperationType::UNKNOWN_TYPE;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType::UNKNOWN_TYPE;
             break;
     }
 }
-OHOS::Notification::WantAgent::WantAgentConstant::Flags GetParamFlags()
+OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags GetParamFlags()
 {
     switch (GetIntParam() % INDEX_TEN) {
         case INDEX_ZERO:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::ONE_TIME_FLAG;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::ONE_TIME_FLAG;
             break;
         case INDEX_ONE:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::NO_BUILD_FLAG;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::NO_BUILD_FLAG;
             break;
         case INDEX_TWO:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::CANCEL_PRESENT_FLAG;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::CANCEL_PRESENT_FLAG;
             break;
         case INDEX_THREE:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG;
             break;
         case INDEX_FOUR:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::CONSTANT_FLAG;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::CONSTANT_FLAG;
             break;
         case INDEX_FIVE:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::REPLACE_ELEMENT;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::REPLACE_ELEMENT;
             break;
         case INDEX_SIX:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::REPLACE_ACTION;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::REPLACE_ACTION;
             break;
         case INDEX_SEVEN:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::REPLACE_URI;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::REPLACE_URI;
             break;
         case INDEX_EIGHT:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::REPLACE_ENTITIES;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::REPLACE_ENTITIES;
             break;
         case INDEX_NINE:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::REPLACE_BUNDLE;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::REPLACE_BUNDLE;
             break;
         default:
-            return OHOS::Notification::WantAgent::WantAgentConstant::Flags::ONE_TIME_FLAG;
+            return OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags::ONE_TIME_FLAG;
             break;
     }
 }
-std::vector<OHOS::Notification::WantAgent::WantAgentConstant::Flags> GetParamFlagsVector()
+std::vector<OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags> GetParamFlagsVector()
 {
-    vector<OHOS::Notification::WantAgent::WantAgentConstant::Flags> param;
+    vector<OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags> param;
     size_t len = GenRandom(0, MAX_LENGTH);
     while (len--) {
-        OHOS::Notification::WantAgent::WantAgentConstant::Flags t = GetParamFlags();
+        OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags t = GetParamFlags();
         param.push_back(t);
     }
     return param;
@@ -813,38 +813,38 @@ std::vector<sptr<OHOS::Notification::Notification>> GetParamNotificationSptrVect
     }
     return param;
 }
-std::shared_ptr<OHOS::Notification::WantAgent::PendingWant> GetParamPendingWant()
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::PendingWant> GetParamPendingWant()
 {
     sptr<AAFwk::IWantSender> target = new WantSender();
     sptr<IRemoteObject> whitelistToken = GetParamSptrRemote();
     if (GetBoolParam()) {
-        return std::make_shared<OHOS::Notification::WantAgent::PendingWant>(target);
+        return std::make_shared<OHOS::AbilityRuntime::WantAgent::PendingWant>(target);
     } else {
-        return std::make_shared<OHOS::Notification::WantAgent::PendingWant>(target, whitelistToken);
+        return std::make_shared<OHOS::AbilityRuntime::WantAgent::PendingWant>(target, whitelistToken);
     }
 }
-std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> GetParamWantAgent()
+std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> GetParamWantAgent()
 {
     if (GetBoolParam()) {
-        return std::make_shared<OHOS::Notification::WantAgent::WantAgent>();
+        return std::make_shared<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent>();
     } else {
-        return std::make_shared<OHOS::Notification::WantAgent::WantAgent>(GetParamPendingWant());
+        return std::make_shared<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent>(GetParamPendingWant());
     }
 }
-std::shared_ptr<OHOS::Notification::WantAgent::CompletedCallback> GetParamCompletedCallback()
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::CompletedCallback> GetParamCompletedCallback()
 {
     return std::make_shared<TestCompletedCallback>();
 }
-std::shared_ptr<OHOS::Notification::WantAgent::TriggerInfo> GetParamTriggerInfo()
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::TriggerInfo> GetParamTriggerInfo()
 {
     if (GetBoolParam()) {
-        return std::make_shared<OHOS::Notification::WantAgent::TriggerInfo>();
+        return std::make_shared<OHOS::AbilityRuntime::WantAgent::TriggerInfo>();
     } else {
-        return std::make_shared<OHOS::Notification::WantAgent::TriggerInfo>(
+        return std::make_shared<OHOS::AbilityRuntime::WantAgent::TriggerInfo>(
             GetStringParam(), GetParamWantParams(), GetParamWant(), GetIntParam());
     }
 }
-std::shared_ptr<OHOS::Notification::WantAgent::CancelListener> GetParamCancelListener()
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::CancelListener> GetParamCancelListener()
 {
     return std::make_shared<TestCancelListener>();
 }

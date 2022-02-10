@@ -63,7 +63,6 @@ ohos_unittest("ans_unit_test") {
   deps = [
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -79,6 +78,7 @@ ohos_unittest("ans_unit_test") {
     "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",

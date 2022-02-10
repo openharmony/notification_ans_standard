@@ -511,67 +511,72 @@ void NotificationFuzzTestManager::RegisterWantAgentHelper()
 {
     callFunctionMap_.emplace("WantAgentHelperGetWantAgentAppExecFwkparamsInfo", []() {
         std::shared_ptr<AbilityRuntime::Context> context = OHOS::AbilityRuntime::Context::GetApplicationContext();
-        const OHOS::Notification::WantAgent::WantAgentInfo paramsInfo = *GetParamWantAgentInfo();
-        OHOS::Notification::WantAgent::WantAgentHelper::GetWantAgent(context, paramsInfo);
+        const OHOS::AbilityRuntime::WantAgent::WantAgentInfo paramsInfo = *GetParamWantAgentInfo();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(context, paramsInfo);
     });
 
     callFunctionMap_.emplace("WantAgentHelperGetWantAgentparamsInfo", []() {
-        const OHOS::Notification::WantAgent::WantAgentInfo paramsInfo = *GetParamWantAgentInfo();
-        OHOS::Notification::WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
+        const OHOS::AbilityRuntime::WantAgent::WantAgentInfo paramsInfo = *GetParamWantAgentInfo();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
     });
 
     callFunctionMap_.emplace("WantAgentHelperGetType", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::GetType(agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::GetType(agent);
     });
 
     callFunctionMap_.emplace("WantAgentHelperTriggerWantAgent", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        const std::shared_ptr<OHOS::Notification::WantAgent::CompletedCallback> callback = GetParamCompletedCallback();
-        OHOS::Notification::WantAgent::TriggerInfo paramsInfo(*GetParamTriggerInfo());
-        OHOS::Notification::WantAgent::WantAgentHelper::TriggerWantAgent(agent, callback, paramsInfo);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        const std::shared_ptr<OHOS::AbilityRuntime::WantAgent::CompletedCallback> callback =
+            GetParamCompletedCallback();
+        OHOS::AbilityRuntime::WantAgent::TriggerInfo paramsInfo(*GetParamTriggerInfo());
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::TriggerWantAgent(agent, callback, paramsInfo);
     });
 
     callFunctionMap_.emplace("WantAgentHelperCancel", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::Cancel(agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::Cancel(agent);
     });
 
     callFunctionMap_.emplace("WantAgentHelperJudgeEquality", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> otherAgent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::JudgeEquality(agent, otherAgent);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> otherAgent
+            = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::JudgeEquality(agent, otherAgent);
     });
     callFunctionMap_.emplace("WantAgentHelperGetHashCode", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::GetHashCode(agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::GetHashCode(agent);
     });
 
     callFunctionMap_.emplace("WantAgentHelperGetBundleName", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::GetBundleName(agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::GetBundleName(agent);
     });
 
     callFunctionMap_.emplace("WantAgentHelperGetUid", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::GetUid(agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::GetUid(agent);
     });
 
     callFunctionMap_.emplace("WantAgentHelperGetWant", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::GetWant(agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::GetWant(agent);
     });
 
     callFunctionMap_.emplace("WantAgentHelperRegisterCancelListener", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::CancelListener> cancelListener;
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::RegisterCancelListener(cancelListener, agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::WantAgent::CancelListener> cancelListener;
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::
+            RegisterCancelListener(cancelListener, agent);
     });
 
     callFunctionMap_.emplace("WantAgentHelperUnregisterCancelListener", []() {
-        const std::shared_ptr<OHOS::Notification::WantAgent::CancelListener> cancelListener = GetParamCancelListener();
-        const std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> agent = GetParamWantAgent();
-        OHOS::Notification::WantAgent::WantAgentHelper::UnregisterCancelListener(cancelListener, agent);
+        const std::shared_ptr<OHOS::AbilityRuntime::WantAgent::CancelListener> cancelListener
+            = GetParamCancelListener();
+        const std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> agent = GetParamWantAgent();
+        OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgentHelper::
+            UnregisterCancelListener(cancelListener, agent);
     });
 }
 

@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace NotificationNapi {
-std::set<std::shared_ptr<WantAgent::WantAgent>> Common::wantAgent_;
+std::set<std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>> Common::wantAgent_;
 
 Common::Common()
 {}
@@ -428,7 +428,7 @@ napi_value Common::SetNotificationRequestByWantAgent(
         return NapiGetBoolean(env, false);
     }
     // wantAgent?: WantAgent
-    std::shared_ptr<WantAgent::WantAgent> agent = request->GetWantAgent();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent = request->GetWantAgent();
     if (agent) {
         napi_value wantAgent = nullptr;
         wantAgent = CreateWantAgentByJS(env, agent);
@@ -438,7 +438,7 @@ napi_value Common::SetNotificationRequestByWantAgent(
     }
 
     // removalWantAgent?: WantAgent
-    std::shared_ptr<WantAgent::WantAgent> removalAgent = request->GetRemovalWantAgent();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> removalAgent = request->GetRemovalWantAgent();
     if (removalAgent) {
         napi_value wantAgent = nullptr;
         wantAgent = CreateWantAgentByJS(env, removalAgent);
@@ -448,7 +448,7 @@ napi_value Common::SetNotificationRequestByWantAgent(
     }
 
     // maxScreenWantAgent?: WantAgent
-    std::shared_ptr<WantAgent::WantAgent> maxScreenAgent = request->GetMaxScreenWantAgent();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> maxScreenAgent = request->GetMaxScreenWantAgent();
     if (maxScreenAgent) {
         napi_value wantAgent = nullptr;
         wantAgent = CreateWantAgentByJS(env, maxScreenAgent);
@@ -1175,7 +1175,7 @@ napi_value Common::SetNotificationActionButton(
     napi_set_named_property(env, result, "title", value);
 
     // wantAgent: WantAgent
-    std::shared_ptr<WantAgent::WantAgent> agent = actionButton->GetWantAgent();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent = actionButton->GetWantAgent();
     if (agent == nullptr) {
         ANS_LOGI("wantAgent is null");
         napi_set_named_property(env, result, "wantAgent", NapiGetNull(env));
@@ -1755,7 +1755,7 @@ napi_value Common::GetNotificationWantAgent(const napi_env &env, const napi_valu
     ANS_LOGI("enter");
 
     bool hasProperty = false;
-    WantAgent::WantAgent *wantAgent = nullptr;
+    AbilityRuntime::WantAgent::WantAgent *wantAgent = nullptr;
     napi_value result = nullptr;
     napi_valuetype valuetype = napi_undefined;
 
@@ -1769,7 +1769,8 @@ napi_value Common::GetNotificationWantAgent(const napi_env &env, const napi_valu
             ANS_LOGE("Invalid object wantAgent");
             return nullptr;
         }
-        std::shared_ptr<WantAgent::WantAgent> sWantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgent);
+        std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> sWantAgent =
+            std::make_shared<AbilityRuntime::WantAgent::WantAgent>(*wantAgent);
         request.SetWantAgent(sWantAgent);
     }
 
@@ -1829,7 +1830,7 @@ napi_value Common::GetNotificationRemovalWantAgent(
     ANS_LOGI("enter");
 
     bool hasProperty = false;
-    WantAgent::WantAgent *wantAgent = nullptr;
+    AbilityRuntime::WantAgent::WantAgent *wantAgent = nullptr;
     napi_value result = nullptr;
     napi_valuetype valuetype = napi_undefined;
 
@@ -1843,7 +1844,8 @@ napi_value Common::GetNotificationRemovalWantAgent(
             ANS_LOGE("Invalid object removalWantAgent");
             return nullptr;
         }
-        std::shared_ptr<WantAgent::WantAgent> removeWantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgent);
+        std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> removeWantAgent =
+            std::make_shared<AbilityRuntime::WantAgent::WantAgent>(*wantAgent);
         request.SetRemovalWantAgent(removeWantAgent);
     }
 
@@ -1856,7 +1858,7 @@ napi_value Common::GetNotificationMaxScreenWantAgent(
     ANS_LOGI("enter");
 
     bool hasProperty = false;
-    WantAgent::WantAgent *wantAgent = nullptr;
+    AbilityRuntime::WantAgent::WantAgent *wantAgent = nullptr;
     napi_value result = nullptr;
     napi_valuetype valuetype = napi_undefined;
 
@@ -1870,7 +1872,8 @@ napi_value Common::GetNotificationMaxScreenWantAgent(
             ANS_LOGE("Invalid object maxScreenWantAgent");
             return nullptr;
         }
-        std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgent);
+        std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> maxScreenWantAgent =
+            std::make_shared<AbilityRuntime::WantAgent::WantAgent>(*wantAgent);
         request.SetMaxScreenWantAgent(maxScreenWantAgent);
     }
 
@@ -2185,9 +2188,9 @@ napi_value Common::GetNotificationActionButtonsDetailedBasicInfo(
     size_t strLen = 0;
     napi_value value = nullptr;
     std::string title;
-    WantAgent::WantAgent *wantAgentPtr = nullptr;
+    AbilityRuntime::WantAgent::WantAgent *wantAgentPtr = nullptr;
     std::shared_ptr<Media::PixelMap> pixelMap = nullptr;
-    std::shared_ptr<WantAgent::WantAgent> wantAgent;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent;
 
     // title: string
     NAPI_CALL(env, napi_has_named_property(env, actionButton, "title", &hasProperty));
@@ -2209,7 +2212,7 @@ napi_value Common::GetNotificationActionButtonsDetailedBasicInfo(
         ANS_LOGE("Invalid object wantAgent");
         return nullptr;
     }
-    wantAgent = std::make_shared<WantAgent::WantAgent>(*wantAgentPtr);
+    wantAgent = std::make_shared<AbilityRuntime::WantAgent::WantAgent>(*wantAgentPtr);
 
     // icon?: image.PixelMap
     NAPI_CALL(env, napi_has_named_property(env, actionButton, "icon", &hasProperty));
@@ -3991,7 +3994,8 @@ bool Common::SourceTypeCToJS(const NotificationConstant::SourceType &inType, Sou
     return true;
 }
 
-napi_value Common::CreateWantAgentByJS(const napi_env &env, const std::shared_ptr<WantAgent::WantAgent> &agent)
+napi_value Common::CreateWantAgentByJS(const napi_env &env,
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &agent)
 {
     if (agent == nullptr) {
         ANS_LOGI("agent is nullptr");
@@ -4018,7 +4022,7 @@ napi_value Common::CreateWantAgentByJS(const napi_env &env, const std::shared_pt
         wantAgent,
         (void *)agent.get(),
         [](napi_env env, void *data, void *hint) {
-            WantAgent::WantAgent *objectInfo = (WantAgent::WantAgent *)data;
+            AbilityRuntime::WantAgent::WantAgent *objectInfo = (AbilityRuntime::WantAgent::WantAgent *)data;
             ANS_LOGI("CreateWantAgentByJS this = %{public}p", objectInfo);
 
             if (objectInfo) {

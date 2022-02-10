@@ -55,7 +55,6 @@ ohos_shared_library("reminderagent") {
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common:napi_common",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//third_party/jsoncpp:jsoncpp",
@@ -66,6 +65,7 @@ ohos_shared_library("reminderagent") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",

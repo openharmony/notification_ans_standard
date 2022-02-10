@@ -59,7 +59,7 @@ public:
     /**
      * Indicates the want agent information.
      */
-    void SetWantAgent(std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> wantAgent) override;
+    void SetWantAgent(std::shared_ptr<OHOS::AbilityRuntime::WantAgent::WantAgent> wantAgent) override;
 
 private:
     std::string action_;

@@ -2931,9 +2931,9 @@ void AdvancedNotificationService::TriggerRemoveWantAgent(const sptr<Notification
     if (request == nullptr || request->GetRemovalWantAgent() == nullptr) {
         return;
     }
-    OHOS::Notification::WantAgent::TriggerInfo triggerInfo;
-    std::shared_ptr<WantAgent::WantAgent> agent = request->GetRemovalWantAgent();
-    WantAgent::WantAgentHelper::TriggerWantAgent(agent, nullptr, triggerInfo);
+    OHOS::AbilityRuntime::WantAgent::TriggerInfo triggerInfo;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent = request->GetRemovalWantAgent();
+    AbilityRuntime::WantAgent::WantAgentHelper::TriggerWantAgent(agent, nullptr, triggerInfo);
 }
 
 ErrCode AdvancedNotificationService::IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed)

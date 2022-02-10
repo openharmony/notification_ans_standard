@@ -1488,7 +1488,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0066, Function | SmallTest | Level1)
 HWTEST_F(AnsModuleTest, AnsModuleTest_0100, Function | SmallTest | Level1)
 {
     // create wantagent
-    std::shared_ptr<WantAgent::WantAgent> agent = std::make_shared<WantAgent::WantAgent>();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent =
+        std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
 
     // subscriber
     auto subscriber = new TestAnsSubscriber();
@@ -1531,7 +1532,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0100, Function | SmallTest | Level1)
 HWTEST_F(AnsModuleTest, AnsModuleTest_0101, Function | SmallTest | Level1)
 {
     // create wantagent
-    std::shared_ptr<WantAgent::WantAgent> agent = std::make_shared<WantAgent::WantAgent>();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent =
+        std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
 
     // subscriber
     auto subscriber = new TestAnsSubscriber();
@@ -1562,7 +1564,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0101, Function | SmallTest | Level1)
 HWTEST_F(AnsModuleTest, AnsModuleTest_0102, Function | SmallTest | Level1)
 {
     // create wantagent
-    std::shared_ptr<WantAgent::WantAgent> agent = std::make_shared<WantAgent::WantAgent>();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent =
+        std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
 
     // subscriber
     auto subscriber = new TestAnsSubscriber();
@@ -1593,7 +1596,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0102, Function | SmallTest | Level1)
 HWTEST_F(AnsModuleTest, AnsModuleTest_0103, Function | SmallTest | Level1)
 {
     // create wantagent
-    std::shared_ptr<WantAgent::WantAgent> agent = std::make_shared<WantAgent::WantAgent>();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent =
+        std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
 
     // subscriber
     auto subscriber = new TestAnsSubscriber();
@@ -1648,7 +1652,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0105, Function | SmallTest | Level1)
 HWTEST_F(AnsModuleTest, AnsModuleTest_0106, Function | SmallTest | Level1)
 {
     // create wantagent
-    std::shared_ptr<WantAgent::WantAgent> agent = std::make_shared<WantAgent::WantAgent>();
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent =
+        std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
 
     // subscriber
     auto subscriber = new TestAnsSubscriber();
