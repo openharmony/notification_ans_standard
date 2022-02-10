@@ -120,6 +120,11 @@ public:
     virtual ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
     virtual ErrCode CancelAllReminders() override;
     virtual ErrCode IsSupportTemplate(const std::string &templateName, bool &support) override;
+    virtual ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) override;
+    virtual ErrCode SetNotificationsEnabledByUser(const int32_t &deviceId, bool enabled) override;
+    virtual ErrCode DeleteAllByUser(const int32_t &userId) override;
+    virtual ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) override;
+    virtual ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
 
 private:
     static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
@@ -192,6 +197,11 @@ private:
     ErrCode HandleGetValidReminders(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelAllReminders(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsSupportTemplate(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsSpecialUserAllowedNotifyByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleSetNotificationsEnabledByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleDeleteAllByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleSetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

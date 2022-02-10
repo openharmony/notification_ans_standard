@@ -121,6 +121,11 @@ public:
     ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
     ErrCode CancelAllReminders() override;
     ErrCode IsSupportTemplate(const std::string &templateName, bool &support) override;
+    ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) override;
+    ErrCode SetNotificationsEnabledByUser(const int32_t &deviceId, bool enabled) override;
+    ErrCode DeleteAllByUser(const int32_t &userId) override;
+    ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
 
     // SystemEvent
     void OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption);
@@ -152,7 +157,8 @@ private:
     ErrCode RemoveFromNotificationList(const sptr<NotificationBundleOption> &bundleOption, const std::string &label,
         int notificationId, sptr<Notification> &notification, bool isCancel = false);
     ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification, bool isCancel = false);
-    ErrCode RemoveFromNotificationListForDeleteAll(const std::string &key, sptr<Notification> &notification);
+    ErrCode RemoveFromNotificationListForDeleteAll(const std::string &key,
+        const int &userId, sptr<Notification> &notification);
     std::vector<std::string> GetNotificationKeys(const sptr<NotificationBundleOption> &bundleOption);
     bool IsNotificationExists(const std::string &key);
     void SortNotificationList();
@@ -196,6 +202,9 @@ private:
         const std::string &deviceId, const std::string &bundleName, const std::string &label, int32_t id);
     ErrCode GetDistributedEnableInApplicationInfo(const sptr<NotificationBundleOption> bundleOption, bool &enable);
 #endif
+
+    ErrCode SetDoNotDisturbDateByUser(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date);
+    ErrCode GetDoNotDisturbDateByUser(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date);
 
 private:
     static sptr<AdvancedNotificationService> instance_;

@@ -71,6 +71,7 @@ ohos_unittest("ans_distributed_unit_test") {
     "ability_runtime:want",
     "bundle_framework:appexecfwk_base",
     "distributeddatamgr:distributeddata_inner",
+    "dmsfwk_standard:zuri",
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
