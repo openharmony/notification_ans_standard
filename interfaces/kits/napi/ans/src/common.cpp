@@ -251,6 +251,10 @@ napi_value Common::SetNotification(
     napi_create_int32(env, notification->GetPid(), &value);
     napi_set_named_property(env, result, "creatorPid", value);
 
+    // readonly creatorUserId?: number
+    napi_create_int32(env, notification->GetUserId(), &value);
+    napi_set_named_property(env, result, "creatorUserId", value);
+
     // distributedOption?:DistributedOptions
     napi_value distributedResult = nullptr;
     napi_create_object(env, &distributedResult);

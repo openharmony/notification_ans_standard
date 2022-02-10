@@ -17,11 +17,20 @@
 
 namespace OHOS {
 namespace NotificationNapi {
-const int SET_DISTURB_MAX_PARA = 2;
+const int SET_DISTURB_MAX_PARA = 3;
 const int SET_DISTURB_MIN_PARA = 1;
+const int GET_DISTURB_MAX_PARA = 2;
 
 struct SetDoNotDisturbDateParams {
     NotificationDoNotDisturbDate date;
+    bool hasUserId = false;
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    napi_ref callback = nullptr;
+};
+
+struct GetDoNotDisturbDateParams {
+    bool hasUserId = false;
+    int32_t userId = SUBSCRIBE_USER_INIT;
     napi_ref callback = nullptr;
 };
 
@@ -35,7 +44,7 @@ struct AsyncCallbackInfoSetDoNotDisturb {
 struct AsyncCallbackInfoGetDoNotDisturb {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
-    napi_ref callback = nullptr;
+    GetDoNotDisturbDateParams params;
     NotificationDoNotDisturbDate date;
     CallbackPromiseInfo info;
 };
@@ -56,10 +65,16 @@ napi_value GetDoNotDisturbDate(const napi_env &env, const napi_value &argv, SetD
     napi_valuetype valuetype = napi_undefined;
     // argv[0]: date:type
     NAPI_CALL(env, napi_has_named_property(env, argv, "type", &hasProperty));
-    NAPI_ASSERT(env, hasProperty, "Property type expected.");
+    if (!hasProperty) {
+        ANS_LOGW("Wrong argument type. Property type expected.");
+        return nullptr;
+    }
     napi_get_named_property(env, argv, "type", &value);
     NAPI_CALL(env, napi_typeof(env, value, &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
+    if (valuetype != napi_number) {
+        ANS_LOGW("Wrong argument type. Number expected.");
+        return nullptr;
+    }
     int type = 0;
     NotificationConstant::DoNotDisturbType outType = NotificationConstant::DoNotDisturbType::NONE;
     napi_get_value_int32(env, value, &type);
@@ -71,7 +86,10 @@ napi_value GetDoNotDisturbDate(const napi_env &env, const napi_value &argv, SetD
 
     // argv[0]: date:begin
     NAPI_CALL(env, napi_has_named_property(env, argv, "begin", &hasProperty));
-    NAPI_ASSERT(env, hasProperty, "Property type expected.");
+    if (!hasProperty) {
+        ANS_LOGW("Wrong argument type. Property type expected.");
+        return nullptr;
+    }
     double begin = 0;
     napi_get_named_property(env, argv, "begin", &value);
     bool isDate = false;
@@ -85,7 +103,10 @@ napi_value GetDoNotDisturbDate(const napi_env &env, const napi_value &argv, SetD
 
     // argv[0]: date:end
     NAPI_CALL(env, napi_has_named_property(env, argv, "end", &hasProperty));
-    NAPI_ASSERT(env, hasProperty, "Property type expected.");
+    if (!hasProperty) {
+        ANS_LOGW("Wrong argument type. Property type expected.");
+        return nullptr;
+    }
     double end = 0;
     napi_get_named_property(env, argv, "end", &value);
     isDate = false;
@@ -108,21 +129,46 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[SET_DISTURB_MAX_PARA] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_ASSERT(env, argc >= SET_DISTURB_MIN_PARA, "Wrong number of arguments");
+    if (argc < SET_DISTURB_MIN_PARA) {
+        ANS_LOGW("Wrong argument type. Property type expected.");
+        return nullptr;
+    }
 
     // argv[0]: date
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    if (valuetype != napi_object) {
+        ANS_LOGW("Wrong argument type. Property type expected.");
+        return nullptr;
+    }
     if (GetDoNotDisturbDate(env, argv[PARAM0], params) == nullptr) {
         return nullptr;
     }
 
-    // argv[1]:callback
-    if (argc >= SET_DISTURB_MAX_PARA) {
+    // argv[1] : userId / callback
+    if (argc >= SET_DISTURB_MAX_PARA - 1) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-        napi_create_reference(env, argv[PARAM1], 1, &params.callback);
+        if ((valuetype != napi_number) && (valuetype != napi_function)) {
+            ANS_LOGW("Wrong argument type. Function or object expected.");
+            return nullptr;
+        }
+
+        if (valuetype == napi_number) {
+            params.hasUserId = true;
+            NAPI_CALL(env, napi_get_value_int32(env, argv[PARAM1], &params.userId));
+        } else {
+            napi_create_reference(env, argv[PARAM1], 1, &params.callback);
+        }
+    }
+
+    // argv[2]:callback
+    if (argc >= SET_DISTURB_MAX_PARA) {
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
+        if (valuetype != napi_function) {
+            ANS_LOGW("Wrong argument type. Function expected.");
+            return nullptr;
+        }
+        napi_create_reference(env, argv[PARAM2], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -149,14 +195,20 @@ napi_value SetDoNotDisturbDate(napi_env env, napi_callback_info info)
     napi_create_string_latin1(env, "setDoNotDisturbDate", NAPI_AUTO_LENGTH, &resourceName);
     // Asynchronous function call
     napi_create_async_work(env,
-        nullptr,
-        resourceName,
-        [](napi_env env, void *data) {
+        nullptr, resourceName, [](napi_env env, void *data) {
             ANS_LOGI("SetDoNotDisturbDate napi_create_async_work start");
             AsyncCallbackInfoSetDoNotDisturb *asynccallbackinfo = (AsyncCallbackInfoSetDoNotDisturb *)data;
-            asynccallbackinfo->info.errorCode = NotificationHelper::SetDoNotDisturbDate(asynccallbackinfo->params.date);
-            ANS_LOGI("SetDoNotDisturbDate date=%{public}s errorCode=%{public}d",
-                asynccallbackinfo->params.date.Dump().c_str(), asynccallbackinfo->info.errorCode);
+            if (asynccallbackinfo->params.hasUserId) {
+                asynccallbackinfo->info.errorCode = NotificationHelper::SetDoNotDisturbDate(
+                    asynccallbackinfo->params.userId, asynccallbackinfo->params.date);
+            } else {
+                asynccallbackinfo->info.errorCode = NotificationHelper::SetDoNotDisturbDate(
+                    asynccallbackinfo->params.date);
+            }
+            
+            ANS_LOGI("SetDoNotDisturbDate date=%{public}s errorCode=%{public}d, hasUserId=%{public}d",
+                asynccallbackinfo->params.date.Dump().c_str(), asynccallbackinfo->info.errorCode,
+                asynccallbackinfo->params.hasUserId);
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("SetDoNotDisturbDate napi_create_async_work end");
@@ -174,8 +226,7 @@ napi_value SetDoNotDisturbDate(napi_env env, napi_callback_info info)
                 asynccallbackinfo = nullptr;
             }
         },
-        (void *)asynccallbackinfo,
-        &asynccallbackinfo->asyncWork);
+        (void *)asynccallbackinfo, &asynccallbackinfo->asyncWork);
 
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
 
@@ -215,22 +266,60 @@ void AsyncCompleteCallbackGetDoNotDisturbDate(napi_env env, napi_status status, 
     }
 }
 
+napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, GetDoNotDisturbDateParams &params)
+{
+    ANS_LOGI("enter");
+
+    size_t argc = GET_DISTURB_MAX_PARA;
+    napi_value argv[GET_DISTURB_MAX_PARA] = {nullptr};
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+
+    napi_valuetype valuetype = napi_undefined;
+    // argv[0]: userId / callback
+    if (argc >= GET_DISTURB_MAX_PARA - 1) {
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
+        if ((valuetype != napi_number) && (valuetype != napi_function)) {
+            ANS_LOGW("Wrong argument type. Function or object expected.");
+            return nullptr;
+        }
+        if (valuetype == napi_number) {
+            params.hasUserId = true;
+            NAPI_CALL(env, napi_get_value_int32(env, argv[PARAM0], &params.userId));
+        } else {
+            napi_create_reference(env, argv[PARAM0], 1, &params.callback);
+        }
+    }
+
+    // argv[1]:callback
+    if (argc >= GET_DISTURB_MAX_PARA) {
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
+        if (valuetype != napi_function) {
+            ANS_LOGW("Wrong argument type. Function expected.");
+            return nullptr;
+        }
+        napi_create_reference(env, argv[PARAM1], 1, &params.callback);
+    }
+
+    return Common::NapiGetNull(env);
+}
+
 napi_value GetDoNotDisturbDate(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    napi_ref callback = nullptr;
-    if (Common::ParseParaOnlyCallback(env, info, callback) == nullptr) {
+    SetDoNotDisturbDateParams params {};
+    if (ParseParameters(env, info, params) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
 
-    AsyncCallbackInfoGetDoNotDisturb *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoGetDoNotDisturb {.env = env, .asyncWork = nullptr, .callback = callback};
+    AsyncCallbackInfoSetDoNotDisturb *asynccallbackinfo =
+        new (std::nothrow) AsyncCallbackInfoSetDoNotDisturb {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
-        return Common::JSParaError(env, callback);
+        return Common::JSParaError(env, params.callback);
     }
     napi_value promise = nullptr;
-    Common::PaddingCallbackPromiseInfo(env, callback, asynccallbackinfo->info, promise);
+    Common::PaddingCallbackPromiseInfo(env, params.callback, asynccallbackinfo->info, promise);
 
     napi_value resourceName = nullptr;
     napi_create_string_latin1(env, "getDoNotDisturbDate", NAPI_AUTO_LENGTH, &resourceName);
@@ -241,9 +330,16 @@ napi_value GetDoNotDisturbDate(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("GetDoNotDisturbDate napi_create_async_work start");
             AsyncCallbackInfoGetDoNotDisturb *asynccallbackinfo = (AsyncCallbackInfoGetDoNotDisturb *)data;
-            asynccallbackinfo->info.errorCode = NotificationHelper::GetDoNotDisturbDate(asynccallbackinfo->date);
-            ANS_LOGI("GetDoNotDisturbDate errorCode=%{public}d date=%{public}s",
-                asynccallbackinfo->info.errorCode, asynccallbackinfo->date.Dump().c_str());
+            if (asynccallbackinfo->params.hasUserId) {
+                asynccallbackinfo->info.errorCode = NotificationHelper::GetDoNotDisturbDate(
+                    asynccallbackinfo->params.userId, asynccallbackinfo->date);
+            } else {
+                asynccallbackinfo->info.errorCode = NotificationHelper::GetDoNotDisturbDate(asynccallbackinfo->date);
+            }
+
+            ANS_LOGI("GetDoNotDisturbDate errorCode=%{public}d date=%{public}s, hasUserId=%{public}d",
+                asynccallbackinfo->info.errorCode, asynccallbackinfo->date.Dump().c_str(),
+                asynccallbackinfo->params.hasUserId);
         },
         AsyncCompleteCallbackGetDoNotDisturbDate,
         (void *)asynccallbackinfo,

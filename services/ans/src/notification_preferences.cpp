@@ -508,15 +508,11 @@ bool NotificationPreferences::GetActiveUserId(int& userId)
     return false;
 }
 
-ErrCode NotificationPreferences::GetNotificationsEnabled(
-    const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
+ErrCode NotificationPreferences::GetNotificationsEnabled(const int32_t &userId, bool &enabled)
 {
-    if (bundleOption == nullptr) {
+    if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }
-
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
 
     ErrCode result = ERR_OK;
     if (!preferencesInfo_.GetEnabledAllNotification(userId, enabled)) {
@@ -525,15 +521,11 @@ ErrCode NotificationPreferences::GetNotificationsEnabled(
     return result;
 }
 
-ErrCode NotificationPreferences::SetNotificationsEnabled(
-    const sptr<NotificationBundleOption> &bundleOption, const bool &enabled)
+ErrCode NotificationPreferences::SetNotificationsEnabled(const int32_t &userId, const bool &enabled)
 {
-    if (bundleOption == nullptr) {
+    if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }
-
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     preferencesInfo.SetEnabledAllNotification(userId, enabled);
@@ -548,16 +540,13 @@ ErrCode NotificationPreferences::SetNotificationsEnabled(
     return result;
 }
 
-ErrCode NotificationPreferences::GetDoNotDisturbDate(
-    const sptr<NotificationBundleOption> &bundleOption, sptr<NotificationDoNotDisturbDate> &date)
+ErrCode NotificationPreferences::GetDoNotDisturbDate(const int32_t &userId,
+    sptr<NotificationDoNotDisturbDate> &date)
 {
-    if (bundleOption == nullptr) {
+    if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }
 
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
-    
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     if (!preferencesInfo.GetDoNotDisturbDate(userId, date)) {
@@ -566,15 +555,12 @@ ErrCode NotificationPreferences::GetDoNotDisturbDate(
     return result;
 }
 
-ErrCode NotificationPreferences::SetDoNotDisturbDate(
-    const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationDoNotDisturbDate> date)
+ErrCode NotificationPreferences::SetDoNotDisturbDate(const int32_t &userId,
+    const sptr<NotificationDoNotDisturbDate> date)
 {
-    if (bundleOption == nullptr) {
+    if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }
-
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     preferencesInfo.SetDoNotDisturbDate(userId, date);

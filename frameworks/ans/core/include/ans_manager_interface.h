@@ -126,6 +126,11 @@ public:
     virtual ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) = 0;
     virtual ErrCode CancelAllReminders() = 0;
     virtual ErrCode IsSupportTemplate(const std::string &templateName, bool &support) = 0;
+    virtual ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) = 0;
+    virtual ErrCode SetNotificationsEnabledByUser(const int32_t &deviceId, bool enabled) = 0;
+    virtual ErrCode DeleteAllByUser(const int32_t &userId) = 0;
+    virtual ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) = 0;
+    virtual ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -195,7 +200,12 @@ protected:
         CANCEL_REMINDER,
         CANCEL_ALL_REMINDERS,
         GET_ALL_VALID_REMINDERS,
-        IS_SUPPORT_TEMPLATE
+        IS_SUPPORT_TEMPLATE,
+        IS_SPECIAL_USER_ALLOWED_NOTIFY,
+        SET_NOTIFICATION_ENABLED_BY_USER,
+        DELETE_ALL_NOTIFICATIONS_BY_USER,
+        SET_DO_NOT_DISTURB_DATE_BY_USER,
+        GET_DO_NOT_DISTURB_DATE_BY_USER
     };
 };
 }  // namespace Notification

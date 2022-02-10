@@ -1224,5 +1224,100 @@ bool AnsNotification::IsNonDistributedNotificationType(const NotificationContent
     }
     return false;
 }
+
+ErrCode AnsNotification::IsAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->IsSpecialUserAllowedNotify(userId, allowed);
+}
+
+ErrCode AnsNotification::SetNotificationsEnabledForAllBundles(const int32_t &userId, bool enabled)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->SetNotificationsEnabledByUser(userId, enabled);
+}
+
+ErrCode AnsNotification::RemoveNotifications(const int32_t &userId)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->DeleteAllByUser(userId);
+}
+
+ErrCode AnsNotification::SetDoNotDisturbDate(const int32_t &userId,
+    const NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    auto dndDatePtr = new (std::nothrow) NotificationDoNotDisturbDate(doNotDisturbDate);
+    if (dndDatePtr == nullptr) {
+        ANS_LOGE("create DoNotDisturbDate failed.");
+        return ERR_ANS_NO_MEMORY;
+    }
+
+    sptr<NotificationDoNotDisturbDate> dndDate(dndDatePtr);
+    return ansManagerProxy_->SetDoNotDisturbDate(dndDate);
+}
+
+ErrCode AnsNotification::GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+    
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationDoNotDisturbDate> dndDate;
+    auto ret = ansManagerProxy_->GetDoNotDisturbDate(dndDate);
+    if (ret != ERR_OK) {
+        ANS_LOGE("Get DoNotDisturbDate failed.");
+        return ret;
+    }
+
+    if (!dndDate) {
+        ANS_LOGE("Invalid DoNotDisturbDate.");
+        return ERR_ANS_NO_MEMORY;
+    }
+
+    doNotDisturbDate = *dndDate;
+    return ret;
+}
 }  // namespace Notification
 }  // namespace OHOS
