@@ -164,7 +164,7 @@ void ReminderRequest::InitReminderId()
     ANSR_LOGI("reminderId_=%{public}d", reminderId_);
 }
 
-void ReminderRequest::InitUserId(const int& userId)
+void ReminderRequest::InitUserId(const int &userId)
 {
     userId_ = userId;
 }

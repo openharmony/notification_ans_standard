@@ -278,7 +278,7 @@ public:
      *
      * @param userId Indicates the userId which the reminder belong to.
      */
-    void InitUserId(const int& userId);
+    void InitUserId(const int &userId);
 
     /**
      * @brief Check the reminder is alerting or not.
