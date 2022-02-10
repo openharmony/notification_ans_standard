@@ -82,8 +82,7 @@ ohos_moduletest("ans_fw_module_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
@@ -159,9 +158,8 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:base",
-    "ability_runtime:want",
+    "ability_base:base",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
@@ -235,8 +233,7 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
@@ -310,8 +307,7 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
+    "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",

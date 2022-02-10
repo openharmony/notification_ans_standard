@@ -75,9 +75,9 @@ ohos_unittest("ans_unit_test") {
   }
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
-    "ability_runtime:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
