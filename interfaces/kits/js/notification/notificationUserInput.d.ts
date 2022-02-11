@@ -18,9 +18,8 @@
  *
  * @name NotificationUserInput
  * @since 8
- * @devices phone, tablet, tv, wearable, car
  * @permission N/A
- * @sysCap SystemCapability.Notification.ANS
+ * @syscap SystemCapability.Notification.Notification
  */
 export interface NotificationUserInput {
   /**
