@@ -52,7 +52,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper001
      * @tc.desc: test publishReminder can return correct reminder id.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper001", 0, async function (done) {
         let timer = {
@@ -82,7 +82,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper002
      * @tc.desc: test publishReminder can return correct reminder id.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper002", 0, async function (done) {
         let timer = {
@@ -104,7 +104,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper003
      * @tc.desc: test addNotificationSlot instance with null
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EC
+     * @tc.require: SR000GGTRB AR000GH8EC
      */
     it("testReminderHelper003", 0, async function (done) {
         function reminderCallback(err, data) {
@@ -119,7 +119,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper004
      * @tc.desc: test addNotificationSlot instance with null
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EC
+     * @tc.require: SR000GGTRB AR000GH8EC
      */
     it("testReminderHelper004", 0, async function (done) {
         let mySlot = null;
@@ -141,7 +141,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper005
      * @tc.desc: test addNotificationSlot with normal value
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EC
+     * @tc.require: SR000GGTRB AR000GH8EC
      */
     it("testReminderHelper005", 0, async function (done) {
         let mySlot = {
@@ -158,7 +158,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper006
      * @tc.desc: test addNotificationSlot with normal value
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EC
+     * @tc.require: SR000GGTRB AR000GH8EC
      */
     it("testReminderHelper006", 0, async function (done) {
         reminderAgent.addNotificationSlot(3, (err, data) => {
@@ -172,7 +172,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper007
      * @tc.desc: test cancelAllReminders can cancel all exist reminders
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EA
+     * @tc.require: SR000GGTRB AR000GH8EA
      */
     it("testReminderHelper007", 0, async function (done) {
         let timer = {
@@ -205,7 +205,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper008
      * @tc.desc: test cancelAllReminders can cancel all exist reminders
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EA
+     * @tc.require: SR000GGTRB AR000GH8EA
      */
     it("testReminderHelper008", 0, async function (done) {
         let timer = {
@@ -238,7 +238,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper009
      * @tc.desc: test cancelReminder with not exit reminder.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EA
+     * @tc.require: SR000GGTRB AR000GH8EA
      */
     it("testReminderHelper009", 0, async function (done) {
         let timer = {
@@ -268,7 +268,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper010
      * @tc.desc: test cancelReminder with not exit reminder.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EA
+     * @tc.require: SR000GGTRB AR000GH8EA
      */
     it("testReminderHelper010", 0, async function (done) {
         let timer = {
@@ -297,7 +297,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper011
      * @tc.desc: test cancelReminder with exist reminder.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EA
+     * @tc.require: SR000GGTRB AR000GH8EA
      */
     it("testReminderHelper011", 0, async function (done) {
         let alarm = {
@@ -335,7 +335,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper012
      * @tc.desc: test cancelReminder with exist reminder.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EA
+     * @tc.require: SR000GGTRB AR000GH8EA
      */
     it("testReminderHelper012", 0, async function (done) {
         let alarm = {
@@ -373,7 +373,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper013
      * @tc.desc: test getValidReminders, verify all the information is correct.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EB
+     * @tc.require: SR000GGTRB AR000GH8EB
      */
     it("testReminderHelper013", 0, async function (done) {
         var alarm = {
@@ -403,7 +403,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper014
      * @tc.desc: test getValidReminders, verify all the information is correct.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EB
+     * @tc.require: SR000GGTRB AR000GH8EB
      */
     it("testReminderHelper014", 0, async function (done) {
         var alarm = {
@@ -433,7 +433,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper015
      * @tc.desc: test removeNotificationSlot with not exist slot.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8ED
+     * @tc.require: SR000GGTRB AR000GH8ED
      */
     it("testReminderHelper015", 0, function (done) {
         function reminderCallback(err, data){
@@ -448,7 +448,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper016
      * @tc.desc: test removeNotificationSlot with not exist slot.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8ED
+     * @tc.require: SR000GGTRB AR000GH8ED
      */
     it("testReminderHelper016", 0, function (done) {
        let promise = new Promise((resolve, reject) => {
@@ -469,7 +469,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper017
      * @tc.desc: test removeNotificationSlot with exist slot.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8ED
+     * @tc.require: SR000GGTRB AR000GH8ED
      */
     it("testReminderHelper017", 0, async function (done) {
         var tarRemoveSlot = {
@@ -487,7 +487,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper018
      * @tc.desc: test removeNotificationSlot with exist slot.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8ED
+     * @tc.require: SR000GGTRB AR000GH8ED
      */
     it("testReminderHelper018", 0, async function (done) {
         var tarRemoveSlot = {
@@ -506,7 +506,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper019
      * @tc.desc: test getValidReminders.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EB AR000GH8EG
+     * @tc.require: SR000GGTRB AR000GH8EB AR000GH8EG
      */
     it("testReminderHelper019", 0, async function (done) {
         let timer = {
@@ -526,7 +526,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name:testReminderHelper020
      * @tc.desc: test getValidReminders.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8EB AR000GH8EG
+     * @tc.require: SR000GGTRB AR000GH8EB AR000GH8EG
      */
     it("testReminderHelper020", 0, async function (done) {
         let timer = {
@@ -546,7 +546,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper021
      * @tc.desc: test publishReminder a normal alarm.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper021", 0, async function (done) {
         let alarm = {
@@ -567,7 +567,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper022
      * @tc.desc: test publishReminder a normal alarm.
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper022", 0, async function (done) {
         let alarm = {
@@ -589,7 +589,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper023
      * @tc.desc: test publishReminder
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper023", 0, function (done) {
         let calendar = {
@@ -670,7 +670,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper024
      * @tc.desc: test publishReminder
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper024", 0, async function (done) {
         let calendar = {
@@ -751,7 +751,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper025
      * @tc.desc: test publishReminder
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper025", 0, async function (done) {
         let calendar = {
@@ -803,7 +803,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper026
      * @tc.desc: test publishReminder
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper026", 0, async function (done) {
         let calendar = {
@@ -855,7 +855,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper027
      * @tc.desc: test publishReminder (max number limit of each application)
      * @tc.type: FUNC
-     * @tc.require: AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper027", 0, async function (done) {
         let timer = {
