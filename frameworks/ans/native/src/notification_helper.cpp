@@ -366,5 +366,32 @@ ErrCode NotificationHelper::IsSupportTemplate(const std::string &templateName, b
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->IsSupportTemplate(templateName, support);
 }
+
+ErrCode NotificationHelper::IsAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->IsAllowedNotify(userId, allowed);
+}
+
+ErrCode NotificationHelper::SetNotificationsEnabledForAllBundles(const int32_t &userId, bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetNotificationsEnabledForAllBundles(
+        userId, enabled);
+}
+
+ErrCode NotificationHelper::RemoveNotifications(const int32_t &userId)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotifications(userId);
+}
+
+ErrCode NotificationHelper::SetDoNotDisturbDate(const int32_t &userId,
+    const NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetDoNotDisturbDate(userId, doNotDisturbDate);
+}
+
+ErrCode NotificationHelper::GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetDoNotDisturbDate(userId, doNotDisturbDate);
+}
 }  // namespace Notification
 }  // namespace OHOS

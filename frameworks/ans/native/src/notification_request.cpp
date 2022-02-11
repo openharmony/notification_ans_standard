@@ -680,6 +680,8 @@ std::string NotificationRequest::Dump()
             ", userInputHistory = " + (!userInputHistory_.empty() ? userInputHistory_.at(0) : "empty") +
             ", distributedOptions = " + distributedOptions_.Dump() +
             ", notificationFlags = " + (notificationFlags_ ? "not null" : "null") +
+            ", creatorUserId = " + std::to_string(creatorUserId_) +
+            ", receiverUserId = " + std::to_string(receiverUserId_) +
             " }";
 }
 
@@ -710,6 +712,12 @@ bool NotificationRequest::ToJson(nlohmann::json &jsonObject) const
     jsonObject["isCountdown"]      = isCountdown_;
     jsonObject["isUnremovable"]    = unremovable_;
     jsonObject["isFloatingIcon"]   = floatingIcon_;
+
+    jsonObject["creatorBundleName"] = creatorBundleName_;
+    jsonObject["creatorUid"]        = creatorUid_;
+    jsonObject["creatorPid"]        = creatorPid_;
+    jsonObject["creatorUserId"]     = creatorUserId_;
+    jsonObject["receiverUserId"]    = receiverUserId_;
 
     if (!ConvertObjectsToJson(jsonObject)) {
         ANS_LOGE("Cannot convert objects to JSON");
@@ -837,6 +845,16 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
 
     if (!parcel.WriteInt32(static_cast<int32_t>(creatorUid_))) {
         ANS_LOGE("Failed to write creator uid");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(creatorUserId_))) {
+        ANS_LOGE("Failed to write creator userId");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(receiverUserId_))) {
+        ANS_LOGE("Failed to write creator userId");
         return false;
     }
 
@@ -1174,6 +1192,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     creatorPid_ = static_cast<pid_t>(parcel.ReadInt32());
     creatorUid_ = static_cast<pid_t>(parcel.ReadInt32());
+    creatorUserId_ = parcel.ReadInt32();
+    receiverUserId_ = parcel.ReadInt32();
 
     if (!parcel.ReadString(settingsText_)) {
         ANS_LOGE("Failed to read settings text");
@@ -1398,6 +1418,16 @@ std::shared_ptr<NotificationFlags> NotificationRequest::GetFlags() const
     return notificationFlags_;
 }
 
+void NotificationRequest::SetReceiverUserId(int32_t userId)
+{
+    receiverUserId_ = userId;
+}
+
+int32_t NotificationRequest::GetReceiverUserId() const
+{
+    return receiverUserId_;
+}
+
 void NotificationRequest::CopyBase(const NotificationRequest &other)
 {
     this->notificationId_ = other.notificationId_;
@@ -1411,6 +1441,8 @@ void NotificationRequest::CopyBase(const NotificationRequest &other)
 
     this->creatorPid_ = other.creatorPid_;
     this->creatorUid_ = other.creatorUid_;
+    this->creatorUserId_ = other.creatorUserId_;
+    this->receiverUserId_ = other.receiverUserId_;
 
     this->slotType_ = other.slotType_;
     this->settingsText_ = other.settingsText_;
@@ -1544,6 +1576,22 @@ void NotificationRequest::ConvertJsonToNum(NotificationRequest *target, const nl
     if (jsonObject.find("autoDeletedTime") != jsonEnd) {
         target->autoDeletedTime_ = jsonObject.at("autoDeletedTime").get<int64_t>();
     }
+
+    if (jsonObject.find("creatorUid") != jsonEnd) {
+        target->creatorUid_ = jsonObject.at("creatorUid").get<uint32_t>();
+    }
+
+    if (jsonObject.find("creatorPid") != jsonEnd) {
+        target->creatorPid_ = jsonObject.at("creatorPid").get<uint32_t>();
+    }
+
+    if (jsonObject.find("creatorUserId") != jsonEnd) {
+        target->creatorUserId_ = jsonObject.at("creatorUserId").get<uint32_t>();
+    }
+
+    if (jsonObject.find("receiverUserId") != jsonEnd) {
+        target->receiverUserId_ = jsonObject.at("receiverUserId").get<uint32_t>();
+    }
 }
 
 void NotificationRequest::ConvertJsonToString(NotificationRequest *target, const nlohmann::json &jsonObject)
@@ -1573,6 +1621,10 @@ void NotificationRequest::ConvertJsonToString(NotificationRequest *target, const
 
     if (jsonObject.find("classification") != jsonEnd) {
         target->classification_ = jsonObject.at("classification").get<std::string>();
+    }
+
+    if (jsonObject.find("creatorBundleName") != jsonEnd) {
+        target->creatorBundleName_ = jsonObject.at("creatorBundleName").get<std::string>();
     }
 }
 

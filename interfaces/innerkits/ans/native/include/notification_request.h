@@ -16,6 +16,7 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 
+#include "ans_const_define.h"
 #include "message_user.h"
 #include "notification_action_button.h"
 #include "notification_content.h"
@@ -928,6 +929,18 @@ public:
      */
     std::shared_ptr<NotificationFlags> GetFlags() const;
 
+    /**
+     * Sets the UserId of the notification receiver.
+     * @param userId the UserId of the notification receiver.
+     */
+    void SetReceiverUserId(int32_t userId);
+
+    /**
+     * Obtains the UserId of the notification receiver.
+     * @return the UserId of the notification receiver.
+     */
+    int32_t GetReceiverUserId() const;
+
 private:
     /**
      * Indicates the color mask, used for calculation with the ARGB value set by setColor(int32_t).
@@ -985,7 +998,8 @@ private:
 
     pid_t creatorPid_ {0};
     pid_t creatorUid_ {0};
-    int32_t creatorUserId_ {-1};
+    int32_t creatorUserId_ {SUBSCRIBE_USER_INIT};
+    int32_t receiverUserId_ {SUBSCRIBE_USER_INIT};
 
     std::string settingsText_ {};
     std::string creatorBundleName_ {};

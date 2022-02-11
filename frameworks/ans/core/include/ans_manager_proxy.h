@@ -114,6 +114,11 @@ public:
     ErrCode CancelReminder(const int32_t reminderId) override;
     ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
     ErrCode CancelAllReminders() override;
+    ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) override;
+    ErrCode SetNotificationsEnabledByUser(const int32_t &userId, bool enabled) override;
+    ErrCode DeleteAllByUser(const int32_t &userId) override;
+    ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

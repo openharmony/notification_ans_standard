@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace NotificationNapi {
-static const int32_t PUBLISH_NOTIFICATION_MAX = 2;
+static const int32_t PUBLISH_NOTIFICATION_MAX = 3;
 
 struct AsyncCallbackInfoPublish {
     napi_env env = nullptr;
@@ -37,7 +37,10 @@ napi_value GetCallback(const napi_env &env, const napi_value &value, ParametersI
 
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, value, &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+    if (valuetype != napi_function) {
+        ANS_LOGW("Wrong argument type. Function expected.");
+        return nullptr;
+    }
     napi_create_reference(env, value, 1, &params.callback);
     ANS_LOGI("end");
     return Common::NapiGetNull(env);
@@ -50,20 +53,43 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     size_t argc = PUBLISH_NOTIFICATION_MAX;
     napi_value argv[PUBLISH_NOTIFICATION_MAX] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
+    if (argc < 1) {
+        ANS_LOGW("Wrong argument type. Function expected.");
+        return nullptr;
+    }
 
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    if (valuetype != napi_object) {
+        ANS_LOGW("Wrong argument type. Object expected.");
+        return nullptr;
+    }
 
     // argv[0] : NotificationRequest
     if (Common::GetNotificationRequest(env, argv[PARAM0], params.request) == nullptr) {
         return nullptr;
     }
 
-    // argv[1] : callback
+    // argv[1] : userId / callback
+    if (argc >= PUBLISH_NOTIFICATION_MAX - 1) {
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
+        if ((valuetype != napi_number) && (valuetype != napi_function)) {
+            ANS_LOGW("Wrong argument type. Function or object expected.");
+            return nullptr;
+        }
+
+        if (valuetype == napi_number) {
+            int32_t recvUserId = SUBSCRIBE_USER_INIT;
+            NAPI_CALL(env, napi_get_value_int32(env, argv[PARAM1], &recvUserId));
+            params.request.SetReceiverUserId(recvUserId);
+        } else {
+            napi_create_reference(env, argv[PARAM1], 1, &params.callback);
+        }
+    }
+
+    // argv[2] : callback
     if (argc >= PUBLISH_NOTIFICATION_MAX) {
-        if (GetCallback(env, argv[PARAM1], params) == nullptr) {
+        if (GetCallback(env, argv[PARAM2], params) == nullptr) {
             return nullptr;
         }
     }
