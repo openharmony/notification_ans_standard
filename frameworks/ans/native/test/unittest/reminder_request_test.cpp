@@ -41,7 +41,7 @@ const uint8_t ReminderRequestTest::REMINDER_STATUS_SHOWING = 4;
  * @tc.name: CanRemove_00100
  * @tc.desc: When reminder init, CanRemove should return true.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, CanRemove_00100, Function | SmallTest | Level1)
 {
@@ -53,7 +53,7 @@ HWTEST_F(ReminderRequestTest, CanRemove_00100, Function | SmallTest | Level1)
  * @tc.name: CanRemove_00200
  * @tc.desc: When reminder is shown, CanRemove should return false.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, CanRemove_00200, Function | SmallTest | Level1)
 {
@@ -66,7 +66,7 @@ HWTEST_F(ReminderRequestTest, CanRemove_00200, Function | SmallTest | Level1)
  * @tc.name: CanRemove_00300
  * @tc.desc: When reminder close, CanRemove should return true.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, CanRemove_00300, Function | SmallTest | Level1)
 {
@@ -80,7 +80,7 @@ HWTEST_F(ReminderRequestTest, CanRemove_00300, Function | SmallTest | Level1)
  * @tc.name: CanRemove_00400
  * @tc.desc: When reminder is covered as same notification id, CanRemove should return true.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF AR000GH8E6
+ * @tc.require: SR000GGGTRD AR000GH8EF AR000GH8E6
  */
 HWTEST_F(ReminderRequestTest, CanRemove_00400, Function | SmallTest | Level1)
 {
@@ -95,7 +95,7 @@ HWTEST_F(ReminderRequestTest, CanRemove_00400, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00100
  * @tc.desc: When reminder init, state should be 0.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00100, Function | SmallTest | Level1)
 {
@@ -107,7 +107,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00100, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00200
  * @tc.desc: When reminder close with param true, state REMINDER_STATUS_SHOWING should be unset.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00200, Function | SmallTest | Level1)
 {
@@ -120,7 +120,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00200, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00300
  * @tc.desc: When reminder close with param false, state REMINDER_STATUS_SHOWING should be unset.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00300, Function | SmallTest | Level1)
 {
@@ -133,7 +133,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00300, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00400
  * @tc.desc: When reminder is covered as same notification id, state REMINDER_STATUS_SHOWING should be unset.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF AR000GH8E6
+ * @tc.require: SR000GGGTRD AR000GH8EF AR000GH8E6
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00400, Function | SmallTest | Level1)
 {
@@ -146,7 +146,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00400, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00500
  * @tc.desc: When reminder is shown with param true,true, state REMINDER_STATUS_SHOWING should be set.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00500, Function | SmallTest | Level1)
 {
@@ -159,7 +159,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00500, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00600
  * @tc.desc: When reminder is shown with param false,true, state REMINDER_STATUS_SHOWING should be set.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00600, Function | SmallTest | Level1)
 {
@@ -172,7 +172,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00600, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00700
  * @tc.desc: When reminder is shown with param true,false, state REMINDER_STATUS_SHOWING should not change.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00700, Function | SmallTest | Level1)
 {
@@ -186,7 +186,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00700, Function | SmallTest | Level1)
  * @tc.name: StateCheck_00800
  * @tc.desc: When reminder is shown with param false,false, state REMINDER_STATUS_SHOWING should be unset.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, StateCheck_00800, Function | SmallTest | Level1)
 {
@@ -200,7 +200,7 @@ HWTEST_F(ReminderRequestTest, StateCheck_00800, Function | SmallTest | Level1)
  * @tc.name: initReminderId_00100
  * @tc.desc: When reminder create successfully, system should assign unique id to reminder.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF AR000GH8E6
+ * @tc.require: SR000GGGTRD AR000GH8EF AR000GH8E6
  */
 HWTEST_F(ReminderRequestTest, initReminderId_00100, Function | SmallTest | Level1)
 {
@@ -216,7 +216,7 @@ HWTEST_F(ReminderRequestTest, initReminderId_00100, Function | SmallTest | Level
  * @tc.name: setContent_00100
  * @tc.desc: Test SetContent with normal parameters.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, setContent_00100, Function | SmallTest | Level1)
 {
@@ -230,7 +230,7 @@ HWTEST_F(ReminderRequestTest, setContent_00100, Function | SmallTest | Level1)
  * @tc.name: setContent_00200
  * @tc.desc: Test SetContent parameters with special characters.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, setContent_00200, Function | SmallTest | Level1)
 {
@@ -244,7 +244,7 @@ HWTEST_F(ReminderRequestTest, setContent_00200, Function | SmallTest | Level1)
  * @tc.name: setExpiredContent_00100
  * @tc.desc: Test SetExpiredContent with normal parameters.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF AR000GNF1U
+ * @tc.require: SR000GGGTRD AR000GH8EF AR000GNF1U
  */
 HWTEST_F(ReminderRequestTest, setExpiredContent_00100, Function | SmallTest | Level1)
 {
@@ -258,7 +258,7 @@ HWTEST_F(ReminderRequestTest, setExpiredContent_00100, Function | SmallTest | Le
  * @tc.name: setExpiredContent_00200
  * @tc.desc: Test SetExpiredContent with special characters.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF AR000GNF1U
+ * @tc.require: SR000GGGTRD AR000GH8EF AR000GNF1U
  */
 HWTEST_F(ReminderRequestTest, setExpiredContent_00200, Function | SmallTest | Level1)
 {
@@ -272,7 +272,7 @@ HWTEST_F(ReminderRequestTest, setExpiredContent_00200, Function | SmallTest | Le
  * @tc.name: setTitle_00100
  * @tc.desc: Test SetTitle with normal parameters.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, setTitle_00100, Function | SmallTest | Level1)
 {
@@ -286,7 +286,7 @@ HWTEST_F(ReminderRequestTest, setTitle_00100, Function | SmallTest | Level1)
  * @tc.name: setTitle_00200
  * @tc.desc: Test SetTitle with special characters.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, setTitle_00200, Function | SmallTest | Level1)
 {
@@ -300,7 +300,7 @@ HWTEST_F(ReminderRequestTest, setTitle_00200, Function | SmallTest | Level1)
  * @tc.name: setNotificationId_00100
  * @tc.desc: Test SetNotificationId parameters.
  * @tc.type: FUNC
- * @tc.require: AR000GH8EF
+ * @tc.require: SR000GGGTRD AR000GH8EF
  */
 HWTEST_F(ReminderRequestTest, setNotificationId_00100, Function | SmallTest | Level1)
 {

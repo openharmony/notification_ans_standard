@@ -40,7 +40,7 @@ public:
  * @tc.name: initCountDownTime_00100
  * @tc.desc: set countDownTime = 0 should throw exception.
  * @tc.type: FUNC
- * @tc.require: AR000GH8E8
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00100, Function | SmallTest | Level1)
 {
@@ -57,7 +57,7 @@ HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00100, Function | SmallTest
  * @tc.name: initCountDownTime_00200
  * @tc.desc: set countDownTime > (UINT64_MAX / 1000) should throw exception.
  * @tc.type: FUNC
- * @tc.require: AR000GH8E8
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00200, Function | SmallTest | Level1)
 {
@@ -74,7 +74,7 @@ HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00200, Function | SmallTest
  * @tc.name: initCountDownTime_00300
  * @tc.desc: set countDownTime with normal value.
  * @tc.type: FUNC
- * @tc.require: AR000GH8E8
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00300, Function | SmallTest | Level1)
 {
