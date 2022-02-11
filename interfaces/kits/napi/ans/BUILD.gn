@@ -75,9 +75,9 @@ ohos_shared_library("notification") {
   ]
 
   external_deps = [
+    "ability_base:base",
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
-    "ability_runtime:base",
-    "ability_runtime:want",
     "bundle_framework:appexecfwk_base",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
