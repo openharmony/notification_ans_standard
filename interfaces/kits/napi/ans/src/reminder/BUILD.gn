@@ -64,8 +64,8 @@ ohos_shared_library("reminderagent") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_runtime:abilitykit_native",
-    "ability_runtime:want",
     "bundle_framework:appexecfwk_base",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
