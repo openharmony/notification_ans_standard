@@ -200,9 +200,6 @@ ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &request)
 
     int userId = SUBSCRIBE_USER_INIT;
     OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
-    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
-        userId = SUBSCRIBE_USER_ALL;
-    }
     request->SetCreatorUserId(userId);
     ErrCode result = CheckPictureSize(request);
 
@@ -933,12 +930,12 @@ ErrCode AdvancedNotificationService::DeleteAll()
 #endif
             sptr<Notification> notification = nullptr;
 
-            result = RemoveFromNotificationListForDeleteAll(key, notification);
+            result = RemoveFromNotificationListForDeleteAll(key, activeUserId, notification);
             if (result != ERR_OK || notification == nullptr) {
                 continue;
             }
 
-            if ((notification->GetUserId() == activeUserId) || (notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
+            if (notification->GetUserId() == activeUserId) {
                 int reason = NotificationConstant::CANCEL_ALL_REASON_DELETE;
                 UpdateRecentNotification(notification, true, reason);
                 sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
@@ -1184,10 +1181,10 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(
 }
 
 ErrCode AdvancedNotificationService::RemoveFromNotificationListForDeleteAll(
-    const std::string &key, sptr<Notification> &notification)
+    const std::string &key, const int &userId, sptr<Notification> &notification)
 {
     for (auto record : notificationList_) {
-        if (record->notification->GetKey() == key) {
+        if ((record->notification->GetKey() == key) && (record->notification->GetUserId() == userId)) {
             if (!record->notification->IsRemoveAllowed()) {
                 return ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
             }
@@ -1297,7 +1294,9 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
     }
 
     int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
+    }
 
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
@@ -1363,16 +1362,16 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForAllBundles(const 
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    ErrCode result = ERR_OK;
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         if (deviceId.empty()) {
             // Local device
-            result = NotificationPreferences::GetInstance().SetNotificationsEnabled(bundleOption, enabled);
+            result = NotificationPreferences::GetInstance().SetNotificationsEnabled(userId, enabled);
         } else {
             // Remote device
         }
@@ -1422,15 +1421,15 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    ErrCode result = ERR_OK;
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         allowed = false;
-        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(bundleOption, allowed);
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
     }));
     return result;
 }
@@ -1467,10 +1466,15 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
         return ERR_ANS_INVALID_BUNDLE;
     }
 
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         allowed = false;
-        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(bundleOption, allowed);
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
         if (result == ERR_OK && allowed) {
             result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(targetBundle, allowed);
             if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
@@ -2274,51 +2278,12 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    if (date == nullptr) {
-        return ERR_ANS_INVALID_PARAM;
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
-    ErrCode result = ERR_OK;
-
-    int64_t beginDate = ResetSeconds(date->GetBeginDate());
-    int64_t endDate = ResetSeconds(date->GetEndDate());
-
-    switch (date->GetDoNotDisturbType()) {
-        case NotificationConstant::DoNotDisturbType::NONE:
-            beginDate = 0;
-            endDate = 0;
-            break;
-        case NotificationConstant::DoNotDisturbType::ONCE:
-            AdjustDateForDndTypeOnce(beginDate, endDate);
-            break;
-        case NotificationConstant::DoNotDisturbType::CLEARLY:
-            if (beginDate >= endDate) {
-                return ERR_ANS_INVALID_PARAM;
-            }
-            break;
-        default:
-            break;
-    }
-
-    const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
-        date->GetDoNotDisturbType(),
-        beginDate,
-        endDate
-    );
-
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
-    }
-
-    handler_->PostSyncTask(std::bind([&]() {
-        result = NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption, newConfig);
-        if (result == ERR_OK) {
-            NotificationSubscriberManager::GetInstance()->NotifyDoNotDisturbDateChanged(newConfig);
-        }
-    }));
-
-    return ERR_OK;
+    return SetDoNotDisturbDateByUser(userId, date);
 }
 
 ErrCode AdvancedNotificationService::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date)
@@ -2333,35 +2298,12 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(sptr<NotificationDoNotD
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    ErrCode result = ERR_OK;
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
-    handler_->PostSyncTask(std::bind([&]() {
-        sptr<NotificationDoNotDisturbDate> currentConfig = nullptr;
-        result = NotificationPreferences::GetInstance().GetDoNotDisturbDate(bundleOption, currentConfig);
-        if (result == ERR_OK) {
-            int64_t now = GetCurrentTime();
-            switch (currentConfig->GetDoNotDisturbType()) {
-                case NotificationConstant::DoNotDisturbType::CLEARLY:
-                case NotificationConstant::DoNotDisturbType::ONCE:
-                    if (now >= currentConfig->GetEndDate()) {
-                        date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
-                        NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption, date);
-                    } else {
-                        date = currentConfig;
-                    }
-                    break;
-                default:
-                    date = currentConfig;
-                    break;
-            }
-        }
-    }));
-
-    return ERR_OK;
+    return GetDoNotDisturbDateByUser(userId, date);
 }
 
 ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSupport)
@@ -2901,6 +2843,211 @@ void AdvancedNotificationService::TriggerRemoveWantAgent(const sptr<Notification
     OHOS::Notification::WantAgent::TriggerInfo triggerInfo;
     std::shared_ptr<WantAgent::WantAgent> agent = request->GetRemovalWantAgent();
     WantAgent::WantAgentHelper::TriggerWantAgent(agent, nullptr, triggerInfo);
+}
+
+ErrCode AdvancedNotificationService::IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        allowed = false;
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::SetNotificationsEnabledByUser(const int32_t &userId, bool enabled)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetNotificationsEnabled(userId, enabled);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::DeleteAllByUser(const int32_t &userId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        std::vector<std::string> keys = GetNotificationKeys(nullptr);
+        for (auto key : keys) {
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+            std::string deviceId = GetNotificationDeviceId(key);
+#endif
+            sptr<Notification> notification = nullptr;
+
+            result = RemoveFromNotificationListForDeleteAll(key, userId, notification);
+            if (result != ERR_OK || notification == nullptr) {
+                continue;
+            }
+
+            if (notification->GetUserId() == userId) {
+                int reason = NotificationConstant::CANCEL_ALL_REASON_DELETE;
+                UpdateRecentNotification(notification, true, reason);
+                sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+                NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+                DoDistributedDelete(deviceId, notification);
+#endif
+            }
+        }
+
+        result = ERR_OK;
+    }));
+
+    return result;
+}
+
+ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const int32_t &userId,
+    const sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    return SetDoNotDisturbDateByUser(userId, date);
+}
+
+ErrCode AdvancedNotificationService::GetDoNotDisturbDate(const int32_t &userId,
+    sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    return GetDoNotDisturbDateByUser(userId, date);
+}
+
+ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &userId,
+    const sptr<NotificationDoNotDisturbDate> &date)
+{
+    if (date == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode result = ERR_OK;
+
+    int64_t beginDate = ResetSeconds(date->GetBeginDate());
+    int64_t endDate = ResetSeconds(date->GetEndDate());
+
+    switch (date->GetDoNotDisturbType()) {
+        case NotificationConstant::DoNotDisturbType::NONE:
+            beginDate = 0;
+            endDate = 0;
+            break;
+        case NotificationConstant::DoNotDisturbType::ONCE:
+            AdjustDateForDndTypeOnce(beginDate, endDate);
+            break;
+        case NotificationConstant::DoNotDisturbType::CLEARLY:
+            if (beginDate >= endDate) {
+                return ERR_ANS_INVALID_PARAM;
+            }
+            break;
+        default:
+            break;
+    }
+
+    const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
+        date->GetDoNotDisturbType(),
+        beginDate,
+        endDate
+    );
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetDoNotDisturbDate(userId, newConfig);
+        if (result == ERR_OK) {
+            NotificationSubscriberManager::GetInstance()->NotifyDoNotDisturbDateChanged(newConfig);
+        }
+    }));
+ 
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::GetDoNotDisturbDateByUser(const int32_t &userId,
+    sptr<NotificationDoNotDisturbDate> &date)
+{
+    ErrCode result = ERR_OK;
+    
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<NotificationDoNotDisturbDate> currentConfig = nullptr;
+        result = NotificationPreferences::GetInstance().GetDoNotDisturbDate(userId, currentConfig);
+        if (result == ERR_OK) {
+            int64_t now = GetCurrentTime();
+            switch (currentConfig->GetDoNotDisturbType()) {
+                case NotificationConstant::DoNotDisturbType::CLEARLY:
+                case NotificationConstant::DoNotDisturbType::ONCE:
+                    if (now >= currentConfig->GetEndDate()) {
+                        date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+                        NotificationPreferences::GetInstance().SetDoNotDisturbDate(userId, date);
+                    } else {
+                        date = currentConfig;
+                    }
+                    break;
+                default:
+                    date = currentConfig;
+                    break;
+            }
+        }
+    }));
+
+    return ERR_OK;
 }
 }  // namespace Notification
 }  // namespace OHOS

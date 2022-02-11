@@ -64,7 +64,10 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
             return ERR_ANS_NO_MEMORY;
         }
 
-        int userId = SUBSCRIBE_USER_ALL;
+        int userId = SUBSCRIBE_USER_INIT;
+        int callingUid = IPCSkeleton::GetCallingUid();
+        OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
+        ANS_LOGD("AddSubscriber callingUid = <%{public}d> userId = <%{public}d>", callingUid, userId);
         subInfo->AddAppUserId(userId);
     }
 
@@ -284,12 +287,15 @@ void NotificationSubscriberManager::NotifyConsumedInner(
     ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
     for (auto record : subscriberRecordList_) {
         ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
+        
+        int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
             (notification->GetUserId() == record->userId ||
-                notification->GetUserId() == SUBSCRIBE_USER_ALL ||
-                record->userId == SUBSCRIBE_USER_ALL)) {
+            notification->GetUserId() == SUBSCRIBE_USER_ALL ||
+            recvUserId == record->userId ||
+            IsSystemUser(record->userId))) {
             record->subscriber->OnConsumed(notification, notificationMap);
             record->subscriber->OnConsumed(notification);
         }
@@ -324,6 +330,15 @@ void NotificationSubscriberManager::NotifyDoNotDisturbDateChangedInner(const spt
     for (auto record : subscriberRecordList_) {
         record->subscriber->OnDoNotDisturbDateChange(date);
     }
+}
+
+bool NotificationSubscriberManager::IsSystemUser(int32_t userId)
+{
+    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
+        return true;
+    }
+
+    return false;
 }
 }  // namespace Notification
 }  // namespace OHOS

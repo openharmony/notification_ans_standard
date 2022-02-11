@@ -38,6 +38,8 @@ struct IsEnableParams {
     NotificationBundleOption option;
     napi_ref callback = nullptr;
     bool hasBundleOption = false;
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    bool hasUserId = false;
 };
 
 struct AsyncCallbackInfoIsEnable {
@@ -108,10 +110,10 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
         return Common::NapiGetNull(env);
     }
 
-    // argv[0]: bundle / callback
+    // argv[0]: bundle / userId / callback
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    if ((valuetype != napi_function) && (valuetype != napi_object)) {
+    if ((valuetype != napi_object) && (valuetype != napi_number) && (valuetype != napi_function)) {
         ANS_LOGW("Wrong argument type. Function or object expected.");
         return nullptr;
     }
@@ -122,6 +124,9 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
             return nullptr;
         }
         params.hasBundleOption = true;
+    } else if (valuetype == napi_number) {
+        NAPI_CALL(env, napi_get_value_int32(env, argv[PARAM0], &params.userId));
+        params.hasUserId = true;
     } else {
         napi_create_reference(env, argv[PARAM0], 1, &params.callback);
     }
@@ -262,6 +267,10 @@ napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)
                     asynccallbackinfo->params.option.GetUid());
                 asynccallbackinfo->info.errorCode =
                     NotificationHelper::IsAllowedNotify(asynccallbackinfo->params.option, asynccallbackinfo->allowed);
+            } else if (asynccallbackinfo->params.hasUserId) {
+                ANS_LOGI("userId = %{public}d", asynccallbackinfo->params.userId);
+                asynccallbackinfo->info.errorCode =
+                    NotificationHelper::IsAllowedNotify(asynccallbackinfo->params.userId, asynccallbackinfo->allowed);
             } else {
                 asynccallbackinfo->info.errorCode = NotificationHelper::IsAllowedNotify(asynccallbackinfo->allowed);
             }

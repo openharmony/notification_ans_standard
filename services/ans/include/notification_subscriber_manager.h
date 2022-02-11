@@ -70,6 +70,7 @@ private:
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
     void NotifyUpdatedInner(const sptr<NotificationSortingMap> &notificationMap);
     void NotifyDoNotDisturbDateChangedInner(const sptr<NotificationDoNotDisturbDate> &date);
+    bool IsSystemUser(int32_t userId);
 
 private:
     std::list<std::shared_ptr<SubscriberRecord>> subscriberRecordList_ {};
