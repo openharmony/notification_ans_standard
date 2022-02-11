@@ -68,7 +68,7 @@ std::shared_ptr<PendingWant> PendingWant::GetAbility(
     wantSenderInfo.allWants.push_back(wantsInfo);
     wantSenderInfo.bundleName = context->GetBundleName();
     wantSenderInfo.flags = flags;
-    wantSenderInfo.userId = 0;
+    wantSenderInfo.userId = -1;
     wantSenderInfo.requestCode = requestCode;
     sptr<IWantSender> target = AbilityManagerClient::GetInstance()->GetWantSender(wantSenderInfo, nullptr);
     WANT_AGENT_LOGI("PendingWant::GetAbility end.");
@@ -95,7 +95,7 @@ std::shared_ptr<PendingWant> PendingWant::GetAbilities(const std::shared_ptr<OHO
     wantSenderInfo.type = (int32_t)WantAgentConstant::OperationType::START_ABILITIES;
     wantSenderInfo.bundleName = context->GetBundleName();
     wantSenderInfo.flags = flags;
-    wantSenderInfo.userId = 0;
+    wantSenderInfo.userId = -1;
     wantSenderInfo.requestCode = requestCode;
     for (auto want : wants) {
         WantsInfo wantsInfo;
@@ -140,7 +140,7 @@ std::shared_ptr<PendingWant> PendingWant::GetCommonEventAsUser(
     wantSenderInfo.allWants.push_back(wantsInfo);
     wantSenderInfo.bundleName = context->GetBundleName();
     wantSenderInfo.flags = flags;
-    wantSenderInfo.userId = 0;
+    wantSenderInfo.userId = -1;
     wantSenderInfo.requestCode = requestCode;
     sptr<IWantSender> target = AbilityManagerClient::GetInstance()->GetWantSender(wantSenderInfo, nullptr);
 
@@ -184,7 +184,7 @@ std::shared_ptr<PendingWant> PendingWant::BuildServicePendingWant(
     wantSenderInfo.allWants.push_back(wantsInfo);
     wantSenderInfo.bundleName = context->GetBundleName();
     wantSenderInfo.flags = flags;
-    wantSenderInfo.userId = 0;
+    wantSenderInfo.userId = -1;
     wantSenderInfo.requestCode = requestCode;
     sptr<IWantSender> target = AbilityManagerClient::GetInstance()->GetWantSender(wantSenderInfo, nullptr);
 
