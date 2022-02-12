@@ -4120,12 +4120,12 @@ napi_value Common::SetNotificationFlags(
 
     napi_value value = nullptr;
 
-    // readonly soundEnabled?: boolean
-    napi_get_boolean(env, flags->IsSoundEnabled(), &value);
+    int32_t soundEnabled = static_cast<int32_t>(flags->IsSoundEnabled());
+    napi_create_int32(env, soundEnabled, &value);
     napi_set_named_property(env, result, "soundEnabled", value);
 
-    // readonly vibrationEnabled?: boolean
-    napi_get_boolean(env, flags->IsVibrationEnabled(), &value);
+    int32_t vibrationEnabled = static_cast<int32_t>(flags->IsVibrationEnabled());
+    napi_create_int32(env, vibrationEnabled, &value);
     napi_set_named_property(env, result, "vibrationEnabled", value);
 
     return NapiGetBoolean(env, true);

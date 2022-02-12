@@ -18,6 +18,8 @@
 
 #include <memory>
 #include "parcel.h"
+
+#include "notification_constant.h"
 #include "notification_json_convert.h"
 
 namespace OHOS {
@@ -38,25 +40,25 @@ public:
      * Sets the notification whether enable sound.
      * @param soundEnabled whether enable sound.
      */
-    void SetSoundEnabled(bool soundEnabled);
+    void SetSoundEnabled(NotificationConstant::FlagStatus soundEnabled);
 
     /**
      * Checks whether enable sound.
      * @return sound enable.
      */
-    bool IsSoundEnabled() const;
+    NotificationConstant::FlagStatus IsSoundEnabled() const;
 
     /**
      * Sets the notification whether enable vibration.
      * @param vibrationEnabled whether enable vibration.
      */
-    void SetVibrationEnabled(bool vibrationEnabled);
+    void SetVibrationEnabled(NotificationConstant::FlagStatus vibrationEnabled);
 
     /**
      * Checks whether enable vibration.
      * @return vibration enable.
      */
-    bool IsVibrationEnabled() const;
+    NotificationConstant::FlagStatus IsVibrationEnabled() const;
 
     /**
      * Returns a string representation of the object.
@@ -97,8 +99,8 @@ private:
     bool ReadFromParcel(Parcel &parcel);
 
 private:
-    bool soundEnabled_ {true};
-    bool vibrationEnabled_ {false};
+    NotificationConstant::FlagStatus soundEnabled_ {NotificationConstant::FlagStatus::NONE};
+    NotificationConstant::FlagStatus vibrationEnabled_ {NotificationConstant::FlagStatus::NONE};
 };
 }  // namespace Notification
 }  // namespace OHOS
