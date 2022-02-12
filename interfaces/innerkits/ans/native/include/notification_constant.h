@@ -120,6 +120,12 @@ public:
         TYPE_TIMER = 0x00000002
     };
 
+    enum class FlagStatus {
+        NONE,
+        OPEN,
+        CLOSE
+    };
+
     /**
      * Indicates that a notification is deleted because it is clicked.
      */

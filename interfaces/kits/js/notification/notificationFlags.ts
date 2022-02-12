@@ -14,11 +14,34 @@
  */
 
 /**
+ * The status of the notification flag.
+ *
+ * @since 8
+ * @systemapi Hide this for inner system use.
+ * @sysCap SystemCapability.Notification.Notification
+ */
+  export enum NotificationFlagStatus {
+  /**
+   * notification flag default value
+   */
+  TYPE_NONE = 0,
+
+  /**
+   * notification flag open
+   */
+   TYPE_OPEN = 1,
+
+  /**
+   * notification flag close
+   */
+   TYPE_CLOSE = 2,
+}
+
+/**
  * Describes a NotificationFlags instance.
  *
  * @name NotificationFlags
  * @since 8
- * @devices phone, tablet, tv, wearable, car
  * @permission N/A
  * @sysCap SystemCapability.Notification.ANS
  */
@@ -26,10 +49,10 @@
   /**
    * Whether to enable sound reminder.
    */
-  readonly soundEnabled?: boolean;
+  readonly soundEnabled?: NotificationFlagStatus;
 
   /**
    * Whether to enable vibration reminder.
    */
-  readonly vibrationEnabled?: boolean;
+  readonly vibrationEnabled?: NotificationFlagStatus;
 }

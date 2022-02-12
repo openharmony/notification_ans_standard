@@ -120,6 +120,12 @@ enum class DeviceRemindType {
     ACTIVE_REMIND
 };
 
+enum class NotificationFlagStatus {
+    TYPE_NONE,
+    TYPE_OPEN,
+    TYPE_CLOSE
+};
+
 struct NotificationSubscribeInfo {
     std::vector<std::string> bundleNames;
     int userId = 0;
