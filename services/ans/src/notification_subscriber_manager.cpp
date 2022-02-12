@@ -148,6 +148,20 @@ void NotificationSubscriberManager::NotifyDoNotDisturbDateChanged(const sptr<Not
     handler_->PostTask(func);
 }
 
+void NotificationSubscriberManager::NotifyEnabledNotificationChanged(
+    const sptr<EnabledNotificationCallbackData> &callbackData)
+{
+    if (handler_ == nullptr) {
+        ANS_LOGE("handler is nullptr");
+        return;
+    }
+
+    AppExecFwk::EventHandler::Callback func =
+        std::bind(&NotificationSubscriberManager::NotifyEnabledNotificationChangedInner, this, callbackData);
+
+    handler_->PostTask(func);
+}
+
 void NotificationSubscriberManager::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
     ANS_LOGI("OnRemoteDied");
@@ -287,7 +301,7 @@ void NotificationSubscriberManager::NotifyConsumedInner(
     ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
     for (auto record : subscriberRecordList_) {
         ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
-        
+
         int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
@@ -339,6 +353,14 @@ bool NotificationSubscriberManager::IsSystemUser(int32_t userId)
     }
 
     return false;
+}
+
+void NotificationSubscriberManager::NotifyEnabledNotificationChangedInner(
+    const sptr<EnabledNotificationCallbackData> &callbackData)
+{
+    for (auto record : subscriberRecordList_) {
+        record->subscriber->OnEnabledNotificationChanged(callbackData);
+    }
 }
 }  // namespace Notification
 }  // namespace OHOS

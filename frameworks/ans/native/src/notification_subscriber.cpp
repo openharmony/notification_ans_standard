@@ -91,6 +91,12 @@ void NotificationSubscriber::SubscriberImpl::OnDoNotDisturbDateChange(const sptr
     subscriber_.OnDoNotDisturbDateChange(std::make_shared<NotificationDoNotDisturbDate>(*date));
 }
 
+void NotificationSubscriber::SubscriberImpl::OnEnabledNotificationChanged(
+    const sptr<EnabledNotificationCallbackData> &callbackData)
+{
+    subscriber_.OnEnabledNotificationChanged(std::make_shared<EnabledNotificationCallbackData>(*callbackData));
+}
+
 bool NotificationSubscriber::SubscriberImpl::GetAnsManagerProxy()
 {
     if (nullptr == proxy_) {

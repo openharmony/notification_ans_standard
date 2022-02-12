@@ -87,6 +87,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) override;
     ErrCode UpdateSlotGroups(const sptr<NotificationBundleOption> &bundleOption,
         const std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    ErrCode RequestEnableNotification(const std::string &deviceId) override;
     ErrCode SetNotificationsEnabledForBundle(const std::string &bundle, bool enabled) override;
     ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) override;
     ErrCode SetNotificationsEnabledForSpecialBundle(
@@ -97,6 +98,7 @@ public:
     ErrCode Subscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
     ErrCode Unsubscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
     ErrCode IsAllowedNotify(bool &allowed) override;
+    ErrCode IsAllowedNotifySelf(bool &allowed) override;
     ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
     ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) override;
@@ -205,6 +207,8 @@ private:
 
     ErrCode SetDoNotDisturbDateByUser(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date);
     ErrCode GetDoNotDisturbDateByUser(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date);
+    ErrCode SetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool hasPopped);
+    ErrCode GetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool &hasPopped);
 
 private:
     static sptr<AdvancedNotificationService> instance_;

@@ -18,6 +18,7 @@
 
 #include "notification_bundle_option.h"
 #include "notification_do_not_disturb_date.h"
+#include "enabled_notification_callback_data.h"
 #include "notification_request.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
@@ -296,12 +297,30 @@ public:
     static ErrCode SetNotificationBadgeNum(int32_t num);
 
     /**
-     * Checks whether this application has permission to publish notifications.
+     * Checks whether this application has permission to publish notifications. The caller must have
+     * system permissions to call this method.
      *
      * @param  allowed True if this application has the permission; returns false otherwise
      * @return Returns is allowed notify result.
      */
     static ErrCode IsAllowedNotify(bool &allowed);
+
+    /**
+     * Checks whether this application has permission to publish notifications.
+     *
+     * @param  allowed True if this application has the permission; returns false otherwise
+     * @return Returns is allowed notify result.
+     */
+    static ErrCode IsAllowedNotifySelf(bool &allowed);
+
+    /**
+     * Allow the current application to publish notifications on a specified device.
+     *
+     * @param deviceId Indicates the ID of the device running the application. At present, this parameter can
+     *                 only be null or an empty string, indicating the current device.
+     * @return Returns set notifications enabled for default bundle result.
+     */
+    static ErrCode RequestEnableNotification(std::string &deviceId);
 
     /**
      * Checks whether this application is in the suspended state.Applications in this state cannot publish

@@ -74,6 +74,7 @@ enum class SubscriberEventType {
     ON_DIED,
     ON_UPDATE,
     ON_DND_CHANGED,
+    ON_ENABLED_NOTIFICATION_CHANGED,
     ON_CANCELED,
     ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON,
     ON_CONSUMED,
@@ -158,6 +159,24 @@ public:
 
 private:
     std::shared_ptr<NotificationDoNotDisturbDate> date_;
+};
+
+class OnEnabledNotificationChangedEvent : public SubscriberEvent {
+public:
+    explicit OnEnabledNotificationChangedEvent(const std::shared_ptr<EnabledNotificationCallbackData> &callbackData)
+        : SubscriberEvent(SubscriberEventType::ON_ENABLED_NOTIFICATION_CHANGED), callbackData_(callbackData)
+    {}
+
+    ~OnEnabledNotificationChangedEvent() override
+    {}
+
+    const std::shared_ptr<EnabledNotificationCallbackData> &GetEnabledNotificationCallbackData() const
+    {
+        return callbackData_;
+    }
+
+private:
+    std::shared_ptr<EnabledNotificationCallbackData> callbackData_;
 };
 
 class OnOnCanceledEvent : public SubscriberEvent {
@@ -280,6 +299,14 @@ public:
     void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {
         std::shared_ptr<OnDoNotDisturbDateChangedEvent> event = std::make_shared<OnDoNotDisturbDateChangedEvent>(date);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
+    }
+    void OnEnabledNotificationChanged(
+        const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) override
+    {
+        std::shared_ptr<OnEnabledNotificationChangedEvent> event =
+            std::make_shared<OnEnabledNotificationChangedEvent>(callbackData);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }

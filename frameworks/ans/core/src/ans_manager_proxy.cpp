@@ -1242,6 +1242,35 @@ ErrCode AnsManagerProxy::UpdateSlotGroups(
     return result;
 }
 
+ErrCode AnsManagerProxy::RequestEnableNotification(const std::string &deviceId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[RequestEnableNotification] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(deviceId)) {
+        ANS_LOGW("[RequestEnableNotification] fail: write deviceId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(REQUEST_ENABLE_NOTIFICATION, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[RequestEnableNotification] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[RequestEnableNotification] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled)
 {
     MessageParcel data;
@@ -1639,6 +1668,35 @@ ErrCode AnsManagerProxy::IsAllowedNotify(bool &allowed)
 
     if (!reply.ReadBool(allowed)) {
         ANS_LOGW("[IsAllowedNotify] fail: read allowed failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::IsAllowedNotifySelf(bool &allowed)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(IS_ALLOWED_NOTIFY_SELF, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(allowed)) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: read allowed failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
