@@ -95,7 +95,7 @@ public:
     virtual Status GetSecurityLevel(SecurityLevel &securityLevel) const override;
 
     virtual Status SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
-        const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback = nullptr) override;
+        const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback) override;
 
     virtual Status SubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
 
