@@ -45,6 +45,7 @@ ohos_shared_library("ans_core") {
     "${core_path}/src/ans_notification.cpp",
     "${core_path}/src/ans_subscriber_proxy.cpp",
     "${core_path}/src/ans_subscriber_stub.cpp",
+    "${frameworks_path}/ans/native/src/enabled_notification_callback_data.cpp",
     "${frameworks_path}/ans/native/src/message_user.cpp",
     "${frameworks_path}/ans/native/src/notification.cpp",
     "${frameworks_path}/ans/native/src/notification_action_button.cpp",

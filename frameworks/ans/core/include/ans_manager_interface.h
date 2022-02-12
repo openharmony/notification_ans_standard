@@ -88,6 +88,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) = 0;
     virtual ErrCode UpdateSlotGroups(
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups) = 0;
+    virtual ErrCode RequestEnableNotification(const std::string &deviceId) = 0;
     virtual ErrCode SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled) = 0;
     virtual ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) = 0;
     virtual ErrCode SetNotificationsEnabledForSpecialBundle(
@@ -101,6 +102,7 @@ public:
     virtual ErrCode AreNotificationsSuspended(bool &suspended) = 0;
     virtual ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap) = 0;
     virtual ErrCode IsAllowedNotify(bool &allowed) = 0;
+    virtual ErrCode IsAllowedNotifySelf(bool &allowed) = 0;
     virtual ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) = 0;
 
     virtual ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) = 0;
@@ -170,6 +172,7 @@ protected:
         GET_SLOTS_BY_BUNDLE,
         UPDATE_SLOTS,
         UPDATE_SLOT_GROUPS,
+        REQUEST_ENABLE_NOTIFICATION,
         SET_NOTIFICATION_ENABLED_FOR_BUNDLE,
         SET_NOTIFICATION_ENABLED_FOR_ALL_BUNDLE,
         SET_NOTIFICATION_ENABLED_FOR_SPECIAL_BUNDLE,
@@ -181,6 +184,7 @@ protected:
         ARE_NOTIFICATION_SUSPENDED,
         GET_CURRENT_APP_SORTING,
         IS_ALLOWED_NOTIFY,
+        IS_ALLOWED_NOTIFY_SELF,
         IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
         SET_DO_NOT_DISTURB_DATE,
         GET_DO_NOT_DISTURB_DATE,

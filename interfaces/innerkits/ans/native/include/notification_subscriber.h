@@ -100,6 +100,13 @@ public:
      **/
     virtual void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) = 0;
 
+    /**
+     * @brief Called when the notification permission changes.
+     *
+     * @param callbackData Indicates the properties of the application that notification permission has changed.
+     **/
+    virtual void OnEnabledNotificationChanged(const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) = 0;
+
 private:
     class SubscriberImpl final : public AnsSubscriberStub {
     public:
@@ -136,6 +143,8 @@ private:
         void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) override;
 
         void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) override;
+
+        void OnEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData) override;
 
         bool GetAnsManagerProxy();
 

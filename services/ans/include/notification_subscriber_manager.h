@@ -47,6 +47,7 @@ public:
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
     void NotifyUpdated(const sptr<NotificationSortingMap> &notificationMap);
     void NotifyDoNotDisturbDateChanged(const sptr<NotificationDoNotDisturbDate> &date);
+    void NotifyEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData);
     void OnRemoteDied(const wptr<IRemoteObject> &object);
 
 private:
@@ -70,6 +71,7 @@ private:
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
     void NotifyUpdatedInner(const sptr<NotificationSortingMap> &notificationMap);
     void NotifyDoNotDisturbDateChangedInner(const sptr<NotificationDoNotDisturbDate> &date);
+    void NotifyEnabledNotificationChangedInner(const sptr<EnabledNotificationCallbackData> &callbackData);
     bool IsSystemUser(int32_t userId);
 
 private:

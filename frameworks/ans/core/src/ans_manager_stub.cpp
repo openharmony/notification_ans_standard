@@ -136,6 +136,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::UPDATE_SLOT_GROUPS,
             std::bind(&AnsManagerStub::HandleUpdateSlotGroups, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
+        {AnsManagerStub::REQUEST_ENABLE_NOTIFICATION,
+            std::bind(&AnsManagerStub::HandleRequestEnableNotification, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::SET_NOTIFICATION_ENABLED_FOR_BUNDLE,
             std::bind(&AnsManagerStub::HandleSetNotificationsEnabledForBundle, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
@@ -168,6 +171,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
                 std::placeholders::_3)},
         {AnsManagerStub::IS_ALLOWED_NOTIFY,
             std::bind(&AnsManagerStub::HandleIsAllowedNotify, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::IS_ALLOWED_NOTIFY_SELF,
+            std::bind(&AnsManagerStub::HandleIsAllowedNotifySelf, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
         {AnsManagerStub::IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
             std::bind(&AnsManagerStub::HandleIsSpecialBundleAllowedNotify, std::placeholders::_1, std::placeholders::_2,
@@ -978,6 +984,22 @@ ErrCode AnsManagerStub::HandleUpdateSlotGroups(MessageParcel &data, MessageParce
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleRequestEnableNotification(MessageParcel &data, MessageParcel &reply)
+{
+    std::string deviceId;
+    if (!data.ReadString(deviceId)) {
+        ANS_LOGW("[HandleRequestEnableNotification] fail: read deviceId failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = RequestEnableNotification(deviceId);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleRequestEnableNotification] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleSetNotificationsEnabledForBundle(MessageParcel &data, MessageParcel &reply)
 {
     std::string deviceId;
@@ -1216,6 +1238,22 @@ ErrCode AnsManagerStub::HandleIsAllowedNotify(MessageParcel &data, MessageParcel
 
     if (!reply.WriteBool(allowed)) {
         ANS_LOGW("[HandleIsAllowedNotify] fail: write allowed failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleIsAllowedNotifySelf(MessageParcel &data, MessageParcel &reply)
+{
+    bool allowed = false;
+    ErrCode result = IsAllowedNotifySelf(allowed);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleIsAllowedNotifySelf] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteBool(allowed)) {
+        ANS_LOGW("[HandleIsAllowedNotifySelf] fail: write allowed failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
     return ERR_OK;
@@ -1897,6 +1935,12 @@ ErrCode AnsManagerStub::UpdateSlotGroups(
     return ERR_INVALID_OPERATION;
 }
 
+ErrCode AnsManagerStub::RequestEnableNotification(const std::string &deviceId)
+{
+    ANS_LOGW("AnsManagerStub::RequestEnableNotification called!");
+    return ERR_INVALID_OPERATION;
+}
+
 ErrCode AnsManagerStub::SetNotificationsEnabledForBundle(const std::string &bundle, bool enabled)
 {
     ANS_LOGW("AnsManagerStub::SetNotificationsEnabledForBundle called!");
@@ -1961,6 +2005,12 @@ ErrCode AnsManagerStub::GetCurrentAppSorting(sptr<NotificationSortingMap> &sorti
 ErrCode AnsManagerStub::IsAllowedNotify(bool &allowed)
 {
     ANS_LOGW("AnsManagerStub::IsAllowedNotify called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::IsAllowedNotifySelf(bool &allowed)
+{
+    ANS_LOGW("AnsManagerStub::IsAllowedNotifySelf called!");
     return ERR_INVALID_OPERATION;
 }
 

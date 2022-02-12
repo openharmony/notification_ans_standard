@@ -66,6 +66,8 @@ public:
     ErrCode SetNotificationsEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, const bool enabled);
     ErrCode GetNotificationsEnabled(const int32_t &userId, bool &enabled);
     ErrCode SetNotificationsEnabled(const int32_t &userId, const bool &enabled);
+    ErrCode GetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool &hasPopped);
+    ErrCode SetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool hasPopped);
     ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date);
     ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> date);
     ErrCode GetTemplateSupported(const std::string& templateName, bool &support);

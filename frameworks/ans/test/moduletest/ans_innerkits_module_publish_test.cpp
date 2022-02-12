@@ -93,6 +93,10 @@ public:
     virtual void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {}
 
+    virtual void OnEnabledNotificationChanged(
+        const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) override
+    {}
+
     virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
     {
         GTEST_LOG_(INFO) << "ANS_Interface_MT::OnCanceled request : " << request->GetNotificationRequest().Dump();

@@ -1328,6 +1328,28 @@ napi_value Common::SetDoNotDisturbDate(
     return NapiGetBoolean(env, true);
 }
 
+napi_value Common::SetEnabledNotificationCallbackData(const napi_env &env, const EnabledNotificationCallbackData &data,
+    napi_value &result)
+{
+    ANS_LOGI("enter");
+    // bundle: string
+    napi_value bundleNapi = nullptr;
+    napi_create_string_utf8(env, data.GetBundle().c_str(), NAPI_AUTO_LENGTH, &bundleNapi);
+    napi_set_named_property(env, result, "bundle", bundleNapi);
+
+    // uid: uid_t
+    napi_value uidNapi = nullptr;
+    napi_create_int32(env, data.GetUid(), &uidNapi);
+    napi_set_named_property(env, result, "uid", uidNapi);
+
+    // enable: bool
+    napi_value enableNapi = nullptr;
+    napi_get_boolean(env, data.GetEnable(), &enableNapi);
+    napi_set_named_property(env, result, "enable", enableNapi);
+
+    return NapiGetBoolean(env, true);
+}
+
 napi_value Common::GetNotificationSubscriberInfo(
     const napi_env &env, const napi_value &value, NotificationSubscribeInfo &subscriberInfo)
 {
