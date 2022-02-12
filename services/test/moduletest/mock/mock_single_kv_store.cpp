@@ -186,7 +186,7 @@ Status AnsTestSingleKvStore::ReleaseKvStoreSnapshot(std::shared_ptr<KvStoreSnaps
 }
 
 Status AnsTestSingleKvStore::SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
-    const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback = nullptr)
+    const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback)
 {
     return Status::SUCCESS;
 }
