@@ -168,6 +168,7 @@ void ReminderRequest::InitUserId(const int &userId)
 {
     userId_ = userId;
 }
+
 bool ReminderRequest::IsExpired() const
 {
     return isExpired_;
@@ -1194,12 +1195,10 @@ int ReminderRequest::GetCTime(const TimeTransferType &type, int actualTime)
 int32_t ReminderRequest::GetUid(const int &userId, const std::string &bundleName)
 {
     AppExecFwk::ApplicationInfo info;
-    OHOS::sptr<OHOS::ISystemAbilityManager> systemAbilityManager
-        = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    OHOS::sptr<OHOS::IRemoteObject> remoteObject
-        = systemAbilityManager->GetSystemAbility(OHOS::BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    OHOS::sptr<OHOS::AppExecFwk::IBundleMgr> bundleMgr
-        = OHOS::iface_cast<OHOS::AppExecFwk::IBundleMgr>(remoteObject);
+    sptr<ISystemAbilityManager> systemAbilityManager
+        = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IRemoteObject> remoteObject  = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    sptr<AppExecFwk::IBundleMgr> bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO,
         static_cast<int32_t>(userId), info);
     return static_cast<int32_t>(info.uid);
