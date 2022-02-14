@@ -79,9 +79,10 @@ public:
 };
 
 /**
- * @tc.number    : initDateTime_00100
- * @tc.name      :
- * @tc.desc      : Check firstDesignateYear set successfully.
+ * @tc.name: initDateTime_00100
+ * @tc.desc: Check firstDesignateYear set successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00100, Function | SmallTest | Level1)
 {
@@ -95,9 +96,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00100, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00200
- * @tc.name      :
- * @tc.desc      : Check firstDesignateMonth set successfully.
+ * @tc.name: initDateTime_00200
+ * @tc.desc: Check firstDesignateMonth set successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00200, Function | SmallTest | Level1)
 {
@@ -111,9 +113,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00200, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00300
- * @tc.name      :
- * @tc.desc      : Check firstDesignateDay set successfully.
+ * @tc.name: initDateTime_00300
+ * @tc.desc: Check firstDesignateDay set successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00300, Function | SmallTest | Level1)
 {
@@ -127,9 +130,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00300, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00400
- * @tc.name      :
- * @tc.desc      : Check repeatMonth set with normal value successfully.
+ * @tc.name: initDateTime_00400
+ * @tc.desc: Check repeatMonth set with normal value successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00400, Function | SmallTest | Level1)
 {
@@ -168,9 +172,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00400, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00500
- * @tc.name      :
- * @tc.desc      : Check repeatMonth set with exception value successfully.
+ * @tc.name: initDateTime_00500
+ * @tc.desc: Check repeatMonth set with exception value successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00500, Function | SmallTest | Level1)
 {
@@ -209,9 +214,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00500, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00600
- * @tc.name      :
- * @tc.desc      : Check repeatDay set with nomal value successfully.
+ * @tc.name: initDateTime_00600
+ * @tc.desc: Check repeatDay set with nomal value successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00600, Function | SmallTest | Level1)
 {
@@ -249,9 +255,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00600, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00700
- * @tc.name      :
- * @tc.desc      : Check repeatDay set with exception value successfully.
+ * @tc.name: initDateTime_00700
+ * @tc.desc: Check repeatDay set with exception value successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00700, Function | SmallTest | Level1)
 {
@@ -291,9 +298,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00700, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00800
- * @tc.name      :
- * @tc.desc      : Check hour set successfully.
+ * @tc.name: initDateTime_00800
+ * @tc.desc: Check hour set successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00800, Function | SmallTest | Level1)
 {
@@ -306,9 +314,10 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00800, Function | SmallTest |
 }
 
 /**
- * @tc.number    : initDateTime_00900
- * @tc.name      :
- * @tc.desc      : Check minut set successfully.
+ * @tc.name: initDateTime_00900
+ * @tc.desc: Check minut set successfully.
+ * @tc.type: FUNC
+ * @tc.require: SR000GN4CU AR000GNF1V
  */
 HWTEST_F(ReminderRequestCalendarTest, initDateTime_00900, Function | SmallTest | Level1)
 {

@@ -270,6 +270,17 @@ public:
     void InitReminderId();
 
     /**
+     * @brief Inits reminder userId when publish reminder success.
+     *
+     * When package remove, user id is sended by wantAgent, but we cannot get the uid according user id as the
+     * package has been removed, and the bundleOption can not be create with correct uid. so we need to record
+     * the user id, and use it to judge which user the reminder belong to.
+     *
+     * @param userId Indicates the userId which the reminder belong to.
+     */
+    void InitUserId(const int &userId);
+
+    /**
      * @brief Check the reminder is alerting or not.
      *
      * @return true if the reminder is playing sound or vibrating.
@@ -549,6 +560,8 @@ public:
     static const std::string PARAM_REMINDER_ID;
     static int GetActualTime(const TimeTransferType &type, int cTime);
     static int GetCTime(const TimeTransferType &type, int actualTime);
+    static int32_t GetUid(const int &userId, const std::string &bundleName);
+    static int GetUserId(const int &uid);
 
 protected:
     ReminderRequest();
@@ -611,6 +624,7 @@ private:
     uint8_t state_ {0};
     int32_t notificationId_ {0};
     int32_t reminderId_ {-1};
+    int userId_ {-1};
 
     // Indicates the reminder has been shown in the past time.
     // When the reminder has been created but not showed, it is equals to 0.

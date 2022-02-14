@@ -36,8 +36,11 @@ public:
 
     /**
      * @brief Cancels all the reminders relative to the bundle option.
+     *
+     * @param bundleOption Indicates the bundle option.
+     * @param userId Indicates the user id which the bundle belong to.
      */
-    void CancelAllReminders(const sptr<NotificationBundleOption> &bundleOption);
+    void CancelAllReminders(const sptr<NotificationBundleOption> &bundleOption, int userId);
 
     /**
      * @brief Cancels the target reminder relative to the reminder id and bundle option.
