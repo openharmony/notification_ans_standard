@@ -1631,7 +1631,9 @@ ErrCode AdvancedNotificationService::CancelAllReminders()
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    ReminderDataManager::GetInstance()->CancelAllReminders(bundleOption);
+    int userId = -1;
+    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), userId);
+    ReminderDataManager::GetInstance()->CancelAllReminders(bundleOption, userId);
     return ERR_OK;
 }
 
