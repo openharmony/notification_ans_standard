@@ -64,6 +64,7 @@ ohos_unittest("ans_unit_test") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
+    "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]

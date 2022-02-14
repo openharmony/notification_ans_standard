@@ -35,7 +35,9 @@
 #include "permission_filter.h"
 #include "reminder_data_manager.h"
 #include "trigger_info.h"
+#include "ui_service_mgr_client.h"
 #include "want_agent_helper.h"
+#include "wm_common.h"
 
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 #include "distributed_notification_manager.h"
@@ -60,6 +62,11 @@ constexpr int32_t NOTIFICATION_MAX_COUNT = 1024;
 constexpr int32_t DEFAULT_RECENT_COUNT = 16;
 
 constexpr int HOURS_IN_ONE_DAY = 24;
+
+constexpr int DIALOG_POSTION_X = 150;
+constexpr int DIALOG_POSTION_Y = 300;
+constexpr int DIALOG_WIDTH = 450;
+constexpr int DIALOG_HEIGHT = 300;
 
 struct RecentNotification {
     sptr<Notification> notification = nullptr;
@@ -1053,11 +1060,6 @@ ErrCode AdvancedNotificationService::UpdateSlotGroups(
     return result;
 }
 
-ErrCode AdvancedNotificationService::SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled)
-{
-    return ERR_INVALID_OPERATION;
-}
-
 ErrCode AdvancedNotificationService::SetShowBadgeEnabledForBundle(
     const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
@@ -1350,6 +1352,68 @@ ErrCode AdvancedNotificationService::GetSpecialActiveNotifications(
     return result;
 }
 
+ErrCode AdvancedNotificationService::RequestEnableNotification(const std::string &deviceId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    ErrCode result = ERR_OK;
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    bool allowedNotify = false;
+    result = IsSpecialBundleAllowedNotify(bundleOption, allowedNotify);
+    if (allowedNotify) {
+        ANS_LOGD("Already granted permission");
+        return result;
+    }
+
+    bool hasPopped = false;
+    result = GetHasPoppedDialog(bundleOption, hasPopped);
+    if (hasPopped) {
+        ANS_LOGD("Already shown dialog");
+        return result;
+    }
+
+    const std::string params = std::string("{\"requestNotification\":\"Allowed to send notification?\", ") +
+        std::string("\"allowButton\":\"Alllow\", \"cancelButton\":\"Cancel\", \"uid\":\"") +
+        std::to_string(bundleOption->GetUid()) + std::string("\"}");
+    Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
+        "notification_dialog",
+        params,
+        OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
+        DIALOG_POSTION_X,
+        DIALOG_POSTION_Y,
+        DIALOG_WIDTH,
+        DIALOG_HEIGHT,
+        [this](int32_t id, const std::string& event, const std::string& params) {
+            ANS_LOGD("Dialog callback: %{public}s, %{public}s", event.c_str(), params.c_str());
+            int32_t uid = std::stoi(params, nullptr);
+            std::string bundle;
+            std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+            if (bundleManager != nullptr) {
+                bundle = bundleManager->GetBundleNameByUid(uid);
+            }
+            sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundle, uid);
+            if (event == "EVENT_ALLOW") {
+                this->SetNotificationsEnabledForSpecialBundle("", bundleOption, true);
+                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
+            } else {
+                this->SetNotificationsEnabledForSpecialBundle("", bundleOption, false);
+                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
+            }
+            this->SetHasPoppedDialog(bundleOption, true);
+        });
+
+    return result;
+}
+
+ErrCode AdvancedNotificationService::SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled)
+{
+    return ERR_INVALID_OPERATION;
+}
+
 ErrCode AdvancedNotificationService::SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
@@ -1397,11 +1461,20 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForSpecialBundle(
         return ERR_ANS_INVALID_BUNDLE;
     }
 
+    sptr<EnabledNotificationCallbackData> bundleData =
+        new EnabledNotificationCallbackData(bundle->GetBundleName(), bundle->GetUid(), enabled);
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         if (deviceId.empty()) {
             // Local device
             result = NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(bundle, enabled);
+            if (!enabled) {
+                result = RemoveAllNotifications(bundle);
+            }
+            if (result == ERR_OK) {
+                NotificationSubscriberManager::GetInstance()->NotifyEnabledNotificationChanged(bundleData);
+            }
         } else {
             // Remote revice
         }
@@ -1431,6 +1504,27 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
         allowed = false;
         result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
     }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::IsAllowedNotifySelf(bool &allowed)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    ErrCode result = ERR_OK;
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    handler_->PostSyncTask(std::bind([&]() {
+        allowed = false;
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+        }
+    }));
+
     return result;
 }
 
@@ -1479,7 +1573,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
             result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(targetBundle, allowed);
             if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
                 result = ERR_OK;
-                allowed = true;
+                allowed = false;
             }
         }
     }));
@@ -3018,7 +3112,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
             NotificationSubscriberManager::GetInstance()->NotifyDoNotDisturbDateChanged(newConfig);
         }
     }));
- 
+
     return ERR_OK;
 }
 
@@ -3026,7 +3120,7 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDateByUser(const int32_t &us
     sptr<NotificationDoNotDisturbDate> &date)
 {
     ErrCode result = ERR_OK;
-    
+
     handler_->PostSyncTask(std::bind([&]() {
         sptr<NotificationDoNotDisturbDate> currentConfig = nullptr;
         result = NotificationPreferences::GetInstance().GetDoNotDisturbDate(userId, currentConfig);
@@ -3050,6 +3144,28 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDateByUser(const int32_t &us
     }));
 
     return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::SetHasPoppedDialog(
+    const sptr<NotificationBundleOption> bundleOption, bool hasPopped)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetHasPoppedDialog(bundleOption, hasPopped);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::GetHasPoppedDialog(
+    const sptr<NotificationBundleOption> bundleOption, bool &hasPopped)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetHasPoppedDialog(bundleOption, hasPopped);
+    }));
+    return result;
 }
 }  // namespace Notification
 }  // namespace OHOS

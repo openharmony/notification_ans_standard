@@ -77,6 +77,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) override;
     virtual ErrCode UpdateSlotGroups(const sptr<NotificationBundleOption> &bundleOption,
         const std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    virtual ErrCode RequestEnableNotification(const std::string &deviceId) override;
     virtual ErrCode SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled) override;
     virtual ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) override;
     virtual ErrCode SetNotificationsEnabledForSpecialBundle(
@@ -93,6 +94,7 @@ public:
     virtual ErrCode AreNotificationsSuspended(bool &suspended) override;
     virtual ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap) override;
     virtual ErrCode IsAllowedNotify(bool &allowed) override;
+    virtual ErrCode IsAllowedNotifySelf(bool &allowed) override;
     virtual ErrCode IsSpecialBundleAllowedNotify(
         const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
@@ -166,6 +168,7 @@ private:
     ErrCode HandleGetSlotsByBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleUpdateSlots(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleUpdateSlotGroups(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleRequestEnableNotification(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetNotificationsEnabledForBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetNotificationsEnabledForAllBundles(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetNotificationsEnabledForSpecialBundle(MessageParcel &data, MessageParcel &reply);
@@ -177,6 +180,7 @@ private:
     ErrCode HandleAreNotificationsSuspended(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetCurrentAppSorting(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsAllowedNotify(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsAllowedNotifySelf(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsDistributedEnabled(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleEnableDistributed(MessageParcel &data, MessageParcel &reply);

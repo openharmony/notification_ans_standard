@@ -18,6 +18,7 @@
 
 #include "iremote_broker.h"
 
+#include "enabled_notification_callback_data.h"
 #include "notification.h"
 #include "notification_constant.h"
 #include "notification_do_not_disturb_date.h"
@@ -45,6 +46,7 @@ public:
         int deleteReason) = 0;
     virtual void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) = 0;
     virtual void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) = 0;
+    virtual void OnEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -56,6 +58,7 @@ protected:
         ON_CANCELED_MAP,
         ON_UPDATED,
         ON_DND_DATE_CHANGED,
+        ON_ENABLED_NOTIFICATION_CHANGED,
     };
 };
 }  // namespace Notification

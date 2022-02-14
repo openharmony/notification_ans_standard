@@ -54,8 +54,10 @@ ohos_shared_library("libans") {
 
   deps = [
     "${core_path}:ans_core",
+    "${frameworks_path}/ans/dialog/dialog_ui/js:dialog_js_files_etc",
     "${frameworks_path}/ans/native:ans_innerkits",
     "${frameworks_path}/wantagent:wantagent_innerkits",
+    "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
     "//utils/native/base:utils",
   ]
 
@@ -77,6 +79,7 @@ ohos_shared_library("libans") {
     "multimedia_media_standard:media_client",
     "os_account_standard:os_account_innerkits",
     "time_native:time_service",
+    "window_manager:libwm",
   ]
   external_deps += ans_standard_external_deps
 

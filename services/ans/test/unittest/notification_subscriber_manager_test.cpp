@@ -45,6 +45,9 @@ private:
         {}
         void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
         {}
+        void OnEnabledNotificationChanged(
+            const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) override
+        {}
         void OnCanceled(const std::shared_ptr<Notification> &request) override
         {}
         void OnCanceled(const std::shared_ptr<Notification> &request,
