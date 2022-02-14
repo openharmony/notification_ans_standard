@@ -540,6 +540,29 @@ ErrCode NotificationPreferences::SetNotificationsEnabled(const int32_t &userId, 
     return result;
 }
 
+ErrCode NotificationPreferences::GetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool &hasPopped)
+{
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+    return GetBundleProperty(bundleOption, BundleType::BUNDLE_POPPED_DIALOG_TYPE, hasPopped);
+}
+
+ErrCode NotificationPreferences::SetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool hasPopped)
+{
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
+    ErrCode result = ERR_OK;
+    result = SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_POPPED_DIALOG_TYPE, hasPopped);
+    if (result == ERR_OK) {
+        preferencesInfo_ = preferencesInfo;
+    }
+    return result;
+}
+
 ErrCode NotificationPreferences::GetDoNotDisturbDate(const int32_t &userId,
     sptr<NotificationDoNotDisturbDate> &date)
 {
@@ -564,7 +587,7 @@ ErrCode NotificationPreferences::SetDoNotDisturbDate(const int32_t &userId,
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     preferencesInfo.SetDoNotDisturbDate(userId, date);
-    
+
     ErrCode result = ERR_OK;
     if (!preferncesDB_->PutDoNotDisturbDate(userId, date)) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
@@ -769,6 +792,10 @@ ErrCode NotificationPreferences::SaveBundleProperty(NotificationPreferencesInfo:
             bundleInfo.SetEnableNotification(value);
             storeDBResult = preferncesDB_->PutNotificationsEnabledForBundle(bundleInfo, value);
             break;
+        case BundleType::BUNDLE_POPPED_DIALOG_TYPE:
+            bundleInfo.SetHasPoppedDialog(value);
+            storeDBResult = preferncesDB_->PutHasPoppedDialog(bundleInfo, value);
+            break;
         default:
             break;
     }
@@ -797,6 +824,9 @@ ErrCode NotificationPreferences::GetBundleProperty(
                 break;
             case BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE:
                 value = bundleInfo.GetEnableNotification();
+                break;
+            case BundleType::BUNDLE_POPPED_DIALOG_TYPE:
+                value = bundleInfo.GetHasPoppedDialog();
                 break;
             default:
                 result = ERR_ANS_INVALID_PARAM;

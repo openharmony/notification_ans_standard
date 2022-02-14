@@ -232,6 +232,9 @@ public:
     static napi_value SetDoNotDisturbDate(
         const napi_env &env, const NotificationDoNotDisturbDate &date, napi_value &result);
 
+    static napi_value SetEnabledNotificationCallbackData(const napi_env &env,
+        const EnabledNotificationCallbackData &data, napi_value &result);
+
     static napi_value GetNotificationSubscriberInfo(
         const napi_env &env, const napi_value &value, NotificationSubscribeInfo &result);
 

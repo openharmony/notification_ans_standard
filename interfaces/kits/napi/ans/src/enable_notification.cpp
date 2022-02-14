@@ -289,5 +289,98 @@ napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)
         return promise;
     }
 }
+
+napi_value IsNotificationEnabledSelf(napi_env env, napi_callback_info info)
+{
+    ANS_LOGI("enter");
+
+    IsEnableParams params {};
+    if (ParseParameters(env, info, params) == nullptr) {
+        return Common::NapiGetUndefined(env);
+    }
+
+    AsyncCallbackInfoIsEnable *asynccallbackinfo =
+        new (std::nothrow) AsyncCallbackInfoIsEnable {.env = env, .asyncWork = nullptr, .params = params};
+    if (!asynccallbackinfo) {
+        return Common::JSParaError(env, params.callback);
+    }
+    napi_value promise = nullptr;
+    Common::PaddingCallbackPromiseInfo(env, params.callback, asynccallbackinfo->info, promise);
+
+    napi_value resourceName = nullptr;
+    napi_create_string_latin1(env, "IsNotificationEnabledSelf", NAPI_AUTO_LENGTH, &resourceName);
+    // Asynchronous function call
+    napi_create_async_work(env,
+        nullptr,
+        resourceName,
+        [](napi_env env, void *data) {
+            ANS_LOGI("IsNotificationEnabledSelf napi_create_async_work start");
+            AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
+
+            if (asynccallbackinfo->params.hasBundleOption) {
+                ANS_LOGE("Not allowed to query another application");
+            } else {
+                asynccallbackinfo->info.errorCode = NotificationHelper::IsAllowedNotifySelf(asynccallbackinfo->allowed);
+            }
+            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d, allowed = %{public}d",
+                asynccallbackinfo->info.errorCode, asynccallbackinfo->allowed);
+        },
+        AsyncCompleteCallbackIsNotificationEnabled,
+        (void *)asynccallbackinfo,
+        &asynccallbackinfo->asyncWork);
+
+    NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
+
+    if (asynccallbackinfo->info.isCallback) {
+        return Common::NapiGetNull(env);
+    } else {
+        return promise;
+    }
+}
+
+napi_value RequestEnableNotification(napi_env env, napi_callback_info info)
+{
+    ANS_LOGI("enter");
+
+    IsEnableParams params {};
+    if (ParseParameters(env, info, params) == nullptr) {
+        return Common::NapiGetUndefined(env);
+    }
+
+    AsyncCallbackInfoIsEnable *asynccallbackinfo =
+        new (std::nothrow) AsyncCallbackInfoIsEnable {.env = env, .asyncWork = nullptr, .params = params};
+
+    if (!asynccallbackinfo) {
+        return Common::JSParaError(env, params.callback);
+    }
+    napi_value promise = nullptr;
+    Common::PaddingCallbackPromiseInfo(env, params.callback, asynccallbackinfo->info, promise);
+
+    napi_value resourceName = nullptr;
+    napi_create_string_latin1(env, "RequestEnableNotification", NAPI_AUTO_LENGTH, &resourceName);
+    // Asynchronous function call
+    napi_create_async_work(env,
+        nullptr,
+        resourceName,
+        [](napi_env env, void *data) {
+            ANS_LOGI("RequestEnableNotification napi_create_async_work start");
+            AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
+
+            std::string deviceId {""};
+            asynccallbackinfo->info.errorCode = NotificationHelper::RequestEnableNotification(deviceId);
+            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d", asynccallbackinfo->info.errorCode);
+        },
+        AsyncCompleteCallbackIsNotificationEnabled,
+        (void *)asynccallbackinfo,
+        &asynccallbackinfo->asyncWork);
+
+    NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
+
+    if (asynccallbackinfo->info.isCallback) {
+        return Common::NapiGetNull(env);
+    } else {
+        return promise;
+    }
+}
 }  // namespace NotificationNapi
 }  // namespace OHOS

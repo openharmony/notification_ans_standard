@@ -46,6 +46,8 @@ public:
         bool GetIsPrivateAllowed() const;
         void SetEnableNotification(const bool &enable);
         bool GetEnableNotification() const;
+        void SetHasPoppedDialog(const bool &hasPopped);
+        bool GetHasPoppedDialog() const;
         void SetSlot(const sptr<NotificationSlot> &slot);
         bool GetSlot(const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot) const;
         bool GetAllSlots(std::vector<sptr<NotificationSlot>> &slots);
@@ -72,6 +74,7 @@ public:
         int badgeTotalNum_ = BUNDLE_BADGE_TOTAL_NUM;
         bool isPrivateAllowed_ = BUNDLE_PRIVATE_ALLOWED;
         bool isEnabledNotification_ = BUNDLE_ENABLE_NOTIFICATION;
+        bool hasPoppedDialog_ = BUNDLE_POPPED_DIALOG;
         std::map<NotificationConstant::SlotType, sptr<NotificationSlot>> slots_;
         std::map<std::string, sptr<NotificationSlotGroup>> groups_;
     };

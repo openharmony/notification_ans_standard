@@ -81,6 +81,17 @@ bool NotificationPreferencesInfo::BundleInfo::GetEnableNotification() const
     return isEnabledNotification_;
 }
 
+
+void NotificationPreferencesInfo::BundleInfo::SetHasPoppedDialog(const bool &hasPopped)
+{
+    hasPoppedDialog_ = hasPopped;
+}
+
+bool NotificationPreferencesInfo::BundleInfo::GetHasPoppedDialog() const
+{
+    return hasPoppedDialog_;
+}
+
 void NotificationPreferencesInfo::BundleInfo::SetSlot(const sptr<NotificationSlot> &slot)
 {
     slots_.insert_or_assign(slot->GetType(), slot);
