@@ -298,11 +298,15 @@ ErrCode NotificationSubscriberManager::RemoveSubscriberInner(
 void NotificationSubscriberManager::NotifyConsumedInner(
     const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap)
 {
-    ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
+    ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());      
+    int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
     for (auto record : subscriberRecordList_) {
         ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
+<<<<<<< HEAD
 
         int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
+=======
+>>>>>>> cancel notification modify
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
@@ -320,12 +324,16 @@ void NotificationSubscriberManager::NotifyCanceledInner(
     const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason)
 {
     ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
+    int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
     for (auto record : subscriberRecordList_) {
         ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
-            (notification->GetUserId() == record->userId || notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
+            (notification->GetUserId() == record->userId ||
+            notification->GetUserId() == SUBSCRIBE_USER_ALL ||
+            recvUserId == record->userId ||
+            IsSystemUser(record->userId))) {
             record->subscriber->OnCanceled(notification, notificationMap, deleteReason);
             record->subscriber->OnCanceled(notification);
         }
