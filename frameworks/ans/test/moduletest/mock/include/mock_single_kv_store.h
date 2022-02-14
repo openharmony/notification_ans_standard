@@ -99,7 +99,7 @@ public:
 
     virtual Status SubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
 
-    virtual Status UnSubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
+    virtual Status UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
 
     Status GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
                               std::shared_ptr<KvStoreSnapshot> &snapshot) const override;
