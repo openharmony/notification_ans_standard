@@ -196,7 +196,7 @@ Status AnsTestSingleKvStore::SubscribeWithQuery(const std::vector<std::string> &
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::UnSubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
+Status AnsTestSingleKvStore::UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
 {
     return Status::SUCCESS;
 }
