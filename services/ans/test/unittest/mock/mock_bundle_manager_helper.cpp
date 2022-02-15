@@ -46,6 +46,11 @@ bool BundleManagerHelper::IsSystemApp(int uid)
     return (uid == SYSTEM_APP_UID);
 }
 
+bool BundleManagerHelper::GetBundleInfoByBundleName(const std::string bundle, AppExecFwk::BundleInfo &bundleInfo)
+{
+    return true;
+}
+
 void BundleManagerHelper::Connect()
 {}
 
