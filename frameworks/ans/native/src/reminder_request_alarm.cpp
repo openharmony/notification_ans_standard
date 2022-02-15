@@ -109,7 +109,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     }
 
     ANSR_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
-        "min=%{public}d, sec=%{public}d, week=%{public}d, \n Target: tar_hour=%{public}d, tar_min=%{public}d",
+        "min=%{public}d, sec=%{public}d, week=%{public}d, Target: tar_hour=%{public}d, tar_min=%{public}d",
         GetActualTime(TimeTransferType::YEAR, nowTime->tm_year),
         GetActualTime(TimeTransferType::MONTH, nowTime->tm_mon),
         nowTime->tm_mday, nowTime->tm_hour, nowTime->tm_min, nowTime->tm_sec,
@@ -159,7 +159,7 @@ int8_t ReminderRequestAlarm::GetNextAlarm(const time_t now, const time_t target)
     if (repeatDays_ == 0) {
         return INVALID_INT_VALUE;
     }
-    int today = gmtime(&now)->tm_wday;
+    int today = GetActualTime(TimeTransferType::WEEK, gmtime(&now)->tm_wday);
     int dayCount = now >= target ? 1 : 0;
     for (; dayCount <= DAYS_PER_WEEK; dayCount++) {
         int day = (today + dayCount) % DAYS_PER_WEEK;
