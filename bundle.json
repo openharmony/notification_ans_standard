@@ -48,9 +48,10 @@
     "ram": "16000KB",
     "deps": {
       "components": [
+        "ability_base",
         "samgr_standard",
         "ipc",
-        "aafwk_standard",
+        "ability_runtime",
         "dmsfwk_standard",
         "multimedia_image_standard",
         "hiviewdfx_hilog_native",
