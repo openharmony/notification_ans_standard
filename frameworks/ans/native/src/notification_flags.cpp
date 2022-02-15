@@ -18,30 +18,30 @@
 
 namespace OHOS {
 namespace Notification {
-void NotificationFlags::SetSoundEnabled(bool soundEnabled)
+void NotificationFlags::SetSoundEnabled(NotificationConstant::FlagStatus soundEnabled)
 {
     soundEnabled_ = soundEnabled;
 }
 
-bool NotificationFlags::IsSoundEnabled() const
+NotificationConstant::FlagStatus NotificationFlags::IsSoundEnabled() const
 {
     return soundEnabled_;
 }
 
-void NotificationFlags::SetVibrationEnabled(bool vibrationEnabled)
+void NotificationFlags::SetVibrationEnabled(NotificationConstant::FlagStatus vibrationEnabled)
 {
     vibrationEnabled_ = vibrationEnabled;
 }
 
-bool NotificationFlags::IsVibrationEnabled() const
+NotificationConstant::FlagStatus NotificationFlags::IsVibrationEnabled() const
 {
     return vibrationEnabled_;
 }
 
 std::string NotificationFlags::Dump()
 {
-    return "soundEnabled = " + std::string(soundEnabled_ ? "true" : "false") +
-        ", vibrationEnabled = " + std::string(vibrationEnabled_ ? "true" : "false");
+    return "soundEnabled = " + std::to_string(static_cast<uint8_t>(soundEnabled_)) +
+        ", vibrationEnabled = " + std::to_string(static_cast<uint8_t>(vibrationEnabled_));
 }
 
 bool NotificationFlags::ToJson(nlohmann::json &jsonObject) const
@@ -67,11 +67,13 @@ NotificationFlags *NotificationFlags::FromJson(const nlohmann::json &jsonObject)
 
     const auto &jsonEnd = jsonObject.cend();
     if (jsonObject.find("soundEnabled") != jsonEnd) {
-        pFlags->soundEnabled_ = jsonObject.at("soundEnabled").get<bool>();
+        auto soundEnabled  = jsonObject.at("soundEnabled").get<uint8_t>();
+        pFlags->soundEnabled_ = static_cast<NotificationConstant::FlagStatus>(soundEnabled);
     }
 
     if (jsonObject.find("vibrationEnabled") != jsonEnd) {
-        pFlags->vibrationEnabled_ = jsonObject.at("vibrationEnabled").get<bool>();
+        auto vibrationEnabled = jsonObject.at("vibrationEnabled").get<uint8_t>();
+        pFlags->vibrationEnabled_ = static_cast<NotificationConstant::FlagStatus>(vibrationEnabled);
     }
 
     return pFlags;
@@ -79,12 +81,12 @@ NotificationFlags *NotificationFlags::FromJson(const nlohmann::json &jsonObject)
 
 bool NotificationFlags::Marshalling(Parcel &parcel) const
 {
-    if (!parcel.WriteBool(soundEnabled_)) {
+    if (!parcel.WriteUint8(static_cast<uint8_t>(soundEnabled_))) {
         ANS_LOGE("Failed to write flag sound enable for the notification");
         return false;
     }
 
-    if (!parcel.WriteBool(vibrationEnabled_)) {
+    if (!parcel.WriteUint8(static_cast<uint8_t>(vibrationEnabled_))) {
         ANS_LOGE("Failed to write flag vibration enable for the notification");
         return false;
     }
@@ -105,8 +107,8 @@ NotificationFlags *NotificationFlags::Unmarshalling(Parcel &parcel)
 
 bool NotificationFlags::ReadFromParcel(Parcel &parcel)
 {
-    soundEnabled_ = parcel.ReadBool();
-    vibrationEnabled_ = parcel.ReadBool();
+    soundEnabled_ = static_cast<NotificationConstant::FlagStatus>(parcel.ReadUint8());
+    vibrationEnabled_ = static_cast<NotificationConstant::FlagStatus>(parcel.ReadUint8());
 
     return true;
 }

@@ -279,6 +279,25 @@ napi_value SourceTypeInit(napi_env env, napi_value exports)
     return exports;
 }
 
+napi_value NotificationFlagTypeInit(napi_env env, napi_value exports)
+{
+    ANS_LOGI("%{public}s, called", __func__);
+
+    napi_value obj = nullptr;
+    napi_create_object(env, &obj);
+
+    SetNamedPropertyByInteger(env, obj, (int32_t)NotificationFlagStatus::TYPE_NONE, "TYPE_NONE");
+    SetNamedPropertyByInteger(env, obj, (int32_t)NotificationFlagStatus::TYPE_OPEN, "TYPE_OPEN");
+    SetNamedPropertyByInteger(env, obj, (int32_t)NotificationFlagStatus::TYPE_CLOSE, "TYPE_CLOSE");
+
+    napi_property_descriptor exportFuncs[] = {
+        DECLARE_NAPI_PROPERTY("NotificationFlagStatus", obj),
+    };
+
+    napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(*exportFuncs), exportFuncs);
+    return exports;
+}
+
 napi_value ConstantInit(napi_env env, napi_value exports)
 {
     NotificationReasonInit(env, exports);
@@ -292,6 +311,7 @@ napi_value ConstantInit(napi_env env, napi_value exports)
     SourceTypeInit(env, exports);
     DoNotDisturbTypeInit(env, exports);
     DeviceRemindTypeInit(env, exports);
+    NotificationFlagTypeInit(env, exports);
     return exports;
 }
 }  // namespace NotificationNapi
