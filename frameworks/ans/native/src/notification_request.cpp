@@ -854,7 +854,7 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
     }
 
     if (!parcel.WriteInt32(static_cast<int32_t>(receiverUserId_))) {
-        ANS_LOGE("Failed to write creator userId");
+        ANS_LOGE("Failed to write receiver userId");
         return false;
     }
 
