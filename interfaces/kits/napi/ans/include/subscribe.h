@@ -88,7 +88,7 @@ struct SubscriberInstancesInfo {
 };
 
 static std::mutex mutex_;
-static std::vector<SubscriberInstancesInfo> subscriberInstances_;
+static thread_local std::vector<SubscriberInstancesInfo> subscriberInstances_;
 
 bool HasNotificationSubscriber(const napi_env &env, const napi_value &value, SubscriberInstancesInfo &subscriberInfo);
 bool AddSubscriberInstancesInfo(const napi_env &env, const SubscriberInstancesInfo &subscriberInfo);
