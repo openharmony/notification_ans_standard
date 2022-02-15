@@ -1,7 +1,7 @@
 {
   "message": {
     "requestNotification": "是否允许发送通知？",
-    "allowmButton": "允许",
+    "allowButton": "允许",
     "cancelButton": "取消"
   }
 }
