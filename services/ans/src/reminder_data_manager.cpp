@@ -58,8 +58,8 @@ void ReminderDataManager::CancelReminder(
         StopTimerLocked(TimerType::TRIGGER_TIMER);
     }
     if (alertingReminderId_ == reminderId) {
-        StopTimerLocked(TimerType::ALERTING_TIMER);
         StopSoundAndVibrationLocked(reminder);
+        StopTimerLocked(TimerType::ALERTING_TIMER);
     }
     int32_t id = reminderId;
     RemoveReminderLocked(id);
@@ -332,8 +332,8 @@ void ReminderDataManager::CloseReminder(const sptr<ReminderRequest> &reminder, b
         StopTimerLocked(TimerType::TRIGGER_TIMER);
     }
     if (alertingReminderId_ == reminderId) {
-        StopTimerLocked(TimerType::ALERTING_TIMER);
         StopSoundAndVibrationLocked(reminder);
+        StopTimerLocked(TimerType::ALERTING_TIMER);
     }
     reminder->OnClose(true);
     RemoveFromShowedReminders(reminder);
@@ -583,8 +583,8 @@ void ReminderDataManager::SnoozeReminderImpl(sptr<ReminderRequest> &reminder)
 
     // 1) Snooze the reminder by manual
     if (alertingReminderId_ == reminder->GetReminderId()) {
-        StopTimerLocked(TimerType::ALERTING_TIMER);
         StopSoundAndVibrationLocked(reminder);
+        StopTimerLocked(TimerType::ALERTING_TIMER);
     }
     reminder->OnSnooze();
 
