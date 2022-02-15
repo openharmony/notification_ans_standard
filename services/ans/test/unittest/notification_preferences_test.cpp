@@ -1120,5 +1120,33 @@ HWTEST_F(NotificationPreferencesTest, GetDoNotDisturbDate_00200, Function | Smal
     EXPECT_EQ((int)NotificationPreferences::GetInstance().GetDoNotDisturbDate(
         NON_SYSTEM_APP_UID, getExsitDate), (int)ERR_ANS_INVALID_PARAM);
 }
+
+/**
+ * @tc.number    : SetHasPoppedDialog_00100
+ * @tc.name      :
+ * @tc.desc      : Set has popped dialog into disturbe DB, return is ERR_OK
+ */
+HWTEST_F(NotificationPreferencesTest, SetHasPoppedDialog_00100, Function | SmallTest | Level1)
+{
+    bool hasPopped = false;
+
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetHasPoppedDialog(bundleOption_, hasPopped), (int)ERR_OK);
+}
+
+/**
+ * @tc.number    : GetHasPoppedDialog_00100
+ * @tc.name      :
+ * @tc.desc      : Get has popped dialog from disturbe DB, return is ERR_OK
+ */
+HWTEST_F(NotificationPreferencesTest, GetHasPoppedDialog_00100, Function | SmallTest | Level1)
+{
+    bool popped = true;
+
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().SetHasPoppedDialog(bundleOption_, popped), (int)ERR_OK);
+
+    bool hasPopped = false;
+    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetHasPoppedDialog(bundleOption_, hasPopped), (int)ERR_OK);
+    EXPECT_TRUE(hasPopped);
+}
 }  // namespace Notification
 }  // namespace OHOS
