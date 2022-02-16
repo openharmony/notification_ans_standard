@@ -1089,7 +1089,8 @@ HWTEST_F(NotificationPreferencesTest, GetNotificationsEnabled_00200, Function | 
     EXPECT_TRUE(enable);
 
     enable = false;
-    EXPECT_EQ((int)NotificationPreferences::GetInstance().GetNotificationsEnabled(101, enable), (int)ERR_OK);
+    EXPECT_EQ(
+        (int)NotificationPreferences::GetInstance().GetNotificationsEnabled(101, enable), (int)ERR_ANS_INVALID_PARAM);
     EXPECT_FALSE(enable);
 }
 
