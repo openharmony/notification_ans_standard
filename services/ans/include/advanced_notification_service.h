@@ -187,6 +187,7 @@ private:
     ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
     bool GetActiveUserId(int& userId);
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
+    bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);
 
     ErrCode SetNotificationRemindType(sptr<Notification> notification, bool isLocal);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
