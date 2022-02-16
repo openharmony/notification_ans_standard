@@ -92,7 +92,7 @@ public:
     }
 
 protected:
-    SubscriberEvent(SubscriberEventType type) : type_(type)
+    explicit SubscriberEvent(SubscriberEventType type) : type_(type)
     {}
 
     SubscriberEventType type_;
@@ -127,7 +127,7 @@ public:
 
 class OnUpdatedEvent : public SubscriberEvent {
 public:
-    OnUpdatedEvent(const std::shared_ptr<NotificationSortingMap> &sortingMap)
+    explicit OnUpdatedEvent(const std::shared_ptr<NotificationSortingMap> &sortingMap)
         : SubscriberEvent(SubscriberEventType::ON_UPDATE), sortingMap_(sortingMap)
     {}
 
@@ -199,7 +199,7 @@ private:
 
 class OnOnCanceledWithSortingMapAndDeleteReasonEvent : public SubscriberEvent {
 public:
-    OnOnCanceledWithSortingMapAndDeleteReasonEvent(const std::shared_ptr<Notification> &request,
+    explicit OnOnCanceledWithSortingMapAndDeleteReasonEvent(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason)
         : SubscriberEvent(SubscriberEventType::ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON),
           request_(request),
@@ -249,7 +249,7 @@ private:
 
 class OnConsumedWithSortingMapEvent : public SubscriberEvent {
 public:
-    OnConsumedWithSortingMapEvent(
+    explicit OnConsumedWithSortingMapEvent(
         const std::shared_ptr<Notification> &request, const std::shared_ptr<NotificationSortingMap> &sortingMap)
         : SubscriberEvent(SubscriberEventType::ON_CONSUMED_WITH_SORTINGMAP), request_(request), sortingMap_(sortingMap)
     {
