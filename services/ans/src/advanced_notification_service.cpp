@@ -118,21 +118,6 @@ inline bool IsSystemApp()
     return isSystemApp;
 }
 
-inline bool CheckApiCompatibility(const std::string bundleName)
-{
-    AppExecFwk::BundleInfo bundleInfo;
-    std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
-    if (bundleManager != nullptr) {
-        bundleManager->GetBundleInfoByBundleName(bundleName, bundleInfo);
-    }
-    for (auto abilityInfo : bundleInfo.abilityInfos) {
-        if (abilityInfo.isStageBasedModel) {
-            return false;
-        }
-    }
-    return true;
-}
-
 inline int64_t ResetSeconds(int64_t date)
 {
     auto milliseconds = std::chrono::milliseconds(date);
@@ -1375,14 +1360,14 @@ ErrCode AdvancedNotificationService::RequestEnableNotification(const std::string
 
     bool allowedNotify = false;
     result = IsSpecialBundleAllowedNotify(bundleOption, allowedNotify);
-    if (allowedNotify) {
+    if (result != ERR_OK || allowedNotify) {
         ANS_LOGD("Already granted permission");
         return result;
     }
 
     bool hasPopped = false;
     result = GetHasPoppedDialog(bundleOption, hasPopped);
-    if (hasPopped) {
+    if (result != ERR_OK || hasPopped) {
         ANS_LOGD("Already shown dialog");
         return result;
     }
@@ -1528,12 +1513,11 @@ ErrCode AdvancedNotificationService::IsAllowedNotifySelf(bool &allowed)
         return ERR_ANS_INVALID_BUNDLE;
     }
 
-    allowed = CheckApiCompatibility(bundleOption->GetBundleName());
-
     handler_->PostSyncTask(std::bind([&]() {
         result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
         if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
             result = ERR_OK;
+            allowed = CheckApiCompatibility(bundleOption);
             SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
         }
     }));
@@ -1586,7 +1570,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
             result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(targetBundle, allowed);
             if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
                 result = ERR_OK;
-                allowed = false;
+                allowed = CheckApiCompatibility(bundleOption);
             }
         }
     }));
@@ -3179,6 +3163,26 @@ ErrCode AdvancedNotificationService::GetHasPoppedDialog(
         result = NotificationPreferences::GetInstance().GetHasPoppedDialog(bundleOption, hasPopped);
     }));
     return result;
+}
+
+bool AdvancedNotificationService::CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption)
+{
+    AppExecFwk::BundleInfo bundleInfo;
+    std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+    int32_t callingUserId;
+    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), callingUserId);
+    if (bundleManager != nullptr) {
+        if (!bundleManager->GetBundleInfoByBundleName(bundleOption->GetBundleName(), callingUserId, bundleInfo)) {
+            return false;
+        }
+    }
+
+    for (auto abilityInfo : bundleInfo.abilityInfos) {
+        if (abilityInfo.isStageBasedModel) {
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace Notification
 }  // namespace OHOS
