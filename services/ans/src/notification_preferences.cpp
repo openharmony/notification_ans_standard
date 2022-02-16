@@ -27,8 +27,7 @@ namespace OHOS {
 namespace Notification {
 NotificationPreferences::NotificationPreferences()
 {
-    preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
-    preferncesDB_->ParseFromDisturbeDB(preferencesInfo_);
+    InitSettingFromDisturbDB();
 }
 
 NotificationPreferences::~NotificationPreferences()
@@ -494,20 +493,6 @@ ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(
     return result;
 }
 
-bool NotificationPreferences::GetActiveUserId(int& userId)
-{
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
-
-    for (auto iter : osAccountInfos) {
-        if (iter.GetIsActived()) {
-            userId = iter.GetLocalId();
-            return true;
-        }
-    }
-    return false;
-}
-
 ErrCode NotificationPreferences::GetNotificationsEnabled(const int32_t &userId, bool &enabled)
 {
     if (userId <= SUBSCRIBE_USER_INIT) {
@@ -881,6 +866,14 @@ ErrCode NotificationPreferences::GetTemplateSupported(const std::string& templat
     jsonObj.clear();
     inFile.close();
     return ERR_OK;
+}
+
+void NotificationPreferences::InitSettingFromDisturbDB()
+{
+    if (!preferncesDB_) {
+        preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
+    }
+    preferncesDB_->ParseFromDisturbeDB(preferencesInfo_);
 }
 }  // namespace Notification
 }  // namespace OHOS
