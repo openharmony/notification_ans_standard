@@ -1295,16 +1295,11 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    int userId = SUBSCRIBE_USER_INIT;
-    if (!GetActiveUserId(userId)) {
-        return ERR_ANS_GET_ACTIVE_USER_FAILED;
-    }
-
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         notifications.clear();
         for (auto record : notificationList_) {
-            if (record->notification != nullptr && record->notification->GetUserId() == userId) {
+            if (record->notification != nullptr) {
                 notifications.push_back(record->notification);
             }
         }
