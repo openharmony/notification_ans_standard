@@ -1195,16 +1195,30 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09300,
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_09600
- * @tc.name      : ANS_IsAllowedNotify_0200
+ * @tc.number    : AdvancedNotificationServiceTest_09500
+ * @tc.name      : ANS_IsAllowedNotify_0100
  * @tc.desc      : Test IsAllowedNotify function
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09500, Function | SmallTest | Level1)
+{
+    EXPECT_EQ(
+        (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
+    bool allowed = false;
+    EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotify(allowed), (int)ERR_OK);
+    EXPECT_TRUE(allowed);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_09600
+ * @tc.name      : ANS_IsAllowedNotifySelf_0100
+ * @tc.desc      : Test IsAllowedNotifySelf function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600, Function | SmallTest | Level1)
 {
     EXPECT_EQ(
         (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     bool allowed = false;
-    EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotify(allowed), (int)ERR_OK);
+    EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotifySelf(allowed), (int)ERR_OK);
     EXPECT_TRUE(allowed);
 }
 
