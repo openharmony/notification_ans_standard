@@ -56,7 +56,6 @@ std::string BundleManagerHelper::GetBundleNameByUid(int uid)
 
     return bundle;
 }
-
 bool BundleManagerHelper::IsSystemApp(int uid)
 {
     bool isSystemApp = false;
@@ -71,6 +70,15 @@ bool BundleManagerHelper::IsSystemApp(int uid)
 
     return isSystemApp;
 }
+
+bool BundleManagerHelper::GetBundleInfoByBundleName(const std::string bundle, AppExecFwk::BundleInfo &bundleInfo)
+{
+    if (bundleMgr_ == nullptr) {
+        return false;
+    }
+    return bundleMgr_->GetBundleInfo(bundle, AppExecFwk::BundleFlag::GET_BUNDLE_WITH_ABILITIES, bundleInfo);
+}
+
 
 void BundleManagerHelper::Connect()
 {

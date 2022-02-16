@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include "ability_context.h"
+#include "ability_info.h"
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
@@ -115,6 +116,21 @@ inline bool IsSystemApp()
     }
 
     return isSystemApp;
+}
+
+inline bool CheckApiCompatibility(const std::string bundleName)
+{
+    AppExecFwk::BundleInfo bundleInfo;
+    std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+    if (bundleManager != nullptr) {
+        bundleManager->GetBundleInfoByBundleName(bundleName, bundleInfo);
+    }
+    for (auto abilityInfo : bundleInfo.abilityInfos) {
+        if (abilityInfo.isStageBasedModel) {
+            return false;
+        }
+    }
+    return true;
 }
 
 inline int64_t ResetSeconds(int64_t date)
@@ -1372,7 +1388,7 @@ ErrCode AdvancedNotificationService::RequestEnableNotification(const std::string
     }
 
     const std::string params = std::string("{\"requestNotification\":\"Allowed to send notification?\", ") +
-        std::string("\"allowButton\":\"Alllow\", \"cancelButton\":\"Cancel\", \"uid\":\"") +
+        std::string("\"allowButton\":\"Allow\", \"cancelButton\":\"Cancel\", \"uid\":\"") +
         std::to_string(bundleOption->GetUid()) + std::string("\"}");
     Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
         "notification_dialog",
@@ -1512,11 +1528,13 @@ ErrCode AdvancedNotificationService::IsAllowedNotifySelf(bool &allowed)
         return ERR_ANS_INVALID_BUNDLE;
     }
 
+    allowed = CheckApiCompatibility(bundleOption->GetBundleName());
+
     handler_->PostSyncTask(std::bind([&]() {
-        allowed = false;
         result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
         if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
             result = ERR_OK;
+            SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
         }
     }));
 
