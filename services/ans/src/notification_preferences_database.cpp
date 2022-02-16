@@ -1147,45 +1147,41 @@ std::string NotificationPreferencesDatabase::SubUniqueIdentifyFromString(
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbType(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetDoNotDisturbType(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetDoNotDisturbType(info, iter);
     }
 }
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbBeginDate(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(info, iter);
     }
 }
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbEndDate(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetDoNotDisturbEndDate(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetDoNotDisturbEndDate(info, iter);
     }
 }
 
 void NotificationPreferencesDatabase::ParseEnableAllNotification(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetEnableAllNotification(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetEnableAllNotification(info, iter);
     }
 }
 
