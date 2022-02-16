@@ -922,7 +922,10 @@ napi_value GetNotificationSubscriber(
         napi_value nOnConsumed = nullptr;
         napi_get_named_property(env, value, "onConsume", &nOnConsumed);
         NAPI_CALL(env, napi_typeof(env, nOnConsumed, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnConsumed, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, CONSUME, result);
     }
@@ -932,7 +935,10 @@ napi_value GetNotificationSubscriber(
         napi_value nOnCanceled = nullptr;
         napi_get_named_property(env, value, "onCancel", &nOnCanceled);
         NAPI_CALL(env, napi_typeof(env, nOnCanceled, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnCanceled, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, CANCEL, result);
     }
@@ -942,7 +948,10 @@ napi_value GetNotificationSubscriber(
         napi_value nOnUpdate = nullptr;
         napi_get_named_property(env, value, "onUpdate", &nOnUpdate);
         NAPI_CALL(env, napi_typeof(env, nOnUpdate, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnUpdate, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, UPDATE, result);
     }
@@ -952,7 +961,10 @@ napi_value GetNotificationSubscriber(
         napi_value nOnConnected = nullptr;
         napi_get_named_property(env, value, "onConnect", &nOnConnected);
         NAPI_CALL(env, napi_typeof(env, nOnConnected, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnConnected, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, CONNECTED, result);
     }
@@ -962,7 +974,10 @@ napi_value GetNotificationSubscriber(
         napi_value nOnDisConnect = nullptr;
         napi_get_named_property(env, value, "onDisconnect", &nOnDisConnect);
         NAPI_CALL(env, napi_typeof(env, nOnDisConnect, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnDisConnect, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, DIS_CONNECTED, result);
     }
@@ -972,7 +987,10 @@ napi_value GetNotificationSubscriber(
         napi_value nOnDied = nullptr;
         napi_get_named_property(env, value, "onDestroy", &nOnDied);
         NAPI_CALL(env, napi_typeof(env, nOnDied, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnDied, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, DIE, result);
     }
@@ -982,7 +1000,10 @@ napi_value GetNotificationSubscriber(
         napi_value nOnDisturbModeChanged = nullptr;
         napi_get_named_property(env, value, "onDisturbModeChange", &nOnDisturbModeChanged);
         NAPI_CALL(env, napi_typeof(env, nOnDisturbModeChanged, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnDisturbModeChanged, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, DISTURB_MODE_CHANGE, result);
     }
@@ -993,12 +1014,27 @@ napi_value GetNotificationSubscriber(
         napi_value nOnDisturbDateChanged = nullptr;
         napi_get_named_property(env, value, "onDoNotDisturbDateChange", &nOnDisturbDateChanged);
         NAPI_CALL(env, napi_typeof(env, nOnDisturbDateChanged, &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, nOnDisturbDateChanged, 1, &result);
         subscriberInfo.subscriber->SetCallbackInfo(env, DISTURB_DATE_CHANGE, result);
     }
 
     // onEnabledNotificationChanged?:(data: notification.EnabledNotificationCallbackData) => void
+    NAPI_CALL(env, napi_has_named_property(env, value, "onEnabledNotificationChanged", &hasProperty));
+    if (hasProperty) {
+        napi_value nOnEnabledNotificationChanged = nullptr;
+        napi_get_named_property(env, value, "onEnabledNotificationChanged", &nOnEnabledNotificationChanged);
+        NAPI_CALL(env, napi_typeof(env, nOnEnabledNotificationChanged, &valuetype));
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
+        napi_create_reference(env, nOnEnabledNotificationChanged, 1, &result);
+        subscriberInfo.subscriber->SetCallbackInfo(env, ENABLE_NOTIFICATION_CHANGED, result);
+    }
 
     return Common::NapiGetNull(env);
 }
@@ -1051,13 +1087,19 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info,
     napi_value argv[SUBSRIBE_MAX_PARA] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_ASSERT(env, argc >= 1, "Wrong number of arguments");
+    if (argc < 1) {
+        ANS_LOGE("Wrong number of arguments");
+        return nullptr;
+    }
 
     napi_valuetype valuetype = napi_undefined;
 
     // argv[0]:subscriber
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type for arg0. NotificationSubscriber object expected.");
+    if (valuetype != napi_object) {
+        ANS_LOGE("Wrong argument type for arg0. NotificationSubscriber object expected.");
+        return nullptr;
+    }
 
     SubscriberInstancesInfo subscriberInstancesInfo;
     if (!HasNotificationSubscriber(env, argv[PARAM0], subscriberInstancesInfo)) {
@@ -1099,7 +1141,10 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info,
     // argv[2]:callback
     if (argc >= SUBSRIBE_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGE("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, argv[PARAM2], 1, &callback);
     }
 
