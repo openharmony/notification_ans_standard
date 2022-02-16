@@ -6,7 +6,7 @@
     </div>
     <div>
         <button class="btn" onclick="onAllow">
-            {{ allowmButton }}
+            {{ allowButton }}
         </button>
         <button class="btn" onclick="onCancel">
             {{ cancelButton }}

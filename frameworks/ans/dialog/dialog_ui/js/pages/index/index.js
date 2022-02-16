@@ -4,7 +4,7 @@ export default {
     data: {
         message: router.getParams().message,
         requestNotification: router.getParams().requestNotification,
-        allowmButton: router.getParams().allowmButton,
+        allowButton: router.getParams().allowButton,
         cancelButton: router.getParams().cancelButton,
         uid: router.getParams().uid,
     },
