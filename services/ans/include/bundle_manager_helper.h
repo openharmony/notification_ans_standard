@@ -34,7 +34,7 @@ public:
     std::string GetBundleNameByUid(int uid);
     bool IsSystemApp(int uid);
     int GetDefaultUidByBundleName(const std::string &bundle);
-    bool GetBundleInfoByBundleName(const std::string bundle, AppExecFwk::BundleInfo &bundleInfo);
+    bool GetBundleInfoByBundleName(const std::string bundle, const int32_t userId, AppExecFwk::BundleInfo &bundleInfo);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
     bool GetDistributedNotificationEnabled(const std::string &bundleName, const int userId);
 #endif
