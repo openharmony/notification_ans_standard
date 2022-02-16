@@ -20,6 +20,7 @@ module_output_path = "ans_standard/wantagent"
 ohos_unittest("pending_want_test") {
   module_out_path = module_output_path
   include_dirs = [
+    "//aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context/",
     "//foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime",
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include/",
