@@ -20,6 +20,7 @@
 #include "completed_dispatcher.h"
 #include "context/context.h"
 #include "context_container.h"
+#include "context_impl.h"
 #include "element_name.h"
 #include "event_handler.h"
 #include "iservice_registry.h"
@@ -102,7 +103,8 @@ Want PendingWantTest::MakeWant(std::string deviceId, std::string abilityName, st
 
 std::shared_ptr<OHOS::AbilityRuntime::Context> GetAppContext()
 {
-    return OHOS::AbilityRuntime::Context::GetApplicationContext();
+    std::shared_ptr<AbilityRuntime::Context> context = std::make_shared<AbilityRuntime::ContextImpl>();
+    return context;
 }
 
 void PendingWantTest::SetUpTestCase(void)
@@ -170,26 +172,10 @@ HWTEST_F(PendingWantTest, PendingWant_0400, Function | MediumTest | Level1)
     want->SetElement(element);
     unsigned int flags = 1;
     flags |= FLAG_NO_CREATE;
-    std::shared_ptr<PendingWant> pendingWant = PendingWant::GetAbility(GetAppContext(), requestCode, want, flags);
+    std::shared_ptr<PendingWant> pendingWant = PendingWant::GetAbility(nullptr, requestCode, want, flags);
     EXPECT_EQ(pendingWant, nullptr);
 }
 
-/*
- * @tc.number    : PendingWant_0500
- * @tc.name      : PendingWant GetAbility
- * @tc.desc      : 1.Get pendingWant (START_ABILITY)
- */
-HWTEST_F(PendingWantTest, PendingWant_0500, Function | MediumTest | Level1)
-{
-    int requestCode = 10;
-    std::shared_ptr<Want> want = std::make_shared<Want>();
-    ElementName element("device", "bundleName", "abilityName");
-    want->SetElement(element);
-    unsigned int flags = 1;
-    flags |= FLAG_NO_CREATE;
-    std::shared_ptr<PendingWant> pendingWant = PendingWant::GetAbility(GetAppContext(), requestCode, want, flags);
-    EXPECT_NE(pendingWant, nullptr);
-}
 
 /*
  * @tc.number    : PendingWant_0600
