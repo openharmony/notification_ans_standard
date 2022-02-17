@@ -380,9 +380,9 @@ void ReminderDataManager::TerminateAlerting(const OHOS::EventFwk::Want &want)
     TerminateAlerting(reminder, "timeOut");
 }
 
-void ReminderDataManager::TerminateAlerting(const uint16_t waitInMilli, const sptr<ReminderRequest> &reminder)
+void ReminderDataManager::TerminateAlerting(const uint16_t waitInSecond, const sptr<ReminderRequest> &reminder)
 {
-    sleep(waitInMilli);
+    sleep(waitInSecond);
     TerminateAlerting(reminder, "waitInMillis");
 }
 
@@ -531,7 +531,7 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         if (needScheduleTimeout) {
             StartTimer(reminder, TimerType::ALERTING_TIMER);
         } else {
-            TerminateAlerting(ReminderRequest::MILLI_SECONDS, reminder);
+            TerminateAlerting(1, reminder);
         }
     } else {
         reminder->OnShow(false, isSysTimeChanged, true);
