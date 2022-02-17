@@ -369,8 +369,7 @@ bool NotificationPreferencesDatabase::PutNotificationsEnabled(const int32_t &use
         std::string().append(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));
     OHOS::DistributedKv::Key enableKey(typeKey);
     OHOS::DistributedKv::Value enableValue(std::to_string(enabled));
-    OHOS::DistributedKv::Status status;
-    status = kvStorePtr_->Put(enableKey, enableValue);
+    OHOS::DistributedKv::Status status = kvStorePtr_->Put(enableKey, enableValue);
     if (status != OHOS::DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Store enable notification failed. %{public}d", status);
         return false;
@@ -771,8 +770,7 @@ OHOS::DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyTo
         ANS_LOGE("KvStore is nullptr.");
         return OHOS::DistributedKv::Status::ERROR;
     }
-    OHOS::DistributedKv::Status status;
-    status = kvStorePtr_->Put(key, value);
+    OHOS::DistributedKv::Status status = kvStorePtr_->Put(key, value);
     return status;
 }
 
