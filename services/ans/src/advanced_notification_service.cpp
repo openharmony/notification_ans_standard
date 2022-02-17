@@ -2914,14 +2914,12 @@ ErrCode AdvancedNotificationService::IsSupportTemplate(const std::string& templa
 
 bool AdvancedNotificationService::GetActiveUserId(int& userId)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
-
-    for (auto iter : osAccountInfos) {
-        if (iter.GetIsActived()) {
-            userId = iter.GetLocalId();
-            return true;
-        }
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
+    if (activeUserId.size() > 0) {
+        userId = activeUserId[0];
+        ANS_LOGD("Return active userId=%{public}d", userId);
+        return true;
     }
     return false;
 }
