@@ -75,6 +75,7 @@ public:
     ErrCode ClearNotificationInRestoreFactorySettings();
 
     void OnDistributedKvStoreDeathRecipient();
+    void InitSettingFromDisturbDB();
 
 private:
     ErrCode CheckSlotForCreateSlot(const sptr<NotificationBundleOption> &bundleOption,
@@ -99,7 +100,6 @@ private:
     ErrCode GetBundleProperty(
         const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, T &value) const;
     std::string GenerateBundleKey(const sptr<NotificationBundleOption> &bundleOption) const;
-    bool GetActiveUserId(int& userId);
 
 private:
     NotificationPreferencesInfo preferencesInfo_ {};
