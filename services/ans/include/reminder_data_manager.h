@@ -362,7 +362,7 @@ private:
      * @param reason Indicates the description information.
      */
     void TerminateAlerting(const sptr<ReminderRequest> &reminder, const std::string &reason);
-    void TerminateAlerting(const uint16_t waitInMilli, const sptr<ReminderRequest> &reminder);
+    void TerminateAlerting(const uint16_t waitInSecond, const sptr<ReminderRequest> &reminder);
 
     /**
      * @brief Assign unique reminder id and save reminder in memory.
