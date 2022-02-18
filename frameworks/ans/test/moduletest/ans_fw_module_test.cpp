@@ -181,7 +181,7 @@ private:
 
 class OnOnCanceledEvent : public SubscriberEvent {
 public:
-    OnOnCanceledEvent(const std::shared_ptr<Notification> &request)
+    explicit OnOnCanceledEvent(const std::shared_ptr<Notification> &request)
         : SubscriberEvent(SubscriberEventType::ON_CANCELED), request_(request)
     {}
 
@@ -231,7 +231,7 @@ private:
 
 class OnConsumedEvent : public SubscriberEvent {
 public:
-    OnConsumedEvent(const std::shared_ptr<Notification> &request)
+    explicit OnConsumedEvent(const std::shared_ptr<Notification> &request)
         : SubscriberEvent(SubscriberEventType::ON_CONSUMED), request_(request)
     {}
 
