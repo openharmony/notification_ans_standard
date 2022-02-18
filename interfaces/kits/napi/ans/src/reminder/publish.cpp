@@ -33,6 +33,7 @@ struct AsyncCallbackInfo {
     napi_async_work asyncWork = nullptr;
     int32_t reminderId = -1;
     std::shared_ptr<ReminderRequest> reminder = nullptr;
+    std::vector<sptr<ReminderRequest>> validReminders;
     NotificationNapi::CallbackPromiseInfo info;
     napi_value result = nullptr;
 };
@@ -545,18 +546,17 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANSR_LOGI("GetValid reminders napi_create_async_work start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
-            std::vector<sptr<ReminderRequest>> validReminders;
-            asynccallbackinfo->info.errorCode = ReminderHelper::GetValidReminders(validReminders);
-            if (asynccallbackinfo->info.errorCode != ERR_OK) {
-                asynccallbackinfo->result = NotificationNapi::Common::NapiGetNull(env);
-                return;
-            }
-            napi_value arr = nullptr;
-            GetValidRemindersInner(env, validReminders, arr);
-            asynccallbackinfo->result = arr;
+            asynccallbackinfo->info.errorCode = ReminderHelper::GetValidReminders(asynccallbackinfo->validReminders);
         },
         [](napi_env env, napi_status status, void *data) {
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+
+            if (asynccallbackinfo->info.errorCode != ERR_OK) {
+                asynccallbackinfo->result = NotificationNapi::Common::NapiGetNull(env);
+            } else {
+                GetValidRemindersInner(env, asynccallbackinfo->validReminders, asynccallbackinfo->result);
+            }
+
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, asynccallbackinfo->result);
             if (asynccallbackinfo->info.callback != nullptr) {
@@ -609,15 +609,18 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
             asynccallbackinfo->info.errorCode = ReminderHelper::PublishReminder(*(asynccallbackinfo->reminder));
             ANSR_LOGD("Return reminderId=%{public}d", asynccallbackinfo->reminder->GetReminderId());
-
-            // reminderId
-            napi_value napiReminderId = nullptr;
-            napi_create_int32(env, asynccallbackinfo->reminder->GetReminderId(), &napiReminderId);
-            asynccallbackinfo->result = napiReminderId;
         },
         [](napi_env env, napi_status status, void *data) {
             ANSR_LOGI("Publish napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+
+            // reminderId
+            if (asynccallbackinfo->info.errorCode == ERR_OK) {
+                napi_create_int32(env, asynccallbackinfo->reminder->GetReminderId(), &(asynccallbackinfo->result));
+            } else {
+                napi_create_int32(env, -1, &(asynccallbackinfo->result));
+            }
+
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, asynccallbackinfo->result);
             if (asynccallbackinfo->info.callback != nullptr) {
