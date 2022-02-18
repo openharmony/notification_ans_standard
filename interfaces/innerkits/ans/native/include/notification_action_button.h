@@ -44,7 +44,7 @@ public:
      * isContextual is true but icon or wantAgent is empty.
      */
     static std::shared_ptr<NotificationActionButton> Create(const std::shared_ptr<Media::PixelMap> &icon,
-        const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
+        const std::string &title, const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent,
         const std::shared_ptr<AAFwk::WantParams> &extras = {},
         NotificationConstant::SemanticActionButton semanticActionButton =
             NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON,
@@ -82,7 +82,7 @@ public:
      * Obtains the WantAgent of this NotificationActionButton.
      * @return the WantAgent of this NotificationActionButton.
      */
-    const std::shared_ptr<WantAgent::WantAgent> GetWantAgent() const;
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetWantAgent() const;
 
     /**
      * Adds additional data to this NotificationActionButton.
@@ -218,7 +218,8 @@ private:
      * @param isContextual Indicates whether this NotificationActionButton is a contextual action.
      */
     NotificationActionButton(const std::shared_ptr<Media::PixelMap> &icon, const std::string &title,
-        const std::shared_ptr<WantAgent::WantAgent> &wantAgent, const std::shared_ptr<AAFwk::WantParams> &extras,
+        const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent,
+        const std::shared_ptr<AAFwk::WantParams> &extras,
         NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
         const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
         const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual);
@@ -232,7 +233,7 @@ private:
 private:
     std::shared_ptr<Media::PixelMap> icon_ {};
     std::string title_ {};
-    std::shared_ptr<WantAgent::WantAgent> wantAgent_ {};
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent_ {};
     std::shared_ptr<AAFwk::WantParams> extras_ {};
     NotificationConstant::SemanticActionButton semanticActionButton_ {
         NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON

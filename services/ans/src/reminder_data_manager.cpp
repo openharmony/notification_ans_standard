@@ -229,8 +229,8 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
     sharedTimerInfo->SetInterval(0);
 
     int requestCode = 10;
-    std::vector<WantAgent::WantAgentConstant::Flags> flags;
-    flags.push_back(WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
+    std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
+    flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
     auto want = std::make_shared<OHOS::AAFwk::Want>();
 
     switch (type) {
@@ -253,14 +253,15 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
     }
     std::vector<std::shared_ptr<AAFwk::Want>> wants;
     wants.push_back(want);
-    WantAgent::WantAgentInfo wantAgentInfo(
+    AbilityRuntime::WantAgent::WantAgentInfo wantAgentInfo(
         requestCode,
-        WantAgent::WantAgentConstant::OperationType::SEND_COMMON_EVENT,
+        AbilityRuntime::WantAgent::WantAgentConstant::OperationType::SEND_COMMON_EVENT,
         flags,
         wants,
         nullptr
     );
-    std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo);
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
+        AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo);
     sharedTimerInfo->SetWantAgent(wantAgent);
     return sharedTimerInfo;
 }

@@ -26,7 +26,7 @@ config("public_ans_core_config") {
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
-    "${interfaces_path}/innerkits/wantAgent/include",
+
     "//utils/native/base/include",
     "//third_party/json/single_include",
     "//third_party/jsoncpp/include",
@@ -85,7 +85,6 @@ ohos_shared_library("ans_core") {
   public_configs = [ ":public_ans_core_config" ]
 
   deps = [
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
@@ -93,6 +92,7 @@ ohos_shared_library("ans_core") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",

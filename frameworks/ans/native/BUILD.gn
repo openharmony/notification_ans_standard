@@ -29,7 +29,7 @@ config("ans_innerkits_public_config") {
     "//third_party/jsoncpp/include",
     "//utils/system/safwk/native/include",
   ]
-  configs = [ "${frameworks_path}/wantagent:wantagent_innerkits_public_config" ]
+  configs = [ "//foundation/aafwk/standard/frameworks/kits/wantagent:wantagent_innerkits_public_config" ]
 }
 
 ohos_shared_library("ans_innerkits") {
@@ -79,13 +79,13 @@ ohos_shared_library("ans_innerkits") {
 
   deps = [
     "${frameworks_path}/ans/core:ans_core",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

@@ -226,25 +226,25 @@ public:
      * @param wantAgent Indicates the operation triggered by tapping the notification, which can be set by
      * WantAgent.
      */
-    void SetWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent);
+    void SetWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
      * Obtains the WantAgent contained in this notification.
      * @return the WantAgent contained in this notification.
      */
-    const std::shared_ptr<WantAgent::WantAgent> GetWantAgent() const;
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetWantAgent() const;
 
     /**
      * Sets an WantAgent object that is triggered when the user explicitly removes this notification.
      * @param wantAgent Indicates the WantAgent object to be triggered.
      */
-    void SetRemovalWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent);
+    void SetRemovalWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
      * Obtains the WantAgent object that is triggered when the user explicitly removes this notification.
      * @return the WantAgent object to be triggered.
      */
-    const std::shared_ptr<WantAgent::WantAgent> GetRemovalWantAgent() const;
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetRemovalWantAgent() const;
 
     /**
      * Sets the WantAgent to start when the device is not in use,
@@ -255,13 +255,13 @@ public:
      * @param wantAgent Indicates the WantAgent object containing information about the to-be-started ability that
      * uses the Page template.
      */
-    void SetMaxScreenWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent);
+    void SetMaxScreenWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
      * Obtains the full-screen WantAgent set by calling setMaxScreenWantAgent(WantAgent).
      * @return the full-screen WantAgent.
      */
-    const std::shared_ptr<WantAgent::WantAgent> GetMaxScreenWantAgent() const;
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetMaxScreenWantAgent() const;
 
     /**
      * Sets extra parameters that are stored as key-value pairs for the notification.
@@ -1031,9 +1031,9 @@ private:
     bool onlyLocal_ {false};
     bool permitted_ {true};
 
-    std::shared_ptr<WantAgent::WantAgent> wantAgent_ {};
-    std::shared_ptr<WantAgent::WantAgent> removalWantAgent_ {};
-    std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent_ {};
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent_ {};
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> removalWantAgent_ {};
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> maxScreenWantAgent_ {};
     std::shared_ptr<AAFwk::WantParams> additionalParams_ {};
     std::shared_ptr<Media::PixelMap> littleIcon_ {};
     std::shared_ptr<Media::PixelMap> bigIcon_ {};
