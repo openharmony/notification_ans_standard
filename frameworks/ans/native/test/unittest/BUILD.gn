@@ -41,13 +41,13 @@ ohos_unittest("ans_reminder_unit_test") {
   deps = [
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "bytrace_standard:bytrace_core",

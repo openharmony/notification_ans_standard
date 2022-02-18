@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Notification {
 std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const std::shared_ptr<Media::PixelMap> &icon,
-    const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
+    const std::string &title, const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent,
     const std::shared_ptr<AAFwk::WantParams> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
     bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
     const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
@@ -93,7 +93,7 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(
 }
 
 NotificationActionButton::NotificationActionButton(const std::shared_ptr<Media::PixelMap> &icon,
-    const std::string &title, const std::shared_ptr<WantAgent::WantAgent> &wantAgent,
+    const std::string &title, const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent,
     const std::shared_ptr<AAFwk::WantParams> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
     bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
     const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
@@ -118,7 +118,7 @@ std::string NotificationActionButton::GetTitle() const
     return title_;
 }
 
-const std::shared_ptr<WantAgent::WantAgent> NotificationActionButton::GetWantAgent() const
+const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> NotificationActionButton::GetWantAgent() const
 {
     return wantAgent_;
 }
@@ -236,7 +236,7 @@ bool NotificationActionButton::ToJson(nlohmann::json &jsonObject) const
 {
     jsonObject["icon"]      = AnsImageUtil::PackImage(icon_);
     jsonObject["title"]     = title_;
-    jsonObject["wantAgent"] = wantAgent_ ? WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
+    jsonObject["wantAgent"] = wantAgent_ ? AbilityRuntime::WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
 
     std::string extrasStr;
     if (extras_) {
@@ -273,7 +273,7 @@ NotificationActionButton *NotificationActionButton::FromJson(const nlohmann::jso
 
     if (jsonObject.find("wantAgent") != jsonEnd) {
         auto wantAgentValue = jsonObject.at("wantAgent").get<std::string>();
-        pButton->wantAgent_ = WantAgent::WantAgentHelper::FromString(wantAgentValue);
+        pButton->wantAgent_ = AbilityRuntime::WantAgent::WantAgentHelper::FromString(wantAgentValue);
     }
 
     if (jsonObject.find("extras") != jsonEnd) {
@@ -410,7 +410,8 @@ bool NotificationActionButton::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        wantAgent_ = std::shared_ptr<WantAgent::WantAgent>(parcel.ReadParcelable<WantAgent::WantAgent>());
+        wantAgent_ = std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>(
+            parcel.ReadParcelable<AbilityRuntime::WantAgent::WantAgent>());
         if (!wantAgent_) {
             ANS_LOGE("Failed to read wantAgent");
             return false;

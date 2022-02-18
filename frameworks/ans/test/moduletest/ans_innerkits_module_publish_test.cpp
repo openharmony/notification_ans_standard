@@ -399,7 +399,7 @@ private:
     }
 };
 
-class CompletedCallbackTest : public WantAgent::CompletedCallback {
+class CompletedCallbackTest : public AbilityRuntime::WantAgent::CompletedCallback {
     void OnSendFinished(
         const AAFwk::Want &want, int resultCode, const std::string &resultData, const AAFwk::WantParams &resultExtras)
     {
@@ -637,8 +637,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00200, Function
     EXPECT_NE(mediaContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(mediaContent);
     EXPECT_NE(content, nullptr);
-    WantAgent::WantAgentInfo paramsInfo;
-    std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
+    AbilityRuntime::WantAgent::WantAgentInfo paramsInfo;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
+        AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
     std::shared_ptr<NotificationActionButton> actionButton =
         NotificationActionButton::Create(nullptr, "title", wantAgent);
     std::shared_ptr<NotificationUserInput> userInput = NotificationUserInput::Create("inputKey");
@@ -696,8 +697,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00300, Function
     EXPECT_NE(mediaContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(mediaContent);
     EXPECT_NE(content, nullptr);
-    WantAgent::WantAgentInfo paramsInfo;
-    std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
+    AbilityRuntime::WantAgent::WantAgentInfo paramsInfo;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
+        AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
     if (nullptr == wantAgent) {
         GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00300::wantAgent is nullptr";
     }
@@ -1314,10 +1316,10 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function
     req.SetLabel("label");
     req.SetOwnerBundleName("owner");
 
-    auto wAgent1 = std::make_shared<WantAgent::WantAgent>();
+    auto wAgent1 = std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
     req.SetWantAgent(wAgent1);
 
-    auto wAgent2 = std::make_shared<WantAgent::WantAgent>();
+    auto wAgent2 = std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
     std::shared_ptr<Media::PixelMap> dummyIcon;
     auto ab1 = NotificationActionButton::Create(dummyIcon, "ab1_title", wAgent2);
 
@@ -1335,7 +1337,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function
     ab1->AddMimeTypeOnlyUserInput(spOnlyUserInput1);
     ab1->AddMimeTypeOnlyUserInput(spOnlyUserInput4);
 
-    std::shared_ptr<WantAgent::WantAgent> dummyWantAgent;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> dummyWantAgent;
     auto ab2 = NotificationActionButton::Create(dummyIcon, "ab2_title", dummyWantAgent);
 
     req.AddActionButton(ab1);
