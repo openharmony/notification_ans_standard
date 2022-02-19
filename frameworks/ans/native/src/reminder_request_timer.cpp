@@ -49,7 +49,7 @@ uint64_t ReminderRequestTimer::GetInitInfo() const
 
 uint64_t ReminderRequestTimer::PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const
 {
-    ANSR_LOGD("countdonw time not support PreGetNextTriggerTimeIgnoreSnooze");
+    ANSR_LOGD("countdown time not support PreGetNextTriggerTimeIgnoreSnooze");
     return ReminderRequest::INVALID_LONG_LONG_VALUE;
 }
 
@@ -67,7 +67,7 @@ bool ReminderRequestTimer::OnTimeZoneChange()
 
 bool ReminderRequestTimer::UpdateNextReminder()
 {
-    ANSR_LOGD("countdonw time not support repeat reminder, no need to update next triggerTime");
+    ANSR_LOGD("countdown time not support repeat reminder, no need to update next triggerTime");
     SetExpired(true);
     return false;
 }

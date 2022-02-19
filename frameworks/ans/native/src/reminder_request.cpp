@@ -976,7 +976,7 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
                 continue;
             }
         }
-        want->SetParam("REMINDER_ID", reminderId_);
+        want->SetParam(PARAM_REMINDER_ID, reminderId_);
         std::vector<std::shared_ptr<AAFwk::Want>> wants;
         wants.push_back(want);
         auto title = static_cast<std::string>(it->second.title);
@@ -1155,12 +1155,14 @@ void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
 
 void ReminderRequest::UpdateNotificationStateForAlert()
 {
+    ANSR_LOGD("UpdateNotification content and buttons");
     UpdateNotificationContent(false);
     UpdateActionButtons(false);
 }
 
 void ReminderRequest::UpdateNotificationStateForSnooze()
 {
+    ANSR_LOGD("UpdateNotification content and buttons");
     UpdateNotificationContent(true);
     UpdateActionButtons(true);
 }
