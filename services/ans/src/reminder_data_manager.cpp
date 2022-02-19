@@ -261,7 +261,7 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
         nullptr
     );
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
-        AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo);
+        AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, 0);
     sharedTimerInfo->SetWantAgent(wantAgent);
     return sharedTimerInfo;
 }
@@ -470,7 +470,9 @@ void ReminderDataManager::SetActiveReminder(const sptr<ReminderRequest> &reminde
     } else {
         activeReminderId_ = reminder->GetReminderId();
         activeReminder_ = reminder;
+        ANSR_LOGD("Set activeReminder with id=%{public}d", activeReminderId_);
     }
+    ANSR_LOGD("Set activeReminderId=%{public}d", activeReminderId_);
 }
 
 void ReminderDataManager::SetAlertingReminder(const sptr<ReminderRequest> &reminder)
@@ -481,7 +483,9 @@ void ReminderDataManager::SetAlertingReminder(const sptr<ReminderRequest> &remin
     } else {
         alertingReminderId_ = reminder->GetReminderId();
         alertingReminder_ = reminder;
+        ANSR_LOGD("Set alertingReminder with id=%{public}d", alertingReminderId_);
     }
+    ANSR_LOGD("Set alertingReminderId=%{public}d", alertingReminderId_);
 }
 
 void ReminderDataManager::ShowActiveReminderExtendLocked(sptr<ReminderRequest> &reminder)
@@ -538,10 +542,9 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         reminder->OnShow(false, isSysTimeChanged, true);
     }
     AddToShowedReminders(reminder);
-    ANSR_LOGD("publish notification.(reminderId=%{public}d)", reminder->GetReminderId());
     UpdateNotification(reminder);  // this should be called after OnShow
-    ErrCode errCode
-        = advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
+    ANSR_LOGD("publish notification.(reminderId=%{public}d)", reminder->GetReminderId());
+    ErrCode errCode = advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
     if (errCode != ERR_OK) {
         reminder->OnShowFail();
         RemoveFromShowedReminders(reminder);
@@ -697,6 +700,14 @@ sptr<ReminderRequest> ReminderDataManager::GetRecentReminderLocked()
     for (auto it = reminderVector_.begin(); it != reminderVector_.end();) {
         if (!(*it)->IsExpired()) {
             ANSR_LOGI("GetRecentReminderLocked: %{public}s", (*it)->Dump().c_str());
+            time_t now;
+            (void)time(&now);  // unit is seconds.
+            if (now < 0
+                || static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS > (*it)->GetTriggerTimeInMilli()) {
+                ANSR_LOGE("Get recent reminder while the trigger time is overdue.");
+                it++;
+                continue;
+            }
             return *it;
         }
         if (!(*it)->CanRemove()) {
@@ -878,7 +889,8 @@ void ReminderDataManager::StopSoundAndVibration(const sptr<ReminderRequest> &rem
         return;
     }
     if (alertingReminderId_ == -1 || (reminder->GetReminderId() != alertingReminderId_)) {
-        ANSR_LOGE("Stop sound and vibration failed as alertingReminder is illegal.");
+        ANSR_LOGE("Stop sound and vibration failed as alertingReminder is illegal, alertingReminderId_=" \
+            "%{public}d, tarReminderId=%{public}d", alertingReminderId_, reminder->GetReminderId());
         return;
     }
     ANSR_LOGD("Stop sound and vibration, reminderId=%{public}d", reminder->GetReminderId());
