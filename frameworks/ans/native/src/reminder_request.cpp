@@ -1174,8 +1174,14 @@ int ReminderRequest::GetActualTime(const TimeTransferType &type, int cTime)
             return BASE_YEAR + cTime;
         case (TimeTransferType::MONTH):  // month
             return 1 + cTime;
-        case (TimeTransferType::WEEK):  // week
-            return 1 + cTime;
+        case (TimeTransferType::WEEK): {  // week
+            int sunDay = 7;
+            if (cTime == 0) {
+                return sunDay;
+            } else {
+                return cTime;
+            }
+        }
         default:
             return -1;
     }
@@ -1188,8 +1194,14 @@ int ReminderRequest::GetCTime(const TimeTransferType &type, int actualTime)
             return actualTime - BASE_YEAR;
         case (TimeTransferType::MONTH):  // month
             return actualTime - 1;
-        case (TimeTransferType::WEEK):  // week
-            return actualTime - 1;
+        case (TimeTransferType::WEEK): {  // week
+            int sunDay = 7;
+            if (actualTime == sunDay) {
+                return 0;
+            } else {
+                return actualTime;
+            }
+        }
         default:
             return -1;
     }
