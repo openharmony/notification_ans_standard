@@ -1545,15 +1545,14 @@ bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
     }
     jsonObject["distributedOptions"] = optObj;
 
-    if (!notificationFlags_) {
-        return false;
+    if (notificationFlags_) {
+        nlohmann::json flagsObj;
+        if (!NotificationJsonConverter::ConvertToJosn(notificationFlags_.get(), flagsObj)) {
+            ANS_LOGE("Cannot convert notificationFlags to JSON");
+            return false;
+        }
+        jsonObject["notificationFlags"] = flagsObj;
     }
-    nlohmann::json flagsObj;
-    if (!NotificationJsonConverter::ConvertToJosn(notificationFlags_.get(), flagsObj)) {
-        ANS_LOGE("Cannot convert notificationFlags to JSON");
-        return false;
-    }
-    jsonObject["notificationFlags"] = flagsObj;
 
     return true;
 }
