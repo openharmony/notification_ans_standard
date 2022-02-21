@@ -133,6 +133,7 @@ public:
 
     static const uint8_t MAX_MONTHS_OF_YEAR;
     static const uint8_t MAX_DAYS_OF_MONTH;
+    static uint8_t GetDaysOfMonth(const uint16_t &year, const uint8_t &month);
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
@@ -140,7 +141,6 @@ protected:
 private:
     ReminderRequestCalendar() : ReminderRequest() {}
 
-    uint8_t GetDaysOfMonth(const uint16_t &year, const uint8_t &month) const;
     uint8_t GetNextDay(const uint16_t &settedYear, const uint8_t &settedMonth, const tm &now, const tm &target) const;
     uint64_t GetNextTriggerTime() const;
     uint64_t GetNextTriggerTimeAsRepeatReminder(const tm &nowTime, const tm &tarTime) const;

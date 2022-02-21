@@ -463,9 +463,10 @@ bool ReminderCommon::CheckCalendarParams(const int32_t &year, const int32_t &mon
             ReminderAgentNapi::CALENDAR_MONTH, ReminderRequestCalendar::MAX_MONTHS_OF_YEAR);
         return false;
     }
-    if (day < 1 || day > ReminderRequestCalendar::MAX_DAYS_OF_MONTH) {
+    uint8_t maxDaysOfMonth = ReminderRequestCalendar::GetDaysOfMonth(static_cast<uint16_t>(year), month);
+    if (day < 1 || day > maxDaysOfMonth) {
         ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [1, %{public}u]",
-            ReminderAgentNapi::CALENDAR_DAY, ReminderRequestCalendar::MAX_DAYS_OF_MONTH);
+            ReminderAgentNapi::CALENDAR_DAY, maxDaysOfMonth);
         return false;
     }
     return true;
