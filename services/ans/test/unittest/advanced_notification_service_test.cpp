@@ -1229,6 +1229,8 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09700, Function | SmallTest | Level1)
 {
+    EXPECT_EQ(
+        (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     TestAddSlot(NotificationConstant::SlotType::OTHER);
     bool allowed = true;
     EXPECT_EQ((int)advancedNotificationService_->IsSpecialBundleAllowedNotify(
@@ -1243,6 +1245,8 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09700,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09800, Function | SmallTest | Level1)
 {
+    EXPECT_EQ(
+        (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     std::vector<sptr<Notification>> notifications;
     bool allowed = true;
     EXPECT_EQ((int)advancedNotificationService_->IsSpecialBundleAllowedNotify(
