@@ -79,7 +79,7 @@ ReminderRequestCalendar::ReminderRequestCalendar(const ReminderRequestCalendar &
     repeatDay_ = other.repeatDay_;
 }
 
-uint8_t ReminderRequestCalendar::GetDaysOfMonth(const uint16_t &year, const uint8_t &month) const
+uint8_t ReminderRequestCalendar::GetDaysOfMonth(const uint16_t &year, const uint8_t &month)
 {
     uint8_t days;
     uint8_t daysArray[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -157,7 +157,7 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTime() const
         if (now <= target) {
             triggerTimeInMilli = static_cast<uint64_t>(target) * MILLI_SECONDS;
             ANSR_LOGD("Now time is: %{public}s", GetDateTimeInfo(now).c_str());
-            ANSR_LOGD("Tar time is: %{public}s", GetDateTimeInfo(target).c_str());
+            ANSR_LOGD("Next calendar time:%{public}s", GetDateTimeInfo(target).c_str());
         }
         return triggerTimeInMilli;
     }
