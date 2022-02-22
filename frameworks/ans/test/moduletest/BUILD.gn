@@ -136,8 +136,6 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
 
   configs = [ "//utils/native/base:utils_config" ]
 
-  ldflags = [ "-Wl,-rpath=/system/lib/module/multimedia/" ]
-
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
