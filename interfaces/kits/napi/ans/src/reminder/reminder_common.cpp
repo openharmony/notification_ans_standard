@@ -469,6 +469,18 @@ bool ReminderCommon::CheckCalendarParams(const int32_t &year, const int32_t &mon
             ReminderAgentNapi::CALENDAR_DAY, maxDaysOfMonth);
         return false;
     }
+    uint8_t maxHour = 23;
+    if (hour < 0 || hour > maxHour) {
+        ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [0, %{public}u]",
+            ReminderAgentNapi::CALENDAR_HOUR, maxHour);
+        return false;
+    }
+    uint8_t maxMinute = 59;
+    if (min < 0 || min > maxMinute) {
+        ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [0, %{public}u]",
+            ReminderAgentNapi::CALENDAR_MINUTE, maxMinute);
+        return false;
+    }
     return true;
 }
 
