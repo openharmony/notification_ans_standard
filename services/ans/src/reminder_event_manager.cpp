@@ -15,10 +15,11 @@
 
 #include "ans_log_wrapper.h"
 #include "appmgr/app_mgr_constants.h"
+#include "bundle_constants.h"
 #include "bundle_mgr_interface.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
-#include "bundle_constants.h"
+#include "ipc_skeleton.h"
 
 #include "reminder_event_manager.h"
 
@@ -44,11 +45,14 @@ void ReminderEventManager::init(std::shared_ptr<ReminderDataManager> &reminderDa
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto subscriber = std::make_shared<ReminderEventSubscriber>(subscriberInfo, reminderDataManager);
+
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     if (CommonEventManager::SubscribeCommonEvent(subscriber)) {
         ANSR_LOGD("SubscribeCommonEvent ok");
     } else {
         ANSR_LOGD("SubscribeCommonEvent fail");
     }
+    IPCSkeleton::SetCallingIdentity(identity);
 }
 
 ReminderEventManager::ReminderEventSubscriber::ReminderEventSubscriber(
