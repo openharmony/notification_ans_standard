@@ -1101,6 +1101,9 @@ bool ReminderRequest::UpdateNextReminder(const bool &force)
 
 void ReminderRequest::UpdateNotificationCommon()
 {
+    time_t now;
+    (void)time(&now);  // unit is seconds.
+    notificationRequest_->SetDeliveryTime(static_cast<int64_t>(now) * MILLI_SECONDS);
     notificationRequest_->SetLabel(NOTIFICATION_LABEL);
     notificationRequest_->SetShowDeliveryTime(true);
     notificationRequest_->SetTapDismissed(true);
@@ -1114,9 +1117,10 @@ void ReminderRequest::UpdateNotificationCommon()
         || reminderType_ == ReminderRequest::ReminderType::ALARM) {
         notificationRequest_->SetUnremovable(true);
     }
-    time_t now;
-    (void)time(&now);  // unit is seconds.
-    notificationRequest_->SetDeliveryTime(static_cast<int64_t>(now) * MILLI_SECONDS);
+    auto flags = std::make_shared<NotificationFlags>();
+    flags->SetSoundEnabled(NotificationConstant::FlagStatus::CLOSE);
+    flags->SetVibrationEnabled(NotificationConstant::FlagStatus::CLOSE);
+    notificationRequest_->SetFlags(flags);
 }
 
 void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
