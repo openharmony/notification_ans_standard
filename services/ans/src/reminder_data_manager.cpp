@@ -703,7 +703,7 @@ sptr<ReminderRequest> ReminderDataManager::GetRecentReminderLocked()
             time_t now;
             (void)time(&now);  // unit is seconds.
             if (now < 0
-                || static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS > (*it)->GetTriggerTimeInMilli()) {
+                || ReminderRequest::GetDurationSinceEpochInMilli(now) > (*it)->GetTriggerTimeInMilli()) {
                 ANSR_LOGE("Get recent reminder while the trigger time is overdue.");
                 it++;
                 continue;
@@ -982,7 +982,7 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
                 ANSR_LOGE("Alerting time out timer has already started.");
                 break;
             }
-            triggerTime = static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS
+            triggerTime = ReminderRequest::GetDurationSinceEpochInMilli(now)
                 + static_cast<uint64_t>(reminderRequest->GetRingDuration() * ReminderRequest::MILLI_SECONDS);
             timerIdAlerting_ = timer->CreateTimer(REMINDER_DATA_MANAGER->CreateTimerInfo(type));
             timer->StartTimer(timerIdAlerting_, triggerTime);
@@ -999,7 +999,7 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
         ANSR_LOGW("Start timer fail");
     } else {
         ANSR_LOGD("Timing info: now:(%{public}llu), tar:(%{public}llu)",
-            (unsigned long long)(static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS),
+            (unsigned long long)(ReminderRequest::GetDurationSinceEpochInMilli(now)),
             (unsigned long long)(triggerTime));
     }
 }

@@ -560,6 +560,7 @@ public:
     static const std::string PARAM_REMINDER_ID;
     static int GetActualTime(const TimeTransferType &type, int cTime);
     static int GetCTime(const TimeTransferType &type, int actualTime);
+    static uint64_t GetDurationSinceEpochInMilli(const time_t target);
     static int32_t GetUid(const int &userId, const std::string &bundleName);
     static int GetUserId(const int &uid);
 
@@ -583,7 +584,7 @@ private:
     std::string GetState(const uint8_t state) const;
     bool HandleSysTimeChange(uint64_t oriTriggerTime, uint64_t optTriggerTime);
     bool HandleTimeZoneChange(uint64_t oldZoneTriggerTime, uint64_t newZoneTriggerTime, uint64_t optTriggerTime);
-    void InitNotificationRequest();
+    bool InitNotificationRequest();
     void SetMaxScreenWantAgent(AppExecFwk::ElementName &element);
     void SetState(bool deSet, const uint8_t newState, std::string function);
     void SetWantAgent(AppExecFwk::ElementName &element);
