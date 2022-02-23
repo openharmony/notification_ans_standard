@@ -108,32 +108,32 @@ int32_t NotificationRequest::GetNotificationId() const
     return notificationId_;
 }
 
-void NotificationRequest::SetWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent)
+void NotificationRequest::SetWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent)
 {
     wantAgent_ = wantAgent;
 }
 
-const std::shared_ptr<WantAgent::WantAgent> NotificationRequest::GetWantAgent() const
+const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> NotificationRequest::GetWantAgent() const
 {
     return wantAgent_;
 }
 
-void NotificationRequest::SetRemovalWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent)
+void NotificationRequest::SetRemovalWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent)
 {
     removalWantAgent_ = wantAgent;
 }
 
-const std::shared_ptr<WantAgent::WantAgent> NotificationRequest::GetRemovalWantAgent() const
+const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> NotificationRequest::GetRemovalWantAgent() const
 {
     return removalWantAgent_;
 }
 
-void NotificationRequest::SetMaxScreenWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent)
+void NotificationRequest::SetMaxScreenWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent)
 {
     maxScreenWantAgent_ = wantAgent;
 }
 
-const std::shared_ptr<WantAgent::WantAgent> NotificationRequest::GetMaxScreenWantAgent() const
+const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> NotificationRequest::GetMaxScreenWantAgent() const
 {
     return maxScreenWantAgent_;
 }
@@ -680,6 +680,8 @@ std::string NotificationRequest::Dump()
             ", userInputHistory = " + (!userInputHistory_.empty() ? userInputHistory_.at(0) : "empty") +
             ", distributedOptions = " + distributedOptions_.Dump() +
             ", notificationFlags = " + (notificationFlags_ ? "not null" : "null") +
+            ", creatorUserId = " + std::to_string(creatorUserId_) +
+            ", receiverUserId = " + std::to_string(receiverUserId_) +
             " }";
 }
 
@@ -710,6 +712,12 @@ bool NotificationRequest::ToJson(nlohmann::json &jsonObject) const
     jsonObject["isCountdown"]      = isCountdown_;
     jsonObject["isUnremovable"]    = unremovable_;
     jsonObject["isFloatingIcon"]   = floatingIcon_;
+
+    jsonObject["creatorBundleName"] = creatorBundleName_;
+    jsonObject["creatorUid"]        = creatorUid_;
+    jsonObject["creatorPid"]        = creatorPid_;
+    jsonObject["creatorUserId"]     = creatorUserId_;
+    jsonObject["receiverUserId"]    = receiverUserId_;
 
     if (!ConvertObjectsToJson(jsonObject)) {
         ANS_LOGE("Cannot convert objects to JSON");
@@ -747,7 +755,7 @@ NotificationRequest *NotificationRequest::FromJson(const nlohmann::json &jsonObj
 
     if (jsonObject.find("wantAgent") != jsonEnd) {
         auto wantAgentValue  = jsonObject.at("wantAgent").get<std::string>();
-        pRequest->wantAgent_ = WantAgent::WantAgentHelper::FromString(wantAgentValue);
+        pRequest->wantAgent_ = AbilityRuntime::WantAgent::WantAgentHelper::FromString(wantAgentValue);
     }
 
     if (!ConvertJsonToNotificationContent(pRequest, jsonObject)) {
@@ -837,6 +845,16 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
 
     if (!parcel.WriteInt32(static_cast<int32_t>(creatorUid_))) {
         ANS_LOGE("Failed to write creator uid");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(creatorUserId_))) {
+        ANS_LOGE("Failed to write creator userId");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(receiverUserId_))) {
+        ANS_LOGE("Failed to write receiver userId");
         return false;
     }
 
@@ -1174,6 +1192,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     creatorPid_ = static_cast<pid_t>(parcel.ReadInt32());
     creatorUid_ = static_cast<pid_t>(parcel.ReadInt32());
+    creatorUserId_ = parcel.ReadInt32();
+    receiverUserId_ = parcel.ReadInt32();
 
     if (!parcel.ReadString(settingsText_)) {
         ANS_LOGE("Failed to read settings text");
@@ -1244,7 +1264,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        wantAgent_ = std::shared_ptr<WantAgent::WantAgent>(parcel.ReadParcelable<WantAgent::WantAgent>());
+        wantAgent_ = std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>(
+            parcel.ReadParcelable<AbilityRuntime::WantAgent::WantAgent>());
         if (!wantAgent_) {
             ANS_LOGE("Failed to read wantAgent");
             return false;
@@ -1253,7 +1274,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        removalWantAgent_ = std::shared_ptr<WantAgent::WantAgent>(parcel.ReadParcelable<WantAgent::WantAgent>());
+        removalWantAgent_ = std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>(
+            parcel.ReadParcelable<AbilityRuntime::WantAgent::WantAgent>());
         if (!removalWantAgent_) {
             ANS_LOGE("Failed to read removalWantAgent");
             return false;
@@ -1262,7 +1284,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
 
     valid = parcel.ReadBool();
     if (valid) {
-        maxScreenWantAgent_ = std::shared_ptr<WantAgent::WantAgent>(parcel.ReadParcelable<WantAgent::WantAgent>());
+        maxScreenWantAgent_ = std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>(
+            parcel.ReadParcelable<AbilityRuntime::WantAgent::WantAgent>());
         if (!maxScreenWantAgent_) {
             ANS_LOGE("Failed to read maxScreenWantAgent");
             return false;
@@ -1398,6 +1421,16 @@ std::shared_ptr<NotificationFlags> NotificationRequest::GetFlags() const
     return notificationFlags_;
 }
 
+void NotificationRequest::SetReceiverUserId(int32_t userId)
+{
+    receiverUserId_ = userId;
+}
+
+int32_t NotificationRequest::GetReceiverUserId() const
+{
+    return receiverUserId_;
+}
+
 void NotificationRequest::CopyBase(const NotificationRequest &other)
 {
     this->notificationId_ = other.notificationId_;
@@ -1411,6 +1444,8 @@ void NotificationRequest::CopyBase(const NotificationRequest &other)
 
     this->creatorPid_ = other.creatorPid_;
     this->creatorUid_ = other.creatorUid_;
+    this->creatorUserId_ = other.creatorUserId_;
+    this->receiverUserId_ = other.receiverUserId_;
 
     this->slotType_ = other.slotType_;
     this->settingsText_ = other.settingsText_;
@@ -1466,7 +1501,7 @@ void NotificationRequest::CopyOther(const NotificationRequest &other)
 
 bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
 {
-    jsonObject["wantAgent"] = wantAgent_ ? WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
+    jsonObject["wantAgent"] = wantAgent_ ? AbilityRuntime::WantAgent::WantAgentHelper::ToString(wantAgent_) : "";
 
     nlohmann::json contentObj;
     if (notificationContent_) {
@@ -1510,12 +1545,14 @@ bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
     }
     jsonObject["distributedOptions"] = optObj;
 
-    nlohmann::json flagsObj;
-    if (!NotificationJsonConverter::ConvertToJosn(notificationFlags_.get(), flagsObj)) {
-        ANS_LOGE("Cannot convert notificationFlags to JSON");
-        return false;
+    if (notificationFlags_) {
+        nlohmann::json flagsObj;
+        if (!NotificationJsonConverter::ConvertToJosn(notificationFlags_.get(), flagsObj)) {
+            ANS_LOGE("Cannot convert notificationFlags to JSON");
+            return false;
+        }
+        jsonObject["notificationFlags"] = flagsObj;
     }
-    jsonObject["notificationFlags"] = flagsObj;
 
     return true;
 }
@@ -1543,6 +1580,22 @@ void NotificationRequest::ConvertJsonToNum(NotificationRequest *target, const nl
 
     if (jsonObject.find("autoDeletedTime") != jsonEnd) {
         target->autoDeletedTime_ = jsonObject.at("autoDeletedTime").get<int64_t>();
+    }
+
+    if (jsonObject.find("creatorUid") != jsonEnd) {
+        target->creatorUid_ = jsonObject.at("creatorUid").get<uint32_t>();
+    }
+
+    if (jsonObject.find("creatorPid") != jsonEnd) {
+        target->creatorPid_ = jsonObject.at("creatorPid").get<uint32_t>();
+    }
+
+    if (jsonObject.find("creatorUserId") != jsonEnd) {
+        target->creatorUserId_ = jsonObject.at("creatorUserId").get<uint32_t>();
+    }
+
+    if (jsonObject.find("receiverUserId") != jsonEnd) {
+        target->receiverUserId_ = jsonObject.at("receiverUserId").get<uint32_t>();
     }
 }
 
@@ -1573,6 +1626,10 @@ void NotificationRequest::ConvertJsonToString(NotificationRequest *target, const
 
     if (jsonObject.find("classification") != jsonEnd) {
         target->classification_ = jsonObject.at("classification").get<std::string>();
+    }
+
+    if (jsonObject.find("creatorBundleName") != jsonEnd) {
+        target->creatorBundleName_ = jsonObject.at("creatorBundleName").get<std::string>();
     }
 }
 

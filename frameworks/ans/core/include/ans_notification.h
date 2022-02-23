@@ -294,12 +294,30 @@ public:
     ErrCode SetNotificationBadgeNum(int32_t num);
 
     /**
-     * Checks whether this application has permission to publish notifications.
+     * Checks whether this application has permission to publish notifications. The caller must have
+     * system permissions to call this method.
      *
      * @param  allowed True if this application has the permission; returns false otherwise
      * @return Returns is allowed notify result.
      */
     ErrCode IsAllowedNotify(bool &allowed);
+
+    /**
+     * Checks whether this application has permission to publish notifications.
+     *
+     * @param  allowed True if this application has the permission; returns false otherwise
+     * @return Returns is allowed notify result.
+     */
+    ErrCode IsAllowedNotifySelf(bool &allowed);
+
+    /**
+     * Allow the current application to publish notifications on a specified device.
+     *
+     * @param deviceId Indicates the ID of the device running the application. At present, this parameter can
+     *                 only be null or an empty string, indicating the current device.
+     * @return Returns set notifications enabled for default bundle result.
+     */
+    ErrCode RequestEnableNotification(std::string &deviceId);
 
     /**
      * Checks whether this application is in the suspended state.Applications in this state cannot publish
@@ -735,6 +753,56 @@ public:
      * @return Returns get valid reminders result.
      */
     ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &validReminders);
+
+    /**
+     * Checks whether this application has permission to publish notifications under the user.
+     *
+     * @param userId Indicates the userId of the application.
+     * @param allowed True if the application has permissions; returns false otherwise.
+     * @return Returns get allowed result.
+     */
+    ErrCode IsAllowedNotify(const int32_t &userId, bool &allowed);
+
+    /**
+     * Sets whether to allow all applications to publish notifications on a specified user.
+     * The caller must have system permissions to call this method.
+     *
+     * @param userId Indicates the ID of the user running the application.
+     * @param enabled Specifies whether to allow all applications to publish notifications. The value true
+     *                indicates that notifications are allowed, and the value false indicates that notifications
+     *                are not allowed.
+     * @return Returns set notifications enabled for all bundles result.
+     */
+    ErrCode SetNotificationsEnabledForAllBundles(const int32_t &userId, bool enabled);
+
+    /**
+     * Removes notifications under specified user.
+     * @note Your application must have platform signature to use this method.
+     *
+     * @param userId Indicates the ID of user whose notifications are to be removed.
+     * @return Returns remove notification result.
+     */
+    ErrCode RemoveNotifications(const int32_t &userId);
+
+    /**
+     * Sets the do not disturb time on a specified user.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param userId Indicates the specific user.
+     * @param doNotDisturbDate Indicates the do not disturb time to set.
+     * @return Returns set do not disturb time result.
+     */
+    ErrCode SetDoNotDisturbDate(const int32_t &userId, const NotificationDoNotDisturbDate &doNotDisturbDate);
+
+    /**
+     * Obtains the do not disturb time on a specified user.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param userId Indicates the specific user.
+     * @param doNotDisturbDate Indicates the do not disturb time to get.
+     * @return Returns set do not disturb time result.
+     */
+    ErrCode GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate);
 
 private:
     /**

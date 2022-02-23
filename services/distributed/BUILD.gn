@@ -45,7 +45,7 @@ ohos_shared_library("libans_distributed") {
   deps = [ "${core_path}:ans_core" ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "distributeddatamgr:distributeddata_inner",
     "dmsfwk_standard:zuri",
     "eventhandler:libeventhandler",

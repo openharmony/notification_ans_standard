@@ -21,6 +21,7 @@
 #include "message_parcel.h"
 #include "parcel.h"
 #include "reminder_request_alarm.h"
+#include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
 
 namespace OHOS {
@@ -135,6 +136,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::UPDATE_SLOT_GROUPS,
             std::bind(&AnsManagerStub::HandleUpdateSlotGroups, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
+        {AnsManagerStub::REQUEST_ENABLE_NOTIFICATION,
+            std::bind(&AnsManagerStub::HandleRequestEnableNotification, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::SET_NOTIFICATION_ENABLED_FOR_BUNDLE,
             std::bind(&AnsManagerStub::HandleSetNotificationsEnabledForBundle, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3)},
@@ -167,6 +171,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
                 std::placeholders::_3)},
         {AnsManagerStub::IS_ALLOWED_NOTIFY,
             std::bind(&AnsManagerStub::HandleIsAllowedNotify, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::IS_ALLOWED_NOTIFY_SELF,
+            std::bind(&AnsManagerStub::HandleIsAllowedNotifySelf, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
         {AnsManagerStub::IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
             std::bind(&AnsManagerStub::HandleIsSpecialBundleAllowedNotify, std::placeholders::_1, std::placeholders::_2,
@@ -231,6 +238,21 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::IS_SUPPORT_TEMPLATE,
             std::bind(
                 &AnsManagerStub::HandleIsSupportTemplate, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::IS_SPECIAL_USER_ALLOWED_NOTIFY,
+            std::bind(&AnsManagerStub::HandleIsSpecialUserAllowedNotifyByUser, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {AnsManagerStub::SET_NOTIFICATION_ENABLED_BY_USER,
+            std::bind(&AnsManagerStub::HandleSetNotificationsEnabledByUser, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3)},
+        {AnsManagerStub::DELETE_ALL_NOTIFICATIONS_BY_USER,
+            std::bind(&AnsManagerStub::HandleDeleteAllByUser, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::SET_DO_NOT_DISTURB_DATE_BY_USER,
+            std::bind(&AnsManagerStub::HandleSetDoNotDisturbDateByUser, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
+        {AnsManagerStub::GET_DO_NOT_DISTURB_DATE_BY_USER,
+            std::bind(&AnsManagerStub::HandleGetDoNotDisturbDateByUser, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
 };
 
@@ -962,6 +984,22 @@ ErrCode AnsManagerStub::HandleUpdateSlotGroups(MessageParcel &data, MessageParce
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleRequestEnableNotification(MessageParcel &data, MessageParcel &reply)
+{
+    std::string deviceId;
+    if (!data.ReadString(deviceId)) {
+        ANS_LOGW("[HandleRequestEnableNotification] fail: read deviceId failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = RequestEnableNotification(deviceId);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleRequestEnableNotification] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleSetNotificationsEnabledForBundle(MessageParcel &data, MessageParcel &reply)
 {
     std::string deviceId;
@@ -1205,6 +1243,22 @@ ErrCode AnsManagerStub::HandleIsAllowedNotify(MessageParcel &data, MessageParcel
     return ERR_OK;
 }
 
+ErrCode AnsManagerStub::HandleIsAllowedNotifySelf(MessageParcel &data, MessageParcel &reply)
+{
+    bool allowed = false;
+    ErrCode result = IsAllowedNotifySelf(allowed);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleIsAllowedNotifySelf] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteBool(allowed)) {
+        ANS_LOGW("[HandleIsAllowedNotifySelf] fail: write allowed failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
 ErrCode AnsManagerStub::HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply)
 {
     sptr<NotificationBundleOption> bundleOption = data.ReadParcelable<NotificationBundleOption>();
@@ -1417,6 +1471,9 @@ ErrCode AnsManagerStub::HandlePublishReminder(MessageParcel &data, MessageParcel
     } else if (ReminderRequest::ReminderType::TIMER == reminderType) {
         ANSR_LOGD("Publish timer");
         reminder = data.ReadParcelable<ReminderRequestTimer>();
+    } else if (ReminderRequest::ReminderType::CALENDAR == reminderType) {
+        ANSR_LOGD("Publish calendar");
+        reminder = data.ReadParcelable<ReminderRequestCalendar>();
     } else {
         ANSR_LOGE("Reminder type invalid");
         return ERR_ANS_INVALID_PARAM;
@@ -1444,7 +1501,6 @@ ErrCode AnsManagerStub::HandleCancelReminder(MessageParcel &data, MessageParcel 
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    ANSR_LOGD("ReminderId=%{public}d", reminderId);
     return CancelReminder(reminderId);
 }
 
@@ -1546,6 +1602,114 @@ ErrCode AnsManagerStub::HandleIsSupportTemplate(MessageParcel &data, MessageParc
         ANS_LOGW("[HandleIsSupportTemplate] fail: write support failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleIsSpecialUserAllowedNotifyByUser(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    if (data.ReadInt32(userId)) {
+        ANS_LOGW("[HandleIsSpecialUserAllowedNotifyByUser] fail: read userId failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    bool allowed = false;
+    ErrCode result = IsSpecialUserAllowedNotify(userId, allowed);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleIsSpecialUserAllowedNotifyByUser] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.WriteBool(allowed)) {
+        ANS_LOGW("[HandleIsSpecialUserAllowedNotifyByUser] fail: write allowed failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleSetNotificationsEnabledByUser(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    if (!data.ReadInt32(userId)) {
+        ANS_LOGW("[HandleSetNotificationsEnabledByUser] fail: read userId failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    bool enabled = false;
+    if (!data.ReadBool(enabled)) {
+        ANS_LOGW("[HandleSetNotificationsEnabledByUser] fail: read enabled failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = SetNotificationsEnabledByUser(userId, enabled);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleSetNotificationsEnabledByUser] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleDeleteAllByUser(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    if (!data.ReadInt32(userId)) {
+        ANS_LOGW("[HandleDeleteAllByUser] fail: read userId failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = DeleteAllByUser(userId);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleDeleteAllByUser] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleSetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    if (!data.ReadInt32(userId)) {
+        ANS_LOGW("[HandleSetDoNotDisturbDateByUser] fail: read userId failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    sptr<NotificationDoNotDisturbDate> date = data.ReadParcelable<NotificationDoNotDisturbDate>();
+    if (date == nullptr) {
+        ANS_LOGW("[HandleSetDoNotDisturbDateByUser] fail: read date failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = SetDoNotDisturbDate(userId, date);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleSetDoNotDisturbDateByUser] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleGetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    if (!data.ReadInt32(userId)) {
+        ANS_LOGW("[HandleGetDoNotDisturbDateByUser] fail: read userId failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    sptr<NotificationDoNotDisturbDate> date = nullptr;
+    ErrCode result = GetDoNotDisturbDate(userId, date);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleGetDoNotDisturbDateByUser] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (result == ERR_OK) {
+        if (!reply.WriteParcelable(date)) {
+            ANS_LOGW("[HandleGetDoNotDisturbDateByUser] fail: write date failed.");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
+    }
+
     return ERR_OK;
 }
 
@@ -1771,6 +1935,12 @@ ErrCode AnsManagerStub::UpdateSlotGroups(
     return ERR_INVALID_OPERATION;
 }
 
+ErrCode AnsManagerStub::RequestEnableNotification(const std::string &deviceId)
+{
+    ANS_LOGW("AnsManagerStub::RequestEnableNotification called!");
+    return ERR_INVALID_OPERATION;
+}
+
 ErrCode AnsManagerStub::SetNotificationsEnabledForBundle(const std::string &bundle, bool enabled)
 {
     ANS_LOGW("AnsManagerStub::SetNotificationsEnabledForBundle called!");
@@ -1835,6 +2005,12 @@ ErrCode AnsManagerStub::GetCurrentAppSorting(sptr<NotificationSortingMap> &sorti
 ErrCode AnsManagerStub::IsAllowedNotify(bool &allowed)
 {
     ANS_LOGW("AnsManagerStub::IsAllowedNotify called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::IsAllowedNotifySelf(bool &allowed)
+{
+    ANS_LOGW("AnsManagerStub::IsAllowedNotifySelf called!");
     return ERR_INVALID_OPERATION;
 }
 
@@ -1956,6 +2132,36 @@ ErrCode AnsManagerStub::CancelAllReminders()
 ErrCode AnsManagerStub::IsSupportTemplate(const std::string &templateName, bool &support)
 {
     ANS_LOGW("AnsManagerStub::IsSupportTemplate called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    ANS_LOGW("AnsManagerStub::IsSpecialUserAllowedNotify called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::SetNotificationsEnabledByUser(const int32_t &deviceId, bool enabled)
+{
+    ANS_LOGW("AnsManagerStub::SetNotificationsEnabledByUser called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::DeleteAllByUser(const int32_t &userId)
+{
+    ANS_LOGW("AnsManagerStub::DeleteAllByUser called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGW("AnsManagerStub::SetDoNotDisturbDate called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGW("AnsManagerStub::GetDoNotDisturbDate called!");
     return ERR_INVALID_OPERATION;
 }
 }  // namespace Notification

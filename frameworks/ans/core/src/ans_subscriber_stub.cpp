@@ -43,6 +43,9 @@ AnsSubscriberStub::AnsSubscriberStub()
     interfaces_.emplace(ON_DND_DATE_CHANGED,
         std::bind(
             &AnsSubscriberStub::HandleOnDoNotDisturbDateChange, this, std::placeholders::_1, std::placeholders::_2));
+    interfaces_.emplace(ON_ENABLED_NOTIFICATION_CHANGED,
+        std::bind(&AnsSubscriberStub::HandleOnEnabledNotificationChanged, this, std::placeholders::_1,
+            std::placeholders::_2));
 }
 
 AnsSubscriberStub::~AnsSubscriberStub()
@@ -189,6 +192,13 @@ ErrCode AnsSubscriberStub::HandleOnDoNotDisturbDateChange(MessageParcel &data, M
     return ERR_OK;
 }
 
+ErrCode AnsSubscriberStub::HandleOnEnabledNotificationChanged(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<EnabledNotificationCallbackData> callbackData = data.ReadParcelable<EnabledNotificationCallbackData>();
+    OnEnabledNotificationChanged(callbackData);
+    return ERR_OK;
+}
+
 void AnsSubscriberStub::OnConnected()
 {}
 
@@ -213,6 +223,9 @@ void AnsSubscriberStub::OnUpdated(const sptr<NotificationSortingMap> &notificati
 {}
 
 void AnsSubscriberStub::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date)
+{}
+
+void AnsSubscriberStub::OnEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData)
 {}
 }  // namespace Notification
 }  // namespace OHOS

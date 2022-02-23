@@ -87,6 +87,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) override;
     ErrCode UpdateSlotGroups(const sptr<NotificationBundleOption> &bundleOption,
         const std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    ErrCode RequestEnableNotification(const std::string &deviceId) override;
     ErrCode SetNotificationsEnabledForBundle(const std::string &bundle, bool enabled) override;
     ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) override;
     ErrCode SetNotificationsEnabledForSpecialBundle(
@@ -97,6 +98,7 @@ public:
     ErrCode Subscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
     ErrCode Unsubscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
     ErrCode IsAllowedNotify(bool &allowed) override;
+    ErrCode IsAllowedNotifySelf(bool &allowed) override;
     ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
     ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) override;
@@ -121,6 +123,11 @@ public:
     ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
     ErrCode CancelAllReminders() override;
     ErrCode IsSupportTemplate(const std::string &templateName, bool &support) override;
+    ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) override;
+    ErrCode SetNotificationsEnabledByUser(const int32_t &deviceId, bool enabled) override;
+    ErrCode DeleteAllByUser(const int32_t &userId) override;
+    ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
 
     // SystemEvent
     void OnBundleRemoved(const sptr<NotificationBundleOption> &bundleOption);
@@ -131,6 +138,8 @@ public:
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();
+    ErrCode CancelPreparedNotification(
+        int notificationId, const std::string &label, const sptr<NotificationBundleOption> &bundleOption);
     ErrCode PrepareNotificationInfo(
         const sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
     ErrCode PublishPreparedNotification(
@@ -150,7 +159,8 @@ private:
     ErrCode RemoveFromNotificationList(const sptr<NotificationBundleOption> &bundleOption, const std::string &label,
         int notificationId, sptr<Notification> &notification, bool isCancel = false);
     ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification, bool isCancel = false);
-    ErrCode RemoveFromNotificationListForDeleteAll(const std::string &key, sptr<Notification> &notification);
+    ErrCode RemoveFromNotificationListForDeleteAll(const std::string &key,
+        const int &userId, sptr<Notification> &notification);
     std::vector<std::string> GetNotificationKeys(const sptr<NotificationBundleOption> &bundleOption);
     bool IsNotificationExists(const std::string &key);
     void SortNotificationList();
@@ -177,6 +187,7 @@ private:
     ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
     bool GetActiveUserId(int& userId);
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
+    bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);
 
     ErrCode SetNotificationRemindType(sptr<Notification> notification, bool isLocal);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
@@ -192,7 +203,13 @@ private:
         const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request);
     void OnDistributedDelete(
         const std::string &deviceId, const std::string &bundleName, const std::string &label, int32_t id);
+    ErrCode GetDistributedEnableInApplicationInfo(const sptr<NotificationBundleOption> bundleOption, bool &enable);
 #endif
+
+    ErrCode SetDoNotDisturbDateByUser(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date);
+    ErrCode GetDoNotDisturbDateByUser(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date);
+    ErrCode SetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool hasPopped);
+    ErrCode GetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool &hasPopped);
 
 private:
     static sptr<AdvancedNotificationService> instance_;

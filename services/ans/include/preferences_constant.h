@@ -32,6 +32,7 @@ const static std::string KEY_BUNDLE_SHOW_BADGE = "showBadge";
 const static std::string KEY_BUNDLE_BADGE_TOTAL_NUM = "badgeTotalNum";
 const static std::string KEY_BUNDLE_PRIVATE_ALLOWED = "privateAllowed";
 const static std::string KEY_BUNDLE_ENABLE_NOTIFICATION = "enabledNotification";
+const static std::string KEY_BUNDLE_POPPED_DIALOG = "poppedDialog";
 const static std::string KEY_BUNDLE_UID = "uid";
 
 const static std::string KEY_GROUP = "group";
@@ -64,6 +65,7 @@ const static int BUNDLE_IMPORTANCE = 3;
 const static int BUNDLE_BADGE_TOTAL_NUM = 0;
 const static int BUNDLE_PRIVATE_ALLOWED = false;
 const static int BUNDLE_ENABLE_NOTIFICATION = true;
+const static int BUNDLE_POPPED_DIALOG = false;
 const static bool BUNDLE_SHOW_BADGE = false;
 
 enum class BundleType {
@@ -73,6 +75,7 @@ enum class BundleType {
     BUNDLE_BADGE_TOTAL_NUM_TYPE,
     BUNDLE_PRIVATE_ALLOWED_TYPE,
     BUNDLE_ENABLE_NOTIFICATION_TYPE,
+    BUNDLE_POPPED_DIALOG_TYPE,
 };
 }  // namespace Notification
 }  // namespace OHOS

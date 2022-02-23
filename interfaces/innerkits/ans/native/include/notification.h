@@ -165,6 +165,12 @@ public:
     pid_t GetPid() const;
 
     /**
+     * Checks whether this notification is unremovable.
+     * @return true if this notification is unremovable; returns false otherwise.
+     */
+    bool IsUnremovable() const;
+
+    /**
      * @brief Obtains the vibration style for this notifications. if
      *
      * @return Return the vibration style.
@@ -254,7 +260,7 @@ private:
     void SetVibrationStyle(const std::vector<int64_t> &style);
     void SetRemindType(const NotificationConstant::RemindType &reminType);
     std::string GenerateNotificationKey(
-        const std::string &deviceId, int32_t uid, const std::string &label, int32_t id);
+        const std::string &deviceId, int32_t userId, int32_t uid, const std::string &label, int32_t id);
     void SetRemoveAllowed(bool removeAllowed);
     void SetSourceType(NotificationConstant::SourceType sourceType);
     bool ReadFromParcel(Parcel &parcel);

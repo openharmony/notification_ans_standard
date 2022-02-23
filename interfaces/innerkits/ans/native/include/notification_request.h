@@ -16,6 +16,7 @@
 #ifndef BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 #define BASE_NOTIFICATION_ANS_STANDARD_KITS_NATIVE_INCLUDE_NOTIFICATION_REQUEST_H
 
+#include "ans_const_define.h"
 #include "message_user.h"
 #include "notification_action_button.h"
 #include "notification_content.h"
@@ -225,25 +226,25 @@ public:
      * @param wantAgent Indicates the operation triggered by tapping the notification, which can be set by
      * WantAgent.
      */
-    void SetWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent);
+    void SetWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
      * Obtains the WantAgent contained in this notification.
      * @return the WantAgent contained in this notification.
      */
-    const std::shared_ptr<WantAgent::WantAgent> GetWantAgent() const;
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetWantAgent() const;
 
     /**
      * Sets an WantAgent object that is triggered when the user explicitly removes this notification.
      * @param wantAgent Indicates the WantAgent object to be triggered.
      */
-    void SetRemovalWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent);
+    void SetRemovalWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
      * Obtains the WantAgent object that is triggered when the user explicitly removes this notification.
      * @return the WantAgent object to be triggered.
      */
-    const std::shared_ptr<WantAgent::WantAgent> GetRemovalWantAgent() const;
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetRemovalWantAgent() const;
 
     /**
      * Sets the WantAgent to start when the device is not in use,
@@ -254,13 +255,13 @@ public:
      * @param wantAgent Indicates the WantAgent object containing information about the to-be-started ability that
      * uses the Page template.
      */
-    void SetMaxScreenWantAgent(const std::shared_ptr<WantAgent::WantAgent> &wantAgent);
+    void SetMaxScreenWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
      * Obtains the full-screen WantAgent set by calling setMaxScreenWantAgent(WantAgent).
      * @return the full-screen WantAgent.
      */
-    const std::shared_ptr<WantAgent::WantAgent> GetMaxScreenWantAgent() const;
+    const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetMaxScreenWantAgent() const;
 
     /**
      * Sets extra parameters that are stored as key-value pairs for the notification.
@@ -928,6 +929,18 @@ public:
      */
     std::shared_ptr<NotificationFlags> GetFlags() const;
 
+    /**
+     * Sets the UserId of the notification receiver.
+     * @param userId the UserId of the notification receiver.
+     */
+    void SetReceiverUserId(int32_t userId);
+
+    /**
+     * Obtains the UserId of the notification receiver.
+     * @return the UserId of the notification receiver.
+     */
+    int32_t GetReceiverUserId() const;
+
 private:
     /**
      * Indicates the color mask, used for calculation with the ARGB value set by setColor(int32_t).
@@ -985,7 +998,8 @@ private:
 
     pid_t creatorPid_ {0};
     pid_t creatorUid_ {0};
-    int32_t creatorUserId_ {-1};
+    int32_t creatorUserId_ {SUBSCRIBE_USER_INIT};
+    int32_t receiverUserId_ {SUBSCRIBE_USER_INIT};
 
     std::string settingsText_ {};
     std::string creatorBundleName_ {};
@@ -1004,7 +1018,7 @@ private:
     NotificationContent::Type notificationContentType_ {NotificationContent::Type::NONE};
 
     bool showDeliveryTime_ {false};
-    bool tapDismissed_ {false};
+    bool tapDismissed_ {true};
     bool colorEnabled_ {false};
     bool alertOneTime_ {false};
     bool showStopwatch_ {false};
@@ -1017,9 +1031,9 @@ private:
     bool onlyLocal_ {false};
     bool permitted_ {true};
 
-    std::shared_ptr<WantAgent::WantAgent> wantAgent_ {};
-    std::shared_ptr<WantAgent::WantAgent> removalWantAgent_ {};
-    std::shared_ptr<WantAgent::WantAgent> maxScreenWantAgent_ {};
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent_ {};
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> removalWantAgent_ {};
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> maxScreenWantAgent_ {};
     std::shared_ptr<AAFwk::WantParams> additionalParams_ {};
     std::shared_ptr<Media::PixelMap> littleIcon_ {};
     std::shared_ptr<Media::PixelMap> bigIcon_ {};

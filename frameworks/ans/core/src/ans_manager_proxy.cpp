@@ -21,6 +21,7 @@
 #include "message_parcel.h"
 #include "parcel.h"
 #include "reminder_request_alarm.h"
+#include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
 
 namespace OHOS {
@@ -1241,6 +1242,35 @@ ErrCode AnsManagerProxy::UpdateSlotGroups(
     return result;
 }
 
+ErrCode AnsManagerProxy::RequestEnableNotification(const std::string &deviceId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[RequestEnableNotification] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(deviceId)) {
+        ANS_LOGW("[RequestEnableNotification] fail: write deviceId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(REQUEST_ENABLE_NOTIFICATION, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[RequestEnableNotification] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[RequestEnableNotification] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled)
 {
     MessageParcel data;
@@ -1638,6 +1668,35 @@ ErrCode AnsManagerProxy::IsAllowedNotify(bool &allowed)
 
     if (!reply.ReadBool(allowed)) {
         ANS_LOGW("[IsAllowedNotify] fail: read allowed failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::IsAllowedNotifySelf(bool &allowed)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(IS_ALLOWED_NOTIFY_SELF, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(allowed)) {
+        ANS_LOGW("[IsAllowedNotifySelf] fail: read allowed failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
@@ -2271,6 +2330,9 @@ ErrCode AnsManagerProxy::ReadReminders(
         } else if (ReminderRequest::ReminderType::TIMER == reminderType) {
             ANSR_LOGD("[GetValidReminders] timer");
             reminder = reply.ReadParcelable<ReminderRequestTimer>();
+        } else if (ReminderRequest::ReminderType::CALENDAR == reminderType) {
+            ANSR_LOGD("[GetValidReminders] calendar");
+            reminder = reply.ReadParcelable<ReminderRequestCalendar>();
         } else {
             ANSR_LOGW("[GetValidReminders] type=%{public}d", typeInfo);
             return ERR_ANS_INVALID_PARAM;
@@ -2380,6 +2442,179 @@ ErrCode AnsManagerProxy::IsSupportTemplate(const std::string &templateName, bool
     if (!reply.ReadBool(support)) {
         ANS_LOGW("[IsSupportTemplate] fail: read support failed.");
         return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[IsSpecialUserAllowedNotify] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        ANS_LOGW("[IsSpecialUserAllowedNotify] fail: write userId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(IS_SPECIAL_USER_ALLOWED_NOTIFY, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(allowed)) {
+        ANS_LOGW("[IsSpecialBundleAllowedNotify] fail: read allowed failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::SetNotificationsEnabledByUser(const int32_t &userId, bool enabled)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[SetNotificationsEnabledByUser] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        ANS_LOGW("[SetNotificationsEnabledByUser] fail: write userId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteBool(enabled)) {
+        ANS_LOGW("[SetNotificationsEnabledByUser] fail: write enabled failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(SET_NOTIFICATION_ENABLED_BY_USER, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[SetNotificationsEnabledByUser] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[SetNotificationsEnabledByUser] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::DeleteAllByUser(const int32_t &userId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[DeleteAllByUser] fail:, write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        ANS_LOGW("[DeleteAllByUser] fail: write userId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(DELETE_ALL_NOTIFICATIONS_BY_USER, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[DeleteAllByUser] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[DeleteAllByUser] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date)
+{
+    if (date == nullptr) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: date is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: write userId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteParcelable(date)) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: write date failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(SET_DO_NOT_DISTURB_DATE_BY_USER, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[SetDoNotDisturbDate] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[GetDoNotDisturbDate] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        ANS_LOGW("[GetDoNotDisturbDate] fail: write userId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(GET_DO_NOT_DISTURB_DATE_BY_USER, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[GetDoNotDisturbDate] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[GetDoNotDisturbDate] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (result == ERR_OK) {
+        date = reply.ReadParcelable<NotificationDoNotDisturbDate>();
+        if (date == nullptr) {
+            ANS_LOGW("[GetDoNotDisturbDate] fail: read date failed.");
+            return ERR_ANS_PARCELABLE_FAILED;
+        }
     }
 
     return result;

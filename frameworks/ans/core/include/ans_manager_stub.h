@@ -77,6 +77,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) override;
     virtual ErrCode UpdateSlotGroups(const sptr<NotificationBundleOption> &bundleOption,
         const std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    virtual ErrCode RequestEnableNotification(const std::string &deviceId) override;
     virtual ErrCode SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled) override;
     virtual ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) override;
     virtual ErrCode SetNotificationsEnabledForSpecialBundle(
@@ -93,6 +94,7 @@ public:
     virtual ErrCode AreNotificationsSuspended(bool &suspended) override;
     virtual ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap) override;
     virtual ErrCode IsAllowedNotify(bool &allowed) override;
+    virtual ErrCode IsAllowedNotifySelf(bool &allowed) override;
     virtual ErrCode IsSpecialBundleAllowedNotify(
         const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
@@ -120,6 +122,11 @@ public:
     virtual ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
     virtual ErrCode CancelAllReminders() override;
     virtual ErrCode IsSupportTemplate(const std::string &templateName, bool &support) override;
+    virtual ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) override;
+    virtual ErrCode SetNotificationsEnabledByUser(const int32_t &deviceId, bool enabled) override;
+    virtual ErrCode DeleteAllByUser(const int32_t &userId) override;
+    virtual ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) override;
+    virtual ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
 
 private:
     static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
@@ -161,6 +168,7 @@ private:
     ErrCode HandleGetSlotsByBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleUpdateSlots(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleUpdateSlotGroups(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleRequestEnableNotification(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetNotificationsEnabledForBundle(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetNotificationsEnabledForAllBundles(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetNotificationsEnabledForSpecialBundle(MessageParcel &data, MessageParcel &reply);
@@ -172,6 +180,7 @@ private:
     ErrCode HandleAreNotificationsSuspended(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetCurrentAppSorting(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsAllowedNotify(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsAllowedNotifySelf(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsSpecialBundleAllowedNotify(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsDistributedEnabled(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleEnableDistributed(MessageParcel &data, MessageParcel &reply);
@@ -192,6 +201,11 @@ private:
     ErrCode HandleGetValidReminders(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleCancelAllReminders(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleIsSupportTemplate(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsSpecialUserAllowedNotifyByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleSetNotificationsEnabledByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleDeleteAllByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleSetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

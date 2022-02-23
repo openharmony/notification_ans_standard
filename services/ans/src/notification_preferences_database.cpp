@@ -115,6 +115,11 @@ const std::map<std::string,
                 std::placeholders::_2, std::placeholders::_3),
         },
         {
+            KEY_BUNDLE_POPPED_DIALOG,
+            std::bind(&NotificationPreferencesDatabase::ParseBundleEnableNotification, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3),
+        },
+        {
             KEY_BUNDLE_UID,
             std::bind(&NotificationPreferencesDatabase::ParseBundleUid, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3),
@@ -364,13 +369,30 @@ bool NotificationPreferencesDatabase::PutNotificationsEnabled(const int32_t &use
         std::string().append(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));
     OHOS::DistributedKv::Key enableKey(typeKey);
     OHOS::DistributedKv::Value enableValue(std::to_string(enabled));
-    OHOS::DistributedKv::Status status;
-    status = kvStorePtr_->Put(enableKey, enableValue);
+    OHOS::DistributedKv::Status status = kvStorePtr_->Put(enableKey, enableValue);
     if (status != OHOS::DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Store enable notification failed. %{public}d", status);
         return false;
     }
     return true;
+}
+
+bool NotificationPreferencesDatabase::PutHasPoppedDialog(
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &hasPopped)
+{
+    if (bundleInfo.GetBundleName().empty()) {
+        ANS_LOGE("Bundle name is null.");
+        return false;
+    }
+
+    if (!CheckBundle(bundleInfo.GetBundleName(), bundleInfo.GetBundleUid())) {
+        return false;
+    }
+
+    std::string bundleKey = GenerateBundleLablel(bundleInfo);
+    OHOS::DistributedKv::Status status =
+        PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_POPPED_DIALOG_TYPE, hasPopped);
+    return (status == OHOS::DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutDoNotDisturbDate(
@@ -502,6 +524,9 @@ bool NotificationPreferencesDatabase::PutBundlePropertyValueToDisturbeDB(
         entries);
     GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_ENABLE_NOTIFICATION),
         std::to_string(bundleInfo.GetEnableNotification()),
+        entries);
+    GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_POPPED_DIALOG),
+        std::to_string(bundleInfo.GetHasPoppedDialog()),
         entries);
     GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_UID), std::to_string(bundleInfo.GetBundleUid()), entries);
     if (!CheckKvStore()) {
@@ -733,6 +758,9 @@ OHOS::DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyTo
         case BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE:
             keyStr = GenerateBundleKey(bundleKey, KEY_BUNDLE_ENABLE_NOTIFICATION);
             break;
+        case BundleType::BUNDLE_POPPED_DIALOG_TYPE:
+            keyStr = GenerateBundleKey(bundleKey, KEY_BUNDLE_POPPED_DIALOG);
+            break;
         default:
             break;
     }
@@ -742,8 +770,7 @@ OHOS::DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyTo
         ANS_LOGE("KvStore is nullptr.");
         return OHOS::DistributedKv::Status::ERROR;
     }
-    OHOS::DistributedKv::Status status;
-    status = kvStorePtr_->Put(key, value);
+    OHOS::DistributedKv::Status status = kvStorePtr_->Put(key, value);
     return status;
 }
 
@@ -1118,45 +1145,41 @@ std::string NotificationPreferencesDatabase::SubUniqueIdentifyFromString(
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbType(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetDoNotDisturbType(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetDoNotDisturbType(info, iter);
     }
 }
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbBeginDate(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(info, iter);
     }
 }
 
 void NotificationPreferencesDatabase::ParseDoNotDisturbEndDate(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetDoNotDisturbEndDate(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetDoNotDisturbEndDate(info, iter);
     }
 }
 
 void NotificationPreferencesDatabase::ParseEnableAllNotification(NotificationPreferencesInfo &info)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
 
-    for (auto iter : osAccountInfos) {
-        int userId = iter.GetLocalId();
-        NotificationPreferencesDatabase::GetEnableAllNotification(info, userId);
+    for (auto iter : activeUserId) {
+        NotificationPreferencesDatabase::GetEnableAllNotification(info, iter);
     }
 }
 
@@ -1211,6 +1234,13 @@ void NotificationPreferencesDatabase::ParseBundleEnableNotification(
     NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const
 {
     ANS_LOGD("SetBundleEnableNotification bundle enable is %{public}s.", value.c_str());
+    bundleInfo.SetEnableNotification(static_cast<bool>(StringToInt(value)));
+}
+
+void NotificationPreferencesDatabase::ParseBundlePoppedDialog(
+    NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const
+{
+    ANS_LOGD("SetBundlePoppedDialog bundle has popped dialog is %{public}s.", value.c_str());
     bundleInfo.SetEnableNotification(static_cast<bool>(StringToInt(value)));
 }
 

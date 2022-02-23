@@ -40,7 +40,7 @@ public:
      */
     explicit ReminderRequestTimer(const ReminderRequestTimer &other);
     ReminderRequestTimer& operator = (const ReminderRequestTimer &other);
-    ~ReminderRequestTimer() {};
+    ~ReminderRequestTimer() override {};
 
     uint64_t GetInitInfo() const;
     virtual bool OnDateTimeChange() override;
@@ -62,7 +62,7 @@ public:
     bool ReadFromParcel(Parcel &parcel) override;
 
 protected:
-    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool forceToGetNext) const override;
+    virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
 
 private:
     ReminderRequestTimer() {};

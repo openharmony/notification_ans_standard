@@ -350,6 +350,15 @@ declare namespace notification {
   function isNotificationEnabled(callback: AsyncCallback<boolean>): void;
 
   /**
+   * Checks whether this application has permission to publish notifications under the user.
+   *
+   * since 8
+   * @systemapi Hide this for inner system use.
+   */
+   function isNotificationEnabled(userId: number, callback: AsyncCallback<boolean>): void;
+   function isNotificationEnabled(userId: number): Promise<boolean>;
+
+  /**
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.

@@ -88,6 +88,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) = 0;
     virtual ErrCode UpdateSlotGroups(
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups) = 0;
+    virtual ErrCode RequestEnableNotification(const std::string &deviceId) = 0;
     virtual ErrCode SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled) = 0;
     virtual ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) = 0;
     virtual ErrCode SetNotificationsEnabledForSpecialBundle(
@@ -101,6 +102,7 @@ public:
     virtual ErrCode AreNotificationsSuspended(bool &suspended) = 0;
     virtual ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap) = 0;
     virtual ErrCode IsAllowedNotify(bool &allowed) = 0;
+    virtual ErrCode IsAllowedNotifySelf(bool &allowed) = 0;
     virtual ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) = 0;
 
     virtual ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) = 0;
@@ -126,6 +128,11 @@ public:
     virtual ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) = 0;
     virtual ErrCode CancelAllReminders() = 0;
     virtual ErrCode IsSupportTemplate(const std::string &templateName, bool &support) = 0;
+    virtual ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) = 0;
+    virtual ErrCode SetNotificationsEnabledByUser(const int32_t &deviceId, bool enabled) = 0;
+    virtual ErrCode DeleteAllByUser(const int32_t &userId) = 0;
+    virtual ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) = 0;
+    virtual ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -165,6 +172,7 @@ protected:
         GET_SLOTS_BY_BUNDLE,
         UPDATE_SLOTS,
         UPDATE_SLOT_GROUPS,
+        REQUEST_ENABLE_NOTIFICATION,
         SET_NOTIFICATION_ENABLED_FOR_BUNDLE,
         SET_NOTIFICATION_ENABLED_FOR_ALL_BUNDLE,
         SET_NOTIFICATION_ENABLED_FOR_SPECIAL_BUNDLE,
@@ -176,6 +184,7 @@ protected:
         ARE_NOTIFICATION_SUSPENDED,
         GET_CURRENT_APP_SORTING,
         IS_ALLOWED_NOTIFY,
+        IS_ALLOWED_NOTIFY_SELF,
         IS_SPECIAL_BUNDLE_ALLOWED_NOTIFY,
         SET_DO_NOT_DISTURB_DATE,
         GET_DO_NOT_DISTURB_DATE,
@@ -195,7 +204,12 @@ protected:
         CANCEL_REMINDER,
         CANCEL_ALL_REMINDERS,
         GET_ALL_VALID_REMINDERS,
-        IS_SUPPORT_TEMPLATE
+        IS_SUPPORT_TEMPLATE,
+        IS_SPECIAL_USER_ALLOWED_NOTIFY,
+        SET_NOTIFICATION_ENABLED_BY_USER,
+        DELETE_ALL_NOTIFICATIONS_BY_USER,
+        SET_DO_NOT_DISTURB_DATE_BY_USER,
+        GET_DO_NOT_DISTURB_DATE_BY_USER
     };
 };
 }  // namespace Notification

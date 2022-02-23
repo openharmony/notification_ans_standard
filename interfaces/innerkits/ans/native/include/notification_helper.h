@@ -18,6 +18,7 @@
 
 #include "notification_bundle_option.h"
 #include "notification_do_not_disturb_date.h"
+#include "enabled_notification_callback_data.h"
 #include "notification_request.h"
 #include "notification_slot.h"
 #include "notification_slot_group.h"
@@ -296,12 +297,30 @@ public:
     static ErrCode SetNotificationBadgeNum(int32_t num);
 
     /**
-     * Checks whether this application has permission to publish notifications.
+     * Checks whether this application has permission to publish notifications. The caller must have
+     * system permissions to call this method.
      *
      * @param  allowed True if this application has the permission; returns false otherwise
      * @return Returns is allowed notify result.
      */
     static ErrCode IsAllowedNotify(bool &allowed);
+
+    /**
+     * Checks whether this application has permission to publish notifications.
+     *
+     * @param  allowed True if this application has the permission; returns false otherwise
+     * @return Returns is allowed notify result.
+     */
+    static ErrCode IsAllowedNotifySelf(bool &allowed);
+
+    /**
+     * Allow the current application to publish notifications on a specified device.
+     *
+     * @param deviceId Indicates the ID of the device running the application. At present, this parameter can
+     *                 only be null or an empty string, indicating the current device.
+     * @return Returns set notifications enabled for default bundle result.
+     */
+    static ErrCode RequestEnableNotification(std::string &deviceId);
 
     /**
      * Checks whether this application is in the suspended state.Applications in this state cannot publish
@@ -696,6 +715,56 @@ public:
      * @return Returns check result.
      */
     static ErrCode IsSupportTemplate(const std::string &templateName, bool &support);
+    
+    /**
+     * Checks whether this application has permission to publish notifications under the user.
+     *
+     * @param userId Indicates the userId of the application.
+     * @param allowed True if the application has permissions; returns false otherwise.
+     * @return Returns get allowed result.
+     */
+    static ErrCode IsAllowedNotify(const int32_t &userId, bool &allowed);
+
+    /**
+     * Sets whether to allow all applications to publish notifications on a specified user.
+     * The caller must have system permissions to call this method.
+     *
+     * @param userId Indicates the ID of the user running the application.
+     * @param enabled Specifies whether to allow all applications to publish notifications. The value true
+     *                indicates that notifications are allowed, and the value false indicates that notifications
+     *                are not allowed.
+     * @return Returns set notifications enabled for all bundles result.
+     */
+    static ErrCode SetNotificationsEnabledForAllBundles(const int32_t &userId, bool enabled);
+
+    /**
+     * Removes notifications under specified user.
+     * @note Your application must have platform signature to use this method.
+     *
+     * @param userId Indicates the ID of user whose notifications are to be removed.
+     * @return Returns remove notification result.
+     */
+    static ErrCode RemoveNotifications(const int32_t &userId);
+
+    /**
+     * Sets the do not disturb time on a specified user.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param userId Indicates the specific user.
+     * @param doNotDisturbDate Indicates the do not disturb time to set.
+     * @return Returns set do not disturb time result.
+     */
+    static ErrCode SetDoNotDisturbDate(const int32_t &userId, const NotificationDoNotDisturbDate &doNotDisturbDate);
+
+    /**
+     * Obtains the do not disturb time on a specified user.
+     * @note Your application must have system signature to call this method.
+     *
+     * @param userId Indicates the specific user.
+     * @param doNotDisturbDate Indicates the do not disturb time to get.
+     * @return Returns set do not disturb time result.
+     */
+    static ErrCode GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate);
 };
 }  // namespace Notification
 }  // namespace OHOS

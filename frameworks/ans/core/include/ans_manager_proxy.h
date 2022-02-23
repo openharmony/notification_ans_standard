@@ -77,6 +77,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, const std::vector<sptr<NotificationSlot>> &slots) override;
     ErrCode UpdateSlotGroups(const sptr<NotificationBundleOption> &bundleOption,
         const std::vector<sptr<NotificationSlotGroup>> &groups) override;
+    ErrCode RequestEnableNotification(const std::string &deviceId) override;
     ErrCode SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled) override;
     ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled) override;
     ErrCode SetNotificationsEnabledForSpecialBundle(
@@ -89,6 +90,7 @@ public:
     ErrCode AreNotificationsSuspended(bool &suspended) override;
     ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap) override;
     ErrCode IsAllowedNotify(bool &allowed) override;
+    ErrCode IsAllowedNotifySelf(bool &allowed) override;
     ErrCode IsSpecialBundleAllowedNotify(const sptr<NotificationBundleOption> &bundleOption, bool &allowed) override;
 
     ErrCode SetDoNotDisturbDate(const sptr<NotificationDoNotDisturbDate> &date) override;
@@ -114,6 +116,11 @@ public:
     ErrCode CancelReminder(const int32_t reminderId) override;
     ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders) override;
     ErrCode CancelAllReminders() override;
+    ErrCode IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed) override;
+    ErrCode SetNotificationsEnabledByUser(const int32_t &userId, bool enabled) override;
+    ErrCode DeleteAllByUser(const int32_t &userId) override;
+    ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

@@ -96,11 +96,11 @@ public:
     virtual Status GetSecurityLevel(SecurityLevel &securityLevel) const override;
 
     virtual Status SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
-                                     const DataQuery &query) override;
+        const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback) override;
 
     virtual Status SubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
 
-    virtual Status UnSubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
+    virtual Status UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
 
     Status GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
                               std::shared_ptr<KvStoreSnapshot> &snapshot) const override;

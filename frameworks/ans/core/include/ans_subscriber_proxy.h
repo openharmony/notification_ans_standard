@@ -38,6 +38,7 @@ public:
         int deleteReason) override;
     void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) override;
     void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) override;
+    void OnEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

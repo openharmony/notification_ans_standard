@@ -414,17 +414,6 @@ public:
         return true;
     }
     /**
-     * @brief Clears cache data of a specified application.
-     * @param bundleName Indicates the bundle name of the application whose cache data is to be cleared.
-     * @param cleanCacheCallback Indicates the callback to be invoked for returning the operation result.
-     * @return Returns true if this function is successfully called; returns false otherwise.
-     */
-    virtual bool CleanBundleCacheFiles(
-        const std::string &bundleName, const sptr<ICleanCacheCallback> &cleanCacheCallback) override
-    {
-        return true;
-    }
-    /**
      * @brief Clears application running data of a specified application.
      * @param bundleName Indicates the bundle name of the application whose data is to be cleared.
      * @return Returns true if the data cleared successfully; returns false otherwise.
@@ -482,17 +471,6 @@ public:
         return true;
     }
     /**
-     * @brief Sets whether to enable a specified application.
-     * @param bundleName Indicates the bundle name of the application.
-     * @param isEnable Specifies whether to enable the application.
-     *                 The value true means to enable it, and the value false means to disable it.
-     * @return Returns true if the application is enabled; returns false otherwise.
-     */
-    virtual bool SetApplicationEnabled(const std::string &bundleName, bool isEnable) override
-    {
-        return true;
-    }
-    /**
      * @brief Sets whether to enable a specified ability.
      * @param abilityInfo Indicates information about the ability to check.
      * @return Returns true if the ability is enabled; returns false otherwise.
@@ -510,17 +488,6 @@ public:
     virtual std::string GetAbilityIcon(const std::string &bundleName, const std::string &className) override
     {
         return "abilityicon";
-    }
-    /**
-     * @brief Sets whether to enable a specified ability.
-     * @param abilityInfo Indicates information about the ability.
-     * @param isEnabled Specifies whether to enable the ability.
-     *                 The value true means to enable it, and the value false means to disable it.
-     * @return Returns true if the ability is enabled; returns false otherwise.
-     */
-    virtual bool SetAbilityEnabled(const AbilityInfo &abilityInfo, bool isEnabled) override
-    {
-        return true;
     }
     /**
      * @brief Obtains the interface used to install and uninstall bundles.

@@ -274,5 +274,27 @@ void AnsSubscriberProxy::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDi
         return;
     }
 }
+
+void AnsSubscriberProxy::OnEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
+        ANS_LOGW("[OnEnabledNotificationChanged] fail: write interface token failed.");
+        return;
+    }
+
+    if (!data.WriteParcelable(callbackData)) {
+        ANS_LOGW("[OnEnabledNotificationChanged] fail: write callbackData failed");
+        return;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_ASYNC};
+    ErrCode result = InnerTransact(ON_ENABLED_NOTIFICATION_CHANGED, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[OnEnabledNotificationChanged] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        return;
+    }
+}
 }  // namespace Notification
 }  // namespace OHOS

@@ -38,6 +38,12 @@
 #include "notification_subscriber.h"
 #include "system_ability_definition.h"
 
+namespace OHOS {
+namespace AppExecFwk {
+void MockSetDistributedNotificationEnabled(bool enable);
+}  // AppExecFwk
+}  // namespace OHOS
+
 using namespace testing::ext;
 using namespace OHOS::Media;
 
@@ -68,6 +74,7 @@ enum class SubscriberEventType {
     ON_DIED,
     ON_UPDATE,
     ON_DND_CHANGED,
+    ON_ENABLED_NOTIFICATION_CHANGED,
     ON_CANCELED,
     ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON,
     ON_CONSUMED,
@@ -85,7 +92,7 @@ public:
     }
 
 protected:
-    SubscriberEvent(SubscriberEventType type) : type_(type)
+    explicit SubscriberEvent(SubscriberEventType type) : type_(type)
     {}
 
     SubscriberEventType type_;
@@ -120,7 +127,7 @@ public:
 
 class OnUpdatedEvent : public SubscriberEvent {
 public:
-    OnUpdatedEvent(const std::shared_ptr<NotificationSortingMap> &sortingMap)
+    explicit OnUpdatedEvent(const std::shared_ptr<NotificationSortingMap> &sortingMap)
         : SubscriberEvent(SubscriberEventType::ON_UPDATE), sortingMap_(sortingMap)
     {}
 
@@ -154,9 +161,27 @@ private:
     std::shared_ptr<NotificationDoNotDisturbDate> date_;
 };
 
+class OnEnabledNotificationChangedEvent : public SubscriberEvent {
+public:
+    explicit OnEnabledNotificationChangedEvent(const std::shared_ptr<EnabledNotificationCallbackData> &callbackData)
+        : SubscriberEvent(SubscriberEventType::ON_ENABLED_NOTIFICATION_CHANGED), callbackData_(callbackData)
+    {}
+
+    ~OnEnabledNotificationChangedEvent() override
+    {}
+
+    const std::shared_ptr<EnabledNotificationCallbackData> &GetEnabledNotificationCallbackData() const
+    {
+        return callbackData_;
+    }
+
+private:
+    std::shared_ptr<EnabledNotificationCallbackData> callbackData_;
+};
+
 class OnOnCanceledEvent : public SubscriberEvent {
 public:
-    OnOnCanceledEvent(const std::shared_ptr<Notification> &request)
+    explicit OnOnCanceledEvent(const std::shared_ptr<Notification> &request)
         : SubscriberEvent(SubscriberEventType::ON_CANCELED), request_(request)
     {}
 
@@ -174,7 +199,7 @@ private:
 
 class OnOnCanceledWithSortingMapAndDeleteReasonEvent : public SubscriberEvent {
 public:
-    OnOnCanceledWithSortingMapAndDeleteReasonEvent(const std::shared_ptr<Notification> &request,
+    explicit OnOnCanceledWithSortingMapAndDeleteReasonEvent(const std::shared_ptr<Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason)
         : SubscriberEvent(SubscriberEventType::ON_CANCELED_WITH_SORTINGMAP_AND_DELETEREASON),
           request_(request),
@@ -206,7 +231,7 @@ private:
 
 class OnConsumedEvent : public SubscriberEvent {
 public:
-    OnConsumedEvent(const std::shared_ptr<Notification> &request)
+    explicit OnConsumedEvent(const std::shared_ptr<Notification> &request)
         : SubscriberEvent(SubscriberEventType::ON_CONSUMED), request_(request)
     {}
 
@@ -224,7 +249,7 @@ private:
 
 class OnConsumedWithSortingMapEvent : public SubscriberEvent {
 public:
-    OnConsumedWithSortingMapEvent(
+    explicit OnConsumedWithSortingMapEvent(
         const std::shared_ptr<Notification> &request, const std::shared_ptr<NotificationSortingMap> &sortingMap)
         : SubscriberEvent(SubscriberEventType::ON_CONSUMED_WITH_SORTINGMAP), request_(request), sortingMap_(sortingMap)
     {
@@ -274,6 +299,14 @@ public:
     void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {
         std::shared_ptr<OnDoNotDisturbDateChangedEvent> event = std::make_shared<OnDoNotDisturbDateChangedEvent>(date);
+        std::unique_lock<std::mutex> lck(mtx_);
+        events_.push_back(event);
+    }
+    void OnEnabledNotificationChanged(
+        const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) override
+    {
+        std::shared_ptr<OnEnabledNotificationChangedEvent> event =
+            std::make_shared<OnEnabledNotificationChangedEvent>(callbackData);
         std::unique_lock<std::mutex> lck(mtx_);
         events_.push_back(event);
     }
@@ -1734,6 +1767,33 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Publish_00200, Function | Medi
 
 /**
  *
+ * @tc.number    : ANS_FW_MT_DistributedNotification_Publish_00300
+ * @tc.name      : DistributedNotification_Publish_00300 MockSetDistributedNotificationEnabled
+ * @tc.desc      : publish a distributed notification when DistributedNotificationEnabled is false in application info.
+ */
+HWTEST_F(AnsFWModuleTest, DistributedNotification_Publish_00300, Function | MediumTest | Level1)
+{
+    ANS_LOGI("%{public}s", test_info_->name());
+    NotificationRequest request = CreateDistributedRequest(test_info_->name());
+    request.SetDistributed(true);
+
+    DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
+    std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
+        DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+    std::vector<DistributedKv::Entry> entries;
+
+    AppExecFwk::MockSetDistributedNotificationEnabled(false);
+    ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
+    DistributedKv::Entry outEntry;
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), false);
+    AppExecFwk::MockSetDistributedNotificationEnabled(true);
+    SleepForFC();
+}
+
+/**
+ *
  * @tc.number    : ANS_FW_MT_DistributedNotification_Cancel_00100
  * @tc.name      : DistributedNotification_Cancel_00100
  * @tc.desc      : cancel a notification to distributed kvstore ,use CancelNotification(label, id).
@@ -2418,7 +2478,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07600, Function
 
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
-    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->IsRemoveAllowed(), false);
+    EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->IsUnremovable(), true);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetSourceType(), NotificationConstant::SourceType::TYPE_CONTINUOUS);
 
     EXPECT_EQ(NotificationHelper::UnSubscribeNotification(subscriber), ERR_OK);

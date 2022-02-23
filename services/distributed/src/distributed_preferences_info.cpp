@@ -50,5 +50,10 @@ bool DistributedPreferencesInfo::GetDistributedBundleEnable(const std::string &b
 
     return iter->second;
 }
+
+void DistributedPreferencesInfo::DeleteDistributedBundleInfo(const std::string &bundleName, int32_t uid)
+{
+    bundleEnable_.erase(std::make_pair(bundleName, uid));
+}
 }  // namespace Notification
 }  // namespace OHOS

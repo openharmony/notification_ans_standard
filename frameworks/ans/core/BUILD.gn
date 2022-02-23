@@ -26,7 +26,7 @@ config("public_ans_core_config") {
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
-    "${interfaces_path}/innerkits/wantAgent/include",
+
     "//utils/native/base/include",
     "//third_party/json/single_include",
     "//third_party/jsoncpp/include",
@@ -45,6 +45,7 @@ ohos_shared_library("ans_core") {
     "${core_path}/src/ans_notification.cpp",
     "${core_path}/src/ans_subscriber_proxy.cpp",
     "${core_path}/src/ans_subscriber_stub.cpp",
+    "${frameworks_path}/ans/native/src/enabled_notification_callback_data.cpp",
     "${frameworks_path}/ans/native/src/message_user.cpp",
     "${frameworks_path}/ans/native/src/notification.cpp",
     "${frameworks_path}/ans/native/src/notification_action_button.cpp",
@@ -75,6 +76,7 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/ans/native/src/reminder_helper.cpp",
     "${frameworks_path}/ans/native/src/reminder_request.cpp",
     "${frameworks_path}/ans/native/src/reminder_request_alarm.cpp",
+    "${frameworks_path}/ans/native/src/reminder_request_calendar.cpp",
     "${frameworks_path}/ans/native/src/reminder_request_timer.cpp",
   ]
 
@@ -83,19 +85,20 @@ ohos_shared_library("ans_core") {
   public_configs = [ ":public_ans_core_config" ]
 
   deps = [
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "os_account_standard:os_account_innerkits",
     "samgr_standard:samgr_proxy",
     "time_native:time_service",
   ]
