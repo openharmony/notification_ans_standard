@@ -159,7 +159,7 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTime() const
     ANSR_LOGD("Now time is: %{public}s", GetDateTimeInfo(now).c_str());
     if (!(repeatMonth_ > 0 && repeatDay_ > 0)) {
         ANSR_LOGD("tarTime: %{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",
-        tarTime.tm_year, tarTime.tm_mon, tarTime.tm_mday, tarTime.tm_hour, tarTime.tm_min, tarTime.tm_sec);
+            tarTime.tm_year, tarTime.tm_mon, tarTime.tm_mday, tarTime.tm_hour, tarTime.tm_min, tarTime.tm_sec);
         const time_t target = mktime(&tarTime);
         if (target == -1) {
             ANSR_LOGW("mktime return error.");
