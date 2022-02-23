@@ -446,6 +446,7 @@ napi_value ReminderCommon::CreateReminderCalendar(
     dateTime.tm_hour = propertyHourVal;
     dateTime.tm_min = propertyMinteVal;
     dateTime.tm_sec = 0;
+    dateTime.tm_isdst = -1;
     reminder = std::make_shared<ReminderRequestCalendar>(dateTime, repeatMonths, repeatDays);
     return NotificationNapi::Common::NapiGetNull(env);
 }

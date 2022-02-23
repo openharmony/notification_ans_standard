@@ -122,6 +122,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     tar.tm_hour = hour_;
     tar.tm_min = minute_;
     tar.tm_sec = 0;
+    tar.tm_isdst = -1;
 
     const time_t target = mktime(&tar);
     int8_t nextDayInterval = GetNextAlarm(now, target);
