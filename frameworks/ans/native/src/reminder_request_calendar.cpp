@@ -164,7 +164,7 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTime() const
         if (target == -1) {
             ANSR_LOGW("mktime return error.");
         }
-        if (now <= target) {
+        if (now < target) {
             triggerTimeInMilli = ReminderRequest::GetDurationSinceEpochInMilli(target);
             ANSR_LOGD("Next calendar time:%{public}s", GetDateTimeInfo(target).c_str());
         }
