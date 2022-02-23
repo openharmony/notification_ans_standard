@@ -244,6 +244,7 @@ AdvancedNotificationService::AdvancedNotificationService()
         std::bind(&AdvancedNotificationService::OnScreenOn, this),
         std::bind(&AdvancedNotificationService::OnScreenOff, this),
 #endif
+        std::bind(&AdvancedNotificationService::OnResourceRemove, this, std::placeholders::_1),
     };
     systemEventObserver_ = std::make_shared<SystemEventObserver>(iSystemEvent);
 
@@ -415,6 +416,11 @@ ErrCode AdvancedNotificationService::PublishPreparedNotification(
 ErrCode AdvancedNotificationService::Publish(const std::string &label, const sptr<NotificationRequest> &request)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (request->GetReceiverUserId() != SUBSCRIBE_USER_INIT && !IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
     sptr<NotificationBundleOption> bundleOption;
     ErrCode result = PrepareNotificationInfo(request, bundleOption);
     if (result != ERR_OK) {
@@ -3181,6 +3187,15 @@ bool AdvancedNotificationService::CheckApiCompatibility(const sptr<NotificationB
         }
     }
     return true;
+}
+
+void AdvancedNotificationService::OnResourceRemove(int32_t userId)
+{
+    DeleteAllByUser(userId);
+
+    handler_->PostSyncTask(std::bind([&]() {
+        NotificationPreferences::GetInstance().RemoveSettings(userId);
+    }));
 }
 }  // namespace Notification
 }  // namespace OHOS

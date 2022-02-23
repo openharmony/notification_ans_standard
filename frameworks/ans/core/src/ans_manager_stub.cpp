@@ -1608,7 +1608,7 @@ ErrCode AnsManagerStub::HandleIsSupportTemplate(MessageParcel &data, MessageParc
 ErrCode AnsManagerStub::HandleIsSpecialUserAllowedNotifyByUser(MessageParcel &data, MessageParcel &reply)
 {
     int32_t userId = SUBSCRIBE_USER_INIT;
-    if (data.ReadInt32(userId)) {
+    if (!data.ReadInt32(userId)) {
         ANS_LOGW("[HandleIsSpecialUserAllowedNotifyByUser] fail: read userId failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
