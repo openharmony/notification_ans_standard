@@ -33,6 +33,7 @@ std::shared_ptr<ReminderDataManager> ReminderDataManager::REMINDER_DATA_MANAGER 
 std::mutex ReminderDataManager::MUTEX;
 std::mutex ReminderDataManager::SHOW_MUTEX;
 std::mutex ReminderDataManager::ALERT_MUTEX;
+std::mutex ReminderDataManager::TIMER_MUTEX;
 
 void ReminderDataManager::PublishReminder(sptr<ReminderRequest> &reminder,
     sptr<NotificationBundleOption> &bundleOption)
@@ -322,6 +323,7 @@ void ReminderDataManager::CloseReminder(const OHOS::EventFwk::Want &want, bool c
         return;
     }
     CloseReminder(reminder, cancelNotification);
+    StartRecentReminder();
 }
 
 void ReminderDataManager::CloseReminder(const sptr<ReminderRequest> &reminder, bool cancelNotification)
@@ -341,7 +343,6 @@ void ReminderDataManager::CloseReminder(const sptr<ReminderRequest> &reminder, b
     if (cancelNotification) {
         CancelNotification(reminder);
     }
-    StartRecentReminder();
 }
 
 std::shared_ptr<ReminderDataManager> ReminderDataManager::GetInstance()
@@ -950,7 +951,7 @@ void ReminderDataManager::RemoveReminderLocked(const int32_t &reminderId)
 
 void ReminderDataManager::StartTimerLocked(const sptr<ReminderRequest> &reminderRequest, TimerType type)
 {
-    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    std::lock_guard<std::mutex> lock(ReminderDataManager::TIMER_MUTEX);
     StartTimer(reminderRequest, type);
 }
 
@@ -1006,7 +1007,7 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
 
 void ReminderDataManager::StopTimerLocked(TimerType type)
 {
-    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    std::lock_guard<std::mutex> lock(ReminderDataManager::TIMER_MUTEX);
     StopTimer(type);
 }
 
