@@ -111,7 +111,7 @@ void BundleManagerHelper::Disconnect()
     }
 }
 
-int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle)
+int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId)
 {
     int uid = -1;
 
@@ -121,7 +121,7 @@ int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle)
 
     if (bundleMgr_ != nullptr) {
         AppExecFwk::BundleInfo bundleInfo;
-        if (bundleMgr_->GetBundleInfo(bundle, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo)) {
+        if (bundleMgr_->GetBundleInfo(bundle, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, userId)) {
             uid = bundleInfo.uid;
         }
     }
