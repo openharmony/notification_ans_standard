@@ -55,6 +55,8 @@ declare namespace notification {
    * @since 8
    * @param Publishes a notification.
    * @param userId of subscriber receiving the notification
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    * 
    */
    function publish(request: NotificationRequest, userId: number, callback: AsyncCallback<void>): void;
@@ -92,6 +94,7 @@ declare namespace notification {
    *
    * @systemapi Hide this for inner system use.
    * @param callback callback function
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlot(slot: NotificationSlot, callback: AsyncCallback<void>): void;
 
@@ -102,6 +105,7 @@ declare namespace notification {
    * This parameter must be specified.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlot(slot: NotificationSlot): Promise<void>;
 
@@ -121,6 +125,7 @@ declare namespace notification {
    * This parameter must be specified.
    * @param callback callback function
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlots(slots: Array<NotificationSlot>, callback: AsyncCallback<void>): void;
 
@@ -131,6 +136,7 @@ declare namespace notification {
    * This parameter must be specified.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlots(slots: Array<NotificationSlot>): Promise<void>;
 
@@ -340,6 +346,7 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(callback: AsyncCallback<boolean>): void;
 
@@ -348,6 +355,7 @@ declare namespace notification {
    *
    * since 8
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
    function isNotificationEnabled(userId: number, callback: AsyncCallback<boolean>): void;
    function isNotificationEnabled(userId: number): Promise<boolean>;
@@ -356,6 +364,7 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(): Promise<boolean>;
 
@@ -363,6 +372,7 @@ declare namespace notification {
    * displayBadge
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function displayBadge(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
 
@@ -370,6 +380,7 @@ declare namespace notification {
    * displayBadge
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function displayBadge(bundle: BundleOption, enable: boolean): Promise<void>;
 
@@ -377,6 +388,7 @@ declare namespace notification {
    * isBadgeDisplayed
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isBadgeDisplayed(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
 
@@ -384,6 +396,7 @@ declare namespace notification {
    * isBadgeDisplayed
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isBadgeDisplayed(bundle: BundleOption): Promise<boolean>;
 
@@ -423,6 +436,7 @@ declare namespace notification {
    * getSlotNumByBundle
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getSlotNumByBundle(bundle: BundleOption, callback: AsyncCallback<number>): void;
 
@@ -430,6 +444,7 @@ declare namespace notification {
    * getSlotNumByBundle
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getSlotNumByBundle(bundle: BundleOption): Promise<number>;
 

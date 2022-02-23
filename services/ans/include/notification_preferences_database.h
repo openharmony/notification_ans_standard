@@ -54,36 +54,39 @@ public:
 
     bool StoreDeathRecipient();
 
+    bool RemoveNotificationEnable(const int32_t userId);
+    bool RemoveDoNotDisturbDate(const int32_t userId);
+
 private:
-    void TryTwice(const std::function<OHOS::DistributedKv::Status()> &func) const;
-    OHOS::DistributedKv::Status GetKvStore();
+    void TryTwice(const std::function<DistributedKv::Status()> &func) const;
+    DistributedKv::Status GetKvStore();
     void CloseKvStore();
     bool CheckKvStore();
 
     bool CheckBundle(const std::string &bundleName, const int &bundleUid);
     bool PutBundlePropertyValueToDisturbeDB(const NotificationPreferencesInfo::BundleInfo &bundleInfo);
     template <typename T>
-    OHOS::DistributedKv::Status PutBundlePropertyToDisturbeDB(
+    DistributedKv::Status PutBundlePropertyToDisturbeDB(
         const std::string &bundleKey, const BundleType &type, const T &t);
     bool PutBundleToDisturbeDB(
         const std::string &bundleKey, const NotificationPreferencesInfo::BundleInfo &bundleInfo);
 
-    void GetValueFromDisturbeDB(const std::string &key, std::function<void(OHOS::DistributedKv::Value &)> funcion);
+    void GetValueFromDisturbeDB(const std::string &key, std::function<void(DistributedKv::Value &)> funcion);
     void GetValueFromDisturbeDB(const std::string &key,
-        std::function<void(OHOS::DistributedKv::Status &, OHOS::DistributedKv::Value &)> funcion);
+        std::function<void(DistributedKv::Status &, DistributedKv::Value &)> funcion);
     bool GetRemoveGroupKeysFromDisturbeDB(
-        const std::string &bundleKey, const std::string &groupId, std::vector<OHOS::DistributedKv::Key> &keys);
+        const std::string &bundleKey, const std::string &groupId, std::vector<DistributedKv::Key> &keys);
 
     bool SlotToEntry(const std::string &bundleName, const int &bundleUid, const sptr<NotificationSlot> &slot,
-        std::vector<OHOS::DistributedKv::Entry> &entries);
+        std::vector<DistributedKv::Entry> &entries);
     bool GroupToEntry(const std::string &bundleName, const int &bundleUid, const sptr<NotificationSlotGroup> &group,
-        std::vector<OHOS::DistributedKv::Entry> &entries);
+        std::vector<DistributedKv::Entry> &entries);
     void GenerateGroupEntry(const std::string &bundleKey, const sptr<NotificationSlotGroup> &group,
-        std::vector<OHOS::DistributedKv::Entry> &entries) const;
+        std::vector<DistributedKv::Entry> &entries) const;
     void GenerateSlotEntry(const std::string &bundleKey, const sptr<NotificationSlot> &slot,
-        std::vector<OHOS::DistributedKv::Entry> &entries) const;
+        std::vector<DistributedKv::Entry> &entries) const;
     void GenerateEntry(
-        const std::string &key, const std::string &value, std::vector<OHOS::DistributedKv::Entry> &entry) const;
+        const std::string &key, const std::string &value, std::vector<DistributedKv::Entry> &entry) const;
 
     std::string FindLastString(const std::string &findString, const std::string &inputString) const;
     std::string SubUniqueIdentifyFromString(const std::string &findString, const std::string &keyStr) const;
@@ -99,19 +102,19 @@ private:
     std::string GenerateBundleKey(const std::string &bundleKey, const std::string &type = "") const;
 
     void ParseBundleFromDistureDB(
-        NotificationPreferencesInfo &info, const std::vector<OHOS::DistributedKv::Entry> &entries);
+        NotificationPreferencesInfo &info, const std::vector<DistributedKv::Entry> &entries);
     void ParseSlotFromDisturbeDB(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &bundleKey,
-        const OHOS::DistributedKv::Entry &entry);
+        const DistributedKv::Entry &entry);
     void ParseGroupFromDisturbeDB(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &bundleKey,
-        const OHOS::DistributedKv::Entry &entry);
+        const DistributedKv::Entry &entry);
     void ParseBundlePropertyFromDisturbeDB(NotificationPreferencesInfo::BundleInfo &bundleInfo,
-        const std::string &bundleKey, const OHOS::DistributedKv::Entry &entry);
+        const std::string &bundleKey, const DistributedKv::Entry &entry);
     void ParseDoNotDisturbType(NotificationPreferencesInfo &info);
     void ParseDoNotDisturbBeginDate(NotificationPreferencesInfo &info);
     void ParseDoNotDisturbEndDate(NotificationPreferencesInfo &info);
     void ParseEnableAllNotification(NotificationPreferencesInfo &info);
     void ParseGroupDescription(
-        const std::string &bundleKey, sptr<NotificationSlotGroup> &group, const OHOS::DistributedKv::Entry &entry);
+        const std::string &bundleKey, sptr<NotificationSlotGroup> &group, const DistributedKv::Entry &entry);
     void ParseBundleName(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
     void ParseBundleImportance(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
     void ParseBundleShowBadge(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
@@ -124,7 +127,7 @@ private:
         NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
     void ParseBundleUid(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
     void ParseSlot(
-        const std::string &findString, sptr<NotificationSlot> &slot, const OHOS::DistributedKv::Entry &entry);
+        const std::string &findString, sptr<NotificationSlot> &slot, const DistributedKv::Entry &entry);
     void ParseSlotGroupId(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotDescription(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotLevel(sptr<NotificationSlot> &slot, const std::string &value) const;

@@ -136,25 +136,25 @@ NotificationPreferencesDatabase::~NotificationPreferencesDatabase()
     CloseKvStore();
 }
 
-void NotificationPreferencesDatabase::TryTwice(const std::function<OHOS::DistributedKv::Status()> &func) const
+void NotificationPreferencesDatabase::TryTwice(const std::function<DistributedKv::Status()> &func) const
 {
-    OHOS::DistributedKv::Status status = func();
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    DistributedKv::Status status = func();
+    if (status != DistributedKv::Status::SUCCESS) {
         status = func();
         ANS_LOGW("Distribute database error and try to call again, result = %{public}d.", status);
     }
 }
 
-OHOS::DistributedKv::Status NotificationPreferencesDatabase::GetKvStore()
+DistributedKv::Status NotificationPreferencesDatabase::GetKvStore()
 {
-    OHOS::DistributedKv::Options options = {
+    DistributedKv::Options options = {
         .createIfMissing = true,
         .encrypt = false,
         .autoSync = false,
-        .kvStoreType = OHOS::DistributedKv::KvStoreType::SINGLE_VERSION,
+        .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
     };
     auto status = dataManager_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Return error: %{public}d.", status);
     } else {
         ANS_LOGD("Get kvStore success.");
@@ -191,7 +191,7 @@ bool NotificationPreferencesDatabase::PutSlotsToDisturbeDB(
     }
 
     bool result = true;
-    std::vector<OHOS::DistributedKv::Entry> entries;
+    std::vector<DistributedKv::Entry> entries;
     for (auto iter : slots) {
         result = SlotToEntry(bundleName, bundleUid, iter, entries);
         if (!result) {
@@ -203,8 +203,8 @@ bool NotificationPreferencesDatabase::PutSlotsToDisturbeDB(
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
-    OHOS::DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutGroupsToDisturbeDB(
@@ -221,7 +221,7 @@ bool NotificationPreferencesDatabase::PutGroupsToDisturbeDB(
     }
 
     bool result = true;
-    std::vector<OHOS::DistributedKv::Entry> entries;
+    std::vector<DistributedKv::Entry> entries;
     for (auto iter : groups) {
         result = GroupToEntry(bundleName, bundleUid, iter, entries);
         if (!result) {
@@ -233,8 +233,8 @@ bool NotificationPreferencesDatabase::PutGroupsToDisturbeDB(
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
-    OHOS::DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
@@ -252,13 +252,13 @@ bool NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
 
     std::string bundleKeyStr = KEY_BUNDLE_LABEL + GenerateBundleLablel(bundleInfo);
     bool result = false;
-    GetValueFromDisturbeDB(bundleKeyStr, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+    GetValueFromDisturbeDB(bundleKeyStr, [&](DistributedKv::Status &status, DistributedKv::Value &value) {
         switch (status) {
-            case OHOS::DistributedKv::Status::KEY_NOT_FOUND: {
+            case DistributedKv::Status::KEY_NOT_FOUND: {
                 result = PutBundleToDisturbeDB(bundleKeyStr, bundleInfo);
                 break;
             }
-            case OHOS::DistributedKv::Status::SUCCESS: {
+            case DistributedKv::Status::SUCCESS: {
                 ANS_LOGE("Current bundle has exsited.");
                 break;
             }
@@ -282,9 +282,9 @@ bool NotificationPreferencesDatabase::PutShowBadge(
     }
 
     std::string bundleKey = GenerateBundleLablel(bundleInfo);
-    OHOS::DistributedKv::Status status =
+    DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_SHOW_BADGE_TYPE, enable);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutImportance(
@@ -300,9 +300,9 @@ bool NotificationPreferencesDatabase::PutImportance(
     }
 
     std::string bundleKey = GenerateBundleLablel(bundleInfo);
-    OHOS::DistributedKv::Status status =
+    DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_IMPORTANCE_TYPE, importance);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutTotalBadgeNums(
@@ -317,9 +317,9 @@ bool NotificationPreferencesDatabase::PutTotalBadgeNums(
         return false;
     }
     std::string bundleKey = GenerateBundleLablel(bundleInfo);
-    OHOS::DistributedKv::Status status =
+    DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, totalBadgeNum);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutPrivateNotificationsAllowed(
@@ -334,10 +334,10 @@ bool NotificationPreferencesDatabase::PutPrivateNotificationsAllowed(
         return false;
     }
     std::string bundleKey = GenerateBundleLablel(bundleInfo);
-    OHOS::DistributedKv::Status status =
+    DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_PRIVATE_ALLOWED_TYPE, allow);
 
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutNotificationsEnabledForBundle(
@@ -353,9 +353,9 @@ bool NotificationPreferencesDatabase::PutNotificationsEnabledForBundle(
     }
 
     std::string bundleKey = GenerateBundleLablel(bundleInfo);
-    OHOS::DistributedKv::Status status =
+    DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE, enabled);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutNotificationsEnabled(const int32_t &userId, const bool &enabled)
@@ -367,10 +367,10 @@ bool NotificationPreferencesDatabase::PutNotificationsEnabled(const int32_t &use
 
     std::string typeKey =
         std::string().append(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));
-    OHOS::DistributedKv::Key enableKey(typeKey);
-    OHOS::DistributedKv::Value enableValue(std::to_string(enabled));
-    OHOS::DistributedKv::Status status = kvStorePtr_->Put(enableKey, enableValue);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    DistributedKv::Key enableKey(typeKey);
+    DistributedKv::Value enableValue(std::to_string(enabled));
+    DistributedKv::Status status = kvStorePtr_->Put(enableKey, enableValue);
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Store enable notification failed. %{public}d", status);
         return false;
     }
@@ -390,9 +390,9 @@ bool NotificationPreferencesDatabase::PutHasPoppedDialog(
     }
 
     std::string bundleKey = GenerateBundleLablel(bundleInfo);
-    OHOS::DistributedKv::Status status =
+    DistributedKv::Status status =
         PutBundlePropertyToDisturbeDB(bundleKey, BundleType::BUNDLE_POPPED_DIALOG_TYPE, hasPopped);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::PutDoNotDisturbDate(
@@ -408,32 +408,32 @@ bool NotificationPreferencesDatabase::PutDoNotDisturbDate(
         return false;
     }
 
-    OHOS::DistributedKv::Entry type;
+    DistributedKv::Entry type;
     std::string typeKey =
         std::string().append(KEY_DO_NOT_DISTURB_TYPE).append(KEY_UNDER_LINE).append(std::to_string(userId));
-    type.key = OHOS::DistributedKv::Key(typeKey);
-    type.value = OHOS::DistributedKv::Value(std::to_string((int)date->GetDoNotDisturbType()));
+    type.key = DistributedKv::Key(typeKey);
+    type.value = DistributedKv::Value(std::to_string((int)date->GetDoNotDisturbType()));
 
-    OHOS::DistributedKv::Entry beginDate;
+    DistributedKv::Entry beginDate;
     std::string beginDateKey =
         std::string().append(KEY_DO_NOT_DISTURB_BEGIN_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
-    beginDate.key = OHOS::DistributedKv::Key(beginDateKey);
-    beginDate.value = OHOS::DistributedKv::Value(std::to_string(date->GetBeginDate()));
+    beginDate.key = DistributedKv::Key(beginDateKey);
+    beginDate.value = DistributedKv::Value(std::to_string(date->GetBeginDate()));
 
-    OHOS::DistributedKv::Entry endDate;
+    DistributedKv::Entry endDate;
     std::string endDateKey =
         std::string().append(KEY_DO_NOT_DISTURB_END_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
-    endDate.key = OHOS::DistributedKv::Key(endDateKey);
-    endDate.value = OHOS::DistributedKv::Value(std::to_string(date->GetEndDate()));
+    endDate.key = DistributedKv::Key(endDateKey);
+    endDate.value = DistributedKv::Value(std::to_string(date->GetEndDate()));
 
-    std::vector<OHOS::DistributedKv::Entry> entries = {
+    std::vector<DistributedKv::Entry> entries = {
         type,
         beginDate,
         endDate,
     };
 
-    OHOS::DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Store DoNotDisturbDate failed. %{public}d", status);
         return false;
     }
@@ -442,18 +442,18 @@ bool NotificationPreferencesDatabase::PutDoNotDisturbDate(
 }
 
 void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
-    const std::string &key, std::function<void(OHOS::DistributedKv::Value &)> funcion)
+    const std::string &key, std::function<void(DistributedKv::Value &)> funcion)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
         return;
     }
 
-    OHOS::DistributedKv::Status status;
-    OHOS::DistributedKv::Value value;
-    OHOS::DistributedKv::Key getKey(key);
+    DistributedKv::Status status;
+    DistributedKv::Value value;
+    DistributedKv::Key getKey(key);
     status = kvStorePtr_->Get(getKey, value);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Get value failed, use defalut value. error code is %{public}d", status);
         return;
     }
@@ -466,16 +466,16 @@ void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
 }
 
 void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
-    const std::string &key, std::function<void(OHOS::DistributedKv::Status &, OHOS::DistributedKv::Value &)> funcion)
+    const std::string &key, std::function<void(DistributedKv::Status &, DistributedKv::Value &)> funcion)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
         return;
     }
 
-    OHOS::DistributedKv::Status status;
-    OHOS::DistributedKv::Value value;
-    OHOS::DistributedKv::Key getKey(key);
+    DistributedKv::Status status;
+    DistributedKv::Value value;
+    DistributedKv::Key getKey(key);
     status = kvStorePtr_->Get(getKey, value);
     funcion(status, value);
 }
@@ -485,16 +485,16 @@ bool NotificationPreferencesDatabase::CheckBundle(const std::string &bundleName,
     std::string bundleKeyStr = KEY_BUNDLE_LABEL + bundleName + std::to_string(bundleUid);
     ANS_LOGD("CheckBundle bundleKeyStr %{public}s", bundleKeyStr.c_str());
     bool result = true;
-    GetValueFromDisturbeDB(bundleKeyStr, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+    GetValueFromDisturbeDB(bundleKeyStr, [&](DistributedKv::Status &status, DistributedKv::Value &value) {
         switch (status) {
-            case OHOS::DistributedKv::Status::KEY_NOT_FOUND: {
+            case DistributedKv::Status::KEY_NOT_FOUND: {
                 NotificationPreferencesInfo::BundleInfo bundleInfo;
                 bundleInfo.SetBundleName(bundleName);
                 bundleInfo.SetBundleUid(bundleUid);
                 result = PutBundleToDisturbeDB(bundleKeyStr, bundleInfo);
                 break;
             }
-            case OHOS::DistributedKv::Status::SUCCESS: {
+            case DistributedKv::Status::SUCCESS: {
                 result = true;
                 break;
             }
@@ -509,7 +509,7 @@ bool NotificationPreferencesDatabase::CheckBundle(const std::string &bundleName,
 bool NotificationPreferencesDatabase::PutBundlePropertyValueToDisturbeDB(
     const NotificationPreferencesInfo::BundleInfo &bundleInfo)
 {
-    std::vector<OHOS::DistributedKv::Entry> entries;
+    std::vector<DistributedKv::Entry> entries;
     std::string bundleKey = bundleInfo.GetBundleName().append(std::to_string(bundleInfo.GetBundleUid()));
     GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_NAME), bundleInfo.GetBundleName(), entries);
     GenerateEntry(GenerateBundleKey(bundleKey, KEY_BUNDLE_BADGE_TOTAL_NUM),
@@ -533,8 +533,8 @@ bool NotificationPreferencesDatabase::PutBundlePropertyValueToDisturbeDB(
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
-    OHOS::DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    DistributedKv::Status status = kvStorePtr_->PutBatch(entries);
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Store bundle failed. %{public}d", status);
         return false;
     }
@@ -553,10 +553,10 @@ bool NotificationPreferencesDatabase::ParseFromDisturbeDB(NotificationPreference
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
-    OHOS::DistributedKv::Status status;
-    std::vector<OHOS::DistributedKv::Entry> entries;
+    DistributedKv::Status status;
+    std::vector<DistributedKv::Entry> entries;
     status = kvStorePtr_->GetEntries(DistributedKv::Key(KEY_BUNDLE_LABEL), entries);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Get Bundle Info failed.");
         return false;
     }
@@ -571,8 +571,8 @@ bool NotificationPreferencesDatabase::RemoveAllDataFromDisturbeDB()
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
-    OHOS::DistributedKv::Status status = dataManager_.DeleteKvStore(appId_, storeId_);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    DistributedKv::Status status = dataManager_.DeleteKvStore(appId_, storeId_);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::RemoveBundleFromDisturbeDB(const std::string &bundleKey)
@@ -583,25 +583,25 @@ bool NotificationPreferencesDatabase::RemoveBundleFromDisturbeDB(const std::stri
         return false;
     }
 
-    OHOS::DistributedKv::Status status;
-    std::vector<OHOS::DistributedKv::Entry> entries;
+    DistributedKv::Status status;
+    std::vector<DistributedKv::Entry> entries;
     status = kvStorePtr_->GetEntries(
         DistributedKv::Key(KEY_ANS_BUNDLE + KEY_UNDER_LINE + bundleKey + KEY_UNDER_LINE), entries);
 
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Get Bundle Info failed.");
         return false;
     }
 
-    std::vector<OHOS::DistributedKv::Key> keys;
+    std::vector<DistributedKv::Key> keys;
     for (auto iter : entries) {
         keys.push_back(iter.key);
     }
 
-    OHOS::DistributedKv::Key bundleDBKey(KEY_BUNDLE_LABEL + KEY_BUNDLE_NAME + KEY_UNDER_LINE + bundleKey);
+    DistributedKv::Key bundleDBKey(KEY_BUNDLE_LABEL + KEY_BUNDLE_NAME + KEY_UNDER_LINE + bundleKey);
     keys.push_back(bundleDBKey);
     status = kvStorePtr_->DeleteBatch(keys);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("delete bundle Info failed.");
         return false;
     }
@@ -622,21 +622,21 @@ bool NotificationPreferencesDatabase::RemoveSlotFromDisturbeDB(
         return false;
     }
 
-    OHOS::DistributedKv::Status status;
-    std::vector<OHOS::DistributedKv::Entry> slotentries;
+    DistributedKv::Status status;
+    std::vector<DistributedKv::Entry> slotentries;
     std::string slotType = std::to_string(type);
     status =
         kvStorePtr_->GetEntries(DistributedKv::Key(GenerateSlotKey(bundleKey, slotType) + KEY_UNDER_LINE), slotentries);
     if (status != DistributedKv::Status::SUCCESS) {
         return false;
     }
-    std::vector<OHOS::DistributedKv::Key> keys;
+    std::vector<DistributedKv::Key> keys;
     for (auto iter : slotentries) {
         keys.push_back(iter.key);
     }
 
     status = kvStorePtr_->DeleteBatch(keys);
-    if (status != OHOS::DistributedKv::Status::SUCCESS) {
+    if (status != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("delete bundle Info failed.");
         return false;
     }
@@ -658,20 +658,20 @@ bool NotificationPreferencesDatabase::RemoveAllSlotsFromDisturbeDB(const std::st
         return false;
     }
 
-    OHOS::DistributedKv::Status status;
-    std::vector<OHOS::DistributedKv::Entry> slotsEntries;
+    DistributedKv::Status status;
+    std::vector<DistributedKv::Entry> slotsEntries;
     status = kvStorePtr_->GetEntries(DistributedKv::Key(GenerateSlotKey(bundleKey) + KEY_UNDER_LINE), slotsEntries);
     if (status != DistributedKv::Status::SUCCESS) {
         return false;
     }
-    std::vector<OHOS::DistributedKv::Key> keys;
+    std::vector<DistributedKv::Key> keys;
     for (auto iter : slotsEntries) {
         keys.push_back(iter.key);
     }
 
     status = kvStorePtr_->DeleteBatch(keys);
     ANS_LOGD("%{public}s remove all slots status %{public}d", __FUNCTION__, status);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::RemoveGroupsFromDisturbeDB(
@@ -692,7 +692,7 @@ bool NotificationPreferencesDatabase::RemoveGroupsFromDisturbeDB(
         return false;
     }
 
-    std::vector<OHOS::DistributedKv::Key> keys;
+    std::vector<DistributedKv::Key> keys;
     bool result = true;
     for (auto iter : groupIds) {
         result = GetRemoveGroupKeysFromDisturbeDB(bundleKey, iter, keys);
@@ -701,21 +701,21 @@ bool NotificationPreferencesDatabase::RemoveGroupsFromDisturbeDB(
         }
     }
 
-    OHOS::DistributedKv::Status status = kvStorePtr_->DeleteBatch(keys);
+    DistributedKv::Status status = kvStorePtr_->DeleteBatch(keys);
     ANS_LOGD("%{public}s remove groups status %{public}d", __FUNCTION__, status);
-    return (status == OHOS::DistributedKv::Status::SUCCESS);
+    return (status == DistributedKv::Status::SUCCESS);
 }
 
 bool NotificationPreferencesDatabase::GetRemoveGroupKeysFromDisturbeDB(
-    const std::string &bundleKey, const std::string &groupId, std::vector<OHOS::DistributedKv::Key> &keys)
+    const std::string &bundleKey, const std::string &groupId, std::vector<DistributedKv::Key> &keys)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
         return false;
     }
 
-    OHOS::DistributedKv::Status status;
-    std::vector<OHOS::DistributedKv::Entry> groupentries;
+    DistributedKv::Status status;
+    std::vector<DistributedKv::Entry> groupentries;
     std::string slotKeyStr = GenerateGroupKey(bundleKey, groupId);
     status = kvStorePtr_->GetEntries(DistributedKv::Key(slotKeyStr + KEY_UNDER_LINE), groupentries);
     if (status != DistributedKv::Status::SUCCESS) {
@@ -738,7 +738,7 @@ bool NotificationPreferencesDatabase::StoreDeathRecipient()
 }
 
 template <typename T>
-OHOS::DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
+DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyToDisturbeDB(
     const std::string &bundleKey, const BundleType &type, const T &t)
 {
     std::string keyStr;
@@ -764,13 +764,13 @@ OHOS::DistributedKv::Status NotificationPreferencesDatabase::PutBundlePropertyTo
         default:
             break;
     }
-    OHOS::DistributedKv::Key key(keyStr);
-    OHOS::DistributedKv::Value value(std::to_string(t));
+    DistributedKv::Key key(keyStr);
+    DistributedKv::Value value(std::to_string(t));
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
-        return OHOS::DistributedKv::Status::ERROR;
+        return DistributedKv::Status::ERROR;
     }
-    OHOS::DistributedKv::Status status = kvStorePtr_->Put(key, value);
+    DistributedKv::Status status = kvStorePtr_->Put(key, value);
     return status;
 }
 
@@ -783,9 +783,9 @@ bool NotificationPreferencesDatabase::PutBundleToDisturbeDB(
     }
 
     ANS_LOGD("Key not fund, so create a bundle, bundle key is %{public}s.", bundleKey.c_str());
-    OHOS::DistributedKv::Key bundleDBKey(bundleKey);
-    OHOS::DistributedKv::Value bundleValue(GenerateBundleLablel(bundleInfo));
-    if (kvStorePtr_->Put(bundleDBKey, bundleValue) != OHOS::DistributedKv::Status::SUCCESS) {
+    DistributedKv::Key bundleDBKey(bundleKey);
+    DistributedKv::Value bundleValue(GenerateBundleLablel(bundleInfo));
+    if (kvStorePtr_->Put(bundleDBKey, bundleValue) != DistributedKv::Status::SUCCESS) {
         ANS_LOGE("Store bundle name to db is failed.");
         return false;
     }
@@ -798,18 +798,18 @@ bool NotificationPreferencesDatabase::PutBundleToDisturbeDB(
 }
 
 void NotificationPreferencesDatabase::GenerateEntry(
-    const std::string &key, const std::string &value, std::vector<OHOS::DistributedKv::Entry> &entries) const
+    const std::string &key, const std::string &value, std::vector<DistributedKv::Entry> &entries) const
 {
-    OHOS::DistributedKv::Entry entry;
-    OHOS::DistributedKv::Key dbKey(key);
-    OHOS::DistributedKv::Value dbValue(value);
+    DistributedKv::Entry entry;
+    DistributedKv::Key dbKey(key);
+    DistributedKv::Value dbValue(value);
     entry.key = dbKey;
     entry.value = dbValue;
     entries.push_back(entry);
 }
 
 bool NotificationPreferencesDatabase::SlotToEntry(const std::string &bundleName, const int &bundleUid,
-    const sptr<NotificationSlot> &slot, std::vector<OHOS::DistributedKv::Entry> &entries)
+    const sptr<NotificationSlot> &slot, std::vector<DistributedKv::Entry> &entries)
 {
     if (slot == nullptr) {
         ANS_LOGE("Notification group is nullptr.");
@@ -826,7 +826,7 @@ bool NotificationPreferencesDatabase::SlotToEntry(const std::string &bundleName,
 }
 
 void NotificationPreferencesDatabase::GenerateSlotEntry(const std::string &bundleKey,
-    const sptr<NotificationSlot> &slot, std::vector<OHOS::DistributedKv::Entry> &entries) const
+    const sptr<NotificationSlot> &slot, std::vector<DistributedKv::Entry> &entries) const
 {
     std::string slotType = std::to_string(slot->GetType());
     GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_TYPE), std::to_string(slot->GetType()), entries);
@@ -857,7 +857,7 @@ void NotificationPreferencesDatabase::GenerateSlotEntry(const std::string &bundl
 }
 
 bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleName, const int &bundleUid,
-    const sptr<NotificationSlotGroup> &group, std::vector<OHOS::DistributedKv::Entry> &entries)
+    const sptr<NotificationSlotGroup> &group, std::vector<DistributedKv::Entry> &entries)
 {
 
     if (group == nullptr) {
@@ -875,7 +875,7 @@ bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleName
 }
 
 void NotificationPreferencesDatabase::GenerateGroupEntry(const std::string &bundleKey,
-    const sptr<NotificationSlotGroup> &group, std::vector<OHOS::DistributedKv::Entry> &entries) const
+    const sptr<NotificationSlotGroup> &group, std::vector<DistributedKv::Entry> &entries) const
 {
     std::string groupLebal = group->GetId().append(KEY_UNDER_LINE);
     GenerateEntry(GenerateGroupKey(bundleKey, groupLebal + KEY_GROUP_ID), group->GetId(), entries);
@@ -886,7 +886,7 @@ void NotificationPreferencesDatabase::GenerateGroupEntry(const std::string &bund
 }
 
 void NotificationPreferencesDatabase::ParseBundleFromDistureDB(
-    NotificationPreferencesInfo &info, const std::vector<OHOS::DistributedKv::Entry> &entries)
+    NotificationPreferencesInfo &info, const std::vector<DistributedKv::Entry> &entries)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
@@ -895,7 +895,7 @@ void NotificationPreferencesDatabase::ParseBundleFromDistureDB(
     for (auto item : entries) {
         std::string bundleKey = item.value.ToString();
         ANS_LOGD("Bundle name is %{public}s.", bundleKey.c_str());
-        std::vector<OHOS::DistributedKv::Entry> bundleEntries;
+        std::vector<DistributedKv::Entry> bundleEntries;
         kvStorePtr_->GetEntries(DistributedKv::Key(GenerateBundleKey(bundleKey)), bundleEntries);
         ANS_LOGD("Bundle key is %{public}s.", GenerateBundleKey(bundleKey).c_str());
         NotificationPreferencesInfo::BundleInfo bunldeInfo;
@@ -914,7 +914,7 @@ void NotificationPreferencesDatabase::ParseBundleFromDistureDB(
 }
 
 void NotificationPreferencesDatabase::ParseSlotFromDisturbeDB(NotificationPreferencesInfo::BundleInfo &bundleInfo,
-    const std::string &bundleKey, const OHOS::DistributedKv::Entry &entry)
+    const std::string &bundleKey, const DistributedKv::Entry &entry)
 {
     std::string slotKey = entry.key.ToString();
     std::string typeStr = SubUniqueIdentifyFromString(GenerateSlotKey(bundleKey) + KEY_UNDER_LINE, slotKey);
@@ -929,7 +929,7 @@ void NotificationPreferencesDatabase::ParseSlotFromDisturbeDB(NotificationPrefer
 }
 
 void NotificationPreferencesDatabase::ParseGroupFromDisturbeDB(NotificationPreferencesInfo::BundleInfo &bundleInfo,
-    const std::string &bundleKey, const OHOS::DistributedKv::Entry &entry)
+    const std::string &bundleKey, const DistributedKv::Entry &entry)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
@@ -942,7 +942,7 @@ void NotificationPreferencesDatabase::ParseGroupFromDisturbeDB(NotificationPrefe
         std::string groupName;
         std::string groupNameKey = GenerateGroupKey(bundleKey, groupId + KEY_UNDER_LINE + KEY_GROUP_NAME);
         GetValueFromDisturbeDB(
-            groupNameKey, [&groupName](OHOS::DistributedKv::Value &value) { groupName = value.ToString(); });
+            groupNameKey, [&groupName](DistributedKv::Value &value) { groupName = value.ToString(); });
         if (groupName.empty()) {
             ANS_LOGE("Group name does not exsited.");
             return;
@@ -956,7 +956,7 @@ void NotificationPreferencesDatabase::ParseGroupFromDisturbeDB(NotificationPrefe
 
 void NotificationPreferencesDatabase::ParseBundlePropertyFromDisturbeDB(
     NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &bundleKey,
-    const OHOS::DistributedKv::Entry &entry)
+    const DistributedKv::Entry &entry)
 {
     std::string typeStr = FindLastString(GenerateBundleKey(bundleKey), entry.key.ToString());
     std::string valueStr = entry.value.ToString();
@@ -970,7 +970,7 @@ void NotificationPreferencesDatabase::ParseBundlePropertyFromDisturbeDB(
 }
 
 void NotificationPreferencesDatabase::ParseSlot(
-    const std::string &findString, sptr<NotificationSlot> &slot, const OHOS::DistributedKv::Entry &entry)
+    const std::string &findString, sptr<NotificationSlot> &slot, const DistributedKv::Entry &entry)
 {
     std::string typeStr = FindLastString(findString, entry.key.ToString());
     std::string valueStr = entry.value.ToString();
@@ -987,7 +987,7 @@ void NotificationPreferencesDatabase::ParseSlot(
 
     if (!typeStr.compare(KEY_SLOT_VIBRATION_STYLE)) {
         GetValueFromDisturbeDB(findString + KEY_SLOT_ENABLE_VRBRATION,
-            [&](OHOS::DistributedKv::Value &value) { ParseSlotEnableVrbration(slot, value.ToString()); });
+            [&](DistributedKv::Value &value) { ParseSlotEnableVrbration(slot, value.ToString()); });
     }
 }
 
@@ -1184,7 +1184,7 @@ void NotificationPreferencesDatabase::ParseEnableAllNotification(NotificationPre
 }
 
 void NotificationPreferencesDatabase::ParseGroupDescription(
-    const std::string &bundleKey, sptr<NotificationSlotGroup> &group, const OHOS::DistributedKv::Entry &entry)
+    const std::string &bundleKey, sptr<NotificationSlotGroup> &group, const DistributedKv::Entry &entry)
 {
     std::string findStr = GenerateGroupKey(bundleKey, group->GetId()) + KEY_UNDER_LINE;
     std::string typeStr = FindLastString(findStr, entry.key.ToString());
@@ -1348,13 +1348,13 @@ void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreference
     std::string key =
         std::string().append(KEY_DO_NOT_DISTURB_TYPE).append(KEY_UNDER_LINE).append(std::to_string(userId));
     GetValueFromDisturbeDB(
-        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+        key, [&](DistributedKv::Status &status, DistributedKv::Value &value) {
             sptr<NotificationDoNotDisturbDate> disturbDate =
                         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
             info.GetDoNotDisturbDate(userId, disturbDate);
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+            if (status == DistributedKv::Status::KEY_NOT_FOUND) {
                 PutDoNotDisturbDate(userId, disturbDate);
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+            } else if (status == DistributedKv::Status::SUCCESS) {
                 if (!value.ToString().empty()) {
                     if (disturbDate != nullptr) {
                         disturbDate->SetDoNotDisturbType(
@@ -1373,13 +1373,13 @@ void NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(NotificationPrefe
     std::string key =
         std::string().append(KEY_DO_NOT_DISTURB_BEGIN_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
     GetValueFromDisturbeDB(
-        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+        key, [&](DistributedKv::Status &status, DistributedKv::Value &value) {
             sptr<NotificationDoNotDisturbDate> disturbDate =
                         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
             info.GetDoNotDisturbDate(userId, disturbDate);
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+            if (status == DistributedKv::Status::KEY_NOT_FOUND) {
                 PutDoNotDisturbDate(userId, disturbDate);
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+            } else if (status == DistributedKv::Status::SUCCESS) {
                 if (!value.ToString().empty()) {
                     if (disturbDate != nullptr) {
                         disturbDate->SetBeginDate(StringToInt64(value.ToString()));
@@ -1397,13 +1397,13 @@ void NotificationPreferencesDatabase::GetDoNotDisturbEndDate(NotificationPrefere
     std::string key =
         std::string().append(KEY_DO_NOT_DISTURB_END_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
     GetValueFromDisturbeDB(
-        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
+        key, [&](DistributedKv::Status &status, DistributedKv::Value &value) {
             sptr<NotificationDoNotDisturbDate> disturbDate =
                         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
             info.GetDoNotDisturbDate(userId, disturbDate);
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+            if (status == DistributedKv::Status::KEY_NOT_FOUND) {
                 PutDoNotDisturbDate(userId, disturbDate);
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+            } else if (status == DistributedKv::Status::SUCCESS) {
                 if (!value.ToString().empty()) {
                     if (disturbDate != nullptr) {
                         disturbDate->SetEndDate(StringToInt64(value.ToString()));
@@ -1421,15 +1421,15 @@ void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPrefe
     std::string key =
         std::string().append(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));
     GetValueFromDisturbeDB(
-        key, [&](OHOS::DistributedKv::Status &status, OHOS::DistributedKv::Value &value) {
-            if (status == OHOS::DistributedKv::Status::KEY_NOT_FOUND) {
+        key, [&](DistributedKv::Status &status, DistributedKv::Value &value) {
+            if (status == DistributedKv::Status::KEY_NOT_FOUND) {
                 bool enable = true;
                 if (!info.GetEnabledAllNotification(userId, enable)) {
                     info.SetEnabledAllNotification(userId, enable);
                     ANS_LOGW("Enable setting not found, default true.");
                 }
                 PutNotificationsEnabled(userId, enable);
-            } else if (status == OHOS::DistributedKv::Status::SUCCESS) {
+            } else if (status == DistributedKv::Status::SUCCESS) {
                 if (!value.ToString().empty()) {
                     info.SetEnabledAllNotification(userId, static_cast<bool>(StringToInt(value.ToString())));
                 }
@@ -1437,6 +1437,58 @@ void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPrefe
                 ANS_LOGW("Parse enable all notification failed, use defalut value.");
             }
         });
+}
+
+bool NotificationPreferencesDatabase::RemoveNotificationEnable(const int32_t userId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    if (!CheckKvStore()) {
+        ANS_LOGE("KvStore is nullptr.");
+        return false;
+    }
+
+    std::string key =
+        std::string(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    DistributedKv::Key enableKey(key);
+    DistributedKv::Status status = kvStorePtr_->Delete(enableKey);
+    if (status != DistributedKv::Status::SUCCESS) {
+        ANS_LOGE("delete bundle Info failed.");
+        return false;
+    }
+
+    ANS_LOGD("%{public}s remove notification enable, userId : %{public}d", __FUNCTION__, userId);
+    return true;
+}
+
+bool NotificationPreferencesDatabase::RemoveDoNotDisturbDate(const int32_t userId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    if (!CheckKvStore()) {
+        ANS_LOGE("KvStore is nullptr.");
+        return false;
+    }
+
+    std::string typeKey =
+        std::string(KEY_DO_NOT_DISTURB_TYPE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    std::string beginDateKey =
+        std::string(KEY_DO_NOT_DISTURB_BEGIN_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+    std::string endDateKey =
+        std::string(KEY_DO_NOT_DISTURB_END_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
+
+    std::vector<DistributedKv::Key> keys = {
+        DistributedKv::Key(typeKey),
+        DistributedKv::Key(beginDateKey),
+        DistributedKv::Key(endDateKey)
+    };
+
+    DistributedKv::Status status = kvStorePtr_->DeleteBatch(keys);
+    if (status != DistributedKv::Status::SUCCESS) {
+        ANS_LOGE("delete DoNotDisturb date failed.");
+        return false;
+    }
+
+    ANS_LOGD("%{public}s remove DoNotDisturb date, userId : %{public}d", __FUNCTION__, userId);
+    return true;
 }
 }  // namespace Notification
 }  // namespace OHOS
