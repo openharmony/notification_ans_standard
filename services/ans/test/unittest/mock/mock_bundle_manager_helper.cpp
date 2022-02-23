@@ -36,7 +36,7 @@ std::string BundleManagerHelper::GetBundleNameByUid(int uid)
     return (uid == NON_BUNDLE_NAME_UID) ? "" : "bundleName";
 }
 
-int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle)
+int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId)
 {
     return NON_SYSTEM_APP_UID;
 }
