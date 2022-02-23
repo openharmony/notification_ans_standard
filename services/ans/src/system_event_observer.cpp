@@ -18,6 +18,7 @@
 #include "bundle_constants.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "notification_preferences.h"
 
 namespace OHOS {
 namespace Notification {
@@ -29,6 +30,7 @@ SystemEventObserver::SystemEventObserver(const ISystemEvent &callbacks) : callba
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
 #endif
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
 
     subscriber_ = std::make_shared<SystemEventSubscriber>(
@@ -46,6 +48,7 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     auto want = data.GetWant();
     std::string action = want.GetAction();
+    ANS_LOGD("OnReceiveEvent action is %{public}s.", action.c_str());
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         if (callbacks_.onBundleRemoved != nullptr) {
             auto element = want.GetElement();
@@ -64,6 +67,8 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
             callbacks_.onScreenOff();
         }
 #endif
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        NotificationPreferences::GetInstance().InitSettingFromDisturbDB();
     }
 }
 }  // namespace Notification

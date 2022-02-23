@@ -34,9 +34,10 @@ public:
 };
 
 /**
- * @tc.number    : initHour_00100
- * @tc.name      :
- * @tc.desc      : set hour < 0 should throw exception.
+ * @tc.name: initHour_00100
+ * @tc.desc: set hour < 0 should throw exception.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initHour_00100, Function | SmallTest | Level1)
 {
@@ -50,9 +51,10 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00100, Function | SmallTest | Level1
 }
 
 /**
- * @tc.number    : initHour_00200
- * @tc.name      :
- * @tc.desc      : set hour > 23 should throw exception.
+ * @tc.name: initHour_00200
+ * @tc.desc: set hour > 23 should throw exception.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initHour_00200, Function | SmallTest | Level1)
 {
@@ -66,9 +68,10 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00200, Function | SmallTest | Level1
 }
 
 /**
- * @tc.number    : initHour_00300
- * @tc.name      :
- * @tc.desc      : test set edge value of hour (0 and 23).
+ * @tc.name: initHour_00300
+ * @tc.desc: test set edge value of hour (0 and 23).
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initHour_00300, Function | SmallTest | Level1)
 {
@@ -90,9 +93,10 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00300, Function | SmallTest | Level1
 }
 
 /**
- * @tc.number    : initHour_00400
- * @tc.name      :
- * @tc.desc      : set minute < 0 should throw exception.
+ * @tc.name: initHour_00400
+ * @tc.desc: set minute < 0 should throw exception.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initHour_00400, Function | SmallTest | Level1)
 {
@@ -106,9 +110,10 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00400, Function | SmallTest | Level1
 }
 
 /**
- * @tc.number    : initHour_00500
- * @tc.name      :
- * @tc.desc      : set minute > 59 should throw exception.
+ * @tc.name: initHour_00500
+ * @tc.desc: set minute > 59 should throw exception.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initHour_00500, Function | SmallTest | Level1)
 {
@@ -122,9 +127,10 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00500, Function | SmallTest | Level1
 }
 
 /**
- * @tc.number    : initHour_00600
- * @tc.name      :
- * @tc.desc      : test set edge value of minute (0 and 59).
+ * @tc.name: initHour_00600
+ * @tc.desc: test set edge value of minute (0 and 59).
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initHour_00600, Function | SmallTest | Level1)
 {
@@ -137,9 +143,10 @@ HWTEST_F(ReminderRequestAlarmTest, initHour_00600, Function | SmallTest | Level1
 }
 
 /**
- * @tc.number    : initDaysOfWeek_00100
- * @tc.name      :
- * @tc.desc      : test set daysOfWeek with normal value.
+ * @tc.name: initDaysOfWeek_00100
+ * @tc.desc: test set daysOfWeek with normal value.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00100, Function | SmallTest | Level1)
 {
@@ -151,9 +158,10 @@ HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00100, Function | SmallTest | 
 }
 
 /**
- * @tc.number    : initDaysOfWeek_00200
- * @tc.name      :
- * @tc.desc      : test set daysOfWeek with edge value.
+ * @tc.name: initDaysOfWeek_00200
+ * @tc.desc: test set daysOfWeek with edge value.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00200, Function | SmallTest | Level1)
 {
@@ -164,9 +172,10 @@ HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00200, Function | SmallTest | 
 }
 
 /**
- * @tc.number    : initDaysOfWeek_00300
- * @tc.name      :
- * @tc.desc      : test set daysOfWeek with duplicate value.
+ * @tc.name: initDaysOfWeek_00300
+ * @tc.desc: test set daysOfWeek with duplicate value.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00300, Function | SmallTest | Level1)
 {
@@ -177,9 +186,10 @@ HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00300, Function | SmallTest | 
 }
 
 /**
- * @tc.number    : initDaysOfWeek_00400
- * @tc.name      :
- * @tc.desc      : test set daysOfWeek exceeding maximum length.
+ * @tc.name: initDaysOfWeek_00400
+ * @tc.desc: test set daysOfWeek exceeding maximum length.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00400, Function | SmallTest | Level1)
 {
@@ -194,9 +204,10 @@ HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00400, Function | SmallTest | 
 }
 
 /**
- * @tc.number    : initDaysOfWeek_00500
- * @tc.name      :
- * @tc.desc      : test set daysOfWeek with null value.
+ * @tc.name: initDaysOfWeek_00500
+ * @tc.desc: test set daysOfWeek with null value.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestAlarmTest, initDaysOfWeek_00500, Function | SmallTest | Level1)
 {

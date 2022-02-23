@@ -46,10 +46,23 @@ bool BundleManagerHelper::IsSystemApp(int uid)
     return (uid == SYSTEM_APP_UID);
 }
 
+bool BundleManagerHelper::GetBundleInfoByBundleName(
+    const std::string bundle, const int32_t userId, AppExecFwk::BundleInfo &bundleInfo)
+{
+    return true;
+}
+
 void BundleManagerHelper::Connect()
 {}
 
 void BundleManagerHelper::Disconnect()
 {}
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+bool BundleManagerHelper::GetDistributedNotificationEnabled(const std::string &bundleName, const int userId)
+{
+    return true;
+}
+#endif
 }  // namespace Notification
 }  // namespace OHOS

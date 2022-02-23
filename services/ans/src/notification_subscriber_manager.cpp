@@ -64,7 +64,10 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
             return ERR_ANS_NO_MEMORY;
         }
 
-        int userId = SUBSCRIBE_USER_ALL;
+        int userId = SUBSCRIBE_USER_INIT;
+        int callingUid = IPCSkeleton::GetCallingUid();
+        OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
+        ANS_LOGD("AddSubscriber callingUid = <%{public}d> userId = <%{public}d>", callingUid, userId);
         subInfo->AddAppUserId(userId);
     }
 
@@ -141,6 +144,20 @@ void NotificationSubscriberManager::NotifyDoNotDisturbDateChanged(const sptr<Not
 
     AppExecFwk::EventHandler::Callback func =
         std::bind(&NotificationSubscriberManager::NotifyDoNotDisturbDateChangedInner, this, date);
+
+    handler_->PostTask(func);
+}
+
+void NotificationSubscriberManager::NotifyEnabledNotificationChanged(
+    const sptr<EnabledNotificationCallbackData> &callbackData)
+{
+    if (handler_ == nullptr) {
+        ANS_LOGE("handler is nullptr");
+        return;
+    }
+
+    AppExecFwk::EventHandler::Callback func =
+        std::bind(&NotificationSubscriberManager::NotifyEnabledNotificationChangedInner, this, callbackData);
 
     handler_->PostTask(func);
 }
@@ -281,13 +298,17 @@ ErrCode NotificationSubscriberManager::RemoveSubscriberInner(
 void NotificationSubscriberManager::NotifyConsumedInner(
     const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap)
 {
+    ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
+    int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
     for (auto record : subscriberRecordList_) {
+        ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
             (notification->GetUserId() == record->userId ||
-                notification->GetUserId() == SUBSCRIBE_USER_ALL ||
-                record->userId == SUBSCRIBE_USER_ALL)) {
+            notification->GetUserId() == SUBSCRIBE_USER_ALL ||
+            recvUserId == record->userId ||
+            IsSystemUser(record->userId))) {
             record->subscriber->OnConsumed(notification, notificationMap);
             record->subscriber->OnConsumed(notification);
         }
@@ -297,12 +318,17 @@ void NotificationSubscriberManager::NotifyConsumedInner(
 void NotificationSubscriberManager::NotifyCanceledInner(
     const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason)
 {
+    ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
+    int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
     for (auto record : subscriberRecordList_) {
+        ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
         auto BundleNames = notification->GetBundleName();
-
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
-            (notification->GetUserId() == record->userId || notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
+            (notification->GetUserId() == record->userId ||
+            notification->GetUserId() == SUBSCRIBE_USER_ALL ||
+            recvUserId == record->userId ||
+            IsSystemUser(record->userId))) {
             record->subscriber->OnCanceled(notification, notificationMap, deleteReason);
             record->subscriber->OnCanceled(notification);
         }
@@ -320,6 +346,23 @@ void NotificationSubscriberManager::NotifyDoNotDisturbDateChangedInner(const spt
 {
     for (auto record : subscriberRecordList_) {
         record->subscriber->OnDoNotDisturbDateChange(date);
+    }
+}
+
+bool NotificationSubscriberManager::IsSystemUser(int32_t userId)
+{
+    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
+        return true;
+    }
+
+    return false;
+}
+
+void NotificationSubscriberManager::NotifyEnabledNotificationChangedInner(
+    const sptr<EnabledNotificationCallbackData> &callbackData)
+{
+    for (auto record : subscriberRecordList_) {
+        record->subscriber->OnEnabledNotificationChanged(callbackData);
     }
 }
 }  // namespace Notification

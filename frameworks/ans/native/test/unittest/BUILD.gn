@@ -15,7 +15,7 @@ import("//base/notification/ans_standard/notification.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-module_output_path = "ans_reminder/unittest"
+module_output_path = "ans_standard/unittest"
 
 ohos_unittest("ans_reminder_unit_test") {
   module_out_path = module_output_path
@@ -31,6 +31,7 @@ ohos_unittest("ans_reminder_unit_test") {
 
   sources = [
     "${native_path}/test/unittest/reminder_request_alarm_test.cpp",
+    "${native_path}/test/unittest/reminder_request_calendar_test.cpp",
     "${native_path}/test/unittest/reminder_request_test.cpp",
     "${native_path}/test/unittest/reminder_request_timer_test.cpp",
   ]
@@ -40,14 +41,13 @@ ohos_unittest("ans_reminder_unit_test") {
   deps = [
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "bytrace_standard:bytrace_core",

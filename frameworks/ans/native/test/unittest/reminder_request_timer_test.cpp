@@ -37,14 +37,16 @@ public:
 };
 
 /**
- * @tc.number    : initCountDownTime_00100
- * @tc.name      :
- * @tc.desc      : set countDownTime = 0 should throw exception.
+ * @tc.name: initCountDownTime_00100
+ * @tc.desc: set countDownTime = 0 should throw exception.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00100, Function | SmallTest | Level1)
 {
     try {
-        auto rrc = std::make_shared<ReminderRequestTimer>(0);
+        uint64_t countDownTimeInSeconds = 0;
+        auto rrc = std::make_shared<ReminderRequestTimer>(countDownTimeInSeconds);
         EXPECT_TRUE(false) << "countDownTime < 0 should throw exception.";
     } catch (const std::invalid_argument &e) {
         ANSR_LOGI("countDownTime < 0 throw exception.");
@@ -52,9 +54,10 @@ HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00100, Function | SmallTest
 }
 
 /**
- * @tc.number    : initCountDownTime_00200
- * @tc.name      :
- * @tc.desc      : set countDownTime > (UINT64_MAX / 1000) should throw exception.
+ * @tc.name: initCountDownTime_00200
+ * @tc.desc: set countDownTime > (UINT64_MAX / 1000) should throw exception.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00200, Function | SmallTest | Level1)
 {
@@ -68,19 +71,23 @@ HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00200, Function | SmallTest
 
 
 /**
- * @tc.number    : initCountDownTime_00300
- * @tc.name      :
- * @tc.desc      : set countDownTime with normal value.
+ * @tc.name: initCountDownTime_00300
+ * @tc.desc: set countDownTime with normal value.
+ * @tc.type: FUNC
+ * @tc.require: SR000GGTRC AR000GH8E8
  */
 HWTEST_F(ReminderRequestTimerTest, initCountDownTime_00300, Function | SmallTest | Level1)
 {
-    auto rrc = std::make_shared<ReminderRequestTimer>(1);
+    uint64_t countDownTimeInSeconds = 1;
+    auto rrc = std::make_shared<ReminderRequestTimer>(countDownTimeInSeconds);
     EXPECT_TRUE(rrc->GetInitInfo() == 1) << "countDownTime is not 1";
 
-    auto rrc2 = std::make_shared<ReminderRequestTimer>(10);
+    countDownTimeInSeconds = 10;
+    auto rrc2 = std::make_shared<ReminderRequestTimer>(countDownTimeInSeconds);
     EXPECT_TRUE(rrc2->GetInitInfo() == 10) << "countDownTime is not 10";
 
-    auto rrc3 = std::make_shared<ReminderRequestTimer>(100);
+    countDownTimeInSeconds = 100;
+    auto rrc3 = std::make_shared<ReminderRequestTimer>(countDownTimeInSeconds);
     EXPECT_TRUE(rrc3->GetInitInfo() == 100) << "countDownTime is not 1";
 }
 }

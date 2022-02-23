@@ -26,14 +26,14 @@ Notification::Notification() {};
 Notification::Notification(const sptr<NotificationRequest> &request)
 {
     request_ = request;
-    key_ = GenerateNotificationKey("", GetUid(), GetLabel(), GetId());
+    key_ = GenerateNotificationKey("", GetUserId(), GetUid(), GetLabel(), GetId());
 }
 
 Notification::Notification(const std::string &deviceId, const sptr<NotificationRequest> &request)
 {
     deviceId_ = deviceId;
     request_ = request;
-    key_ = GenerateNotificationKey(deviceId, GetUid(), GetLabel(), GetId());
+    key_ = GenerateNotificationKey(deviceId, GetUserId(), GetUid(), GetLabel(), GetId());
 }
 
 Notification::Notification(const Notification &other)
@@ -159,6 +159,14 @@ pid_t Notification::GetPid() const
         return 0;
     }
     return request_->GetCreatorPid();
+}
+
+bool Notification::IsUnremovable() const
+{
+    if (request_ == nullptr) {
+        return false;
+    }
+    return request_->IsUnremovable();
 }
 
 std::vector<int64_t> Notification::GetVibrationStyle() const
@@ -455,12 +463,12 @@ void Notification::SetRemindType(const NotificationConstant::RemindType &reminTy
 }
 
 std::string Notification::GenerateNotificationKey(
-    const std::string &deviceId, int32_t uid, const std::string &label, int32_t id)
+    const std::string &deviceId, int32_t userId, int32_t uid, const std::string &label, int32_t id)
 {
     const char *KEY_SPLITER = "_";
 
     std::stringstream stream;
-    stream << deviceId << KEY_SPLITER << uid << KEY_SPLITER << label << KEY_SPLITER << id;
+    stream << deviceId << KEY_SPLITER << userId << KEY_SPLITER << uid << KEY_SPLITER << label << KEY_SPLITER << id;
 
     return stream.str();
 }

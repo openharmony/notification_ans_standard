@@ -160,6 +160,29 @@ bool DistributedPreferencesDatabase::GetEntriesFromDistributedDB(
     return true;
 }
 
+bool DistributedPreferencesDatabase::DeleteToDistributedDB(const std::string &key)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    if (!CheckKvStore()) {
+        return false;
+    }
+
+    if (!KvStoreFlowControl()) {
+        ANS_LOGE("kvStore flow control.");
+        return false;
+    }
+
+    DistributedKv::Key kvStoreKey(key);
+    DistributedKv::Value kvStoreValue;
+    DistributedKv::Status status = kvStore_->Delete(kvStoreKey);
+    if (status != DistributedKv::Status::SUCCESS) {
+        ANS_LOGE("kvStore Delete() failed ret = 0x%{public}x", status);
+        return false;
+    }
+    return true;
+}
+
 bool DistributedPreferencesDatabase::ClearDatabase(void)
 {
     std::lock_guard<std::mutex> lock(mutex_);

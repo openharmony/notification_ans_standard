@@ -1,0 +1,15 @@
+<div class="container" onswipe="touchMove">
+    <div>
+        <text>
+            {{ requestNotification }}
+        </text>
+    </div>
+    <div>
+        <button class="btn" onclick="onAllow">
+            {{ allowButton }}
+        </button>
+        <button class="btn" onclick="onCancel">
+            {{ cancelButton }}
+        </button>
+    </div>
+</div>

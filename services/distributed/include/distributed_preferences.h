@@ -35,6 +35,7 @@ public:
     ErrCode GetDistributedEnable(bool &isEnable);
     ErrCode SetDistributedBundleEnable(const sptr<NotificationBundleOption> &bundleOption, bool isEnable);
     ErrCode GetDistributedBundleEnable(const sptr<NotificationBundleOption> &bundleOption, bool &isEnable);
+    ErrCode DeleteDistributedBundleInfo(const sptr<NotificationBundleOption> &bundleOption);
     ErrCode ClearDataInRestoreFactorySettings();
 
 private:

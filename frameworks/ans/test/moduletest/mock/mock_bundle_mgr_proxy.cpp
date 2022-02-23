@@ -24,17 +24,24 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-BundleMgrProxy::BundleMgrProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBundleMgr>(impl)
+namespace {
+bool distributedNotificationEnabled = true;
+}
+void MockSetDistributedNotificationEnabled(bool enable)
 {
+    distributedNotificationEnabled = enable;
 }
 
+BundleMgrProxy::BundleMgrProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBundleMgr>(impl)
+{}
+
 BundleMgrProxy::~BundleMgrProxy()
-{
-}
+{}
 
 bool BundleMgrProxy::GetApplicationInfo(
     const std::string &appName, const ApplicationFlag flag, const int userId, ApplicationInfo &appInfo)
 {
+    appInfo.distributedNotificationEnabled = distributedNotificationEnabled;
     return true;
 }
 
@@ -51,8 +58,7 @@ bool BundleMgrProxy::GetBundleInfo(
     return true;
 }
 
-bool BundleMgrProxy::GetBundleInfos(
-    const BundleFlag flag, std::vector<BundleInfo> &bundleInfos, int32_t userId)
+bool BundleMgrProxy::GetBundleInfos(const BundleFlag flag, std::vector<BundleInfo> &bundleInfos, int32_t userId)
 {
     return true;
 }
@@ -179,12 +185,6 @@ bool BundleMgrProxy::IsSafeMode()
     return true;
 }
 
-bool BundleMgrProxy::CleanBundleCacheFiles(
-    const std::string &bundleName, const sptr<ICleanCacheCallback> &cleanCacheCallback)
-{
-    return true;
-}
-
 bool BundleMgrProxy::CleanBundleDataFiles(const std::string &bundleName, const int userId)
 {
     return true;
@@ -205,8 +205,7 @@ bool BundleMgrProxy::UnregisterBundleStatusCallback()
     return true;
 }
 
-bool BundleMgrProxy::DumpInfos(
-    const DumpFlag flag, const std::string &bundleName, int32_t userId, std::string &result)
+bool BundleMgrProxy::DumpInfos(const DumpFlag flag, const std::string &bundleName, int32_t userId, std::string &result)
 {
     return true;
 }
@@ -216,17 +215,7 @@ bool BundleMgrProxy::IsApplicationEnabled(const std::string &bundleName)
     return true;
 }
 
-bool BundleMgrProxy::SetApplicationEnabled(const std::string &bundleName, bool isEnable)
-{
-    return true;
-}
-
 bool BundleMgrProxy::IsAbilityEnabled(const AbilityInfo &abilityInfo)
-{
-    return true;
-}
-
-bool BundleMgrProxy::SetAbilityEnabled(const AbilityInfo &abilityInfo, bool isEnabled)
 {
     return true;
 }
@@ -264,13 +253,13 @@ bool BundleMgrProxy::UnregisterPermissionsChanged(const sptr<OnPermissionChanged
     return true;
 }
 
-template<typename T>
+template <typename T>
 bool BundleMgrProxy::GetParcelableInfo(IBundleMgr::Message code, MessageParcel &data, T &parcelableInfo)
 {
     return true;
 }
 
-template<typename T>
+template <typename T>
 bool BundleMgrProxy::GetParcelableInfos(IBundleMgr::Message code, MessageParcel &data, std::vector<T> &parcelableInfos)
 {
     return true;

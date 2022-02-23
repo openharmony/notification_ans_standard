@@ -41,11 +41,9 @@ ohos_moduletest("ans_fw_module_test") {
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//base/notification/ces_standard/interfaces/innerkits/native/include",
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
-    "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
-    "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
@@ -69,7 +67,6 @@ ohos_moduletest("ans_fw_module_test") {
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -82,8 +79,8 @@ ohos_moduletest("ans_fw_module_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
@@ -116,11 +113,9 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//base/notification/ces_standard/interfaces/innerkits/native/include",
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
-    "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
-    "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
@@ -141,12 +136,9 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
 
   configs = [ "//utils/native/base:utils_config" ]
 
-  ldflags = [ "-Wl,-rpath=/system/lib/module/multimedia/" ]
-
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -159,9 +151,9 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:base",
-    "ability_runtime:want",
+    "ability_base:base",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
@@ -194,11 +186,9 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//base/notification/ces_standard/interfaces/innerkits/native/include",
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
-    "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
-    "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
@@ -222,7 +212,6 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -235,8 +224,8 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
@@ -269,11 +258,9 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/test/moduletest/mock/include",
     "//base/notification/ces_standard/interfaces/innerkits/native/include",
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
-    "//base/notification/ans_standard/interfaces/innerkits/wantagent/include",
     "${core_path}/common/include",
     "${core_path}/include",
     "${interfaces_path}/innerkits/ans/native/include",
-    "${interfaces_path}/innerkits/wantAgent/include",
     "//utils/native/base/include",
     "//third_party/jsoncpp/include",
     "//base/notification/ans_standard/frameworks/ans/test/moduletest/mock/include",
@@ -297,7 +284,6 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
   deps = [
     "${frameworks_path}/ans/core:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "${services_path}/ans:libans",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
@@ -310,8 +296,8 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
   }
 
   external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:want",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
@@ -329,7 +315,7 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
   part_name = "ans_standard"
 }
 
-ohos_js_unittest("ReminderAgentTest") {
+ohos_js_unittest("ReminderAgentJsTest") {
   module_out_path = module_output_path
 
   hap_profile = "./config.json"
@@ -341,7 +327,7 @@ group("moduletest") {
   deps = []
 
   deps += [
-    ":ReminderAgentTest",
+    ":ReminderAgentJsTest",
     ":ans_fw_module_test",
     ":ans_innerkits_module_publish_test",
     ":ans_innerkits_module_setting_test",

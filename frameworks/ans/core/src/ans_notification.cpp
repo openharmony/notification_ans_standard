@@ -19,6 +19,7 @@
 #include "ans_log_wrapper.h"
 #include "iservice_registry.h"
 #include "reminder_request_alarm.h"
+#include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
 #include "system_ability_definition.h"
 
@@ -403,6 +404,26 @@ ErrCode AnsNotification::IsAllowedNotify(bool &allowed)
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
     return ansManagerProxy_->IsAllowedNotify(allowed);
+}
+
+ErrCode AnsNotification::IsAllowedNotifySelf(bool &allowed)
+{
+    ANS_LOGD("enter");
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->IsAllowedNotifySelf(allowed);
+}
+
+ErrCode AnsNotification::RequestEnableNotification(std::string &deviceId)
+{
+    ANS_LOGD("enter");
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->RequestEnableNotification(deviceId);
 }
 
 ErrCode AnsNotification::AreNotificationsSuspended(bool &suspended)
@@ -964,19 +985,30 @@ ErrCode AnsNotification::PublishReminder(ReminderRequest &reminder)
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
-
     sptr<ReminderRequest> tarReminder;
-    if (reminder.GetReminderType() == ReminderRequest::ReminderType::ALARM) {
-        ANSR_LOGI("Publish alarm");
-        ReminderRequestAlarm &alarm = (ReminderRequestAlarm &)reminder;
-        tarReminder = new (std::nothrow) ReminderRequestAlarm(alarm);
-    } else if (reminder.GetReminderType() == ReminderRequest::ReminderType::TIMER) {
-        ANSR_LOGI("Publish timer");
-        ReminderRequestTimer &timer = (ReminderRequestTimer &)reminder;
-        tarReminder = new (std::nothrow) ReminderRequestTimer(timer);
-    } else {
-        ANSR_LOGW("PublishReminder fail.");
-        return ERR_ANS_INVALID_PARAM;
+    switch (reminder.GetReminderType()) {
+        case (ReminderRequest::ReminderType::TIMER): {
+            ANSR_LOGI("Publish timer");
+            ReminderRequestTimer &timer = (ReminderRequestTimer &)reminder;
+            tarReminder = new (std::nothrow) ReminderRequestTimer(timer);
+            break;
+        }
+        case (ReminderRequest::ReminderType::ALARM): {
+            ANSR_LOGI("Publish alarm");
+            ReminderRequestAlarm &alarm = (ReminderRequestAlarm &)reminder;
+            tarReminder = new (std::nothrow) ReminderRequestAlarm(alarm);
+            break;
+        }
+        case (ReminderRequest::ReminderType::CALENDAR): {
+            ANSR_LOGI("Publish calendar");
+            ReminderRequestCalendar &calendar = (ReminderRequestCalendar &)reminder;
+            tarReminder = new (std::nothrow) ReminderRequestCalendar(calendar);
+            break;
+        }
+        default: {
+            ANSR_LOGW("PublishReminder fail.");
+            return ERR_ANS_INVALID_PARAM;
+        }
     }
     ErrCode code = ansManagerProxy_->PublishReminder(tarReminder);
     reminder.SetReminderId(tarReminder->GetReminderId());
@@ -1211,6 +1243,101 @@ bool AnsNotification::IsNonDistributedNotificationType(const NotificationContent
         return true;
     }
     return false;
+}
+
+ErrCode AnsNotification::IsAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->IsSpecialUserAllowedNotify(userId, allowed);
+}
+
+ErrCode AnsNotification::SetNotificationsEnabledForAllBundles(const int32_t &userId, bool enabled)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->SetNotificationsEnabledByUser(userId, enabled);
+}
+
+ErrCode AnsNotification::RemoveNotifications(const int32_t &userId)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    return ansManagerProxy_->DeleteAllByUser(userId);
+}
+
+ErrCode AnsNotification::SetDoNotDisturbDate(const int32_t &userId,
+    const NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    auto dndDatePtr = new (std::nothrow) NotificationDoNotDisturbDate(doNotDisturbDate);
+    if (dndDatePtr == nullptr) {
+        ANS_LOGE("create DoNotDisturbDate failed.");
+        return ERR_ANS_NO_MEMORY;
+    }
+
+    sptr<NotificationDoNotDisturbDate> dndDate(dndDatePtr);
+    return ansManagerProxy_->SetDoNotDisturbDate(dndDate);
+}
+
+ErrCode AnsNotification::GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+    
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationDoNotDisturbDate> dndDate;
+    auto ret = ansManagerProxy_->GetDoNotDisturbDate(dndDate);
+    if (ret != ERR_OK) {
+        ANS_LOGE("Get DoNotDisturbDate failed.");
+        return ret;
+    }
+
+    if (!dndDate) {
+        ANS_LOGE("Invalid DoNotDisturbDate.");
+        return ERR_ANS_NO_MEMORY;
+    }
+
+    doNotDisturbDate = *dndDate;
+    return ret;
 }
 }  // namespace Notification
 }  // namespace OHOS

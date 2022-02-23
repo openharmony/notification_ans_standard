@@ -22,24 +22,25 @@ config("ans_innerkits_public_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${interfaces_path}/ans/native/include",
+    "${interfaces_path}/innerkits/ans/native/include",
     "${frameworks_path}/ans/core/common/include",
     "${frameworks_path}/ans/core/include",
     "//third_party/json/single_include",
     "//third_party/jsoncpp/include",
     "//utils/system/safwk/native/include",
   ]
-  configs = [ "${frameworks_path}/wantagent:wantagent_innerkits_public_config" ]
+  configs = [ "//foundation/aafwk/standard/frameworks/kits/wantagent:wantagent_innerkits_public_config" ]
 }
 
 ohos_shared_library("ans_innerkits") {
   include_dirs = [
-    "${interfaces_path}/ans/native/include",
+    "${interfaces_path}/innerkits/ans/native/include",
     "//utils/system/safwk/native/include",
     "//third_party/jsoncpp/include",
   ]
 
   sources = [
+    "src/enabled_notification_callback_data.cpp",
     "src/message_user.cpp",
     "src/notification.cpp",
     "src/notification_action_button.cpp",
@@ -78,13 +79,13 @@ ohos_shared_library("ans_innerkits") {
 
   deps = [
     "${frameworks_path}/ans/core:ans_core",
-    "${frameworks_path}/wantagent:wantagent_innerkits",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

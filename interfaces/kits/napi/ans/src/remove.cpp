@@ -22,7 +22,6 @@ const int REMOVE_MIN_PARA = 1;
 const int REMOVE_OR_BUNDLE_MAX_PARA = 2;
 
 const int REMOVE_ALL_MAX_PARA = 2;
-const int REMOVE_ALL_WHEN_HAS_PARA_MIN_PARA = 1;
 
 const int REMOVE_BY_BUNDLE_AND_KEY_MIN_PARA = 2;
 const int REMOVE_BY_BUNDLE_AND_KEY_MAX_PARA = 3;
@@ -38,6 +37,8 @@ struct BundleAndKeyInfo {
 struct RemoveParams {
     std::optional<std::string> hashcode {};
     std::optional<BundleAndKeyInfo> bundleAndKeyInfo {};
+    int32_t userId = SUBSCRIBE_USER_INIT;
+    bool hasUserId = false;
     napi_ref callback = nullptr;
 };
 
@@ -69,13 +70,18 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[REMOVE_BY_BUNDLE_AND_KEY_MAX_PARA] = {nullptr};
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_ASSERT(env, argc >= REMOVE_MIN_PARA, "Wrong number of arguments");
+    if (argc < REMOVE_MIN_PARA) {
+        ANS_LOGW("Wrong number of arguments.");
+        return nullptr;
+    }
 
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env,
-        (valuetype == napi_string) || (valuetype == napi_object),
-        "Wrong argument type. String or object expected.");
+    if ((valuetype != napi_string) && (valuetype != napi_object)) {
+        ANS_LOGW("Wrong argument type. String or object expected.");
+        return nullptr;
+    }
+
     if (valuetype == napi_string) {
         // argv[0]: hashCode
         size_t strLen = 0;
@@ -86,11 +92,17 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
         // argv[1]:callback
         if (argc >= REMOVE_OR_BUNDLE_MAX_PARA) {
             NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+            if (valuetype != napi_function) {
+                ANS_LOGW("Wrong argument type. Function expected.");
+                return nullptr;
+            }
             napi_create_reference(env, argv[PARAM1], 1, &params.callback);
         }
     } else {
-        NAPI_ASSERT(env, argc >= REMOVE_BY_BUNDLE_AND_KEY_MIN_PARA, "Wrong number of arguments");
+        if (argc < REMOVE_BY_BUNDLE_AND_KEY_MIN_PARA) {
+            ANS_LOGW("Wrong number of arguments.");
+            return nullptr;
+        }
 
         BundleAndKeyInfo info {};
         // argv[0]: BundleOption
@@ -112,7 +124,10 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
         // argv[2]:callback
         if (argc >= REMOVE_BY_BUNDLE_AND_KEY_MAX_PARA) {
             NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+            if (valuetype != napi_function) {
+                ANS_LOGW("Wrong argument type. Function expected.");
+                return nullptr;
+            }
             napi_create_reference(env, argv[PARAM2], 1, &params.callback);
         }
     }
@@ -129,31 +144,40 @@ napi_value ParseParametersByRemoveAll(const napi_env &env, const napi_callback_i
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
 
-    if (argc < REMOVE_ALL_WHEN_HAS_PARA_MIN_PARA) {
+    if (argc == 0) {
         return Common::NapiGetNull(env);
     }
 
+    // argv[0]: bundle / userId / callback
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env,
-        (valuetype == napi_function) || (valuetype == napi_object),
-        "Wrong argument type. Function or object expected.");
-    if (valuetype == napi_function) {
-        // argv[0]: callback
-        napi_create_reference(env, argv[PARAM0], 1, &params.callback);
-    } else {
+    if ((valuetype != napi_object) && (valuetype != napi_number) && (valuetype != napi_function)) {
+        ANS_LOGW("Wrong argument type. Function or object expected.");
+        return nullptr;
+    }
+    if (valuetype == napi_object) {
         BundleAndKeyInfo info {};
-        // argv[0]: BundleOption
         auto retValue = Common::GetBundleOption(env, argv[PARAM0], info.option);
-        NAPI_ASSERT(env, retValue != nullptr, "GetBundleOption failed.");
-        params.bundleAndKeyInfo = info;
-
-        // argv[1]:callback
-        if (argc >= REMOVE_ALL_MAX_PARA) {
-            NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
-            NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
-            napi_create_reference(env, argv[PARAM1], 1, &params.callback);
+        if (retValue == nullptr) {
+            ANS_LOGW("GetBundleOption failed.");
+            return nullptr;
         }
+        params.bundleAndKeyInfo = info;
+    } else if (valuetype == napi_number) {
+        NAPI_CALL(env, napi_get_value_int32(env, argv[PARAM0], &params.userId));
+        params.hasUserId = true;
+    } else {
+        napi_create_reference(env, argv[PARAM0], 1, &params.callback);
+    }
+
+    // argv[1]:callback
+    if (argc >= REMOVE_ALL_MAX_PARA) {
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
+        if (valuetype != napi_function) {
+            ANS_LOGW("Wrong argument type. Function expected.");
+            return nullptr;
+        }
+        napi_create_reference(env, argv[PARAM1], 1, &params.callback);
     }
 
     return Common::NapiGetNull(env);
@@ -169,11 +193,17 @@ napi_value ParseParameters(
     napi_value thisVar = nullptr;
     napi_valuetype valuetype = napi_undefined;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    NAPI_ASSERT(env, argc >= REMOVE_GROUP_BY_BUNDLE_MIN_PARA, "Wrong number of arguments");
+    if (argc < REMOVE_GROUP_BY_BUNDLE_MIN_PARA) {
+        ANS_LOGW("Wrong number of arguments.");
+        return nullptr;
+    }
 
     // argv[0]: bundle
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_object, "Wrong argument type. Object expected.");
+    if (valuetype != napi_object) {
+        ANS_LOGW("Wrong argument type. Object expected.");
+        return nullptr;
+    }
     auto retValue = Common::GetBundleOption(env, argv[PARAM0], params.option);
     if (retValue == nullptr) {
         ANS_LOGE("GetBundleOption failed.");
@@ -182,7 +212,10 @@ napi_value ParseParameters(
 
     // argv[1]: groupName: string
     NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
-    NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
+    if (valuetype != napi_string) {
+        ANS_LOGW("Wrong argument type. String expected.");
+        return nullptr;
+    }
     char str[STR_MAX_SIZE] = {0};
     size_t strLen = 0;
     NAPI_CALL(env, napi_get_value_string_utf8(env, argv[PARAM1], str, STR_MAX_SIZE - 1, &strLen));
@@ -191,7 +224,10 @@ napi_value ParseParameters(
     // argv[2]:callback
     if (argc >= REMOVE_GROUP_BY_BUNDLE_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
-        NAPI_ASSERT(env, valuetype == napi_function, "Wrong argument type. Function expected.");
+        if (valuetype != napi_function) {
+            ANS_LOGW("Wrong argument type. Function expected.");
+            return nullptr;
+        }
         napi_create_reference(env, argv[PARAM2], 1, &params.callback);
     }
 
@@ -294,6 +330,9 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
                 auto &infos = asynccallbackinfo->params.bundleAndKeyInfo.value();
 
                 asynccallbackinfo->info.errorCode = NotificationHelper::RemoveAllNotifications(infos.option);
+            } else if (asynccallbackinfo->params.hasUserId) {
+                asynccallbackinfo->info.errorCode = NotificationHelper::RemoveNotifications(
+                    asynccallbackinfo->params.userId);
             } else {
                 asynccallbackinfo->info.errorCode = NotificationHelper::RemoveNotifications();
             }

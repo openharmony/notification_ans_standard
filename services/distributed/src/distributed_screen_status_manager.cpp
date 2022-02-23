@@ -183,9 +183,11 @@ ErrCode DistributedScreenStatusManager::CheckRemoteDevicesIsUsing(bool &isUsing)
     for (auto entry : entries) {
         std::string key = entry.key.ToString();
         std::string deviceId = key.substr(0, key.find_first_of(DELIMITER));
+        ANS_LOGD("key-deviceId:%{public}s, value:%{public}s", deviceId.c_str(), entry.value.ToString().c_str());
         for (auto devInfo : devInfoList) {
+            ANS_LOGD("list-deviceId:%{public}s", devInfo.deviceId.c_str());
             if (devInfo.deviceId == deviceId) {
-                isUsing |= entry.value.ToString() == SCREEN_STATUS_VALUE_ON;
+                isUsing = isUsing || (entry.value.ToString() == SCREEN_STATUS_VALUE_ON);
                 break;
             }
         }
@@ -194,12 +196,14 @@ ErrCode DistributedScreenStatusManager::CheckRemoteDevicesIsUsing(bool &isUsing)
         }
     }
 
+    ANS_LOGI("%{public}s, isUsing:%{public}s", __FUNCTION__, isUsing ? "true" : "false");
     return ERR_OK;
 }
 
 ErrCode DistributedScreenStatusManager::SetLocalScreenStatus(bool screenOn)
 {
     std::lock_guard<std::recursive_mutex> lock(mutex_);
+    ANS_LOGI("%{public}s, screenOn:%{public}s", __FUNCTION__, screenOn ? "true" : "false");
     localScreenOn_ = screenOn;
     if (!CheckKvStore()) {
         return ERR_ANS_DISTRIBUTED_OPERATION_FAILED;

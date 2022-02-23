@@ -27,8 +27,7 @@ namespace OHOS {
 namespace Notification {
 NotificationPreferences::NotificationPreferences()
 {
-    preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
-    preferncesDB_->ParseFromDisturbeDB(preferencesInfo_);
+    InitSettingFromDisturbDB();
 }
 
 NotificationPreferences::~NotificationPreferences()
@@ -494,29 +493,11 @@ ErrCode NotificationPreferences::SetNotificationsEnabledForBundle(
     return result;
 }
 
-bool NotificationPreferences::GetActiveUserId(int& userId)
+ErrCode NotificationPreferences::GetNotificationsEnabled(const int32_t &userId, bool &enabled)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
-
-    for (auto iter : osAccountInfos) {
-        if (iter.GetIsActived()) {
-            userId = iter.GetLocalId();
-            return true;
-        }
-    }
-    return false;
-}
-
-ErrCode NotificationPreferences::GetNotificationsEnabled(
-    const sptr<NotificationBundleOption> &bundleOption, bool &enabled)
-{
-    if (bundleOption == nullptr) {
+    if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }
-
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
 
     ErrCode result = ERR_OK;
     if (!preferencesInfo_.GetEnabledAllNotification(userId, enabled)) {
@@ -525,15 +506,11 @@ ErrCode NotificationPreferences::GetNotificationsEnabled(
     return result;
 }
 
-ErrCode NotificationPreferences::SetNotificationsEnabled(
-    const sptr<NotificationBundleOption> &bundleOption, const bool &enabled)
+ErrCode NotificationPreferences::SetNotificationsEnabled(const int32_t &userId, const bool &enabled)
 {
-    if (bundleOption == nullptr) {
+    if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }
-
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
 
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     preferencesInfo.SetEnabledAllNotification(userId, enabled);
@@ -548,16 +525,36 @@ ErrCode NotificationPreferences::SetNotificationsEnabled(
     return result;
 }
 
-ErrCode NotificationPreferences::GetDoNotDisturbDate(
-    const sptr<NotificationBundleOption> &bundleOption, sptr<NotificationDoNotDisturbDate> &date)
+ErrCode NotificationPreferences::GetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool &hasPopped)
+{
+    if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+    return GetBundleProperty(bundleOption, BundleType::BUNDLE_POPPED_DIALOG_TYPE, hasPopped);
+}
+
+ErrCode NotificationPreferences::SetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool hasPopped)
 {
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_PARAM;
     }
 
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
-    
+    NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
+    ErrCode result = ERR_OK;
+    result = SetBundleProperty(preferencesInfo, bundleOption, BundleType::BUNDLE_POPPED_DIALOG_TYPE, hasPopped);
+    if (result == ERR_OK) {
+        preferencesInfo_ = preferencesInfo;
+    }
+    return result;
+}
+
+ErrCode NotificationPreferences::GetDoNotDisturbDate(const int32_t &userId,
+    sptr<NotificationDoNotDisturbDate> &date)
+{
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     if (!preferencesInfo.GetDoNotDisturbDate(userId, date)) {
@@ -566,19 +563,16 @@ ErrCode NotificationPreferences::GetDoNotDisturbDate(
     return result;
 }
 
-ErrCode NotificationPreferences::SetDoNotDisturbDate(
-    const sptr<NotificationBundleOption> &bundleOption, const sptr<NotificationDoNotDisturbDate> date)
+ErrCode NotificationPreferences::SetDoNotDisturbDate(const int32_t &userId,
+    const sptr<NotificationDoNotDisturbDate> date)
 {
-    if (bundleOption == nullptr) {
+    if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }
 
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
-
     NotificationPreferencesInfo preferencesInfo = preferencesInfo_;
     preferencesInfo.SetDoNotDisturbDate(userId, date);
-    
+
     ErrCode result = ERR_OK;
     if (!preferncesDB_->PutDoNotDisturbDate(userId, date)) {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
@@ -783,6 +777,10 @@ ErrCode NotificationPreferences::SaveBundleProperty(NotificationPreferencesInfo:
             bundleInfo.SetEnableNotification(value);
             storeDBResult = preferncesDB_->PutNotificationsEnabledForBundle(bundleInfo, value);
             break;
+        case BundleType::BUNDLE_POPPED_DIALOG_TYPE:
+            bundleInfo.SetHasPoppedDialog(value);
+            storeDBResult = preferncesDB_->PutHasPoppedDialog(bundleInfo, value);
+            break;
         default:
             break;
     }
@@ -811,6 +809,9 @@ ErrCode NotificationPreferences::GetBundleProperty(
                 break;
             case BundleType::BUNDLE_ENABLE_NOTIFICATION_TYPE:
                 value = bundleInfo.GetEnableNotification();
+                break;
+            case BundleType::BUNDLE_POPPED_DIALOG_TYPE:
+                value = bundleInfo.GetHasPoppedDialog();
                 break;
             default:
                 result = ERR_ANS_INVALID_PARAM;
@@ -865,6 +866,14 @@ ErrCode NotificationPreferences::GetTemplateSupported(const std::string& templat
     jsonObj.clear();
     inFile.close();
     return ERR_OK;
+}
+
+void NotificationPreferences::InitSettingFromDisturbDB()
+{
+    if (!preferncesDB_) {
+        preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
+    }
+    preferncesDB_->ParseFromDisturbeDB(preferencesInfo_);
 }
 }  // namespace Notification
 }  // namespace OHOS

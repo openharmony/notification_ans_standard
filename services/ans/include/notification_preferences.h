@@ -64,17 +64,18 @@ public:
     ErrCode SetPrivateNotificationsAllowed(const sptr<NotificationBundleOption> &bundleOption, const bool allow);
     ErrCode GetNotificationsEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, bool &enabled);
     ErrCode SetNotificationsEnabledForBundle(const sptr<NotificationBundleOption> &bundleOption, const bool enabled);
-    ErrCode GetNotificationsEnabled(const sptr<NotificationBundleOption> &bundleOption, bool &enabled);
-    ErrCode SetNotificationsEnabled(const sptr<NotificationBundleOption> &bundleOption, const bool &enabled);
-    ErrCode GetDoNotDisturbDate(const sptr<NotificationBundleOption> &bundleOption,
-        sptr<NotificationDoNotDisturbDate> &date);
-    ErrCode SetDoNotDisturbDate(const sptr<NotificationBundleOption> &bundleOption,
-        const sptr<NotificationDoNotDisturbDate> date);
+    ErrCode GetNotificationsEnabled(const int32_t &userId, bool &enabled);
+    ErrCode SetNotificationsEnabled(const int32_t &userId, const bool &enabled);
+    ErrCode GetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool &hasPopped);
+    ErrCode SetHasPoppedDialog(const sptr<NotificationBundleOption> &bundleOption, bool hasPopped);
+    ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date);
+    ErrCode SetDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> date);
     ErrCode GetTemplateSupported(const std::string& templateName, bool &support);
 
     ErrCode ClearNotificationInRestoreFactorySettings();
 
     void OnDistributedKvStoreDeathRecipient();
+    void InitSettingFromDisturbDB();
 
 private:
     ErrCode CheckSlotForCreateSlot(const sptr<NotificationBundleOption> &bundleOption,
@@ -99,7 +100,6 @@ private:
     ErrCode GetBundleProperty(
         const sptr<NotificationBundleOption> &bundleOption, const BundleType &type, T &value) const;
     std::string GenerateBundleKey(const sptr<NotificationBundleOption> &bundleOption) const;
-    bool GetActiveUserId(int& userId);
 
 private:
     NotificationPreferencesInfo preferencesInfo_ {};

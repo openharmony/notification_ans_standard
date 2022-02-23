@@ -111,19 +111,19 @@ OHOS::Notification::NotificationSlot::NotificationLevel GetParamNotificationLeve
 std::shared_ptr<OHOS::Notification::NotificationSubscriber> GetParamNotificationSubscriber();
 std::shared_ptr<OHOS::Notification::NotificationSubscribeInfo> GetParamNotificationSubscribeInfo();
 
-std::shared_ptr<OHOS::Notification::WantAgent::WantAgentInfo> GetParamWantAgentInfo();
-OHOS::Notification::WantAgent::WantAgentConstant::OperationType GetParamOperationType();
-OHOS::Notification::WantAgent::WantAgentConstant::Flags GetParamFlags();
-std::vector<OHOS::Notification::WantAgent::WantAgentConstant::Flags> GetParamFlagsVector();
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::WantAgentInfo> GetParamWantAgentInfo();
+OHOS::AbilityRuntime::WantAgent::WantAgentConstant::OperationType GetParamOperationType();
+OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags GetParamFlags();
+std::vector<OHOS::AbilityRuntime::WantAgent::WantAgentConstant::Flags> GetParamFlagsVector();
 
 std::shared_ptr<OHOS::Notification::Notification> GetParamNotification();
 sptr<OHOS::Notification::Notification> GetParamNotificationSptr();
 std::vector<sptr<OHOS::Notification::Notification>> GetParamNotificationSptrVector();
-std::shared_ptr<OHOS::Notification::WantAgent::PendingWant> GetParamPendingWant();
-std::shared_ptr<OHOS::Notification::WantAgent::WantAgent> GetParamWantAgent();
-std::shared_ptr<OHOS::Notification::WantAgent::CompletedCallback> GetParamCompletedCallback();
-std::shared_ptr<OHOS::Notification::WantAgent::TriggerInfo> GetParamTriggerInfo();
-std::shared_ptr<OHOS::Notification::WantAgent::CancelListener> GetParamCancelListener();
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::PendingWant> GetParamPendingWant();
+std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> GetParamWantAgent();
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::CompletedCallback> GetParamCompletedCallback();
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::TriggerInfo> GetParamTriggerInfo();
+std::shared_ptr<OHOS::AbilityRuntime::WantAgent::CancelListener> GetParamCancelListener();
 
 std::shared_ptr<OHOS::AppExecFwk::LauncherService> GetParamLauncherService();
 std::vector<OHOS::AppExecFwk::LauncherAbilityInfo> GetParamLauncherAbilityInfoVector();
@@ -251,13 +251,13 @@ public:
     static std::mutex mutex;
 };
 
-class TestCompletedCallback : public OHOS::Notification::WantAgent::CompletedCallback {
+class TestCompletedCallback : public OHOS::AbilityRuntime::WantAgent::CompletedCallback {
     void OnSendFinished(const AAFwk::Want &want, int resultCode, const std::string &resultData,
         const AAFwk::WantParams &resultExtras) override
     {}
 };
 
-class TestCancelListener : public OHOS::Notification::WantAgent::CancelListener {
+class TestCancelListener : public OHOS::AbilityRuntime::WantAgent::CancelListener {
 public:
     void OnCancelled(int resultCode) override
     {}

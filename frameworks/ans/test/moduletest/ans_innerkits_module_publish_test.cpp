@@ -56,6 +56,7 @@ const int32_t CASE_TWELVE = 12;
 const int32_t CASE_THIRTEEN = 13;
 const int32_t CASE_FOURTEEN = 14;
 const int32_t CASE_FIFTEEN = 15;
+const int32_t CASE_SIXTEEN = 16;
 const int32_t CALLING_UID = 9999;
 
 const int32_t PIXEL_MAP_TEST_WIDTH = 32;
@@ -91,6 +92,10 @@ public:
     {}
 
     virtual void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
+    {}
+
+    virtual void OnEnabledNotificationChanged(
+        const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) override
     {}
 
     virtual void OnCanceled(const std::shared_ptr<Notification> &request) override
@@ -139,6 +144,8 @@ public:
             CheckCaseFourteenResult(notificationRequest);
         } else if (CASE_FIFTEEN == notificationRequest.GetNotificationId()) {
             CheckCaseFifteenResult(notificationRequest);
+        } else if (CASE_SIXTEEN == notificationRequest.GetNotificationId()) {
+            CheckCaseSixteenResult(notificationRequest);
         } else {
             GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish::OnConsumed do nothing!!!!!";
         }
@@ -377,13 +384,22 @@ private:
     {
         std::shared_ptr<NotificationFlags> notiFlags = notificationRequest.GetFlags();
         if (notiFlags != nullptr) {
-            EXPECT_EQ(false, notiFlags->IsSoundEnabled());
-            EXPECT_EQ(true, notiFlags->IsVibrationEnabled());
+            EXPECT_EQ(NotificationConstant::FlagStatus::CLOSE, notiFlags->IsSoundEnabled());
+            EXPECT_EQ(NotificationConstant::FlagStatus::OPEN, notiFlags->IsVibrationEnabled());
+        }
+    }
+
+    void CheckCaseSixteenResult(NotificationRequest notificationRequest)
+    {
+        std::shared_ptr<NotificationFlags> notiFlags = notificationRequest.GetFlags();
+        if (notiFlags != nullptr) {
+            EXPECT_EQ(NotificationConstant::FlagStatus::NONE, notiFlags->IsSoundEnabled());
+            EXPECT_EQ(NotificationConstant::FlagStatus::NONE, notiFlags->IsVibrationEnabled());
         }
     }
 };
 
-class CompletedCallbackTest : public WantAgent::CompletedCallback {
+class CompletedCallbackTest : public AbilityRuntime::WantAgent::CompletedCallback {
     void OnSendFinished(
         const AAFwk::Want &want, int resultCode, const std::string &resultData, const AAFwk::WantParams &resultExtras)
     {
@@ -621,8 +637,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00200, Function
     EXPECT_NE(mediaContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(mediaContent);
     EXPECT_NE(content, nullptr);
-    WantAgent::WantAgentInfo paramsInfo;
-    std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
+    AbilityRuntime::WantAgent::WantAgentInfo paramsInfo;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
+        AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
     std::shared_ptr<NotificationActionButton> actionButton =
         NotificationActionButton::Create(nullptr, "title", wantAgent);
     std::shared_ptr<NotificationUserInput> userInput = NotificationUserInput::Create("inputKey");
@@ -680,8 +697,9 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00300, Function
     EXPECT_NE(mediaContent, nullptr);
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(mediaContent);
     EXPECT_NE(content, nullptr);
-    WantAgent::WantAgentInfo paramsInfo;
-    std::shared_ptr<WantAgent::WantAgent> wantAgent = WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
+    AbilityRuntime::WantAgent::WantAgentInfo paramsInfo;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
+        AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(paramsInfo);
     if (nullptr == wantAgent) {
         GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00300::wantAgent is nullptr";
     }
@@ -1298,10 +1316,10 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function
     req.SetLabel("label");
     req.SetOwnerBundleName("owner");
 
-    auto wAgent1 = std::make_shared<WantAgent::WantAgent>();
+    auto wAgent1 = std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
     req.SetWantAgent(wAgent1);
 
-    auto wAgent2 = std::make_shared<WantAgent::WantAgent>();
+    auto wAgent2 = std::make_shared<AbilityRuntime::WantAgent::WantAgent>();
     std::shared_ptr<Media::PixelMap> dummyIcon;
     auto ab1 = NotificationActionButton::Create(dummyIcon, "ab1_title", wAgent2);
 
@@ -1319,7 +1337,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function
     ab1->AddMimeTypeOnlyUserInput(spOnlyUserInput1);
     ab1->AddMimeTypeOnlyUserInput(spOnlyUserInput4);
 
-    std::shared_ptr<WantAgent::WantAgent> dummyWantAgent;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> dummyWantAgent;
     auto ab2 = NotificationActionButton::Create(dummyIcon, "ab2_title", dummyWantAgent);
 
     req.AddActionButton(ab1);
@@ -1359,8 +1377,8 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_05000, Function
 
     std::shared_ptr<NotificationFlags> notiFlags = std::make_shared<NotificationFlags>();
     EXPECT_NE(notiFlags, nullptr);
-    notiFlags->SetSoundEnabled(false);
-    notiFlags->SetVibrationEnabled(true);
+    notiFlags->SetSoundEnabled(NotificationConstant::FlagStatus::CLOSE);
+    notiFlags->SetVibrationEnabled(NotificationConstant::FlagStatus::OPEN);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_04000::flags::" << notiFlags->Dump();
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
     EXPECT_NE(normalContent, nullptr);
@@ -1371,6 +1389,39 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_05000, Function
     req.SetFlags(notiFlags);
     req.SetSlotType(NotificationConstant::OTHER);
     req.SetNotificationId(CASE_FIFTEEN);
+    g_consumed_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+    WaitOnConsumed();
+    g_unsubscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
+    WaitOnUnsubscribeResult();
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_Publish_06000
+ * @tc.name      : Publish_06000
+ * @tc.desc      : Add notification slot(type is OTHER), make a subscriber and publish a flags notification.
+ * @tc.expected  : Add notification slot success, make a subscriber and publish default flags notification success.
+ */
+HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_06000, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::OTHER);
+    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
+    auto subscriber = TestAnsSubscriber();
+    NotificationSubscribeInfo info = NotificationSubscribeInfo();
+    info.AddAppName("bundleName");
+    g_subscribe_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
+    WaitOnSubscribeResult();
+
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
+    NotificationRequest req;
+    req.SetContent(content);
+    req.SetSlotType(NotificationConstant::OTHER);
+    req.SetNotificationId(CASE_SIXTEEN);
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();

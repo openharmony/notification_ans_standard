@@ -167,6 +167,16 @@ ErrCode NotificationHelper::IsAllowedNotify(bool &allowed)
     return DelayedSingleton<AnsNotification>::GetInstance()->IsAllowedNotify(allowed);
 }
 
+ErrCode NotificationHelper::IsAllowedNotifySelf(bool &allowed)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->IsAllowedNotifySelf(allowed);
+}
+
+ErrCode NotificationHelper::RequestEnableNotification(std::string &deviceId)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->RequestEnableNotification(deviceId);
+}
+
 ErrCode NotificationHelper::AreNotificationsSuspended(bool &suspended)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->AreNotificationsSuspended(suspended);
@@ -365,6 +375,33 @@ ErrCode NotificationHelper::CancelContinuousTaskNotification(const std::string &
 ErrCode NotificationHelper::IsSupportTemplate(const std::string &templateName, bool &support)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->IsSupportTemplate(templateName, support);
+}
+
+ErrCode NotificationHelper::IsAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->IsAllowedNotify(userId, allowed);
+}
+
+ErrCode NotificationHelper::SetNotificationsEnabledForAllBundles(const int32_t &userId, bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetNotificationsEnabledForAllBundles(
+        userId, enabled);
+}
+
+ErrCode NotificationHelper::RemoveNotifications(const int32_t &userId)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotifications(userId);
+}
+
+ErrCode NotificationHelper::SetDoNotDisturbDate(const int32_t &userId,
+    const NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetDoNotDisturbDate(userId, doNotDisturbDate);
+}
+
+ErrCode NotificationHelper::GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetDoNotDisturbDate(userId, doNotDisturbDate);
 }
 }  // namespace Notification
 }  // namespace OHOS

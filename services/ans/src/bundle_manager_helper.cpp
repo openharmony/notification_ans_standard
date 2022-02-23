@@ -19,6 +19,9 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+#include "ans_const_define.h"
+#include "ans_log_wrapper.h"
+
 namespace OHOS {
 namespace Notification {
 BundleManagerHelper::BundleManagerHelper()
@@ -53,7 +56,6 @@ std::string BundleManagerHelper::GetBundleNameByUid(int uid)
 
     return bundle;
 }
-
 bool BundleManagerHelper::IsSystemApp(int uid)
 {
     bool isSystemApp = false;
@@ -67,6 +69,15 @@ bool BundleManagerHelper::IsSystemApp(int uid)
     }
 
     return isSystemApp;
+}
+
+bool BundleManagerHelper::GetBundleInfoByBundleName(
+    const std::string bundle, const int32_t userId, AppExecFwk::BundleInfo &bundleInfo)
+{
+    if (bundleMgr_ == nullptr) {
+        return false;
+    }
+    return bundleMgr_->GetBundleInfo(bundle, AppExecFwk::BundleFlag::GET_BUNDLE_WITH_ABILITIES, bundleInfo, userId);
 }
 
 void BundleManagerHelper::Connect()
@@ -117,5 +128,26 @@ int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle)
 
     return uid;
 }
+
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+bool BundleManagerHelper::GetDistributedNotificationEnabled(const std::string &bundleName, const int userId)
+{
+    std::lock_guard<std::mutex> lock(connectionMutex_);
+
+    Connect();
+
+    if (bundleMgr_ != nullptr) {
+        AppExecFwk::ApplicationInfo appInfo;
+        if (bundleMgr_->GetApplicationInfo(
+            bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, userId, appInfo)) {
+            ANS_LOGD("APPLICATION_INFO distributed enabled %{public}d", appInfo.distributedNotificationEnabled);
+            return appInfo.distributedNotificationEnabled;
+        }
+    }
+
+    ANS_LOGD("APPLICATION_INFO distributed enabled is default");
+    return DEFAULT_DISTRIBUTED_ENABLE_IN_APPLICATION_INFO;
+}
+#endif
 }  // namespace Notification
 }  // namespace OHOS

@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include "ability_context.h"
+#include "ability_info.h"
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
@@ -35,7 +36,9 @@
 #include "permission_filter.h"
 #include "reminder_data_manager.h"
 #include "trigger_info.h"
+#include "ui_service_mgr_client.h"
 #include "want_agent_helper.h"
+#include "wm_common.h"
 
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 #include "distributed_notification_manager.h"
@@ -60,6 +63,11 @@ constexpr int32_t NOTIFICATION_MAX_COUNT = 1024;
 constexpr int32_t DEFAULT_RECENT_COUNT = 16;
 
 constexpr int HOURS_IN_ONE_DAY = 24;
+
+constexpr int DIALOG_POSTION_X = 150;
+constexpr int DIALOG_POSTION_Y = 300;
+constexpr int DIALOG_WIDTH = 450;
+constexpr int DIALOG_HEIGHT = 300;
 
 struct RecentNotification {
     sptr<Notification> notification = nullptr;
@@ -108,6 +116,32 @@ inline bool IsSystemApp()
     }
 
     return isSystemApp;
+}
+
+inline int64_t ResetSeconds(int64_t date)
+{
+    auto milliseconds = std::chrono::milliseconds(date);
+    auto tp = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(milliseconds);
+    auto tp_minutes = std::chrono::time_point_cast<std::chrono::minutes>(tp);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(tp_minutes.time_since_epoch());
+    return duration.count();
+}
+
+inline int64_t GetCurrentTime()
+{
+    auto now = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    return duration.count();
+}
+
+inline tm GetLocalTime(time_t time)
+{
+    tm result = {0};
+    tm *lt = localtime(&time);
+    if (lt != nullptr) {
+        result = *lt;
+    }
+    return result;
 }
 
 inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRecord> &record)
@@ -174,11 +208,12 @@ ErrCode PrepereNotificationRequest(const sptr<NotificationRequest> &request)
 
     int userId = SUBSCRIBE_USER_INIT;
     OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
-    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
-        userId = SUBSCRIBE_USER_ALL;
-    }
     request->SetCreatorUserId(userId);
     ErrCode result = CheckPictureSize(request);
+
+    if (request->GetDeliveryTime() <= 0) {
+        request->SetDeliveryTime(GetCurrentTime());
+    }
 
     return result;
 }
@@ -290,6 +325,33 @@ ErrCode AdvancedNotificationService::AssignToNotificationList(const std::shared_
         }
         UpdateInNotificationList(record);
     }
+    return result;
+}
+
+ErrCode AdvancedNotificationService::CancelPreparedNotification(
+    int notificationId, const std::string &label, const sptr<NotificationBundleOption> &bundleOption)
+{
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<Notification> notification = nullptr;
+        result = RemoveFromNotificationList(bundleOption, label, notificationId, notification, true);
+        if (result != ERR_OK) {
+            return;
+        }
+
+        if (notification != nullptr) {
+            int reason = NotificationConstant::APP_CANCEL_REASON_DELETE;
+            UpdateRecentNotification(notification, true, reason);
+            sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+            NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+            DoDistributedDelete("", notification);
+#endif
+        }
+    }));
     return result;
 }
 
@@ -455,29 +517,7 @@ ErrCode AdvancedNotificationService::Cancel(int notificationId, const std::strin
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
-    }
-
-    ErrCode result = ERR_OK;
-    handler_->PostSyncTask(std::bind([&]() {
-        sptr<Notification> notification = nullptr;
-        result = RemoveFromNotificationList(bundleOption, label, notificationId, notification, true);
-        if (result != ERR_OK) {
-            return;
-        }
-
-        if (notification != nullptr) {
-            int reason = NotificationConstant::APP_CANCEL_REASON_DELETE;
-            UpdateRecentNotification(notification, true, reason);
-            sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
-            NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
-#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
-            DoDistributedDelete("", notification);
-#endif
-        }
-    }));
-    return result;
+    return CancelPreparedNotification(notificationId, label, bundleOption);
 }
 
 ErrCode AdvancedNotificationService::CancelAll()
@@ -898,12 +938,12 @@ ErrCode AdvancedNotificationService::DeleteAll()
 #endif
             sptr<Notification> notification = nullptr;
 
-            result = RemoveFromNotificationListForDeleteAll(key, notification);
+            result = RemoveFromNotificationListForDeleteAll(key, activeUserId, notification);
             if (result != ERR_OK || notification == nullptr) {
                 continue;
             }
 
-            if ((notification->GetUserId() == activeUserId) || (notification->GetUserId() == SUBSCRIBE_USER_ALL)) {
+            if (notification->GetUserId() == activeUserId) {
                 int reason = NotificationConstant::CANCEL_ALL_REASON_DELETE;
                 UpdateRecentNotification(notification, true, reason);
                 sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
@@ -1021,11 +1061,6 @@ ErrCode AdvancedNotificationService::UpdateSlotGroups(
     return result;
 }
 
-ErrCode AdvancedNotificationService::SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled)
-{
-    return ERR_INVALID_OPERATION;
-}
-
 ErrCode AdvancedNotificationService::SetShowBadgeEnabledForBundle(
     const sptr<NotificationBundleOption> &bundleOption, bool enabled)
 {
@@ -1103,9 +1138,6 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(const sptr<Notif
     const std::string &label, int notificationId, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
-        if (!record->notification->IsRemoveAllowed()) {
-            continue;
-        }
         if ((record->bundleOption->GetBundleName() == bundleOption->GetBundleName()) &&
             (record->bundleOption->GetUid() == bundleOption->GetUid()) &&
             (record->notification->GetLabel() == label) &&
@@ -1114,8 +1146,8 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(const sptr<Notif
             && record->deviceId.empty()
 #endif
         ) {
-            if (!isCancel && record->request->IsUnremovable()) {
-                return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+            if (!isCancel && !record->notification->IsRemoveAllowed()) {
+                return ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
             }
             notification = record->notification;
             // delete or delete all, call the function
@@ -1134,12 +1166,9 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(
     const std::string &key, sptr<Notification> &notification, bool isCancel)
 {
     for (auto record : notificationList_) {
-        if (!record->notification->IsRemoveAllowed() && isCancel) {
-            continue;
-        }
         if (record->notification->GetKey() == key) {
-            if (!isCancel && record->request->IsUnremovable()) {
-                return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+            if (!isCancel && !record->notification->IsRemoveAllowed()) {
+                return ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
             }
             notification = record->notification;
             // delete or delete all, call the function
@@ -1155,13 +1184,13 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationList(
 }
 
 ErrCode AdvancedNotificationService::RemoveFromNotificationListForDeleteAll(
-    const std::string &key, sptr<Notification> &notification)
+    const std::string &key, const int &userId, sptr<Notification> &notification)
 {
     for (auto record : notificationList_) {
-        if (!record->notification->IsRemoveAllowed()) {
-            continue;
-        }
-        if (record->notification->GetKey() == key) {
+        if ((record->notification->GetKey() == key) && (record->notification->GetUserId() == userId)) {
+            if (!record->notification->IsRemoveAllowed()) {
+                return ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
+            }
             if (record->request->IsUnremovable()) {
                 return ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
             }
@@ -1267,14 +1296,11 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    int userId = SUBSCRIBE_USER_INIT;
-    (void)GetActiveUserId(userId);
-
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         notifications.clear();
         for (auto record : notificationList_) {
-            if (record->notification != nullptr && record->notification->GetUserId() == userId) {
+            if (record->notification != nullptr) {
                 notifications.push_back(record->notification);
             }
         }
@@ -1322,6 +1348,68 @@ ErrCode AdvancedNotificationService::GetSpecialActiveNotifications(
     return result;
 }
 
+ErrCode AdvancedNotificationService::RequestEnableNotification(const std::string &deviceId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    ErrCode result = ERR_OK;
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    bool allowedNotify = false;
+    result = IsSpecialBundleAllowedNotify(bundleOption, allowedNotify);
+    if (result != ERR_OK || allowedNotify) {
+        ANS_LOGD("Already granted permission");
+        return result;
+    }
+
+    bool hasPopped = false;
+    result = GetHasPoppedDialog(bundleOption, hasPopped);
+    if (result != ERR_OK || hasPopped) {
+        ANS_LOGD("Already shown dialog");
+        return result;
+    }
+
+    const std::string params = std::string("{\"requestNotification\":\"Allowed to send notification?\", ") +
+        std::string("\"allowButton\":\"Allow\", \"cancelButton\":\"Cancel\", \"uid\":\"") +
+        std::to_string(bundleOption->GetUid()) + std::string("\"}");
+    Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
+        "notification_dialog",
+        params,
+        OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
+        DIALOG_POSTION_X,
+        DIALOG_POSTION_Y,
+        DIALOG_WIDTH,
+        DIALOG_HEIGHT,
+        [this](int32_t id, const std::string& event, const std::string& params) {
+            ANS_LOGD("Dialog callback: %{public}s, %{public}s", event.c_str(), params.c_str());
+            int32_t uid = std::stoi(params, nullptr);
+            std::string bundle;
+            std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+            if (bundleManager != nullptr) {
+                bundle = bundleManager->GetBundleNameByUid(uid);
+            }
+            sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundle, uid);
+            if (event == "EVENT_ALLOW") {
+                this->SetNotificationsEnabledForSpecialBundle("", bundleOption, true);
+                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
+            } else {
+                this->SetNotificationsEnabledForSpecialBundle("", bundleOption, false);
+                Ace::UIServiceMgrClient::GetInstance()->CancelDialog(id);
+            }
+            this->SetHasPoppedDialog(bundleOption, true);
+        });
+
+    return result;
+}
+
+ErrCode AdvancedNotificationService::SetNotificationsEnabledForBundle(const std::string &deviceId, bool enabled)
+{
+    return ERR_INVALID_OPERATION;
+}
+
 ErrCode AdvancedNotificationService::SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
@@ -1334,16 +1422,16 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForAllBundles(const 
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    ErrCode result = ERR_OK;
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         if (deviceId.empty()) {
             // Local device
-            result = NotificationPreferences::GetInstance().SetNotificationsEnabled(bundleOption, enabled);
+            result = NotificationPreferences::GetInstance().SetNotificationsEnabled(userId, enabled);
         } else {
             // Remote device
         }
@@ -1369,11 +1457,20 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForSpecialBundle(
         return ERR_ANS_INVALID_BUNDLE;
     }
 
+    sptr<EnabledNotificationCallbackData> bundleData =
+        new EnabledNotificationCallbackData(bundle->GetBundleName(), bundle->GetUid(), enabled);
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         if (deviceId.empty()) {
             // Local device
             result = NotificationPreferences::GetInstance().SetNotificationsEnabledForBundle(bundle, enabled);
+            if (!enabled) {
+                result = RemoveAllNotifications(bundle);
+            }
+            if (result == ERR_OK) {
+                NotificationSubscriberManager::GetInstance()->NotifyEnabledNotificationChanged(bundleData);
+            }
         } else {
             // Remote revice
         }
@@ -1393,6 +1490,23 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
         return ERR_ANS_PERMISSION_DENIED;
     }
 
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        allowed = false;
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::IsAllowedNotifySelf(bool &allowed)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
     ErrCode result = ERR_OK;
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
@@ -1400,9 +1514,14 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
     }
 
     handler_->PostSyncTask(std::bind([&]() {
-        allowed = false;
-        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(bundleOption, allowed);
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            result = ERR_OK;
+            allowed = CheckApiCompatibility(bundleOption);
+            SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
+        }
     }));
+
     return result;
 }
 
@@ -1438,15 +1557,20 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
         return ERR_ANS_INVALID_BUNDLE;
     }
 
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         allowed = false;
-        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(bundleOption, allowed);
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
         if (result == ERR_OK && allowed) {
             result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(targetBundle, allowed);
             if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
                 result = ERR_OK;
-                allowed = true;
+                allowed = CheckApiCompatibility(bundleOption);
             }
         }
     }));
@@ -1504,14 +1628,13 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
     if (result != ERR_OK) {
         return result;
     }
-
+    request->SetUnremovable(true);
     std::shared_ptr<NotificationRecord> record = std::make_shared<NotificationRecord>();
     record->request = request;
     record->bundleOption = bundleOption;
     record->notification = new Notification(request);
     if (record->notification != nullptr) {
         record->notification->SetSourceType(NotificationConstant::SourceType::TYPE_CONTINUOUS);
-        record->notification->SetRemoveAllowed(false);
     }
 
     handler_->PostSyncTask(std::bind([&]() {
@@ -1599,7 +1722,9 @@ ErrCode AdvancedNotificationService::CancelAllReminders()
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    ReminderDataManager::GetInstance()->CancelAllReminders(bundleOption);
+    int userId = -1;
+    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), userId);
+    ReminderDataManager::GetInstance()->CancelAllReminders(bundleOption, userId);
     return ERR_OK;
 }
 
@@ -1834,6 +1959,7 @@ void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleO
             ANS_LOGW("NotificationPreferences::RemoveNotificationForBundle failed: %{public}d", result);
         }
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+        DistributedPreferences::GetInstance()->DeleteDistributedBundleInfo(bundleOption);
         std::vector<std::string> keys = GetLocalNotificationKeys(bundleOption);
 #else
         std::vector<std::string> keys = GetNotificationKeys(bundleOption);
@@ -1861,12 +1987,14 @@ void AdvancedNotificationService::OnBundleRemoved(const sptr<NotificationBundleO
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
 void AdvancedNotificationService::OnScreenOn()
 {
+    ANS_LOGI("%{public}s", __FUNCTION__);
     localScreenOn_ = true;
     DistributedScreenStatusManager::GetInstance()->SetLocalScreenStatus(true);
 }
 
 void AdvancedNotificationService::OnScreenOff()
 {
+    ANS_LOGI("%{public}s", __FUNCTION__);
     localScreenOn_ = false;
     DistributedScreenStatusManager::GetInstance()->SetLocalScreenStatus(false);
 }
@@ -1961,8 +2089,8 @@ ErrCode AdvancedNotificationService::RemoveNotification(
                 (record->deviceId.empty()) &&
 #endif
                 (record->notification->GetId() == notificationId) && (record->notification->GetLabel() == label)) {
-                if (record->request->IsUnremovable()) {
-                    result = ERR_ANS_NOTIFICATION_IS_UNREMOVABLE;
+                if (!record->notification->IsRemoveAllowed()) {
+                    result = ERR_ANS_NOTIFICATION_IS_UNALLOWED_REMOVEALLOWED;
                     break;
                 }
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
@@ -2144,6 +2272,9 @@ ErrCode AdvancedNotificationService::RemoveGroupByBundle(
     handler_->PostSyncTask(std::bind([&]() {
         std::vector<std::shared_ptr<NotificationRecord>> removeList;
         for (auto record : notificationList_) {
+            if (!record->notification->IsRemoveAllowed()) {
+                continue;
+            }
             if ((record->bundleOption->GetBundleName() == bundle->GetBundleName()) &&
                 (record->bundleOption->GetUid() == bundle->GetUid()) && !record->request->IsUnremovable() &&
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
@@ -2170,32 +2301,6 @@ ErrCode AdvancedNotificationService::RemoveGroupByBundle(
     }));
 
     return ERR_OK;
-}
-
-inline int64_t ResetSeconds(int64_t date)
-{
-    auto milliseconds = std::chrono::milliseconds(date);
-    auto tp = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>(milliseconds);
-    auto tp_minutes = std::chrono::time_point_cast<std::chrono::minutes>(tp);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(tp_minutes.time_since_epoch());
-    return duration.count();
-}
-
-inline int64_t GetCurrentTime()
-{
-    auto now = std::chrono::system_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    return duration.count();
-}
-
-inline tm GetLocalTime(time_t time)
-{
-    tm result = {0};
-    tm *lt = localtime(&time);
-    if (lt != nullptr) {
-        result = *lt;
-    }
-    return result;
 }
 
 void AdvancedNotificationService::AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate)
@@ -2266,51 +2371,12 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    if (date == nullptr) {
-        return ERR_ANS_INVALID_PARAM;
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
-    ErrCode result = ERR_OK;
-
-    int64_t beginDate = ResetSeconds(date->GetBeginDate());
-    int64_t endDate = ResetSeconds(date->GetEndDate());
-
-    switch (date->GetDoNotDisturbType()) {
-        case NotificationConstant::DoNotDisturbType::NONE:
-            beginDate = 0;
-            endDate = 0;
-            break;
-        case NotificationConstant::DoNotDisturbType::ONCE:
-            AdjustDateForDndTypeOnce(beginDate, endDate);
-            break;
-        case NotificationConstant::DoNotDisturbType::CLEARLY:
-            if (beginDate >= endDate) {
-                return ERR_ANS_INVALID_PARAM;
-            }
-            break;
-        default:
-            break;
-    }
-
-    const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
-        date->GetDoNotDisturbType(),
-        beginDate,
-        endDate
-    );
-
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
-    }
-
-    handler_->PostSyncTask(std::bind([&]() {
-        result = NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption, newConfig);
-        if (result == ERR_OK) {
-            NotificationSubscriberManager::GetInstance()->NotifyDoNotDisturbDateChanged(newConfig);
-        }
-    }));
-
-    return ERR_OK;
+    return SetDoNotDisturbDateByUser(userId, date);
 }
 
 ErrCode AdvancedNotificationService::GetDoNotDisturbDate(sptr<NotificationDoNotDisturbDate> &date)
@@ -2325,35 +2391,12 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(sptr<NotificationDoNotD
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    ErrCode result = ERR_OK;
-    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
-    if (bundleOption == nullptr) {
-        return ERR_ANS_INVALID_BUNDLE;
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
-    handler_->PostSyncTask(std::bind([&]() {
-        sptr<NotificationDoNotDisturbDate> currentConfig = nullptr;
-        result = NotificationPreferences::GetInstance().GetDoNotDisturbDate(bundleOption, currentConfig);
-        if (result == ERR_OK) {
-            int64_t now = GetCurrentTime();
-            switch (currentConfig->GetDoNotDisturbType()) {
-                case NotificationConstant::DoNotDisturbType::CLEARLY:
-                case NotificationConstant::DoNotDisturbType::ONCE:
-                    if (now >= currentConfig->GetEndDate()) {
-                        date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
-                        NotificationPreferences::GetInstance().SetDoNotDisturbDate(bundleOption, date);
-                    } else {
-                        date = currentConfig;
-                    }
-                    break;
-                default:
-                    date = currentConfig;
-                    break;
-            }
-        }
-    }));
-
-    return ERR_OK;
+    return GetDoNotDisturbDateByUser(userId, date);
 }
 
 ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSupport)
@@ -2440,9 +2483,21 @@ ErrCode AdvancedNotificationService::EnableDistributedByBundle(
         return ERR_ANS_PERMISSION_DENIED;
     }
 
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundle, appInfoEnable);
+    if (!appInfoEnable) {
+        ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
-        result = DistributedPreferences::GetInstance()->SetDistributedBundleEnable(bundleOption, enabled);
+        result = DistributedPreferences::GetInstance()->SetDistributedBundleEnable(bundle, enabled);
         if (result != ERR_OK) {
             result = ERR_OK;
             enabled = false;
@@ -2461,6 +2516,13 @@ ErrCode AdvancedNotificationService::EnableDistributedSelf(const bool enabled)
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    if (!appInfoEnable) {
+        ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
+        return ERR_ANS_PERMISSION_DENIED;
     }
 
     ErrCode result = ERR_OK;
@@ -2486,9 +2548,22 @@ ErrCode AdvancedNotificationService::IsDistributedEnableByBundle(
         return ERR_ANS_PERMISSION_DENIED;
     }
 
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundle, appInfoEnable);
+    if (!appInfoEnable) {
+        ANS_LOGD("Get from bms is %{public}d", appInfoEnable);
+        enabled = appInfoEnable;
+        return ERR_OK;
+    }
+
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
-        result = DistributedPreferences::GetInstance()->GetDistributedBundleEnable(bundleOption, enabled);
+        result = DistributedPreferences::GetInstance()->GetDistributedBundleEnable(bundle, enabled);
         if (result != ERR_OK) {
             result = ERR_OK;
             enabled = false;
@@ -2593,6 +2668,12 @@ std::string AdvancedNotificationService::GetNotificationDeviceId(const std::stri
 ErrCode AdvancedNotificationService::DoDistributedPublish(
     const sptr<NotificationBundleOption> bundleOption, const std::shared_ptr<NotificationRecord> record)
 {
+    bool appInfoEnable = true;
+    GetDistributedEnableInApplicationInfo(bundleOption, appInfoEnable);
+    if (!appInfoEnable) {
+        return ERR_OK;
+    }
+
     if (!record->request->GetNotificationDistributedOptions().IsDistributed()) {
         return ERR_OK;
     }
@@ -2791,6 +2872,22 @@ void AdvancedNotificationService::OnDistributedDelete(
         }
     }));
 }
+
+ErrCode AdvancedNotificationService::GetDistributedEnableInApplicationInfo(
+    const sptr<NotificationBundleOption> bundleOption, bool &enable)
+{
+    int userId = SUBSCRIBE_USER_INIT;
+    OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), userId);
+
+    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
+        enable = true;
+    } else {
+        enable = BundleManagerHelper::GetInstance()->GetDistributedNotificationEnabled(
+            bundleOption->GetBundleName(), userId);
+    }
+
+    return ERR_OK;
+}
 #endif
 
 ErrCode AdvancedNotificationService::PrepereContinuousTaskNotificationRequest(
@@ -2817,14 +2914,12 @@ ErrCode AdvancedNotificationService::IsSupportTemplate(const std::string& templa
 
 bool AdvancedNotificationService::GetActiveUserId(int& userId)
 {
-    std::vector<OHOS::AccountSA::OsAccountInfo> osAccountInfos;
-    OHOS::AccountSA::OsAccountManager::QueryAllCreatedOsAccounts(osAccountInfos);
-
-    for (auto iter : osAccountInfos) {
-        if (iter.GetIsActived()) {
-            userId = iter.GetLocalId();
-            return true;
-        }
+    std::vector<int> activeUserId;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
+    if (activeUserId.size() > 0) {
+        userId = activeUserId[0];
+        ANS_LOGD("Return active userId=%{public}d", userId);
+        return true;
     }
     return false;
 }
@@ -2836,9 +2931,256 @@ void AdvancedNotificationService::TriggerRemoveWantAgent(const sptr<Notification
     if (request == nullptr || request->GetRemovalWantAgent() == nullptr) {
         return;
     }
-    OHOS::Notification::WantAgent::TriggerInfo triggerInfo;
-    std::shared_ptr<WantAgent::WantAgent> agent = request->GetRemovalWantAgent();
-    WantAgent::WantAgentHelper::TriggerWantAgent(agent, nullptr, triggerInfo);
+    OHOS::AbilityRuntime::WantAgent::TriggerInfo triggerInfo;
+    std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> agent = request->GetRemovalWantAgent();
+    AbilityRuntime::WantAgent::WantAgentHelper::TriggerWantAgent(agent, nullptr, triggerInfo);
+}
+
+ErrCode AdvancedNotificationService::IsSpecialUserAllowedNotify(const int32_t &userId, bool &allowed)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        allowed = false;
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::SetNotificationsEnabledByUser(const int32_t &userId, bool enabled)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetNotificationsEnabled(userId, enabled);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::DeleteAllByUser(const int32_t &userId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        std::vector<std::string> keys = GetNotificationKeys(nullptr);
+        for (auto key : keys) {
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+            std::string deviceId = GetNotificationDeviceId(key);
+#endif
+            sptr<Notification> notification = nullptr;
+
+            result = RemoveFromNotificationListForDeleteAll(key, userId, notification);
+            if (result != ERR_OK || notification == nullptr) {
+                continue;
+            }
+
+            if (notification->GetUserId() == userId) {
+                int reason = NotificationConstant::CANCEL_ALL_REASON_DELETE;
+                UpdateRecentNotification(notification, true, reason);
+                sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+                NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+                DoDistributedDelete(deviceId, notification);
+#endif
+            }
+        }
+
+        result = ERR_OK;
+    }));
+
+    return result;
+}
+
+ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const int32_t &userId,
+    const sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    return SetDoNotDisturbDateByUser(userId, date);
+}
+
+ErrCode AdvancedNotificationService::GetDoNotDisturbDate(const int32_t &userId,
+    sptr<NotificationDoNotDisturbDate> &date)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (userId <= SUBSCRIBE_USER_INIT) {
+        ANS_LOGE("Input userId is invalid.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission(GetClientBundleName())) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    return GetDoNotDisturbDateByUser(userId, date);
+}
+
+ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &userId,
+    const sptr<NotificationDoNotDisturbDate> &date)
+{
+    if (date == nullptr) {
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    ErrCode result = ERR_OK;
+
+    int64_t beginDate = ResetSeconds(date->GetBeginDate());
+    int64_t endDate = ResetSeconds(date->GetEndDate());
+
+    switch (date->GetDoNotDisturbType()) {
+        case NotificationConstant::DoNotDisturbType::NONE:
+            beginDate = 0;
+            endDate = 0;
+            break;
+        case NotificationConstant::DoNotDisturbType::ONCE:
+            AdjustDateForDndTypeOnce(beginDate, endDate);
+            break;
+        case NotificationConstant::DoNotDisturbType::CLEARLY:
+            if (beginDate >= endDate) {
+                return ERR_ANS_INVALID_PARAM;
+            }
+            break;
+        default:
+            break;
+    }
+
+    const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
+        date->GetDoNotDisturbType(),
+        beginDate,
+        endDate
+    );
+
+    sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetDoNotDisturbDate(userId, newConfig);
+        if (result == ERR_OK) {
+            NotificationSubscriberManager::GetInstance()->NotifyDoNotDisturbDateChanged(newConfig);
+        }
+    }));
+
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::GetDoNotDisturbDateByUser(const int32_t &userId,
+    sptr<NotificationDoNotDisturbDate> &date)
+{
+    ErrCode result = ERR_OK;
+
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<NotificationDoNotDisturbDate> currentConfig = nullptr;
+        result = NotificationPreferences::GetInstance().GetDoNotDisturbDate(userId, currentConfig);
+        if (result == ERR_OK) {
+            int64_t now = GetCurrentTime();
+            switch (currentConfig->GetDoNotDisturbType()) {
+                case NotificationConstant::DoNotDisturbType::CLEARLY:
+                case NotificationConstant::DoNotDisturbType::ONCE:
+                    if (now >= currentConfig->GetEndDate()) {
+                        date = new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
+                        NotificationPreferences::GetInstance().SetDoNotDisturbDate(userId, date);
+                    } else {
+                        date = currentConfig;
+                    }
+                    break;
+                default:
+                    date = currentConfig;
+                    break;
+            }
+        }
+    }));
+
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::SetHasPoppedDialog(
+    const sptr<NotificationBundleOption> bundleOption, bool hasPopped)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().SetHasPoppedDialog(bundleOption, hasPopped);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::GetHasPoppedDialog(
+    const sptr<NotificationBundleOption> bundleOption, bool &hasPopped)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        result = NotificationPreferences::GetInstance().GetHasPoppedDialog(bundleOption, hasPopped);
+    }));
+    return result;
+}
+
+bool AdvancedNotificationService::CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption)
+{
+    AppExecFwk::BundleInfo bundleInfo;
+    std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+    int32_t callingUserId;
+    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), callingUserId);
+    if (bundleManager != nullptr) {
+        if (!bundleManager->GetBundleInfoByBundleName(bundleOption->GetBundleName(), callingUserId, bundleInfo)) {
+            return false;
+        }
+    }
+
+    for (auto abilityInfo : bundleInfo.abilityInfos) {
+        if (abilityInfo.isStageBasedModel) {
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace Notification
 }  // namespace OHOS

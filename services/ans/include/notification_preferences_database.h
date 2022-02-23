@@ -41,6 +41,7 @@ public:
     bool PutNotificationsEnabledForBundle(
         const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &enabled);
     bool PutNotificationsEnabled(const int32_t &userId, const bool &enabled);
+    bool PutHasPoppedDialog(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &hasPopped);
     bool PutDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date);
 
     bool ParseFromDisturbeDB(NotificationPreferencesInfo &info);
@@ -118,6 +119,8 @@ private:
     void ParseBundlePrivateAllowed(
         NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
     void ParseBundleEnableNotification(
+        NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
+    void ParseBundlePoppedDialog(
         NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
     void ParseBundleUid(NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const;
     void ParseSlot(

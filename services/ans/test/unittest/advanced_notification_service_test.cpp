@@ -90,6 +90,9 @@ public:
     {}
     void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {}
+    void OnEnabledNotificationChanged(
+        const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) override
+    {}
     void OnCanceled(const std::shared_ptr<Notification> &request) override
     {}
     void OnCanceled(const std::shared_ptr<Notification> &request,
@@ -1192,16 +1195,30 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09300,
 }
 
 /**
- * @tc.number    : AdvancedNotificationServiceTest_09600
- * @tc.name      : ANS_IsAllowedNotify_0200
+ * @tc.number    : AdvancedNotificationServiceTest_09500
+ * @tc.name      : ANS_IsAllowedNotify_0100
  * @tc.desc      : Test IsAllowedNotify function
+ */
+HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09500, Function | SmallTest | Level1)
+{
+    EXPECT_EQ(
+        (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
+    bool allowed = false;
+    EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotify(allowed), (int)ERR_OK);
+    EXPECT_TRUE(allowed);
+}
+
+/**
+ * @tc.number    : AdvancedNotificationServiceTest_09600
+ * @tc.name      : ANS_IsAllowedNotifySelf_0100
+ * @tc.desc      : Test IsAllowedNotifySelf function
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600, Function | SmallTest | Level1)
 {
     EXPECT_EQ(
         (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     bool allowed = false;
-    EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotify(allowed), (int)ERR_OK);
+    EXPECT_EQ((int)advancedNotificationService_->IsAllowedNotifySelf(allowed), (int)ERR_OK);
     EXPECT_TRUE(allowed);
 }
 
@@ -1212,6 +1229,8 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09600,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09700, Function | SmallTest | Level1)
 {
+    EXPECT_EQ(
+        (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     TestAddSlot(NotificationConstant::SlotType::OTHER);
     bool allowed = true;
     EXPECT_EQ((int)advancedNotificationService_->IsSpecialBundleAllowedNotify(
@@ -1226,6 +1245,8 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09700,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_09800, Function | SmallTest | Level1)
 {
+    EXPECT_EQ(
+        (int)advancedNotificationService_->SetNotificationsEnabledForAllBundles(std::string(), true), (int)ERR_OK);
     std::vector<sptr<Notification>> notifications;
     bool allowed = true;
     EXPECT_EQ((int)advancedNotificationService_->IsSpecialBundleAllowedNotify(

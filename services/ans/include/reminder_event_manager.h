@@ -40,7 +40,10 @@ public:
     virtual void OnReceiveEvent(const EventFwk::CommonEventData &data);
 
 private:
-    std::shared_ptr<ReminderDataManager> reminderDataManager_;
+    sptr<NotificationBundleOption> GetBundleOption(const OHOS::EventFwk::Want &want) const;
+    void HandlePackageRemove(OHOS::EventFwk::Want &want) const;
+    void HandleProcessDied(OHOS::EventFwk::Want &want) const;
+    std::shared_ptr<ReminderDataManager> reminderDataManager_ = nullptr;
 };
 };
 }  // namespace OHOS
