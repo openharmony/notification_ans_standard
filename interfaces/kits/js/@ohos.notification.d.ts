@@ -32,8 +32,7 @@ import { NotificationRequest } from './notification/notificationRequest';
  *
  * @name notification
  * @since 7
- * @sysCap SystemCapability.Notification.ANS
- * @devices phone, tablet, tv, wearable, car
+ * @syscap SystemCapability.Notification.Notification
  * @import import notification from '@ohos.notification';
  * @permission N/A
  */
@@ -44,23 +43,37 @@ declare namespace notification {
    * <p>If a notification with the same ID has been published by the current application and has not been deleted,
    * this method will update the notification.
    *
-   * @param Publishes a notification.
+   * @param request notification request
+   * @param callback callback function
    */
   function publish(request: NotificationRequest, callback: AsyncCallback<void>): void;
   function publish(request: NotificationRequest): Promise<void>;
 
   /**
+   * Publishes a notification to the specified user.
+   *
+   * @since 8
+   * @param Publishes a notification.
+   * @param userId of subscriber receiving the notification
+   *
+   */
+   function publish(request: NotificationRequest, userId: number, callback: AsyncCallback<void>): void;
+   function publish(request: NotificationRequest, userId: number): Promise<void>;
+
+  /**
    * Cancels a notification with the specified ID.
    *
-   * @param ID of the notification to cancel, which must be unique in the application.
+   * @param id of the notification to cancel, which must be unique in the application.
+   * @param callback callback function
    */
   function cancel(id: number, callback: AsyncCallback<void>): void;
 
   /**
    * Cancels a notification with the specified label and ID.
    *
-   * @param ID of the notification to cancel, which must be unique in the application.
-   * @param Label of the notification to cancel.
+   * @param id ID of the notification to cancel, which must be unique in the application.
+   * @param label Label of the notification to cancel.
+   * @param callback callback function
    */
   function cancel(id: number, label: string, callback: AsyncCallback<void>): void;
   function cancel(id: number, label?: string): Promise<void>;
@@ -76,8 +89,9 @@ declare namespace notification {
    *
    * @param slot Indicates the notification slot to be created, which is set by {@link NotificationSlot}.
    * This parameter must be specified.
-   *
+   * @param callback callback function
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlot(slot: NotificationSlot, callback: AsyncCallback<void>): void;
 
@@ -88,13 +102,15 @@ declare namespace notification {
    * This parameter must be specified.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlot(slot: NotificationSlot): Promise<void>;
 
   /**
    * Adds a slot type.
    *
-   * @param Slot type to add.
+   * @param type Slot type to add.
+   * @param callback callback function
    */
   function addSlot(type: SlotType, callback: AsyncCallback<void>): void;
   function addSlot(type: SlotType): Promise<void>;
@@ -104,8 +120,9 @@ declare namespace notification {
    *
    * @param slots Indicates the notification slots to be created, which is set by {@link NotificationSlot}.
    * This parameter must be specified.
-   *
+   * @param callback callback function
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlots(slots: Array<NotificationSlot>, callback: AsyncCallback<void>): void;
 
@@ -116,14 +133,15 @@ declare namespace notification {
    * This parameter must be specified.
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlots(slots: Array<NotificationSlot>): Promise<void>;
 
   /**
    * Obtains a notification slot of the specified slot type.
    *
-   * @param Type of the notification slot to obtain.
-   *
+   * @param slotType Type of the notification slot to obtain.
+   * @param callback callback function
    * @return Returns the created {@link NotificationSlot}.
    */
   function getSlot(slotType: SlotType, callback: AsyncCallback<NotificationSlot>): void;
@@ -140,7 +158,8 @@ declare namespace notification {
   /**
    * Removes a NotificationSlot of the specified SlotType created by the current application.
    *
-   * @param Type of the NotificationSlot to remove.
+   * @param slotType Type of the NotificationSlot to remove.
+   * @param callback callback function
    */
   function removeSlot(slotType: SlotType, callback: AsyncCallback<void>): void;
   function removeSlot(slotType: SlotType): Promise<void>;
@@ -186,8 +205,7 @@ declare namespace notification {
    *
    * @name ContentType
    * @since 7
-   * @sysCap SystemCapability.Notification.ANS
-   * @devices phone, tablet, tv, wearable, car
+   * @syscap SystemCapability.Notification.Notification
    * @permission N/A
    */
   export enum ContentType {
@@ -311,6 +329,7 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
 
@@ -318,6 +337,7 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(bundle: BundleOption): Promise<boolean>;
 
@@ -325,6 +345,7 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(callback: AsyncCallback<boolean>): void;
 
@@ -332,13 +353,25 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(): Promise<boolean>;
+
+  /**
+   * Checks whether this application has permission to publish notifications under the user.
+   *
+   * since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+  function isNotificationEnabled(userId: number, callback: AsyncCallback<boolean>): void;
+  function isNotificationEnabled(userId: number): Promise<boolean>;
 
   /**
    * displayBadge
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function displayBadge(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
 
@@ -346,6 +379,7 @@ declare namespace notification {
    * displayBadge
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function displayBadge(bundle: BundleOption, enable: boolean): Promise<void>;
 
@@ -353,6 +387,7 @@ declare namespace notification {
    * isBadgeDisplayed
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isBadgeDisplayed(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
 
@@ -360,6 +395,7 @@ declare namespace notification {
    * isBadgeDisplayed
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isBadgeDisplayed(bundle: BundleOption): Promise<boolean>;
 
@@ -399,6 +435,7 @@ declare namespace notification {
    * getSlotNumByBundle
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getSlotNumByBundle(bundle: BundleOption, callback: AsyncCallback<number>): void;
 
@@ -406,6 +443,7 @@ declare namespace notification {
    * getSlotNumByBundle
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getSlotNumByBundle(bundle: BundleOption): Promise<number>;
 
@@ -456,6 +494,16 @@ declare namespace notification {
    * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function removeAll(callback: AsyncCallback<void>): void;
+
+  /**
+   * Remove all notifications under the specified user.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+   function removeAll(userId: number, callback: AsyncCallback<void>): void;
+   function removeAll(userId: number): Promise<void>;
 
   /**
    * removeAll
@@ -524,6 +572,16 @@ declare namespace notification {
   function setDoNotDisturbDate(date: DoNotDisturbDate): Promise<void>;
 
   /**
+   * Set the Do Not Disturb date under the specified user.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+   function setDoNotDisturbDate(date: DoNotDisturbDate, userId: number, callback: AsyncCallback<void>): void;
+   function setDoNotDisturbDate(date: DoNotDisturbDate, userId: number): Promise<void>;
+
+  /**
    * Obtains the Do Not Disturb date.
    *
    * @since 8
@@ -532,6 +590,16 @@ declare namespace notification {
    */
   function getDoNotDisturbDate(callback: AsyncCallback<DoNotDisturbDate>): void;
   function getDoNotDisturbDate(): Promise<DoNotDisturbDate>;
+
+  /**
+   * Obtains the Do Not Disturb date.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use under the specified user.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+   function getDoNotDisturbDate(userId: number, callback: AsyncCallback<DoNotDisturbDate>): void;
+   function getDoNotDisturbDate(userId: number): Promise<DoNotDisturbDate>;
 
   /**
    * Obtains whether to support the Do Not Disturb mode.
@@ -548,15 +616,33 @@ declare namespace notification {
    *
    * @since 8
    * @param templateName Name of template to be Obtained
+   * @param callback callback function
    */
   function isSupportTemplate(templateName: string, callback: AsyncCallback<boolean>): void;
   function isSupportTemplate(templateName: string): Promise<boolean>;
+
+  /**
+   * Query notification sending permission.
+   *
+   * @since 8
+   */
+  function isNotificationEnabledSelf(callback: AsyncCallback<boolean>): void;
+  function isNotificationEnabledSelf(): Promise<boolean>;
+
+  /**
+   * Request permission to send notification.
+   *
+   * @since 8
+   */
+   function requestEnableNotification(callback: AsyncCallback<void>): void;
+   function requestEnableNotification(): Promise<void>;
 
   /**
    * Sets whether the device supports distributed notification.
    *
    * @since 8
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function enableDistributed(enable: boolean, callback: AsyncCallback<void>): void;
   function enableDistributed(enable: boolean): Promise<void>;
@@ -574,9 +660,20 @@ declare namespace notification {
    *
    * @since 8
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function enableDistributedByBundle(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
   function enableDistributedByBundle(bundle: BundleOption, enable: boolean): Promise<void>;
+
+  /**
+   * Obtains whether an application supports distributed notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+  function isDistributedEnabledByBundle(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
+  function isDistributedEnabledByBundle(bundle: BundleOption): Promise<boolean>;
 
   /**
    * Sets whether the application supports distributed notification.
@@ -587,19 +684,11 @@ declare namespace notification {
   function enableDistributedSelf(enable: boolean): Promise<void>;
 
   /**
-   * Obtains whether an application supports distributed notification.
-   *
-   * @since 8
-   * @systemapi Hide this for inner system use.
-   */
-  function isDistributedEnabledByBundle(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
-  function isDistributedEnabledByBundle(bundle: BundleOption): Promise<boolean>;
-
-  /**
    * Obtains the remind modes of the notification.
    *
    * @since 8
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function getDeviceRemindType(callback: AsyncCallback<DeviceRemindType>): void;
   function getDeviceRemindType(): Promise<DeviceRemindType>;
