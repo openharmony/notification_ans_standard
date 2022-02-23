@@ -29,9 +29,6 @@ namespace Notification {
 ErrCode ReminderHelper::PublishReminder(ReminderRequest &reminder)
 {
     ANSR_LOGI("PublishReminder start");
-    if (!CheckPermission()) {
-        return ERR_PERMISSION_DENIED;
-    }
     NotificationSlot slot(reminder.GetSlotType());
     NotificationHelper::AddNotificationSlot(slot);
     return DelayedSingleton<AnsNotification>::GetInstance()->PublishReminder(reminder);
