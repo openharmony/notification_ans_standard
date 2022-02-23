@@ -31,7 +31,7 @@ ReminderRequestTimer::ReminderRequestTimer(uint64_t countDownTimeInSeconds)
     time_t now;  // unit is seconds.
     (void)time(&now);
     ReminderRequest::SetTriggerTimeInMilli(
-        (static_cast<uint64_t>(now) + countDownTimeInSeconds_) * ReminderRequest::MILLI_SECONDS);
+        ReminderRequest::GetDurationSinceEpochInMilli(now) + countDownTimeInSeconds_ * ReminderRequest::MILLI_SECONDS);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
     firstRealTimeInMilliSeconds_ = timer->GetBootTimeMs();
 }
@@ -88,7 +88,7 @@ void ReminderRequestTimer::UpdateTimeInfo(const std::string description)
     ANSR_LOGD("%{public}s, update countdown time trigger time", description.c_str());
     time_t now;
     (void)time(&now);  // unit is seconds.
-    whenToChangeSysTime_ = static_cast<uint64_t>(now) * MILLI_SECONDS;
+    whenToChangeSysTime_ = ReminderRequest::GetDurationSinceEpochInMilli(now);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
     int64_t bootTime = timer->GetBootTimeMs();
     SetTriggerTimeInMilli(whenToChangeSysTime_ + (countDownTimeInSeconds_ * MILLI_SECONDS -

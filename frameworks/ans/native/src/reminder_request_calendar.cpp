@@ -156,7 +156,7 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTime() const
     if (!(repeatMonth_ > 0 && repeatDay_ > 0)) {
         const time_t target = mktime(&tarTime);
         if (now <= target) {
-            triggerTimeInMilli = static_cast<uint64_t>(target) * MILLI_SECONDS;
+            triggerTimeInMilli = ReminderRequest::GetDurationSinceEpochInMilli(target);
             ANSR_LOGD("Next calendar time:%{public}s", GetDateTimeInfo(target).c_str());
         }
         return triggerTimeInMilli;
@@ -211,14 +211,7 @@ uint64_t ReminderRequestCalendar::GetTimeInstantMilli(
         ANSR_LOGW("mktime return error.");
         return INVALID_LONG_LONG_VALUE;
     }
-    auto tarEndTimePoint = std::chrono::system_clock::from_time_t(target);
-    auto tarDuration = std::chrono::duration_cast<std::chrono::milliseconds>(tarEndTimePoint.time_since_epoch());
-    int64_t tarDate = tarDuration.count();
-    if (tarDate < 0) {
-        ANSR_LOGW("tarDuration is less than 0.");
-        return INVALID_LONG_LONG_VALUE;
-    }
-    return static_cast<uint64_t>(tarDate);
+    return ReminderRequest::GetDurationSinceEpochInMilli(target);
 }
 
 void ReminderRequestCalendar::InitDateTime()
