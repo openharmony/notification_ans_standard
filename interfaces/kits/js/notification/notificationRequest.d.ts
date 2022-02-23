@@ -163,6 +163,11 @@ export interface NotificationRequest {
   readonly creatorPid?: number;
 
   /**
+   * Read-only UserId of the notification creator.
+   */
+  readonly creatorUserId?: number;
+
+  /**
    * Obtains the classification of this notification.
    *
    * @systemapi Hide this for inner system use.
