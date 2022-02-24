@@ -391,6 +391,7 @@ private:
     static std::mutex MUTEX;
     static std::mutex SHOW_MUTEX;
     static std::mutex ALERT_MUTEX;
+    static std::mutex TIMER_MUTEX;
 
     /**
      * Max number of reminders limit for the whole system.
