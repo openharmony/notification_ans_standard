@@ -122,6 +122,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     tar.tm_hour = hour_;
     tar.tm_min = minute_;
     tar.tm_sec = 0;
+    tar.tm_isdst = -1;
 
     const time_t target = mktime(&tar);
     int8_t nextDayInterval = GetNextAlarm(now, target);
@@ -151,7 +152,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     if (static_cast<int64_t>(nextTriggerTime) <= 0) {
         return 0;
     }
-    return static_cast<uint64_t>(nextTriggerTime) * ReminderRequest::MILLI_SECONDS;
+    return ReminderRequest::GetDurationSinceEpochInMilli(nextTriggerTime);
 }
 
 int8_t ReminderRequestAlarm::GetNextAlarm(const time_t now, const time_t target) const
@@ -273,7 +274,7 @@ bool ReminderRequestAlarm::Marshalling(Parcel &parcel) const
 ReminderRequestAlarm *ReminderRequestAlarm::Unmarshalling(Parcel &parcel)
 {
     ANSR_LOGD("New alarm");
-    auto objptr = new ReminderRequestAlarm();
+    auto objptr = new (std::nothrow) ReminderRequestAlarm();
     if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;

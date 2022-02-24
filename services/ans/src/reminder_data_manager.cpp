@@ -33,6 +33,7 @@ std::shared_ptr<ReminderDataManager> ReminderDataManager::REMINDER_DATA_MANAGER 
 std::mutex ReminderDataManager::MUTEX;
 std::mutex ReminderDataManager::SHOW_MUTEX;
 std::mutex ReminderDataManager::ALERT_MUTEX;
+std::mutex ReminderDataManager::TIMER_MUTEX;
 
 void ReminderDataManager::PublishReminder(sptr<ReminderRequest> &reminder,
     sptr<NotificationBundleOption> &bundleOption)
@@ -322,6 +323,7 @@ void ReminderDataManager::CloseReminder(const OHOS::EventFwk::Want &want, bool c
         return;
     }
     CloseReminder(reminder, cancelNotification);
+    StartRecentReminder();
 }
 
 void ReminderDataManager::CloseReminder(const sptr<ReminderRequest> &reminder, bool cancelNotification)
@@ -341,7 +343,6 @@ void ReminderDataManager::CloseReminder(const sptr<ReminderRequest> &reminder, b
     if (cancelNotification) {
         CancelNotification(reminder);
     }
-    StartRecentReminder();
 }
 
 std::shared_ptr<ReminderDataManager> ReminderDataManager::GetInstance()
@@ -703,7 +704,7 @@ sptr<ReminderRequest> ReminderDataManager::GetRecentReminderLocked()
             time_t now;
             (void)time(&now);  // unit is seconds.
             if (now < 0
-                || static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS > (*it)->GetTriggerTimeInMilli()) {
+                || ReminderRequest::GetDurationSinceEpochInMilli(now) > (*it)->GetTriggerTimeInMilli()) {
                 ANSR_LOGE("Get recent reminder while the trigger time is overdue.");
                 it++;
                 continue;
@@ -950,7 +951,7 @@ void ReminderDataManager::RemoveReminderLocked(const int32_t &reminderId)
 
 void ReminderDataManager::StartTimerLocked(const sptr<ReminderRequest> &reminderRequest, TimerType type)
 {
-    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    std::lock_guard<std::mutex> lock(ReminderDataManager::TIMER_MUTEX);
     StartTimer(reminderRequest, type);
 }
 
@@ -982,7 +983,7 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
                 ANSR_LOGE("Alerting time out timer has already started.");
                 break;
             }
-            triggerTime = static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS
+            triggerTime = ReminderRequest::GetDurationSinceEpochInMilli(now)
                 + static_cast<uint64_t>(reminderRequest->GetRingDuration() * ReminderRequest::MILLI_SECONDS);
             timerIdAlerting_ = timer->CreateTimer(REMINDER_DATA_MANAGER->CreateTimerInfo(type));
             timer->StartTimer(timerIdAlerting_, triggerTime);
@@ -999,14 +1000,14 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
         ANSR_LOGW("Start timer fail");
     } else {
         ANSR_LOGD("Timing info: now:(%{public}llu), tar:(%{public}llu)",
-            (unsigned long long)(static_cast<uint64_t>(now) * ReminderRequest::MILLI_SECONDS),
+            (unsigned long long)(ReminderRequest::GetDurationSinceEpochInMilli(now)),
             (unsigned long long)(triggerTime));
     }
 }
 
 void ReminderDataManager::StopTimerLocked(TimerType type)
 {
-    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    std::lock_guard<std::mutex> lock(ReminderDataManager::TIMER_MUTEX);
     StopTimer(type);
 }
 
