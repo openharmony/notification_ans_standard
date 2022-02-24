@@ -55,7 +55,9 @@ declare namespace notification {
    * @since 8
    * @param Publishes a notification.
    * @param userId of subscriber receiving the notification
-   *
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   * 
    */
    function publish(request: NotificationRequest, userId: number, callback: AsyncCallback<void>): void;
    function publish(request: NotificationRequest, userId: number): Promise<void>;

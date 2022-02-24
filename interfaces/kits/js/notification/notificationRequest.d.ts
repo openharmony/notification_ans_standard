@@ -163,6 +163,7 @@ export interface NotificationRequest {
   readonly creatorPid?: number;
 
   /**
+   * @since 8
    * Read-only UserId of the notification creator.
    */
   readonly creatorUserId?: number;
