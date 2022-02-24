@@ -678,14 +678,6 @@ declare namespace notification {
   function isDistributedEnabledByBundle(bundle: BundleOption): Promise<boolean>;
 
   /**
-   * Sets whether the application supports distributed notification.
-   *
-   * @since 8
-   */
-  function enableDistributedSelf(enable: boolean, callback: AsyncCallback<void>): void;
-  function enableDistributedSelf(enable: boolean): Promise<void>;
-
-  /**
    * Obtains the remind modes of the notification.
    *
    * @since 8
@@ -768,29 +760,6 @@ declare namespace notification {
   }
 
   /**
-   * Notification source type
-   *
-   * @since 8
-   * @systemapi Hide this for inner system use.
-   */
-  export enum SourceType {
-    /**
-     * General notification
-     */
-    TYPE_NORMAL = 0x00000000,
-
-    /**
-     * Continuous notification
-     */
-    TYPE_CONTINUOUS = 0x00000001,
-
-    /**
-     * Scheduled notification
-     */
-    TYPE_TIMER = 0x00000002,
-  }
-
-  /**
    * The type of the Do Not Disturb.
    *
    * @since 8
@@ -844,29 +813,6 @@ declare namespace notification {
      * @since 8
      */
     end: Date;
-  }
-
-  /**
-   * Notification source type
-   *
-   * @since 8
-   * @systemapi Hide this for inner system use.
-   */
-  export enum SourceType {
-    /**
-     * General notification
-     */
-    TYPE_NORMAL = 0x00000000,
-
-    /**
-     * Continuous notification
-     */
-    TYPE_CONTINUOUS = 0x00000001,
-
-    /**
-     * Scheduled notification
-     */
-    TYPE_TIMER = 0x00000002,
   }
 
   /**
