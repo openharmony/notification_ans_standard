@@ -261,11 +261,11 @@ bool ReminderRequest::HandleTimeZoneChange(
             ANSR_LOGE("Get now time error");
             return false;
         }
-        if (newZoneTriggerTime <= (static_cast<uint64_t>(now))) {
+        if (newZoneTriggerTime <= GetDurationSinceEpochInMilli(now)) {
             snoozeTimesDynamic_ = 0;
             showImmediately = true;
         } else {
-            SetTriggerTimeInMilli(newZoneTriggerTime * MILLI_SECONDS);
+            SetTriggerTimeInMilli(newZoneTriggerTime);
             showImmediately = false;
         }
     }
@@ -367,7 +367,8 @@ bool ReminderRequest::OnTimeZoneChange()
     struct tm *oriTime = gmtime(&oldZoneTriggerTime);
     time_t newZoneTriggerTime = mktime(oriTime);
     uint64_t nextTriggerTime = PreGetNextTriggerTimeIgnoreSnooze(true, false);
-    return HandleTimeZoneChange(oldZoneTriggerTime, newZoneTriggerTime, nextTriggerTime);
+    return HandleTimeZoneChange(
+        triggerTimeInMilli_, GetDurationSinceEpochInMilli(newZoneTriggerTime), nextTriggerTime);
 }
 
 ReminderRequest& ReminderRequest::SetMaxScreenWantAgentInfo(
@@ -849,21 +850,40 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
         info.title = title;
         actionButtonMap_.insert(std::pair<ActionButtonType, ActionButtonInfo>(type, info));
     }
-    InitNotificationRequest();
+    if (!InitNotificationRequest()) {
+        return false;
+    }
     return true;
 }
 
-void ReminderRequest::InitNotificationRequest()
+bool ReminderRequest::InitNotificationRequest()
 {
     ANSR_LOGI("Init notification");
-    notificationRequest_ = new NotificationRequest(notificationId_);
+    notificationRequest_ = new (std::nothrow) NotificationRequest(notificationId_);
+    if (notificationRequest_ == nullptr) {
+        ANSR_LOGE("Failed to create notification.");
+        return false;
+    }
     displayContent_ = content_;
     AddActionButtons(true);
+    return true;
 }
 
 bool ReminderRequest::IsAlerting() const
 {
     return (state_ & REMINDER_STATUS_ALERTING) != 0;
+}
+
+uint64_t ReminderRequest::GetDurationSinceEpochInMilli(const time_t target)
+{
+    auto tarEndTimePoint = std::chrono::system_clock::from_time_t(target);
+    auto tarDuration = std::chrono::duration_cast<std::chrono::milliseconds>(tarEndTimePoint.time_since_epoch());
+    int64_t tarDate = tarDuration.count();
+    if (tarDate < 0) {
+        ANSR_LOGW("tarDuration is less than 0.");
+        return INVALID_LONG_LONG_VALUE;
+    }
+    return static_cast<uint64_t>(tarDate);
 }
 
 std::string ReminderRequest::GetDateTimeInfo(const time_t &timeInSecond) const
@@ -879,7 +899,7 @@ uint64_t ReminderRequest::GetNowInstantMilli() const
         ANSR_LOGE("Get now time error");
         return 0;
     }
-    return static_cast<uint64_t>(now) * MILLI_SECONDS;
+    return GetDurationSinceEpochInMilli(now);
 }
 
 std::string ReminderRequest::GetShowTime(const uint64_t showTime) const
