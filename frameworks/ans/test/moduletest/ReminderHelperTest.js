@@ -52,7 +52,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper001
      * @tc.desc: test publishReminder can return correct reminder id.
      * @tc.type: FUNC
-     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8EH AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper001", 0, async function (done) {
         let timer = {
@@ -82,7 +82,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper002
      * @tc.desc: test publishReminder can return correct reminder id.
      * @tc.type: FUNC
-     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8EH AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper002", 0, async function (done) {
         let timer = {
@@ -205,7 +205,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper008
      * @tc.desc: test cancelAllReminders can cancel all exist reminders
      * @tc.type: FUNC
-     * @tc.require: SR000GGTRB AR000GH8EA
+     * @tc.require: SR000GGTRB AR000GH8EA AR000GH8EF AR000GH8EI
      */
     it("testReminderHelper008", 0, async function (done) {
         let timer = {
@@ -373,7 +373,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper013
      * @tc.desc: test getValidReminders, verify all the information is correct.
      * @tc.type: FUNC
-     * @tc.require: SR000GGTRB AR000GH8EB
+     * @tc.require: SR000GGTRB AR000GH8EB AR000GH8EF
      */
     it("testReminderHelper013", 0, async function (done) {
         var alarm = {
@@ -567,7 +567,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper022
      * @tc.desc: test publishReminder a normal alarm.
      * @tc.type: FUNC
-     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH AR000GH8EE
      */
     it("testReminderHelper022", 0, async function (done) {
         let alarm = {
@@ -855,7 +855,7 @@ describe("ReminderHelperTest", function () {
      * @tc.name: testReminderHelper027
      * @tc.desc: test publishReminder (max number limit of each application)
      * @tc.type: FUNC
-     * @tc.require: SR000GGTRB AR000GH8E9 AR00GH8EH
+     * @tc.require: SR000GGTRE AR000GH8E9 AR00GH8EH
      */
     it("testReminderHelper027", 0, async function (done) {
         let timer = {
