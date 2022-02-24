@@ -113,6 +113,7 @@ public:
         OnConsumedReceived = true;
         g_consumed_mtx.unlock();
         NotificationRequest notificationRequest = request->GetNotificationRequest();
+        GTEST_LOG_(INFO) << "OnConsumed notificationId : " << notificationRequest.GetNotificationId();
         if (CASE_ONE == notificationRequest.GetNotificationId()) {
             CheckCaseOneResult(notificationRequest);
         } else if (CASE_TWO == notificationRequest.GetNotificationId()) {
@@ -337,7 +338,7 @@ private:
         EXPECT_EQ(false, notificationRequest.IsInProgress());
         EXPECT_EQ(false, notificationRequest.IsUnremovable());
         EXPECT_EQ(0, notificationRequest.GetBadgeNumber());
-        EXPECT_EQ(0, notificationRequest.GetDeliveryTime());
+        EXPECT_NE(0, notificationRequest.GetDeliveryTime());
         EXPECT_EQ(false, notificationRequest.IsShowDeliveryTime());
         EXPECT_EQ(false, notificationRequest.IsPermitSystemGeneratedContextualActionButtons());
         EXPECT_EQ(false, notificationRequest.IsAlertOneTime());
@@ -543,11 +544,13 @@ void AnsInterfaceModulePublishTest::CheckJsonConverter(const NotificationRequest
  */
 HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00100, Function | MediumTest | Level1)
 {
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00100 start ==========>";
     NotificationSlot slot(NotificationConstant::OTHER);
     EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_00100::SubscribeInfo:" << info.Dump();
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
@@ -569,7 +572,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00100, Function
     std::vector<std::string> style;
     style.push_back("style");
     req.SetNotificationUserInputHistory(style);
-    req.SetOwnerBundleName("ownerbundlename");
+    req.SetOwnerBundleName("bundleName");
     req.SetCreatorBundleName("creatorbundlename");
     req.SetLabel("ANS_Interface_MT_Publish_00100");
     std::shared_ptr<NotificationRequest> requestPtr = std::make_shared<NotificationRequest>();
@@ -630,6 +633,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00200, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -667,6 +671,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00200, Function
     req.SetSlotType(NotificationConstant::OTHER);
     req.AddActionButton(actionButton);
     req.SetNotificationId(CASE_TWO);
+    req.SetOwnerBundleName("bundleName");
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -690,6 +695,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00300, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -718,6 +724,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00300, Function
     req.SetSlotType(NotificationConstant::OTHER);
     req.AddActionButton(actionButton);
     req.SetNotificationId(CASE_THREE);
+    req.SetOwnerBundleName("bundleName");
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -741,6 +748,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00400, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -769,6 +777,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00400, Function
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
     req.SetNotificationId(CASE_FOUR);
+    req.SetOwnerBundleName("bundleName");
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -790,6 +799,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00500, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -806,6 +816,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00500, Function
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
     req.SetNotificationId(CASE_FIVE);
+    req.SetOwnerBundleName("bundleName");
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -827,6 +838,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00600, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -843,6 +855,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00600, Function
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
     req.SetNotificationId(CASE_SIX);
+    req.SetOwnerBundleName("bundleName");
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -864,6 +877,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00700, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -881,6 +895,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00700, Function
     req.SetContent(content);
     req.SetSlotType(NotificationConstant::OTHER);
     req.SetNotificationId(CASE_SEVEN);
+    req.SetOwnerBundleName("bundleName");
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -924,6 +939,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00800, Function
     req.SetAutoDeletedTime(0);
     req.SetClassification("classification");
     req.SetColor(0);
+    req.SetCreatorUserId(SUBSCRIBE_USER_SYSTEM_BEGIN);
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -970,6 +986,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00900, Function
     req.SetShortcutId("shortcutid");
     req.SetFloatingIcon(false);
     req.SetProgressBar(0, 0, false);
+    req.SetCreatorUserId(SUBSCRIBE_USER_SYSTEM_BEGIN);
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
@@ -1125,6 +1142,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -1142,6 +1160,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     NotificationRequest req1(0);
     req1.SetLabel(label1);
     req1.SetContent(content);
+    req1.SetCreatorUserId(SUBSCRIBE_USER_SYSTEM_BEGIN);
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req1));
     WaitOnConsumed();
@@ -1151,6 +1170,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     NotificationRequest req2(0);
     req2.SetLabel(label2);
     req2.SetContent(content);
+    req2.SetCreatorUserId(SUBSCRIBE_USER_SYSTEM_BEGIN);
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
     WaitOnConsumed();
@@ -1161,7 +1181,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotifications(requests));
     EXPECT_EQ("Label1", requests[0]->GetLabel());
     EXPECT_EQ("Label2", requests[1]->GetLabel());
-    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications());
+    EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::RemoveNotifications(SUBSCRIBE_USER_SYSTEM_BEGIN));
     sleep(SLEEP_TIME);
     EXPECT_EQ(OnCanceledReceived, true);
     EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countAfter));
@@ -1182,6 +1202,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_CancelGroup_10100, Func
 {
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
 
     auto subscriber = TestAnsSubscriber();
     g_subscribe_mtx.lock();
@@ -1228,13 +1249,13 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_CancelGroup_10100, Func
 
     NotificationBundleOption bo("bundlename", 0);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_CancelGroup_10100:: call RemoveGroupByBundle : effective parameters";
-    EXPECT_NE(0, NotificationHelper::RemoveGroupByBundle(bo, "group10100"));
+    EXPECT_EQ(0, NotificationHelper::RemoveGroupByBundle(bo, "group10100"));
 
     sleep(SLEEP_TIME);
     OnCanceledReceived = false;
 
     GTEST_LOG_(INFO) << "ANS_Interface_MT_CancelGroup_10100:: call RemoveGroupByBundle : invalid parameters";
-    EXPECT_NE(0, NotificationHelper::RemoveGroupByBundle(bo, "ngroup"));
+    EXPECT_EQ(0, NotificationHelper::RemoveGroupByBundle(bo, "ngroup"));
 
     sleep(SLEEP_TIME);
     OnCanceledReceived = false;
@@ -1257,6 +1278,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_04000, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -1371,6 +1393,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_05000, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();
@@ -1410,6 +1433,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_06000, Function
     auto subscriber = TestAnsSubscriber();
     NotificationSubscribeInfo info = NotificationSubscribeInfo();
     info.AddAppName("bundleName");
+    info.AddAppUserId(SUBSCRIBE_USER_ALL);
     g_subscribe_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::SubscribeNotification(subscriber, info));
     WaitOnSubscribeResult();

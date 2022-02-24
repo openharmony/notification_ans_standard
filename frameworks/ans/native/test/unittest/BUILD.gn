@@ -70,5 +70,5 @@ group("unittest") {
   testonly = true
   deps = []
 
-  deps += [ ":ans_reminder_unit_test" ]
+  # deps += [ ":ans_reminder_unit_test" ]
 }
