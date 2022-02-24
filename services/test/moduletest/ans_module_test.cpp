@@ -126,7 +126,7 @@ void TestAddSlots()
 /**
  * @tc.number    : AnsModuleTest_001
  * @tc.name      : ANS_Subscribe_Publish_0100
- * @tc.desc      : Test the functions of subscribing, publishing, and canceling
+ * @tc.desc      : Test the functions of subscribing all notifications, publishing, and canceling
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_001, Function | SmallTest | Level1)
 {
@@ -141,6 +141,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_001, Function | SmallTest | Level1)
     req1->SetLabel(label);
     sptr<NotificationSubscribeInfo> info = new NotificationSubscribeInfo();
     info->AddAppName("bundleName");
+    info->AddAppUserId(SUBSCRIBE_USER_ALL);
     EXPECT_EQ((int)g_advancedNotificationService->Subscribe(subscriber->GetImpl(), info), (int)ERR_OK);
     EXPECT_EQ((int)g_advancedNotificationService->Publish(label, req), (int)ERR_OK);
     EXPECT_EQ((int)g_advancedNotificationService->Publish(label, req1), (int)ERR_OK);
@@ -186,7 +187,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_002, Function | SmallTest | Level1)
 /**
  * @tc.number    : AnsModuleTest_003
  * @tc.name      : ANS_Module_Test_0300
- * @tc.desc      : Test publish notifications when slot are not allowed publish.
+ * @tc.desc      : Test publish notifications when slot not found, add it.
  */
 HWTEST_F(AnsModuleTest, AnsModuleTest_003, Function | SmallTest | Level1)
 {
@@ -213,7 +214,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_003, Function | SmallTest | Level1)
     g_advancedNotificationService->SetNotificationsEnabledForBundle("", false);
 
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(false, passed);
+    EXPECT_EQ(true, passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -228,6 +229,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_005, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
@@ -275,6 +277,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_006, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
@@ -308,6 +311,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_007, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
@@ -355,6 +359,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0013, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
@@ -388,6 +393,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0014, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
@@ -426,6 +432,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0015, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
@@ -464,6 +471,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0017, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
@@ -502,6 +510,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0019, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
@@ -540,6 +549,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0021, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
@@ -593,6 +603,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0023, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification>, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
@@ -631,6 +642,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0031, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
@@ -684,6 +696,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0033, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>) {
@@ -728,6 +741,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0034, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>) {
@@ -772,6 +786,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0035, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->canceledCb_ = [](const std::shared_ptr<Notification> &request,
                                   const std::shared_ptr<NotificationSortingMap> &sortingMap,
@@ -812,6 +827,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0036, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->canceledCb_ = [](const std::shared_ptr<Notification> &request,
                                   const std::shared_ptr<NotificationSortingMap> &sortingMap,
@@ -852,6 +868,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0039, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
@@ -906,6 +923,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0040, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>) { passed = true; };
@@ -944,6 +962,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0041, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>) { passed = true; };
@@ -982,6 +1001,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0042, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>) { passed = true; };
@@ -1020,6 +1040,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0043, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> notification,
                                   const std::shared_ptr<NotificationSortingMap>) { passed = true; };
@@ -1204,6 +1225,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0058, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> r, const std::shared_ptr<NotificationSortingMap>) {
         if (r->GetNotificationRequest().GetBadgeNumber() == 1) {
             passed = true;
@@ -1245,6 +1267,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0060, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> r, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
     };
@@ -1292,6 +1315,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0061, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     subscriber->consumedCb_ = [](const std::shared_ptr<Notification> r, const std::shared_ptr<NotificationSortingMap>) {
         passed = true;
     };
@@ -1339,6 +1363,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0062, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
@@ -1616,7 +1641,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0103, Function | SmallTest | Level1)
 
     // publish request
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(passed, false);
+    EXPECT_EQ(passed, true);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
@@ -1659,6 +1684,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0106, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
     subscriber->consumedCb_ =
         [](const std::shared_ptr<Notification> notification, const std::shared_ptr<NotificationSortingMap> sortingMap) {
@@ -1691,6 +1717,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0107, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
 
     // add slot
@@ -1719,8 +1746,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0107, Function | SmallTest | Level1)
     g_advancedNotificationService->Publish(label, req1);
 
     // remove request
-    g_advancedNotificationService->Delete("_1_testLabel_0");
-    g_advancedNotificationService->Delete("_1_testLabel_1");
+    g_advancedNotificationService->Delete("_0_1_testLabel_0");
+    g_advancedNotificationService->Delete("_0_1_testLabel_1");
     int nums = -1;
     g_advancedNotificationService->GetActiveNotificationNums(nums);
     EXPECT_EQ(nums, 0);
@@ -1738,6 +1765,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0108, Function | SmallTest | Level1)
     auto subscriber = new TestAnsSubscriber();
     sptr<NotificationSubscribeInfo> subscriberInfo = new NotificationSubscribeInfo();
     subscriberInfo->AddAppName("bundleName");
+    subscriberInfo->AddAppUserId(SUBSCRIBE_USER_ALL);
     g_advancedNotificationService->Subscribe(subscriber->GetImpl(), subscriberInfo);
 
     // add slot
@@ -1752,6 +1780,8 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0108, Function | SmallTest | Level1)
     sptr<NotificationRequest> req1 = new NotificationRequest(1);
     req->SetLabel(label);
     req1->SetLabel(label);
+    req->SetNotificationId(0);
+    req1->SetNotificationId(1);
 
     // set content
     std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
@@ -1766,7 +1796,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0108, Function | SmallTest | Level1)
     g_advancedNotificationService->Publish(label, req1);
 
     // remove request
-    g_advancedNotificationService->DeleteAll();
+    g_advancedNotificationService->DeleteAllByUser(0);
     int nums = -1;
     g_advancedNotificationService->GetActiveNotificationNums(nums);
     EXPECT_EQ(nums, 0);
@@ -1826,9 +1856,10 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0112, Function | SmallTest | Level1)
             NotificationSorting sorting1;
             NotificationSorting sorting2;
             if (sortingKey.size() == 2) {
-                sortingMap->GetNotificationSorting("_1_testLabel_0", sorting1);
-                sortingMap->GetNotificationSorting("_1_testLabel_1", sorting2);
+                sortingMap->GetNotificationSorting("_0_1_testLabel_0", sorting1);
+                sortingMap->GetNotificationSorting("_0_1_testLabel_1", sorting2);
             }
+
             if (sorting1.GetRanking() < sorting2.GetRanking() && notification->EnableLight() &&
                 notification->EnableSound() && notification->EnableVibrate()) {
                 passed = true;
@@ -1862,7 +1893,9 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0112, Function | SmallTest | Level1)
     req1->SetSlotType(NotificationConstant::SlotType::SOCIAL_COMMUNICATION);
 
     // publish request
-    EXPECT_FALSE(passed);
+    g_advancedNotificationService->Publish(label, req);
+    g_advancedNotificationService->Publish(label, req1);
+    EXPECT_TRUE(passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr);
 }
 
@@ -2140,7 +2173,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0120, Function | SmallTest | Level1)
     g_advancedNotificationService->SetNotificationsEnabledForBundle("bundleName", false);
 
     g_advancedNotificationService->Publish(label, req);
-    EXPECT_EQ(false, passed);
+    EXPECT_EQ(true, passed);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
 }
 
