@@ -113,6 +113,7 @@ uint8_t ReminderRequestCalendar::GetNextDay(
             setTime.tm_hour = target.tm_hour;
             setTime.tm_min = target.tm_min;
             setTime.tm_sec = target.tm_sec;
+            setTime.tm_isdst = -1;
 
             struct tm nowTime;
             nowTime.tm_year = now.tm_year;
@@ -121,6 +122,8 @@ uint8_t ReminderRequestCalendar::GetNextDay(
             nowTime.tm_hour = now.tm_hour;
             nowTime.tm_min = now.tm_min;
             nowTime.tm_sec = now.tm_sec;
+            nowTime.tm_isdst = -1;
+
             if (mktime(&nowTime) >= mktime(&setTime)) {
                 continue;
             } else {
@@ -151,12 +154,18 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTime() const
     tarTime.tm_hour = hour_;
     tarTime.tm_min = minute_;
     tarTime.tm_sec = 0;
+    tarTime.tm_isdst = -1;
 
     ANSR_LOGD("Now time is: %{public}s", GetDateTimeInfo(now).c_str());
     if (!(repeatMonth_ > 0 && repeatDay_ > 0)) {
+        ANSR_LOGD("tarTime: %{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",
+            tarTime.tm_year, tarTime.tm_mon, tarTime.tm_mday, tarTime.tm_hour, tarTime.tm_min, tarTime.tm_sec);
         const time_t target = mktime(&tarTime);
-        if (now <= target) {
-            triggerTimeInMilli = static_cast<uint64_t>(target) * MILLI_SECONDS;
+        if (target == -1) {
+            ANSR_LOGW("mktime return error.");
+        }
+        if (now < target) {
+            triggerTimeInMilli = ReminderRequest::GetDurationSinceEpochInMilli(target);
             ANSR_LOGD("Next calendar time:%{public}s", GetDateTimeInfo(target).c_str());
         }
         return triggerTimeInMilli;
@@ -206,19 +215,16 @@ uint64_t ReminderRequestCalendar::GetTimeInstantMilli(
     tar.tm_hour = hour;
     tar.tm_min = minute;
     tar.tm_sec = second;
+    tar.tm_isdst = -1;
+
+    ANSR_LOGD("tar: %{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",
+        tar.tm_year, tar.tm_mon, tar.tm_mday, tar.tm_hour, tar.tm_min, tar.tm_sec);
     const time_t target = mktime(&tar);
     if (target == -1) {
         ANSR_LOGW("mktime return error.");
         return INVALID_LONG_LONG_VALUE;
     }
-    auto tarEndTimePoint = std::chrono::system_clock::from_time_t(target);
-    auto tarDuration = std::chrono::duration_cast<std::chrono::milliseconds>(tarEndTimePoint.time_since_epoch());
-    int64_t tarDate = tarDuration.count();
-    if (tarDate < 0) {
-        ANSR_LOGW("tarDuration is less than 0.");
-        return INVALID_LONG_LONG_VALUE;
-    }
-    return static_cast<uint64_t>(tarDate);
+    return ReminderRequest::GetDurationSinceEpochInMilli(target);
 }
 
 void ReminderRequestCalendar::InitDateTime()
@@ -229,6 +235,7 @@ void ReminderRequestCalendar::InitDateTime()
     dateTime_.tm_hour = hour_;
     dateTime_.tm_min = minute_;
     dateTime_.tm_sec = second_;
+    dateTime_.tm_isdst = -1;
 }
 
 void ReminderRequestCalendar::InitDateTime(const tm &dateTime)
@@ -239,6 +246,7 @@ void ReminderRequestCalendar::InitDateTime(const tm &dateTime)
     dateTime_.tm_hour = dateTime.tm_hour;
     dateTime_.tm_min = dateTime.tm_min;
     dateTime_.tm_sec = dateTime.tm_sec;
+    dateTime_.tm_isdst = -1;
 }
 
 bool ReminderRequestCalendar::IsRepeatReminder() const
