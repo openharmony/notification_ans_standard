@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Notification {
 NotificationPreferences::NotificationPreferences()
 {
+    preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
     InitSettingFromDisturbDB();
 }
 
@@ -870,10 +871,23 @@ ErrCode NotificationPreferences::GetTemplateSupported(const std::string& templat
 
 void NotificationPreferences::InitSettingFromDisturbDB()
 {
-    if (!preferncesDB_) {
-        preferncesDB_ = std::make_unique<NotificationPreferencesDatabase>();
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    if (preferncesDB_ != nullptr) {
+        preferncesDB_->ParseFromDisturbeDB(preferencesInfo_);
     }
-    preferncesDB_->ParseFromDisturbeDB(preferencesInfo_);
+}
+
+void NotificationPreferences::RemoveSettings(int32_t userId)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    preferencesInfo_.RemoveNotificationEnable(userId);
+    preferencesInfo_.RemoveDoNotDisturbDate(userId);
+
+    if (preferncesDB_ != nullptr) {
+        preferncesDB_->RemoveNotificationEnable(userId);
+        preferncesDB_->RemoveDoNotDisturbDate(userId);
+    }
 }
 }  // namespace Notification
 }  // namespace OHOS

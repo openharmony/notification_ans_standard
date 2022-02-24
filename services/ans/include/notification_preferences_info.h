@@ -94,6 +94,8 @@ public:
         sptr<NotificationDoNotDisturbDate> &doNotDisturbDate) const;
     void SetEnabledAllNotification(const int32_t &userId, const bool &enable);
     bool GetEnabledAllNotification(const int32_t &userId, bool &enable) const;
+    void RemoveNotificationEnable(const int32_t userId);
+    void RemoveDoNotDisturbDate(const int32_t userId);
 
 private:
     std::map<int32_t, bool> isEnabledAllNotification_;
