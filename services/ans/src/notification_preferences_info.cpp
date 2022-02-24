@@ -313,5 +313,15 @@ bool NotificationPreferencesInfo::GetEnabledAllNotification(const int32_t &userI
     }
     return false;
 }
+
+void NotificationPreferencesInfo::RemoveNotificationEnable(const int32_t userId)
+{
+    isEnabledAllNotification_.erase(userId);
+}
+
+void NotificationPreferencesInfo::RemoveDoNotDisturbDate(const int32_t userId)
+{
+    doNotDisturbDate_.erase(userId);
+}
 }  // namespace Notification
 }  // namespace OHOS
