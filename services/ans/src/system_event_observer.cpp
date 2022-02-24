@@ -15,6 +15,7 @@
 
 #include "system_event_observer.h"
 
+#include "advanced_notification_service.h"
 #include "bundle_constants.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
@@ -31,6 +32,7 @@ SystemEventObserver::SystemEventObserver(const ISystemEvent &callbacks) : callba
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
 #endif
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
 
     subscriber_ = std::make_shared<SystemEventSubscriber>(
@@ -69,6 +71,9 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
 #endif
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         NotificationPreferences::GetInstance().InitSettingFromDisturbDB();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
+        int32_t userId = data.GetCode();
+        callbacks_.onResourceRemove(userId);
     }
 }
 }  // namespace Notification

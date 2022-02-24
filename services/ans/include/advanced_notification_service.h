@@ -135,6 +135,7 @@ public:
     void OnScreenOn();
     void OnScreenOff();
 #endif
+    void OnResourceRemove(int32_t userId);
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();

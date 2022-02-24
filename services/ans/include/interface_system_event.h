@@ -29,6 +29,7 @@ struct ISystemEvent {
     std::function<void()> onScreenOn;
     std::function<void()> onScreenOff;
 #endif
+    std::function<void(int32_t userId)> onResourceRemove;
 };
 }  // namespace Notification
 }  // namespace OHOS
