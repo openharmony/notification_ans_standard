@@ -15,12 +15,8 @@
 
 #include "ans_log_wrapper.h"
 #include "ans_notification.h"
-#include "application_env_impl.h"
-#include "bundle_mgr_interface.h"
-#include "iservice_registry.h"
 #include "notification_helper.h"
 #include "singleton.h"
-#include "system_ability_definition.h"
 
 #include "reminder_helper.h"
 
@@ -44,25 +40,6 @@ ErrCode ReminderHelper::CancelAllReminders()
 {
     ANSR_LOGI("CancelAllReminders start");
     return DelayedSingleton<AnsNotification>::GetInstance()->CancelAllReminders();
-}
-
-bool ReminderHelper::CheckPermission()
-{
-    ANSR_LOGI("CheckPermission");
-    AppExecFwk::ApplicationEnvImpl* application = AppExecFwk::ApplicationEnvImpl::GetInstance();
-    std::string pkgName = application->GetBundleName();
-    sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemManager == nullptr) {
-        ANSR_LOGE("Permission denied");
-        return false;
-    }
-    auto bundleManager =
-        iface_cast<AppExecFwk::IBundleMgr>(systemManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID));
-    if (bundleManager->CheckPermission(pkgName, "ohos.permission.PUBLISH_AGENT_REMINDER") != 0) {
-        ANSR_LOGE("Permission denied");
-        return false;
-    }
-    return true;
 }
 
 ErrCode ReminderHelper::GetValidReminders(std::vector<sptr<ReminderRequest>> &validReminders)
