@@ -113,8 +113,7 @@ void ReminderCommon::GenMaxScreenWantAgent(
     char str[NotificationNapi::STR_MAX_SIZE] = {0};
     napi_value maxScreenWantAgent = nullptr;
     if (GetObject(env, value, ReminderAgentNapi::MAX_SCREEN_WANT_AGENT, maxScreenWantAgent)) {
-        std::shared_ptr<ReminderRequest::MaxScreenAgentInfo> maxScreenWantAgentInfo(
-            new ReminderRequest::MaxScreenAgentInfo());
+        auto maxScreenWantAgentInfo = std::make_shared<ReminderRequest::MaxScreenAgentInfo>();
         if (GetStringUtf8(env, maxScreenWantAgent,
             ReminderAgentNapi::MAX_SCREEN_WANT_AGENT_PKG, str, NotificationNapi::STR_MAX_SIZE)) {
             maxScreenWantAgentInfo->pkgName = str;
@@ -173,22 +172,22 @@ napi_value ReminderCommon::GenReminder(
 
     // title
     if (GetStringUtf8(env, value, ReminderAgentNapi::TITLE, str, NotificationNapi::STR_MAX_SIZE)) {
-        reminder->SetTitle(str);
+        reminder->SetTitle(std::string(str));
     }
 
     // content
     if (GetStringUtf8(env, value, ReminderAgentNapi::CONTENT, str, NotificationNapi::STR_MAX_SIZE)) {
-        reminder->SetContent(str);
+        reminder->SetContent(std::string(str));
     }
 
     // expiredContent
     if (GetStringUtf8(env, value, ReminderAgentNapi::EXPIRED_CONTENT, str, NotificationNapi::STR_MAX_SIZE)) {
-        reminder->SetExpiredContent(str);
+        reminder->SetExpiredContent(std::string(str));
     }
 
     // snoozeContent
     if (GetStringUtf8(env, value, ReminderAgentNapi::SNOOZE_CONTENT, str, NotificationNapi::STR_MAX_SIZE)) {
-        reminder->SetSnoozeContent(str);
+        reminder->SetSnoozeContent(std::string(str));
     }
 
     // ringDuration

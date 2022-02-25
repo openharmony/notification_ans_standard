@@ -44,11 +44,7 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
     uint64_t nextTriggerTime = INVALID_LONG_LONG_VALUE;
     if ((nextTriggerTime = GetNextTriggerTime()) != INVALID_LONG_LONG_VALUE) {
         time_t target = static_cast<time_t>(nextTriggerTime / MILLI_SECONDS);
-        tm *tar = localtime(&target);
-        if (tar == nullptr) {
-            throw std::invalid_argument("Get localtime error");
-        }
-        dateTime_ = *tar;
+        (void)localtime_r(&target, &dateTime_);
     } else {
         ANSR_LOGW("Not exist next trigger time, please check the param of ReminderRequestCalendar constructor.");
         throw std::invalid_argument(
@@ -140,12 +136,8 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTime() const
     uint64_t triggerTimeInMilli = INVALID_LONG_LONG_VALUE;
     time_t now;
     (void)time(&now);  // unit is seconds.
-    tm *nowTmp = localtime(&now);
-    if (nowTmp == nullptr) {
-        ANSR_LOGW("Get local time fail.");
-        return triggerTimeInMilli;
-    }
-    struct tm nowTime = *nowTmp;
+    struct tm nowTime;
+    (void)localtime_r(&now, &nowTime);
     nowTime.tm_sec = 0;
     struct tm tarTime;
     tarTime.tm_year = GetCTime(TimeTransferType::YEAR, firstDesignateYear_);

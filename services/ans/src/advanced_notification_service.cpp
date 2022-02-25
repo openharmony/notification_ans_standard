@@ -380,7 +380,11 @@ ErrCode AdvancedNotificationService::PublishPreparedNotification(
     ANS_LOGI("PublishPreparedNotification");
     auto record = std::make_shared<NotificationRecord>();
     record->request = request;
-    record->notification = new Notification(request);
+    record->notification = new (std::nothrow) Notification(request);
+    if (record->notification == nullptr) {
+        ANS_LOGE("Failed to create notification.");
+        return ERR_ANS_NO_MEMORY;
+    }
     record->bundleOption = bundleOption;
     SetNotificationRemindType(record->notification, true);
 

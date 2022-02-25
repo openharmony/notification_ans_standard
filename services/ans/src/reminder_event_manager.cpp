@@ -114,13 +114,21 @@ void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(OHOS::Ev
     OHOS::AppExecFwk::ElementName ele = want.GetElement();
     std::string bundleName = ele.GetBundleName();
     int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
-    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, -1);
+    sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption(bundleName, -1);
+    if (bundleOption == nullptr) {
+        ANSR_LOGE("new NotificationBundleOption fail due to no memory.");
+        return;
+    }
     reminderDataManager_->CancelAllReminders(bundleOption, userId);
 }
 
 void ReminderEventManager::ReminderEventSubscriber::HandleProcessDied(OHOS::EventFwk::Want &want) const
 {
     sptr<NotificationBundleOption> bundleOption = GetBundleOption(want);
+    if (bundleOption == nullptr) {
+        ANSR_LOGE("Get bundle option error.");
+        return;
+    }
     reminderDataManager_->OnProcessDiedLocked(bundleOption);
 }
 
@@ -132,7 +140,10 @@ sptr<NotificationBundleOption> ReminderEventManager::ReminderEventSubscriber::Ge
     int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
     int32_t uid = ReminderRequest::GetUid(userId, bundleName);
     ANSR_LOGD("bundleName=%{public}s, userId=%{public}d, uid=%{public}d", bundleName.c_str(), userId, uid);
-    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
+    sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption(bundleName, uid);
+    if (bundleOption == nullptr) {
+        ANSR_LOGE("new NotificationBundleOption fail due to no memory.");
+    }
     return bundleOption;
 }
 }  // namespace OHOS

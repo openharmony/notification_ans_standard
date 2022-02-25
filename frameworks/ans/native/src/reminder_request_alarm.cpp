@@ -102,23 +102,19 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
 {
     time_t now;
     (void)time(&now);  // unit is seconds.
-    struct tm *nowTime = localtime(&now);
-    if (nowTime == nullptr) {
-        ANSR_LOGW("Get local time fail.");
-        return 0;
-    }
-
+    struct tm nowTime;
+    (void)localtime_r(&now, &nowTime);
     ANSR_LOGD("Now: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d, Target: tar_hour=%{public}d, tar_min=%{public}d",
-        GetActualTime(TimeTransferType::YEAR, nowTime->tm_year),
-        GetActualTime(TimeTransferType::MONTH, nowTime->tm_mon),
-        nowTime->tm_mday, nowTime->tm_hour, nowTime->tm_min, nowTime->tm_sec,
-        GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday), hour_, minute_);
+        GetActualTime(TimeTransferType::YEAR, nowTime.tm_year),
+        GetActualTime(TimeTransferType::MONTH, nowTime.tm_mon),
+        nowTime.tm_mday, nowTime.tm_hour, nowTime.tm_min, nowTime.tm_sec,
+        GetActualTime(TimeTransferType::WEEK, nowTime.tm_wday), hour_, minute_);
 
     struct tm tar;
-    tar.tm_year = nowTime->tm_year;
-    tar.tm_mon = nowTime->tm_mon;
-    tar.tm_mday = nowTime->tm_mday;
+    tar.tm_year = nowTime.tm_year;
+    tar.tm_mon = nowTime.tm_mon;
+    tar.tm_mday = nowTime.tm_mday;
     tar.tm_hour = hour_;
     tar.tm_min = minute_;
     tar.tm_sec = 0;
@@ -138,16 +134,14 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     } else {
         nextTriggerTime = target + nextDayInterval * HOURS_PER_DAY * SECONDS_PER_HOUR;
     }
-    struct tm *test = localtime(&nextTriggerTime);
-    if (test == nullptr) {
-        return 0;
-    }
+    struct tm test;
+    (void)localtime_r(&nextTriggerTime, &test);
     ANSR_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
         "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld",
-        GetActualTime(TimeTransferType::YEAR, test->tm_year),
-        GetActualTime(TimeTransferType::MONTH, test->tm_mon),
-        test->tm_mday, test->tm_hour, test->tm_min, test->tm_sec,
-        GetActualTime(TimeTransferType::WEEK, test->tm_wday), (long long)nextTriggerTime);
+        GetActualTime(TimeTransferType::YEAR, test.tm_year),
+        GetActualTime(TimeTransferType::MONTH, test.tm_mon),
+        test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec,
+        GetActualTime(TimeTransferType::WEEK, test.tm_wday), (long long)nextTriggerTime);
 
     if (static_cast<int64_t>(nextTriggerTime) <= 0) {
         return 0;
