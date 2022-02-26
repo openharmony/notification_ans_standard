@@ -156,8 +156,8 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
-    "access_token:libaccesstoken_sdk",
     "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
