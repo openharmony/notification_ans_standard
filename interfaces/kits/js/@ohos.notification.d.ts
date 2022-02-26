@@ -57,7 +57,7 @@ declare namespace notification {
    * @param userId of subscriber receiving the notification
    * @systemapi Hide this for inner system use.
    * @permission ohos.permission.NOTIFICATION_CONTROLLER
-   * 
+   *
    */
    function publish(request: NotificationRequest, userId: number, callback: AsyncCallback<void>): void;
    function publish(request: NotificationRequest, userId: number): Promise<void>;
@@ -622,14 +622,6 @@ declare namespace notification {
    */
   function isSupportTemplate(templateName: string, callback: AsyncCallback<boolean>): void;
   function isSupportTemplate(templateName: string): Promise<boolean>;
-
-  /**
-   * Query notification sending permission.
-   *
-   * @since 8
-   */
-  function isNotificationEnabledSelf(callback: AsyncCallback<boolean>): void;
-  function isNotificationEnabledSelf(): Promise<boolean>;
 
   /**
    * Request permission to send notification.
