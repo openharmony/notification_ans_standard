@@ -302,7 +302,12 @@ sptr<NotificationBundleOption> AdvancedNotificationService::GenerateValidBundleO
     if (bundleOption->GetUid() <= 0) {
         std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
         if (bundleManager != nullptr) {
-            int uid = bundleManager->GetDefaultUidByBundleName(bundleOption->GetBundleName());
+            int activeUserId = -1;
+            if (!GetActiveUserId(activeUserId)) {
+                ANS_LOGE("Failed to get active user id!");
+                return validBundleOption;
+            }
+            int uid = bundleManager->GetDefaultUidByBundleName(bundleOption->GetBundleName(), activeUserId);
             if (uid > 0) {
                 validBundleOption = new NotificationBundleOption(bundleOption->GetBundleName(), uid);
             }
@@ -1576,7 +1581,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
             result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(targetBundle, allowed);
             if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
                 result = ERR_OK;
-                allowed = CheckApiCompatibility(bundleOption);
+                allowed = CheckApiCompatibility(targetBundle);
             }
         }
     }));
@@ -2737,8 +2742,12 @@ void AdvancedNotificationService::OnDistributedPublish(
     const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-
-    request->SetCreatorUid(BundleManagerHelper::GetInstance()->GetDefaultUidByBundleName(bundleName));
+    int activeUserId = -1;
+    if (!GetActiveUserId(activeUserId)) {
+        ANS_LOGE("Failed to get active user id!");
+        return;
+    }
+    request->SetCreatorUid(BundleManagerHelper::GetInstance()->GetDefaultUidByBundleName(bundleName, activeUserId));
 
     handler_->PostTask(std::bind([this, deviceId, bundleName, request]() {
         if (!CheckDistributedNotificationType(request)) {
@@ -2788,8 +2797,12 @@ void AdvancedNotificationService::OnDistributedUpdate(
     const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-
-    request->SetCreatorUid(BundleManagerHelper::GetInstance()->GetDefaultUidByBundleName(bundleName));
+    int activeUserId = -1;
+    if (!GetActiveUserId(activeUserId)) {
+        ANS_LOGE("Failed to get active user id!");
+        return;
+    }
+    request->SetCreatorUid(BundleManagerHelper::GetInstance()->GetDefaultUidByBundleName(bundleName, activeUserId));
 
     handler_->PostTask(std::bind([this, deviceId, bundleName, request]() {
         if (!CheckDistributedNotificationType(request)) {
@@ -3177,6 +3190,8 @@ bool AdvancedNotificationService::CheckApiCompatibility(const sptr<NotificationB
     AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), callingUserId);
     if (bundleManager != nullptr) {
         if (!bundleManager->GetBundleInfoByBundleName(bundleOption->GetBundleName(), callingUserId, bundleInfo)) {
+            ANS_LOGW("Failed to GetBundleInfoByBundleName, bundlename = %{public}s",
+                bundleOption->GetBundleName().c_str());
             return false;
         }
     }
