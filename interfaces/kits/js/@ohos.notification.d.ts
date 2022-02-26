@@ -91,9 +91,8 @@ declare namespace notification {
    *
    * @param slot Indicates the notification slot to be created, which is set by {@link NotificationSlot}.
    * This parameter must be specified.
-   *
-   * @systemapi Hide this for inner system use.
    * @param callback callback function
+   * @systemapi Hide this for inner system use.
    * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function addSlot(slot: NotificationSlot, callback: AsyncCallback<void>): void;
@@ -161,7 +160,7 @@ declare namespace notification {
   /**
    * Removes a NotificationSlot of the specified SlotType created by the current application.
    *
-   * @param slotType of the NotificationSlot to remove.
+   * @param slotType Type of the NotificationSlot to remove.
    * @param callback callback function
    */
   function removeSlot(slotType: SlotType, callback: AsyncCallback<void>): void;
@@ -332,6 +331,7 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
 
@@ -339,6 +339,7 @@ declare namespace notification {
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(bundle: BundleOption): Promise<boolean>;
 
@@ -351,22 +352,22 @@ declare namespace notification {
   function isNotificationEnabled(callback: AsyncCallback<boolean>): void;
 
   /**
-   * Checks whether this application has permission to publish notifications under the user.
-   *
-   * since 8
-   * @systemapi Hide this for inner system use.
-   * @permission ohos.permission.NOTIFICATION_CONTROLLER
-   */
-   function isNotificationEnabled(userId: number, callback: AsyncCallback<boolean>): void;
-   function isNotificationEnabled(userId: number): Promise<boolean>;
-
-  /**
    * isNotificationEnabled
    *
    * @systemapi Hide this for inner system use.
    * @permission ohos.permission.NOTIFICATION_CONTROLLER
    */
   function isNotificationEnabled(): Promise<boolean>;
+
+  /**
+   * Checks whether this application has permission to publish notifications under the user.
+   *
+   * since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+  function isNotificationEnabled(userId: number, callback: AsyncCallback<boolean>): void;
+  function isNotificationEnabled(userId: number): Promise<boolean>;
 
   /**
    * displayBadge
@@ -623,6 +624,70 @@ declare namespace notification {
   function isSupportTemplate(templateName: string): Promise<boolean>;
 
   /**
+   * Query notification sending permission.
+   *
+   * @since 8
+   */
+  function isNotificationEnabledSelf(callback: AsyncCallback<boolean>): void;
+  function isNotificationEnabledSelf(): Promise<boolean>;
+
+  /**
+   * Request permission to send notification.
+   *
+   * @since 8
+   */
+   function requestEnableNotification(callback: AsyncCallback<void>): void;
+   function requestEnableNotification(): Promise<void>;
+
+  /**
+   * Sets whether the device supports distributed notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+  function enableDistributed(enable: boolean, callback: AsyncCallback<void>): void;
+  function enableDistributed(enable: boolean): Promise<void>;
+
+  /**
+   * Obtains whether the device supports distributed notification.
+   *
+   * @since 8
+   */
+  function isDistributedEnabled(callback: AsyncCallback<boolean>): void;
+  function isDistributedEnabled(): Promise<boolean>;
+
+  /**
+   * Sets whether an application supports distributed notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+  function enableDistributedByBundle(bundle: BundleOption, enable: boolean, callback: AsyncCallback<void>): void;
+  function enableDistributedByBundle(bundle: BundleOption, enable: boolean): Promise<void>;
+
+  /**
+   * Obtains whether an application supports distributed notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+  function isDistributedEnabledByBundle(bundle: BundleOption, callback: AsyncCallback<boolean>): void;
+  function isDistributedEnabledByBundle(bundle: BundleOption): Promise<boolean>;
+
+  /**
+   * Obtains the remind modes of the notification.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   * @permission ohos.permission.NOTIFICATION_CONTROLLER
+   */
+  function getDeviceRemindType(callback: AsyncCallback<DeviceRemindType>): void;
+  function getDeviceRemindType(): Promise<DeviceRemindType>;
+
+  /**
    * Describes a BundleOption.
    */
   export interface BundleOption {
@@ -695,29 +760,6 @@ declare namespace notification {
   }
 
   /**
-   * Notification source type
-   *
-   * @since 8
-   * @systemapi Hide this for inner system use.
-   */
-  export enum SourceType {
-    /**
-     * General notification
-     */
-    TYPE_NORMAL = 0x00000000,
-
-    /**
-     * Continuous notification
-     */
-    TYPE_CONTINUOUS = 0x00000001,
-
-    /**
-     * Scheduled notification
-     */
-    TYPE_TIMER = 0x00000002,
-  }
-
-  /**
    * The type of the Do Not Disturb.
    *
    * @since 8
@@ -774,26 +816,31 @@ declare namespace notification {
   }
 
   /**
-   * Notification source type
+   * The remind type of the nofication.
    *
    * @since 8
    * @systemapi Hide this for inner system use.
    */
-  export enum SourceType {
+  export enum DeviceRemindType {
     /**
-     * General notification
+     * The device is not in use, no reminder
      */
-    TYPE_NORMAL = 0x00000000,
+    IDLE_DONOT_REMIND = 0,
 
     /**
-     * Continuous notification
+     * The device is not in use, remind
      */
-    TYPE_CONTINUOUS = 0x00000001,
+    IDLE_REMIND = 1,
 
     /**
-     * Scheduled notification
+     * The device is in use, no reminder
      */
-    TYPE_TIMER = 0x00000002,
+    ACTIVE_DONOT_REMIND = 2,
+
+    /**
+     * The device is in use, reminder
+     */
+    ACTIVE_REMIND = 3,
   }
 }
 
