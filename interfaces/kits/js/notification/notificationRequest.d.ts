@@ -205,9 +205,58 @@ export interface NotificationRequest {
   template?: NotificationTemplate;
 
   /**
+   * The options to distributed notification.
+   *
+   * @since 8
+   */
+  distributedOption?: DistributedOptions;
+
+  /**
+   * The device ID of the notification source.
+   *
+   * @since 8
+   * @systemapi Hide this for inner system use.
+   */
+  readonly deviceId?: string;
+
+  /**
    * Obtains the set of identifiers for the notification.
    *
    * @since 8
    */
    readonly notificationFlags?: NotificationFlags;
+}
+
+/**
+ * Describes distributed options.
+ *
+ * @name DistributedOptions
+ * @since 8
+ * @sysCap SystemCapability.Notification.Notification
+ * @permission N/A
+ */
+export interface DistributedOptions {
+  /**
+   * Obtains whether is the distributed notification.
+   *
+   * @default true
+   */
+  isDistributed?: boolean;
+
+  /**
+   * Obtains the types of devices to which the notification can be synchronized.
+   */
+  supportDisplayDevices?: Array<string>;
+
+  /**
+   * Obtains the devices on which notifications can be open.
+   */
+  supportOperateDevices?: Array<string>;
+
+  /**
+   * Obtains the remind mode of the notification. enum DeviceRemindType.
+
+   * @systemapi Hide this for inner system use.
+   */
+  readonly remindType?: number;
 }
