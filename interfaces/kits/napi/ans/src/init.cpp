@@ -63,7 +63,6 @@ napi_value NotificationInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("removeGroupByBundle", RemoveGroupByBundle),
         DECLARE_NAPI_FUNCTION("enableNotification", EnableNotification),
         DECLARE_NAPI_FUNCTION("isNotificationEnabled", IsNotificationEnabled),
-        DECLARE_NAPI_FUNCTION("isNotificationEnabledSelf", IsNotificationEnabledSelf),
         DECLARE_NAPI_FUNCTION("requestEnableNotification", RequestEnableNotification),
         DECLARE_NAPI_FUNCTION("displayBadge", DisplayBadge),
         DECLARE_NAPI_FUNCTION("isBadgeDisplayed", IsBadgeDisplayed),
