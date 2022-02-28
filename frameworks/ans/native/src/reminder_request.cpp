@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "reminder_request.h"
+
 #include "ans_log_wrapper.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
@@ -20,8 +22,6 @@
 #include "os_account_manager.h"
 #include "system_ability_definition.h"
 #include "want_agent_helper.h"
-
-#include "reminder_request.h"
 
 namespace OHOS {
 namespace Notification {

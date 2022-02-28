@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#include "reminder_helper.h"
+
 #include "ans_log_wrapper.h"
 #include "ans_notification.h"
 #include "notification_helper.h"
 #include "singleton.h"
-
-#include "reminder_helper.h"
 
 namespace OHOS {
 namespace Notification {

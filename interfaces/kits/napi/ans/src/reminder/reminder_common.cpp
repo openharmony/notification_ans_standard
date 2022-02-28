@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
+#include "reminder/reminder_common.h"
+
 #include "ans_log_wrapper.h"
 #include "common.h"
 #include "reminder_request_alarm.h"
 #include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
-
-#include "reminder/reminder_common.h"
 
 namespace OHOS {
 namespace ReminderAgentNapi {
@@ -402,7 +402,7 @@ napi_value ReminderCommon::CreateReminderCalendar(
 {
     napi_value dateTimeObj = nullptr;
     if (!GetObject(env, value, ReminderAgentNapi::CALENDAR_DATE_TIME, dateTimeObj)) {
-        ANSR_LOGW("Create calender reminder fail: dateTime must be setted.");
+        ANSR_LOGW("Create calendar reminder fail: dateTime must be setted.");
         return nullptr;
     }
 
@@ -454,30 +454,30 @@ bool ReminderCommon::CheckCalendarParams(const int32_t &year, const int32_t &mon
     const int32_t &hour, const int32_t &min)
 {
     if (year < 0 || year > UINT16_MAX) {
-        ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [0, %{public}u]",
+        ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [0, %{public}hu]",
             ReminderAgentNapi::CALENDAR_YEAR, UINT16_MAX);
         return false;
     }
     if (month < 1 || month > ReminderRequestCalendar::MAX_MONTHS_OF_YEAR) {
-        ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [1, %{public}u]",
+        ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [1, %{public}hhu]",
             ReminderAgentNapi::CALENDAR_MONTH, ReminderRequestCalendar::MAX_MONTHS_OF_YEAR);
         return false;
     }
     uint8_t maxDaysOfMonth = ReminderRequestCalendar::GetDaysOfMonth(static_cast<uint16_t>(year), month);
     if (day < 1 || day > maxDaysOfMonth) {
-        ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [1, %{public}u]",
+        ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [1, %{public}hhu]",
             ReminderAgentNapi::CALENDAR_DAY, maxDaysOfMonth);
         return false;
     }
     uint8_t maxHour = 23;
     if (hour < 0 || hour > maxHour) {
-        ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [0, %{public}u]",
+        ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [0, %{public}hhu]",
             ReminderAgentNapi::CALENDAR_HOUR, maxHour);
         return false;
     }
     uint8_t maxMinute = 59;
     if (min < 0 || min > maxMinute) {
-        ANSR_LOGW("Create calender reminder fail: designated %{public}s must between [0, %{public}u]",
+        ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [0, %{public}hhu]",
             ReminderAgentNapi::CALENDAR_MINUTE, maxMinute);
         return false;
     }
@@ -501,7 +501,7 @@ napi_value ReminderCommon::ParseInt32Array(const napi_env &env, const napi_value
         uint32_t length = 0;
         napi_get_array_length(env, result, &length);
         if (length > maxLen) {
-            ANSR_LOGW("The max length of array of %{public}s is %{public}d.", propertyName, maxLen);
+            ANSR_LOGW("The max length of array of %{public}s is %{public}hhu.", propertyName, maxLen);
             return nullptr;
         }
         napi_valuetype valuetype = napi_undefined;
