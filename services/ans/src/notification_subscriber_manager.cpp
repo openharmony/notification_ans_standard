@@ -63,11 +63,18 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
             ANS_LOGE("Failed to create NotificationSubscribeInfo ptr.");
             return ERR_ANS_NO_MEMORY;
         }
+    }
 
+    if (subInfo->GetAppUserId() == SUBSCRIBE_USER_INIT) {
         int userId = SUBSCRIBE_USER_INIT;
         int callingUid = IPCSkeleton::GetCallingUid();
-        OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
-        ANS_LOGD("AddSubscriber callingUid = <%{public}d> userId = <%{public}d>", callingUid, userId);
+        ErrCode ret = OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
+        if (ret != ERR_OK) {
+            ANS_LOGD("Get userId failed, callingUid = <%{public}d>", callingUid);
+            return ERR_ANS_INVALID_PARAM;
+        }
+
+        ANS_LOGD("Get userId successed, callingUid = <%{public}d> userId = <%{public}d>", callingUid, userId);
         subInfo->AddAppUserId(userId);
     }
 
@@ -222,9 +229,6 @@ void NotificationSubscriberManager::AddRecordInfo(
             record->subscribedAll = false;
         }
         record->userId = subscribeInfo->GetAppUserId();
-        if (record->userId == SUBSCRIBE_USER_INIT) {
-            record->userId = SUBSCRIBE_USER_ALL;
-        }
     } else {
         record->bundleList_.clear();
         record->subscribedAll = true;
@@ -300,15 +304,17 @@ void NotificationSubscriberManager::NotifyConsumedInner(
 {
     ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
     int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
+    int32_t sendUserId = notification->GetUserId();
     for (auto record : subscriberRecordList_) {
         ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
-            (notification->GetUserId() == record->userId ||
-            notification->GetUserId() == SUBSCRIBE_USER_ALL ||
-            recvUserId == record->userId ||
-            IsSystemUser(record->userId))) {
+            (record->userId == sendUserId ||
+            record->userId == SUBSCRIBE_USER_ALL ||
+            record->userId == recvUserId ||
+            IsSystemUser(record->userId) ||  // Delete this, When the systemui subscribe carry the user ID.
+            IsSystemUser(sendUserId))) {
             record->subscriber->OnConsumed(notification, notificationMap);
             record->subscriber->OnConsumed(notification);
         }
@@ -320,15 +326,17 @@ void NotificationSubscriberManager::NotifyCanceledInner(
 {
     ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
     int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
+    int32_t sendUserId = notification->GetUserId();
     for (auto record : subscriberRecordList_) {
         ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
-            (notification->GetUserId() == record->userId ||
-            notification->GetUserId() == SUBSCRIBE_USER_ALL ||
-            recvUserId == record->userId ||
-            IsSystemUser(record->userId))) {
+            (record->userId == sendUserId ||
+            record->userId == SUBSCRIBE_USER_ALL ||
+            record->userId == recvUserId ||
+            IsSystemUser(record->userId) ||   // Delete this, When the systemui subscribe carry the user ID.
+            IsSystemUser(sendUserId))) {
             record->subscriber->OnCanceled(notification, notificationMap, deleteReason);
             record->subscriber->OnCanceled(notification);
         }
