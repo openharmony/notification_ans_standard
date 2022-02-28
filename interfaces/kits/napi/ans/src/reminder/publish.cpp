@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
+#include "reminder/publish.h"
+
 #include "ans_log_wrapper.h"
 #include "common.h"
 #include "reminder_request_alarm.h"
 #include "reminder_request_calendar.h"
 #include "reminder_request_timer.h"
-
-#include "reminder/publish.h"
 
 namespace OHOS {
 namespace ReminderAgentNapi {
@@ -314,29 +314,29 @@ void ParseReminderCalendar(const napi_env &env, ReminderRequest &reminder, napi_
 {
     // dateTime
     napi_value value = nullptr;
-    ReminderRequestCalendar& calender = (ReminderRequestCalendar&)reminder;
+    ReminderRequestCalendar& calendar = (ReminderRequestCalendar&)reminder;
     napi_value dateTime = nullptr;
     napi_create_object(env, &dateTime);
     napi_set_named_property(env, result, CALENDAR_DATE_TIME, dateTime);
 
-    napi_create_uint32(env, static_cast<uint32_t>(calender.GetYear()), &value);
+    napi_create_uint32(env, static_cast<uint32_t>(calendar.GetYear()), &value);
     napi_set_named_property(env, dateTime, CALENDAR_YEAR, value);
-    napi_create_uint32(env, static_cast<uint32_t>(calender.GetMonth()), &value);
+    napi_create_uint32(env, static_cast<uint32_t>(calendar.GetMonth()), &value);
     napi_set_named_property(env, dateTime, CALENDAR_MONTH, value);
-    napi_create_uint32(env, static_cast<uint32_t>(calender.GetDay()), &value);
+    napi_create_uint32(env, static_cast<uint32_t>(calendar.GetDay()), &value);
     napi_set_named_property(env, dateTime, CALENDAR_DAY, value);
-    napi_create_uint32(env, static_cast<uint32_t>(calender.GetHour()), &value);
+    napi_create_uint32(env, static_cast<uint32_t>(calendar.GetHour()), &value);
     napi_set_named_property(env, dateTime, CALENDAR_HOUR, value);
-    napi_create_uint32(env, static_cast<uint32_t>(calender.GetMinute()), &value);
+    napi_create_uint32(env, static_cast<uint32_t>(calendar.GetMinute()), &value);
     napi_set_named_property(env, dateTime, CALENDAR_MINUTE, value);
-    napi_create_uint32(env, static_cast<uint32_t>(calender.GetSecond()), &value);
+    napi_create_uint32(env, static_cast<uint32_t>(calendar.GetSecond()), &value);
     napi_set_named_property(env, dateTime, CALENDAR_SECOND, value);
 
     // repeatMonths
     napi_create_array(env, &value);
     napi_set_named_property(env, result, CALENDAR_REPEAT_MONTHS, value);
     int count = 0;
-    for (auto month : calender.GetRepeatMonths()) {
+    for (auto month : calendar.GetRepeatMonths()) {
         napi_value napiDay = nullptr;
         napi_create_int32(env, month, &napiDay);
         napi_set_element(env, value, count, napiDay);
@@ -347,7 +347,7 @@ void ParseReminderCalendar(const napi_env &env, ReminderRequest &reminder, napi_
     napi_create_array(env, &value);
     napi_set_named_property(env, result, CALENDAR_REPEAT_DAYS, value);
     count = 0;
-    for (auto day : calender.GetRepeatDays()) {
+    for (auto day : calendar.GetRepeatDays()) {
         napi_value napiDay = nullptr;
         napi_create_int32(env, day, &napiDay);
         napi_set_element(env, value, count, napiDay);

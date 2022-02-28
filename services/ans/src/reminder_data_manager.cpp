@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "reminder_data_manager.h"
+
 #include "ans_log_wrapper.h"
 #include "ans_const_define.h"
 #include "common_event_support.h"
@@ -20,8 +22,6 @@
 #include "reminder_event_manager.h"
 #include "time_service_client.h"
 #include "singleton.h"
-
-#include "reminder_data_manager.h"
 
 namespace OHOS {
 namespace Notification {
@@ -390,14 +390,14 @@ void ReminderDataManager::TerminateAlerting(const uint16_t waitInSecond, const s
 
 void ReminderDataManager::TerminateAlerting(const sptr<ReminderRequest> &reminder, const std::string &reason)
 {
-    ANSR_LOGI("Terminate the alerting reminder, %{public}s, called by %{public}s",
-        reminder->Dump().c_str(), reason.c_str());
-    StopAlertingReminder(reminder);
-
     if (reminder == nullptr) {
         ANSR_LOGE("TerminateAlerting illegal.");
         return;
     }
+    ANSR_LOGI("Terminate the alerting reminder, %{public}s, called by %{public}s",
+        reminder->Dump().c_str(), reason.c_str());
+    StopAlertingReminder(reminder);
+
     if (!reminder->OnTerminate()) {
         return;
     }
@@ -531,7 +531,7 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         reminder->OnShow(false, isSysTimeChanged, false);
         return;
     }
-    if (isNeedToPlaySound) {  // todo if shouldAlert
+    if (isNeedToPlaySound) {
         PlaySoundAndVibration(reminder);  // play sound and vibration
         reminder->OnShow(true, isSysTimeChanged, true);
         if (needScheduleTimeout) {
@@ -832,7 +832,7 @@ bool ReminderDataManager::IsBelongToSameApp(
 
 void ReminderDataManager::PlaySoundAndVibrationLocked(const sptr<ReminderRequest> &reminder)
 {
-    std::lock_guard<std::mutex> lock(ReminderDataManager::ALERT_MUTEX);  // todo check died lock
+    std::lock_guard<std::mutex> lock(ReminderDataManager::ALERT_MUTEX);
     PlaySoundAndVibration(reminder);
 }
 

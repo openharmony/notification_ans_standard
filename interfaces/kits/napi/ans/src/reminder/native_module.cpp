@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#include "reminder/native_module.h"
+
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "reminder/publish.h"
 #include "slot.h"
-
-#include "reminder/native_module.h"
 
 namespace OHOS {
 namespace ReminderAgentNapi {
