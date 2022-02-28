@@ -21,6 +21,7 @@
 
 #include "ability_context.h"
 #include "ability_info.h"
+#include "accesstoken_kit.h"
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
@@ -386,7 +387,11 @@ ErrCode AdvancedNotificationService::PublishPreparedNotification(
     ANS_LOGI("PublishPreparedNotification");
     auto record = std::make_shared<NotificationRecord>();
     record->request = request;
-    record->notification = new Notification(request);
+    record->notification = new (std::nothrow) Notification(request);
+    if (record->notification == nullptr) {
+        ANS_LOGE("Failed to create notification.");
+        return ERR_ANS_NO_MEMORY;
+    }
     record->bundleOption = bundleOption;
     SetNotificationRemindType(record->notification, true);
 
@@ -1701,10 +1706,18 @@ ErrCode AdvancedNotificationService::CancelContinuousTaskNotification(const std:
 ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &reminder)
 {
     ANSR_LOGI("Publish reminder");
+    Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
+    ErrCode result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(
+        callerToken, "ohos.permission.PUBLISH_AGENT_REMINDER");
+    if (result != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+        ANSR_LOGW("Permission denied: ohos.permission.PUBLISH_AGENT_REMINDER");
+        return result;
+    }
+
     ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationRequest> notificationRequest = reminder->GetNotificationRequest();
     sptr<NotificationBundleOption> bundleOption = nullptr;
-    ErrCode result = PrepareNotificationInfo(notificationRequest, bundleOption);
+    result = PrepareNotificationInfo(notificationRequest, bundleOption);
     if (result != ERR_OK) {
         ANSR_LOGW("PrepareNotificationInfo fail");
         return result;

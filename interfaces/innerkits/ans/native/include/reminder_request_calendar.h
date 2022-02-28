@@ -174,8 +174,8 @@ private:
     uint8_t hour_ {1};
     uint8_t minute_ {1};
     uint8_t second_ {0};
-    uint16_t repeatMonth_;
-    uint32_t repeatDay_;
+    uint16_t repeatMonth_ {0};
+    uint32_t repeatDay_ {0};
 };
 }
 }
