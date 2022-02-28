@@ -189,6 +189,28 @@ declare namespace reminderAgent {
   }
 
   /**
+   * Max screen want agent information.
+   *
+   * @since 7
+   * @syscap SystemCapability.Notification.ReminderAgent
+   */
+  interface MaxScreenWantAgent {
+    /**
+     * Name of the package that is automatically started when the reminder arrives and the device is not in use.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    pkgName: string;
+
+    /**
+     * Name of the ability that is automatically started when the reminder arrives and the device is not in use.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    abilityName: string;
+  }
+
+  /**
    * Reminder Common information.
    *
    * @since 7
@@ -218,6 +240,35 @@ declare namespace reminderAgent {
     wantAgent?: WantAgent;
 
     /**
+     * Information about the ability that is automatically started when the reminder arrives.
+     * If the device is in use, a notification will be displayed.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent
+     */
+    maxScreenWantAgent?: MaxScreenWantAgent;
+
+    /**
+     * Ringing duration.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    ringDuration?: number;
+
+    /**
+     * Number of reminder snooze times.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    snoozeTimes?: number;
+
+    /**
+     * Reminder snooze interval.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    timeInterval?: number;
+
+    /**
      * Reminder title.
      * @since 7
      * @syscap SystemCapability.Notification.ReminderAgent
@@ -232,11 +283,18 @@ declare namespace reminderAgent {
     content?: string;
 
     /**
-     * Content to be displayed when the reminder is snoozing.
+     * Content to be displayed when the reminder is expired.
      * @since 7
      * @syscap SystemCapability.Notification.ReminderAgent
      */
     expiredContent?: string;
+
+    /**
+     * Content to be displayed when the reminder is snoozing.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    snoozeContent?: string;
 
     /**
      * notification id. If there are reminders with the same ID, the later one will overwrite the earlier one.
@@ -251,6 +309,29 @@ declare namespace reminderAgent {
      * @syscap SystemCapability.Notification.ReminderAgent
      */
     slotType?: notification.SlotType;
+  }
+
+  interface ReminderRequestCalendar extends ReminderRequest {
+    /**
+     * Reminder time.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    dateTime: LocalDateTime;
+
+    /**
+     * Month in which the reminder repeats.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    repeatMonths?: Array<number>;
+
+    /**
+     * Date on which the reminder repeats.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    repeatDays?: Array<number>;
   }
 
   /**
@@ -290,6 +371,43 @@ declare namespace reminderAgent {
    */
   interface ReminderRequestTimer extends ReminderRequest {
     triggerTimeInSeconds: number;
+  }
+
+  interface LocalDateTime {
+    /**
+     * value of year.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    year: number;
+
+    /**
+     * value of month.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    month: number;
+
+    /**
+     * value of day.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    day: number;
+
+    /**
+     * value of hour.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    hour: number;
+
+    /**
+     * value of minute.
+     * @since 7
+     * @syscap SystemCapability.Notification.ReminderAgent.
+     */
+    minute: number;
   }
 }
 export default reminderAgent;
