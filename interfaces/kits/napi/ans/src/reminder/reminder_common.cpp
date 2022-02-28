@@ -454,7 +454,7 @@ bool ReminderCommon::CheckCalendarParams(const int32_t &year, const int32_t &mon
     const int32_t &hour, const int32_t &min)
 {
     if (year < 0 || year > UINT16_MAX) {
-        ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [0, %{public}hu]",
+        ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [0, %{public}d]",
             ReminderAgentNapi::CALENDAR_YEAR, UINT16_MAX);
         return false;
     }
