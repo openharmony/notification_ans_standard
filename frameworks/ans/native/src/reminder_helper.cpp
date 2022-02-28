@@ -48,13 +48,13 @@ ErrCode ReminderHelper::GetValidReminders(std::vector<sptr<ReminderRequest>> &va
     return DelayedSingleton<AnsNotification>::GetInstance()->GetValidReminders(validReminders);
 }
 
-ErrCode AddNotificationSlot(const NotificationSlot &slot)
+ErrCode ReminderHelper::AddNotificationSlot(const NotificationSlot &slot)
 {
     ANSR_LOGI("AddNotificationSlot start");
     return DelayedSingleton<AnsNotification>::GetInstance()->AddNotificationSlot(slot);
 }
 
-ErrCode RemoveNotificationSlot(const NotificationConstant::SlotType &slotType)
+ErrCode ReminderHelper::RemoveNotificationSlot(const NotificationConstant::SlotType &slotType)
 {
     ANSR_LOGI("RemoveNotificationSlot start");
     return DelayedSingleton<AnsNotification>::GetInstance()->RemoveNotificationSlot(slotType);
