@@ -364,8 +364,9 @@ bool ReminderRequest::OnTerminate()
 bool ReminderRequest::OnTimeZoneChange()
 {
     time_t oldZoneTriggerTime = static_cast<time_t>(triggerTimeInMilli_ / MILLI_SECONDS);
-    struct tm *oriTime = gmtime(&oldZoneTriggerTime);
-    time_t newZoneTriggerTime = mktime(oriTime);
+    struct tm oriTime;
+    (void)gmtime_r(&oldZoneTriggerTime, &oriTime);
+    time_t newZoneTriggerTime = mktime(&oriTime);
     uint64_t nextTriggerTime = PreGetNextTriggerTimeIgnoreSnooze(true, false);
     return HandleTimeZoneChange(
         triggerTimeInMilli_, GetDurationSinceEpochInMilli(newZoneTriggerTime), nextTriggerTime);
@@ -916,23 +917,20 @@ std::string ReminderRequest::GetTimeInfoInner(const time_t &timeInSecond, const 
 {
     uint8_t dateTimeLen = 80;
     char dateTimeBuffer[dateTimeLen];
-    struct tm *timeInfo = localtime(&timeInSecond);
-    if (timeInfo == nullptr) {
-        ANSR_LOGW("GetTimeInfoInner fail.");
-    } else {
-        switch (format) {
-            case TimeFormat::YMDHMS: {
-                (void)strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", timeInfo);
-                break;
-            }
-            case TimeFormat::HM: {
-                (void)strftime(dateTimeBuffer, dateTimeLen, "%H:%M", timeInfo);
-                break;
-            }
-            default: {
-                ANSR_LOGW("Time format not support.");
-                break;
-            }
+    struct tm timeInfo;
+    (void)localtime_r(&timeInSecond, &timeInfo);
+    switch (format) {
+        case TimeFormat::YMDHMS: {
+            (void)strftime(dateTimeBuffer, dateTimeLen, "%Y-%m-%d %H:%M:%S", &timeInfo);
+            break;
+        }
+        case TimeFormat::HM: {
+            (void)strftime(dateTimeBuffer, dateTimeLen, "%H:%M", &timeInfo);
+            break;
+        }
+        default: {
+            ANSR_LOGW("Time format not support.");
+            break;
         }
     }
     std::string dateTimeInfo(dateTimeBuffer);
