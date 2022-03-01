@@ -53,7 +53,7 @@ public:
     /**
      * Cancels a specified reminder.
      *
-     * @param reminderId Indicates the ID of the reminder instace to cancel.
+     * @param reminderId Indicates the ID of the reminder instance to cancel.
      * @return Returns cancel reminder result.
      */
     static ErrCode CancelReminder(const int32_t reminderId);
@@ -69,7 +69,7 @@ public:
      * Obtains all valid reminder notifications set by the current application, namely, the reminders that will
      * still be triggered later. If a reminder will never be triggered again, it is not considered a valid reminder.
      *
-     * @param[out] validReminders Indicates an initial vector to recieve the result.
+     * @param[out] validReminders Indicates an initial vector to receive the result.
      * @return Returns an array list containing all valid reminder notifications set by the current application.
      */
     static ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &validReminders);

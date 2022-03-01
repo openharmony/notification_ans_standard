@@ -2302,7 +2302,7 @@ ErrCode AnsManagerProxy::GetValidReminders(std::vector<sptr<ReminderRequest>> &r
         ANSR_LOGE("[GetValidReminders] fail: read reminder count failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
-    ANSR_LOGD("[GetValidReminders] count=%{public}u", count);
+    ANSR_LOGD("[GetValidReminders] count=%{public}hhu", count);
     reminders.clear();
     result = ReadReminders(count, reply, reminders);
     if (result != ERR_OK) {
