@@ -2388,15 +2388,18 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (!IsSystemApp()) {
+        ANS_LOGW("Not system app!");
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
     if (!CheckPermission(GetClientBundleName())) {
+        ANS_LOGW("Check permission denied!");
         return ERR_ANS_PERMISSION_DENIED;
     }
 
     int userId = SUBSCRIBE_USER_INIT;
     if (!GetActiveUserId(userId)) {
+        ANS_LOGW("No active user found!");
         return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
@@ -3096,7 +3099,9 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(const int32_t &userId,
 ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &userId,
     const sptr<NotificationDoNotDisturbDate> &date)
 {
+    ANS_LOGD("%{public}s enter, userId = %{public}d", __FUNCTION__, userId);
     if (date == nullptr) {
+        ANS_LOGE("Invalid date param");
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -3104,7 +3109,6 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
 
     int64_t beginDate = ResetSeconds(date->GetBeginDate());
     int64_t endDate = ResetSeconds(date->GetEndDate());
-
     switch (date->GetDoNotDisturbType()) {
         case NotificationConstant::DoNotDisturbType::NONE:
             beginDate = 0;
@@ -3121,7 +3125,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
         default:
             break;
     }
-
+    ANS_LOGD("Before set SetDoNotDisturbDate beginDate = %{public}lld, endDate = %{public}lld", beginDate, endDate);
     const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
         date->GetDoNotDisturbType(),
         beginDate,
@@ -3130,6 +3134,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
 
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
+        ANS_LOGE("Generate invalid bundle option!");
         return ERR_ANS_INVALID_BUNDLE;
     }
 
