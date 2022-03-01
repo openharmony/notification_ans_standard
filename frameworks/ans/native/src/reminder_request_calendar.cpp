@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "ans_log_wrapper.h"
-
 #include "reminder_request_calendar.h"
+
+#include "ans_log_wrapper.h"
 
 namespace OHOS {
 namespace Notification {
@@ -29,7 +29,7 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
     const std::vector<uint8_t> &repeatMonths, const std::vector<uint8_t> &repeatDays)
     : ReminderRequest(ReminderRequest::ReminderType::CALENDAR)
 {
-    // 1. record the infomation which designated by user at first time.
+    // 1. record the information which designated by user at first time.
     firstDesignateYear_ = GetActualTime(TimeTransferType::YEAR, dateTime.tm_year);
     firstDesignateMonth_ = GetActualTime(TimeTransferType::MONTH, dateTime.tm_mon);
     firstDesignateDay_ = dateTime.tm_mday;
@@ -51,7 +51,7 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
             "Not exist next trigger time, please check the param of ReminderRequestCalendar constructor.");
     }
 
-    // 2. set the time infomation (used to transfer to proxy service) which is decided to trigger firstly.
+    // 2. set the time information (used to transfer to proxy service) which is decided to trigger firstly.
     year_ = GetActualTime(TimeTransferType::YEAR, dateTime_.tm_year);
     month_ = GetActualTime(TimeTransferType::MONTH, dateTime_.tm_mon);
     day_ = dateTime_.tm_mday;
@@ -191,7 +191,7 @@ uint64_t ReminderRequestCalendar::GetNextTriggerTimeAsRepeatReminder(const tm &n
     }
     if ((triggerTimeInMilli = GetTimeInstantMilli(setYear, setMonth, setDay, hour_, minute_, second_))
         != INVALID_LONG_LONG_VALUE) {
-        ANSR_LOGD("Next calendar time:%{public}u/%{public}u/%{public}u %{public}u:%{public}u:%{public}u",
+        ANSR_LOGD("Next calendar time:%{public}hu/%{public}hhu/%{public}hhu %{public}hhu:%{public}hhu:%{public}hhu",
             setYear, setMonth, setDay, hour_, minute_, second_);
     }
     return triggerTimeInMilli;
@@ -284,7 +284,7 @@ void ReminderRequestCalendar::SetMonth(const uint8_t &month, const bool &isSet)
 void ReminderRequestCalendar::SetRepeatMonths(const std::vector<uint8_t> &repeatMonths)
 {
     if (repeatMonths.size() > MAX_MONTHS_OF_YEAR) {
-        ANSR_LOGW("The length of repeat months array should not larger than %{public}u", MAX_MONTHS_OF_YEAR);
+        ANSR_LOGW("The length of repeat months array should not larger than %{public}hhu", MAX_MONTHS_OF_YEAR);
         throw std::invalid_argument(
             "The length of repeat months array should not larger than " + std::to_string(MAX_MONTHS_OF_YEAR));
     }
@@ -297,7 +297,7 @@ void ReminderRequestCalendar::SetRepeatMonths(const std::vector<uint8_t> &repeat
 void ReminderRequestCalendar::SetRepeatDaysOfMonth(const std::vector<uint8_t> &repeateDays)
 {
     if (repeateDays.size() > MAX_DAYS_OF_MONTH) {
-        ANSR_LOGW("The length of repeat days array should not larger than %{public}u", MAX_DAYS_OF_MONTH);
+        ANSR_LOGW("The length of repeat days array should not larger than %{public}hhu", MAX_DAYS_OF_MONTH);
         throw std::invalid_argument(
             "The length of repeat days array should not larger than " + std::to_string(MAX_DAYS_OF_MONTH));
     }

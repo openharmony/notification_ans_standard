@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,7 @@ public:
      */
     enum class ActionButtonType : uint8_t {
         /**
-         * @brief Indicates that this action button is used to close reminder's notfication.
+         * @brief Indicates that this action button is used to close reminder's notification.
          * It always works well, whether the application is running at the time.
          *
          */
@@ -343,7 +343,7 @@ public:
      *
      * 1) Updates the trigger time to the next one.
      * 2) Updates the notification content for "Snooze".
-     * 3) Switchs the state from "Showing[, Alerting]" to "Snooze".
+     * 3) Switches the state from "Showing[, Alerting]" to "Snooze".
      */
     bool OnSnooze();
 
@@ -432,7 +432,7 @@ public:
     /**
      * @brief Sets the ringing or vibration duration for this reminder, in seconds.
      *
-     * @param ringDurationInSeconds Indicates the duration. The defautl is 1 second.
+     * @param ringDurationInSeconds Indicates the duration. The default is 1 second.
      * @return Current reminder self.
      */
     ReminderRequest& SetRingDuration(const uint64_t ringDurationInSeconds);
@@ -514,7 +514,7 @@ public:
     virtual bool UpdateNextReminder();
 
     /**
-     * @brief Update notification attibutes.
+     * @brief Update notification attributes.
      *
      * Some attributes need to be updated after the reminder published or before the notification publish.
      * For example, action button should not init until the reminder is published successfully, as the reminder id is
