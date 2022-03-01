@@ -169,7 +169,7 @@ HWTEST_F(DistributedDatabaseTest, GetLocalDeviceId_00100, Function | SmallTest |
 /**
  * @tc.name      : DistributedDatabase_GetLocalDeviceInfo_00100
  * @tc.number    : GetLocalDeviceInfo_00100
- * @tc.desc      : Get local device infomation.
+ * @tc.desc      : Get local device information.
  */
 HWTEST_F(DistributedDatabaseTest, GetLocalDeviceInfo_00100, Function | SmallTest | Level1)
 {
