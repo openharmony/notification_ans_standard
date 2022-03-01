@@ -1625,6 +1625,10 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
     if (uid != SYSTEM_SERVICE_UID) {
         return ERR_ANS_NOT_SYSTEM_SERVICE;
     }
+    int userId = SUBSCRIBE_USER_INIT;
+    OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+    request->SetCreatorUserId(userId);
+    ANS_LOGD("%{public}s, uid=%{public}d userId=%{public}d", __FUNCTION__, uid, userId);
 
     if (request->GetCreatorBundleName().empty()) {
         request->SetCreatorBundleName(FOUNDATION_BUNDLE_NAME);
