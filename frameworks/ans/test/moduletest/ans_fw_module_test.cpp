@@ -28,6 +28,7 @@
 #include "ans_manager_proxy.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "datetime_ex.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "mock_ipc_skeleton.h"
@@ -63,6 +64,7 @@ const std::string KVSTORE_PREFERENCES_STORE_ID = "distributed_preferences";
 const std::string KVSTORE_SCREEN_STATUS_STORE_ID = "distributed_screen_status";
 
 constexpr int UID = 1;
+constexpr int USER_ID = 0;
 constexpr int CANCEL_REASON_DELETE = 2;
 constexpr int APP_CANCEL_REASON_DELETE = 8;
 constexpr int APP_CANCEL_ALL_REASON_DELETE = 9;
@@ -472,7 +474,9 @@ public:
 
     void Parse(std::list<std::shared_ptr<SubscriberEvent>> events)
     {
+        GTEST_LOG_(INFO) << "TestAnsSubscriber::Parse event size=" << events.size();
         for (auto event : events) {
+            GTEST_LOG_(INFO) << "TestAnsSubscriber::Parse event type=" << static_cast<int>(event->GetType());
             if (event->GetType() == SubscriberEventType::ON_SUBSCRIBERESULT) {
                 waitOnSubscriber_ = true;
             } else if (event->GetType() == SubscriberEventType::ON_CONSUMED) {
@@ -670,7 +674,8 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | L
         int32_t notificationIdInt = i;
         if (i < MAX_ACTIVE_NUM_PERSECOND) {
             std::stringstream stream;
-            stream << KEY_SPLITER << UID << KEY_SPLITER << notificationLabel << KEY_SPLITER << notificationIdInt;
+            stream << KEY_SPLITER << USER_ID << KEY_SPLITER << UID << KEY_SPLITER
+                << notificationLabel << KEY_SPLITER << notificationIdInt;
             std::string notificationKey = stream.str();
             NotificationSorting sorting;
             EXPECT_EQ(eventParser.GetOnConsumedReq()[i]->GetLabel().c_str(), notificationLabel);
@@ -726,7 +731,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00100, Function | M
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
     std::stringstream stream;
-    stream << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
+    stream << KEY_SPLITER << USER_ID << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
     std::string notificationKey = stream.str();
     NotificationSorting sorting;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey);
@@ -816,7 +821,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00100, Function | Medium
     eventParser.Parse(events);
     EXPECT_TRUE(eventParser.GetWaitOnConsumed());
     SleepForFC();
-    EXPECT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
+    EXPECT_EQ(NotificationHelper::RemoveNotifications(USER_ID), ERR_OK);
     std::vector<sptr<Notification>> notifications;
     EXPECT_EQ(NotificationHelper::GetAllActiveNotifications(notifications), ERR_OK);
     EXPECT_EQ((int)notifications.size(), (int)0);
@@ -999,7 +1004,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelNotificationById_00100, Function | Med
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 1);
     std::stringstream stream;
-    stream << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 1;
+    stream << KEY_SPLITER << USER_ID << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 1;
     std::string notificationKey = stream.str();
     NotificationSorting sorting;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey);
@@ -1094,7 +1099,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelAllNotifications_00100, Function | Med
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetLabel().c_str(), NOTIFICATION_LABEL_0);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[0]->GetId(), 0);
     std::stringstream stream0;
-    stream0 << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
+    stream0 << KEY_SPLITER << USER_ID << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_0 << KEY_SPLITER << 0;
     std::string notificationKey0 = stream0.str();
     NotificationSorting sorting0;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[0]->GetKey(), notificationKey0);
@@ -1106,7 +1111,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_CancelAllNotifications_00100, Function | Med
     EXPECT_EQ(eventParser.GetOnConsumedReq()[1]->GetLabel().c_str(), NOTIFICATION_LABEL_1);
     EXPECT_EQ(eventParser.GetOnConsumedReq()[1]->GetId(), 1);
     std::stringstream stream1;
-    stream1 << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_1 << KEY_SPLITER << 1;
+    stream1 << KEY_SPLITER << USER_ID << KEY_SPLITER << UID << KEY_SPLITER << NOTIFICATION_LABEL_1 << KEY_SPLITER << 1;
     std::string notificationKey1 = stream1.str();
     NotificationSorting sorting1;
     EXPECT_EQ(eventParser.GetOnCanceledReq()[1]->GetKey(), notificationKey1);
@@ -1787,7 +1792,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Publish_00300, Function | Medi
     ASSERT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
     ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
     DistributedKv::Entry outEntry;
-    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), false);
+    ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
     AppExecFwk::MockSetDistributedNotificationEnabled(true);
     SleepForFC();
 }
@@ -1910,7 +1915,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Remove_00200, Function | Mediu
     ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
     ASSERT_EQ(GetRequestInDistributedEntryList(request, entries, outEntry), true);
 
-    ASSERT_EQ(NotificationHelper::RemoveNotifications(), ERR_OK);
+    ASSERT_EQ(NotificationHelper::RemoveNotifications(USER_ID), ERR_OK);
     ASSERT_EQ(pointer->GetEntries(DistributedKv::Key(""), entries), DistributedKv::Status::SUCCESS);
     ASSERT_EQ(entries.size(), std::size_t(0));
     SleepForFC();
@@ -1979,7 +1984,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00100, Function | Me
 
     EventParser parser1;
     parser1.Parse(subscriber.GetEvents());
-    auto notificationList = parser1.GetOnConsumedReq();
+    auto notificationList = parser1.GetOnConsumedWithSortingMapReq();
     EXPECT_NE(notificationList.size(), std::size_t(0));
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
@@ -1990,7 +1995,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00100, Function | Me
 
     EventParser parser2;
     parser2.Parse(subscriber.GetEvents());
-    notificationList = parser2.GetOnConsumedReq();
+    notificationList = parser2.GetOnConsumedWithSortingMapReq();
     EXPECT_NE(notificationList.size(), std::size_t(0));
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
     subscriber.ClearEvents();
@@ -2040,7 +2045,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00200, Function | Me
 
     EventParser parser1;
     parser1.Parse(subscriber.GetEvents());
-    auto notificationList = parser1.GetOnConsumedReq();
+    auto notificationList = parser1.GetOnConsumedWithSortingMapReq();
     EXPECT_NE(notificationList.size(), std::size_t(0));
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
@@ -2114,12 +2119,12 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00100, Function | MediumTest | Lev
 
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
-
     EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    SleepForFC();
 
     EventParser parser;
     parser.Parse(subscriber.GetEvents());
-    auto notificationList = parser.GetOnConsumedReq();
+    auto notificationList = parser.GetOnConsumedWithSortingMapReq();
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
     EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND);
@@ -2145,12 +2150,12 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00200, Function | MediumTest | Lev
 
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
-
     EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    SleepForFC();
 
     EventParser parser;
     parser.Parse(subscriber.GetEvents());
-    auto notificationList = parser.GetOnConsumedReq();
+    auto notificationList = parser.GetOnConsumedWithSortingMapReq();
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
     EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND);
@@ -2176,12 +2181,12 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00300, Function | MediumTest | Lev
 
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
-
     EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    SleepForFC();
 
     EventParser parser;
     parser.Parse(subscriber.GetEvents());
-    auto notificationList = parser.GetOnConsumedReq();
+    auto notificationList = parser.GetOnConsumedWithSortingMapReq();
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
     EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_IDLE_REMIND);
@@ -2207,12 +2212,12 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00400, Function | MediumTest | Lev
 
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
-
     EXPECT_EQ(NotificationHelper::PublishNotification(request), ERR_OK);
+    SleepForFC();
 
     EventParser parser;
     parser.Parse(subscriber.GetEvents());
-    auto notificationList = parser.GetOnConsumedReq();
+    auto notificationList = parser.GetOnConsumedWithSortingMapReq();
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
     EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_IDLE_DONOT_REMIND);
@@ -2241,21 +2246,23 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00500, Function | MediumTest | Lev
 
     PublishCommonEventScreenStatus(true);
 
-    TestAnsSubscriber subscriber;
-    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
     DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
-    DistributedKv::StoreId storeId = {.storeId = KVSTORE_SCREEN_STATUS_STORE_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
     std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
         DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
 
     DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
     DistributedKv::Value value(jsonString);
     pointer->InsertDataToDoCallback(key, value);
     SleepForFC();
+    SleepForFC();
 
     EventParser parser;
     parser.Parse(subscriber.GetEvents());
-    auto notificationList = parser.GetOnConsumedReq();
+    auto notificationList = parser.GetOnConsumedWithSortingMapReq();
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
     EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_ACTIVE_REMIND);
@@ -2284,12 +2291,13 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00600, Function | MediumTest | Lev
 
     PublishCommonEventScreenStatus(false);
 
-    TestAnsSubscriber subscriber;
-    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
     DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
-    DistributedKv::StoreId storeId = {.storeId = KVSTORE_SCREEN_STATUS_STORE_ID};
+    DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
     std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
         DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
+
+    TestAnsSubscriber subscriber;
+    EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
 
     DistributedKv::Key key(GenerateDistributedKey(request, REMOTE_DEVICE_ID));
     DistributedKv::Value value(jsonString);
@@ -2298,7 +2306,7 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00600, Function | MediumTest | Lev
 
     EventParser parser;
     parser.Parse(subscriber.GetEvents());
-    auto notificationList = parser.GetOnConsumedReq();
+    auto notificationList = parser.GetOnConsumedWithSortingMapReq();
     std::shared_ptr<Notification> outNotification;
     EXPECT_EQ(GetRequestInNotificationList(request, notificationList, outNotification), true);
     EXPECT_EQ(outNotification->GetRemindType(), NotificationConstant::RemindType::DEVICE_IDLE_DONOT_REMIND);
@@ -2314,7 +2322,11 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07100, Function
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
+    req.SetContent(content);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
     SleepForFC();
@@ -2349,7 +2361,11 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07200, Function
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
+    req.SetContent(content);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
     SleepForFC();
@@ -2386,7 +2402,11 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07300, Function
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
+    req.SetContent(content);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
     SleepForFC();
@@ -2419,7 +2439,10 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07300, Function
 
 HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07400, Function | MediumTest | Level1)
 {
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
+    req.SetContent(content);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
 }
@@ -2466,7 +2489,10 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07600, Function
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
 
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
+    req.SetContent(content);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
 
@@ -2492,7 +2518,11 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07700, Function
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
+    req.SetContent(content);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
     SleepForFC();
@@ -2530,7 +2560,11 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07800, Function
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
     EXPECT_EQ(NotificationHelper::SubscribeNotification(subscriber), ERR_OK);
+
+    std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
     NotificationRequest req(0);
+    req.SetContent(content);
     req.SetLabel(NOTIFICATION_LABEL_0);
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), ERR_OK);
     SleepForFC();
