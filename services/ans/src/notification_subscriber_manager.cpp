@@ -306,8 +306,9 @@ void NotificationSubscriberManager::NotifyConsumedInner(
     int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
     int32_t sendUserId = notification->GetUserId();
     for (auto record : subscriberRecordList_) {
-        ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
         auto BundleNames = notification->GetBundleName();
+        ANS_LOGD("%{public}s record->userId = <%{public}d> BundleName  = <%{public}s",
+            __FUNCTION__, record->userId, BundleNames.c_str());
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
             (record->userId == sendUserId ||
