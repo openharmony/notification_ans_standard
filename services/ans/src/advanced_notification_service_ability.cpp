@@ -38,9 +38,7 @@ void AdvancedNotificationServiceAbility::OnStart()
     if (!Publish(service_)) {
         return;
     }
-    ANSR_LOGD("~~~~derek AdvancedNotificationServiceAbility onStart");
     reminderAgent_ = ReminderDataManager::InitInstance(service_);
-    // reminderAgent_->SetService(static_cast<AdvancedNotificationService*>(service_.GetRefPtr()));
 }
 
 void AdvancedNotificationServiceAbility::OnStop()

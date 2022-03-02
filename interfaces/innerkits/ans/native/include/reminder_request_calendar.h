@@ -176,10 +176,12 @@ private:
     uint8_t GetNextDay(const uint16_t &settedYear, const uint8_t &settedMonth, const tm &now, const tm &target) const;
     uint64_t GetNextTriggerTime() const;
     uint64_t GetNextTriggerTimeAsRepeatReminder(const tm &nowTime, const tm &tarTime) const;
-    uint32_t GetRepeatDay() const {
+    uint32_t GetRepeatDay() const
+    {
         return repeatDay_;
     }
-    uint16_t GetRepeatMonth() const {
+    uint16_t GetRepeatMonth() const
+    {
         return repeatMonth_;
     }
     uint64_t GetTimeInstantMilli(
