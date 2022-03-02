@@ -22,13 +22,16 @@
 #include "advanced_notification_service.h"
 #include "player.h"
 #include "reminder_request.h"
+#include "reminder_store.h"
 #include "reminder_timer_info.h"
 
 namespace OHOS {
 namespace Notification {
 class ReminderDataManager final {
 public:
-    ReminderDataManager() {};
+    ReminderDataManager() {
+        Init(false);
+    };
     ~ReminderDataManager() {};
 
     ReminderDataManager(ReminderDataManager &other) = delete;
@@ -72,6 +75,8 @@ public:
      * @return Single instance of ReminderDataManager.
      */
     static std::shared_ptr<ReminderDataManager> GetInstance();
+    static std::shared_ptr<ReminderDataManager> InitInstance(
+        sptr<AdvancedNotificationService> &advancedNotificationService);
 
     /**
      * Obtains all the valid reminders (which are not expired) relative to the bundle option.
@@ -81,6 +86,15 @@ public:
      */
     void GetValidReminders(
         const sptr<NotificationBundleOption> bundleOption, std::vector<sptr<ReminderRequest>> &reminders);
+
+    /**
+     * @brief Inits and recovery data from database.
+     *
+     * @param isFromBootComplete Indicates the init is called when boot completed.
+     */
+    void Init(bool isFromBootComplete);
+
+    void OnServiceStart();
 
     /**
      * @brief Triggered when third party application died.
@@ -128,6 +142,11 @@ public:
      * @param want Which contains the given reminder.
      */
     void SnoozeReminder(const OHOS::EventFwk::Want &want);
+
+    /**
+     * Starts the recent reminder timing.
+     */
+    void StartRecentReminder();
 
     /**
      * @brief Terminate the alerting reminder.
@@ -187,6 +206,8 @@ private:
      * @return pointer of ReminderTimerInfo.
      */
     std::shared_ptr<ReminderTimerInfo> CreateTimerInfo(TimerType type) const;
+
+    void GetImmediatelyShowRemindersLocked(std::vector<sptr<ReminderRequest>> &reminders) const;
 
     std::string GetSoundUri(const sptr<ReminderRequest> &reminder);
 
@@ -254,6 +275,8 @@ private:
 
     bool HandleSysTimeChange(const sptr<ReminderRequest> reminder) const;
 
+    bool IsReminderAgentReady() const;
+
     /**
      * Judge the two reminders is belong to the same application or not.
      *
@@ -264,6 +287,8 @@ private:
      */
     bool IsBelongToSameApp(
         const sptr<ReminderRequest> reminder, const std::string otherPkgName, const int otherUserId);
+
+    void LoadReminderFromDb();
 
     void PlaySoundAndVibrationLocked(const sptr<ReminderRequest> &reminder);
     void PlaySoundAndVibration(const sptr<ReminderRequest> &reminder);
@@ -320,11 +345,6 @@ private:
         const bool &isNeedToStartNext, const bool &isSysTimeChanged, const bool &needScheduleTimeout);
 
     void SnoozeReminderImpl(sptr<ReminderRequest> &reminder);
-
-    /**
-     * Starts the recent reminder timing.
-     */
-    void StartRecentReminder();
 
     /**
      * Starts timing actually.
@@ -403,6 +423,8 @@ private:
      */
     static const int16_t MAX_NUM_REMINDER_LIMIT_APP;
 
+    bool isReminderAgentReady_ = false;
+
     /**
      * Vector used to record all the reminders in system.
      */
@@ -446,7 +468,8 @@ private:
      * Indicates the total count of reminders in system.
      */
     int16_t totalCount_ {0};
-    AdvancedNotificationService *advancedNotificationService_;
+    sptr<AdvancedNotificationService> advancedNotificationService_ = nullptr;
+    std::shared_ptr<ReminderStore> store_ = nullptr;
 };
 }  // namespace OHOS
 }  // namespace Nofitifcation

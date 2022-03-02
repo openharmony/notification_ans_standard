@@ -21,7 +21,10 @@
 #include "bundle_mgr_interface.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
 using namespace OHOS::EventFwk;
 namespace OHOS {
@@ -38,6 +41,7 @@ void ReminderEventManager::init(std::shared_ptr<ReminderDataManager> &reminderDa
     matchingSkills.AddEvent(ReminderRequest::REMINDER_EVENT_ALERT_TIMEOUT);
     matchingSkills.AddEvent(ReminderRequest::REMINDER_EVENT_CLOSE_ALERT);
     matchingSkills.AddEvent(ReminderRequest::REMINDER_EVENT_SNOOZE_ALERT);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_PACKAGE_RESTARTED);
@@ -53,6 +57,18 @@ void ReminderEventManager::init(std::shared_ptr<ReminderDataManager> &reminderDa
         ANSR_LOGD("SubscribeCommonEvent fail");
     }
     IPCSkeleton::SetCallingIdentity(identity);
+
+    sptr<SystemAbilityStatusChangeListener> statusChangeListener
+        = new SystemAbilityStatusChangeListener(reminderDataManager);
+    sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        ANSR_LOGD("samgrProxy is null");
+        return;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID, statusChangeListener);
+    if (ret != ERR_OK) {
+        ANSR_LOGE("subscribe system ability id: %{public}d failed", BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    }
 }
 
 ReminderEventManager::ReminderEventSubscriber::ReminderEventSubscriber(
@@ -85,6 +101,10 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
     }
     if (action == ReminderRequest::REMINDER_EVENT_REMOVE_NOTIFICATION) {
         reminderDataManager_->CloseReminder(want, false);
+        return;
+    }
+    if (action == CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED) {
+        reminderDataManager_->Init(true);
         return;
     }
     if (action == CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
@@ -145,6 +165,25 @@ sptr<NotificationBundleOption> ReminderEventManager::ReminderEventSubscriber::Ge
         ANSR_LOGE("new NotificationBundleOption fail due to no memory.");
     }
     return bundleOption;
+}
+
+ReminderEventManager::SystemAbilityStatusChangeListener::SystemAbilityStatusChangeListener(
+    std::shared_ptr<ReminderDataManager> &reminderDataManager)
+{
+    reminderDataManager_ = reminderDataManager;
+}
+
+void ReminderEventManager::SystemAbilityStatusChangeListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    ANSR_LOGD("OnAddSystemAbilityInner");
+    reminderDataManager_->OnServiceStart();
+}
+
+void ReminderEventManager::SystemAbilityStatusChangeListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string& deviceId)
+{
+    ANSR_LOGD("OnRemoveSystemAbilityInner");
 }
 }  // namespace OHOS
 }  // namespace Notification

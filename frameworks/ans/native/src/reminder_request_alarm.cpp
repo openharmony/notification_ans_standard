@@ -16,6 +16,7 @@
 #include "reminder_request_alarm.h"
 
 #include "ans_log_wrapper.h"
+#include "reminder_store.h"
 
 namespace OHOS {
 namespace Notification {
@@ -295,6 +296,65 @@ bool ReminderRequestAlarm::ReadFromParcel(Parcel &parcel)
     }
     ANSR_LOGD("hour_=%{public}d, minute_=%{public}d, repeatDays_=%{public}d", hour_, minute_, repeatDays_);
     return true;
+}
+
+void ReminderRequestAlarm::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+{
+    ReminderRequest::RecoveryFromDb(resultSet);
+
+    // repeatDays
+    repeatDays_ =
+        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::REPEAT_DAYS_OF_WEEK, DbRecoveryType::INT));
+
+    // hour
+    hour_ =
+        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::ALARM_HOUR, DbRecoveryType::INT));
+
+    // minute
+    minute_ =
+        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::ALARM_MINUTE, DbRecoveryType::INT));
+}
+
+void ReminderRequestAlarm::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+    const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values)
+{
+    uint8_t repeatDays = 0;
+    uint8_t hour = 0;
+    uint8_t minute = 0;
+    if (reminder->GetReminderType() == ReminderRequest::ReminderType::ALARM) {
+        ReminderRequestAlarm* alarm = static_cast<ReminderRequestAlarm*>(reminder.GetRefPtr());
+        repeatDays = alarm->GetRepeatDay();
+        hour = alarm->GetHour();
+        minute = alarm->GetMinute();
+    }
+    values.PutInt(Instance::REPEAT_DAYS_OF_WEEK, repeatDays);
+    values.PutInt(Instance::ALARM_HOUR, hour);
+    values.PutInt(Instance::ALARM_MINUTE, minute);
+}
+
+const std::string ReminderRequestAlarm::Instance::REPEAT_DAYS_OF_WEEK = "repeat_days_of_week";
+const std::string ReminderRequestAlarm::Instance::ALARM_HOUR = "alarm_hour";
+const std::string ReminderRequestAlarm::Instance::ALARM_MINUTE = "alarm_minute";
+
+std::string ReminderRequestAlarm::Instance::SQL_ADD_COLUMNS = "";
+std::vector<std::string> ReminderRequestAlarm::Instance::COLUMNS;
+
+void ReminderRequestAlarm::Instance::Init()
+{
+    AddColumn(REPEAT_DAYS_OF_WEEK, "INT", false);
+    AddColumn(ALARM_HOUR, "INT", false);
+    AddColumn(ALARM_MINUTE, "INT", true);
+}
+
+void ReminderRequestAlarm::Instance::AddColumn(
+    const std::string &name, const std::string &type, const bool &isEnd)
+{
+    COLUMNS.push_back(name);
+    if (!isEnd) {
+        SQL_ADD_COLUMNS += name + " " + type + ", ";
+    } else {
+        SQL_ADD_COLUMNS += name + " " + type;
+    }
 }
 }
 }

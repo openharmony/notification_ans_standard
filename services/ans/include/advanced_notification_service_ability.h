@@ -19,6 +19,7 @@
 #include "system_ability.h"
 
 #include "advanced_notification_service.h"
+#include "reminder_data_manager.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -36,6 +37,7 @@ private:
 
 private:
     sptr<AdvancedNotificationService> service_;
+    std::shared_ptr<ReminderDataManager> reminderAgent_;
 };
 }  // namespace Notification
 }  // namespace OHOS

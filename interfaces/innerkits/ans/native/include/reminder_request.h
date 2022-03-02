@@ -19,8 +19,11 @@
 #include <map>
 #include <string>
 
+#include "abs_shared_result_set.h"
+#include "notification_bundle_option.h"
 #include "notification_constant.h"
 #include "notification_request.h"
+#include "values_bucket.h"
 
 namespace OHOS {
 namespace Notification {
@@ -75,6 +78,7 @@ public:
         REMOVAL_WANT_AGENT,
         WANT_AGENT,
         MAX_SCREEN_WANT_AGENT,
+        BUNDLE_INFO,
         CONTENT
     };
 
@@ -129,6 +133,14 @@ public:
      * @param Indicates the exist reminder.
      */
     explicit ReminderRequest(const ReminderRequest &other);
+
+    /**
+     * @brief This constructor should only be used in background proxy service process
+     * when reminder instance recovery from database.
+     *
+     * @param reminderId Indicates reminder id.
+     */
+    explicit ReminderRequest(int32_t reminderId);
     ReminderRequest& operator = (const ReminderRequest &other);
     virtual ~ReminderRequest() override {};
 
@@ -256,6 +268,9 @@ public:
      */
     uint64_t GetTriggerTimeInMilli() const;
 
+    int GetUserId() const;
+    int32_t GetUid() const;
+
     /**
      * @brief Obtains want agent information.
      *
@@ -279,6 +294,16 @@ public:
      * @param userId Indicates the userId which the reminder belong to.
      */
     void InitUserId(const int &userId);
+
+    /**
+     * @brief Inites reminder uid when publish reminder success.
+     *
+     * When system reboot and recovery from database, we cannot get the uid according user id as BMS has not be
+     * ready. So we need to record the uid in order to create correct bundleOption.
+     *
+     * @param uid Indicates the uid which the reminder belong to.
+     */
+    void InitUid(const int32_t &uid);
 
     /**
      * @brief Check the reminder is alerting or not.
@@ -377,6 +402,15 @@ public:
      * @return true if need to show reminder immediately.
      */
     virtual bool OnTimeZoneChange();
+
+    /**
+     * @brief Recovery reminder instance from database record.
+     *
+     * @param resultSet Indicates the resultSet with pointer to the row of record data.
+     */
+    virtual void RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
+    void RecoveryActionButton(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
+    void RecoveryWantAgent(std::string wantAgentInfo, const uint8_t &type);
 
     /**
      * @brief Sets action button.
@@ -525,6 +559,8 @@ public:
      */
     void UpdateNotificationRequest(UpdateNotificationType type, std::string extra);
 
+    static uint8_t GetConstStateInactive();
+
     static int32_t GLOBAL_ID;
     static const uint64_t INVALID_LONG_LONG_VALUE;
     static const uint16_t INVALID_U16_VALUE;
@@ -563,8 +599,52 @@ public:
     static uint64_t GetDurationSinceEpochInMilli(const time_t target);
     static int32_t GetUid(const int &userId, const std::string &bundleName);
     static int GetUserId(const int &uid);
+    static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+        const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
+
+class Instance {
+public:
+    const static std::string REMINDER_ID;
+    const static std::string PKG_NAME;
+    const static std::string USER_ID;
+    const static std::string UID;
+    const static std::string APP_LABEL;
+    const static std::string REMINDER_TYPE;
+    const static std::string REMINDER_TIME;
+    const static std::string TRIGGER_TIME;
+    const static std::string RTC_TRIGGER_TIME;
+    const static std::string TIME_INTERVAL;
+    const static std::string SNOOZE_TIMES;
+    const static std::string DYNAMIC_SNOOZE_TIMES;
+    const static std::string RING_DURATION;
+    const static std::string IS_EXPIRED;
+    const static std::string IS_ACTIVE;
+    const static std::string STATE;
+    const static std::string ZONE_ID;
+    const static std::string HAS_SCHEDULED_TIMEOUT;
+    const static std::string ACTION_BUTTON_INFO;
+    const static std::string SLOT_ID;
+    const static std::string NOTIFICATION_ID;
+    const static std::string TITLE;
+    const static std::string CONTENT;
+    const static std::string SNOOZE_CONTENT;
+    const static std::string EXPIRED_CONTENT;
+    const static std::string AGENT;
+    const static std::string MAX_SCREEN_AGENT;
+
+    static std::string SQL_ADD_COLUMNS;
+    static std::vector<std::string> COLUMNS;
+    static void Init();
+
+private:
+    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
+};
 
 protected:
+    enum class DbRecoveryType : uint8_t {
+        INT,
+        LONG
+    };
     ReminderRequest();
     explicit ReminderRequest(ReminderType reminderType);
     std::string GetDateTimeInfo(const time_t &timeInSecond) const;
@@ -572,12 +652,15 @@ protected:
     {
         return INVALID_LONG_LONG_VALUE;
     }
+    int64_t RecoveryInt64FromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+        const std::string &columnName, const DbRecoveryType &columnType);
     static const int BASE_YEAR;
 
 private:
     void AddActionButtons(const bool includeSnooze);
     void AddRemovalWantAgent();
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> CreateWantAgent(AppExecFwk::ElementName &element) const;
+    std::string GetButtonInfo() const;
     uint64_t GetNowInstantMilli() const;
     std::string GetShowTime(const uint64_t showTime) const;
     std::string GetTimeInfoInner(const time_t &timeInSecond, const TimeFormat &format) const;
@@ -585,13 +668,22 @@ private:
     bool HandleSysTimeChange(uint64_t oriTriggerTime, uint64_t optTriggerTime);
     bool HandleTimeZoneChange(uint64_t oldZoneTriggerTime, uint64_t newZoneTriggerTime, uint64_t optTriggerTime);
     bool InitNotificationRequest();
+    void InitServerObj();
     void SetMaxScreenWantAgent(AppExecFwk::ElementName &element);
     void SetState(bool deSet, const uint8_t newState, std::string function);
     void SetWantAgent(AppExecFwk::ElementName &element);
+    std::vector<std::string> StringSplit(std::string source, const std::string &split) const;
     void UpdateActionButtons(const bool &setSnooze);
     bool UpdateNextReminder(const bool &force);
     void UpdateNotificationContent(const bool &setSnooze);
     void UpdateNotificationCommon();
+
+    /**
+     * @brief Used for reminder recovery from database.
+     *
+     * @param bundleName Indicates the third part bundle name.
+     */
+    void UpdateNotificationBundleInfo();
 
     /**
      * @brief Update the notification, which will be shown for the "Alerting" reminder.
@@ -613,12 +705,16 @@ private:
     static const uint8_t REMINDER_STATUS_SHOWING;
     static const uint8_t REMINDER_STATUS_SNOOZE;
     static const uint32_t MIN_TIME_INTERVAL_IN_MILLI;
+    static const std::string SEP_BUTTON_SINGLE;
+    static const std::string SEP_BUTTON_MULTI;
+    static const std::string SEP_WANT_AGENT;
 
     std::string content_ {};
     std::string expiredContent_ {};
     std::string snoozeContent_ {};
     std::string displayContent_ {};
     std::string title_ {};
+    std::string bundleName_ {};
     bool isExpired_ {false};
     uint8_t snoozeTimes_ {0};
     uint8_t snoozeTimesDynamic_ {0};
@@ -626,6 +722,7 @@ private:
     int32_t notificationId_ {0};
     int32_t reminderId_ {-1};
     int userId_ {-1};
+    int32_t uid_ {-1};
 
     // Indicates the reminder has been shown in the past time.
     // When the reminder has been created but not showed, it is equals to 0.
