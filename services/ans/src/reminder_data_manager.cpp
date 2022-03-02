@@ -917,7 +917,7 @@ void ReminderDataManager::LoadReminderFromDb()
             continue;
         }
         auto ret = notificationBundleOptionMap_.insert(
-        std::pair<int32_t, sptr<NotificationBundleOption>>(reminderId, bundleOption));
+            std::pair<int32_t, sptr<NotificationBundleOption>>(reminderId, bundleOption));
         if (!ret.second) {
             ANSR_LOGE("Containers add to map error");
             continue;

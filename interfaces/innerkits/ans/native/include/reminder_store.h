@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,10 +60,10 @@ private:
     int32_t InitData();
     sptr<ReminderRequest> BuildReminder(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
     int32_t Delete(const std::string &deleteCondition);
-    void GetInt32Val(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet
-        , const std::string &name, int32_t &value) const;
-    void GetStringVal(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet
-        , const std::string &name, std::string &value) const;
+    void GetInt32Val(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+        const std::string &name, int32_t &value) const;
+    void GetStringVal(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+        const std::string &name, std::string &value) const;
     std::vector<sptr<ReminderRequest>> GetReminders(const std::string &queryCondition);
     void GenerateData(const sptr<ReminderRequest> &remindert,
         const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values) const;

@@ -49,7 +49,8 @@ int32_t ReminderStore::ReminderStoreDataCallBack::OnCreate(NativeRdb::RdbStore &
     return store.ExecuteSql(CREATE_REMINDER_TABLE);
 }
 
-int32_t ReminderStore::ReminderStoreDataCallBack::OnUpgrade(NativeRdb::RdbStore &store, int32_t oldVersion, int32_t newVersion)
+int32_t ReminderStore::ReminderStoreDataCallBack::OnUpgrade(
+    NativeRdb::RdbStore &store, int32_t oldVersion, int32_t newVersion)
 {
     return NativeRdb::E_OK;
 }
@@ -196,8 +197,8 @@ int64_t ReminderStore::Insert(
     ReminderStore::GenerateData(reminder, bundleOption, values);
     int32_t result = rdbStore_->Insert(rowId, REMINDER_DB_TABLE, values);
     if (result != NativeRdb::E_OK) {
-        ANSR_LOGE("Insert operation failed, result: %{public}d, reminderId=%{public}d."
-            , result, reminder->GetReminderId());
+        ANSR_LOGE("Insert operation failed, result: %{public}d, reminderId=%{public}d.",
+            result, reminder->GetReminderId());
         return result;
     }
     ANSR_LOGD("Insert successfully, reminderId=%{public}d.", reminder->GetReminderId());
@@ -219,12 +220,12 @@ int64_t ReminderStore::Update(
     std::vector<std::string> whereArgs;
     int32_t result = rdbStore_->Update(changedRows, REMINDER_DB_TABLE, values, updateCondition, whereArgs);
     if ((result != NativeRdb::E_OK) || (changedRows <= 0)) {
-        ANSR_LOGE("Update operation failed, result: %{public}d, updated rows: %{public}d, reminderId=%{public}d."
-            , result, changedRows, reminder->GetReminderId());
+        ANSR_LOGE("Update operation failed, result: %{public}d, updated rows: %{public}d, reminderId=%{public}d.",
+            result, changedRows, reminder->GetReminderId());
         return result;
     }
-    ANSR_LOGD("Update successfully, updated rows: %{public}d, reminderId=%{public}d."
-        , changedRows, reminder->GetReminderId());
+    ANSR_LOGD("Update successfully, updated rows: %{public}d, reminderId=%{public}d.",
+        changedRows, reminder->GetReminderId());
     return result;
 }
 
@@ -329,8 +330,8 @@ std::vector<sptr<ReminderRequest>> ReminderStore::GetReminders(const std::string
 {
     std::vector<sptr<ReminderRequest>> reminders;
     if (rdbStore_ == nullptr) {
-         ANSR_LOGE("Rdb store is not initialized.");
-         return reminders;
+        ANSR_LOGE("Rdb store is not initialized.");
+        return reminders;
     }
     std::shared_ptr<NativeRdb::AbsSharedResultSet> queryResultSet = Query(queryCondition);
     if (queryResultSet == nullptr) {
@@ -338,7 +339,7 @@ std::vector<sptr<ReminderRequest>> ReminderStore::GetReminders(const std::string
     }
     bool isAtLastRow = false;
     queryResultSet->IsAtLastRow(isAtLastRow);
-    while(!isAtLastRow) {
+    while (!isAtLastRow) {
         queryResultSet->GoToNextRow();
         sptr<ReminderRequest> reminder;
         reminder = BuildReminder(queryResultSet);
@@ -407,16 +408,16 @@ bool ReminderStore::GetBundleOption(const int32_t &reminderId, sptr<Notification
     return true;
 }
 
-void ReminderStore::GetInt32Val(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet
-    , const std::string &name, int32_t &value) const
+void ReminderStore::GetInt32Val(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+    const std::string &name, int32_t &value) const
 {
     int32_t columnIndex;
     resultSet->GetColumnIndex(name, columnIndex);
     resultSet->GetInt(columnIndex, value);
 }
 
-void ReminderStore::GetStringVal(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet
-    , const std::string &name, std::string &value) const
+void ReminderStore::GetStringVal(std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+    const std::string &name, std::string &value) const
 {
     int32_t columnIndex;
     resultSet->GetColumnIndex(name, columnIndex);

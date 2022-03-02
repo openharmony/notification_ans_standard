@@ -29,7 +29,8 @@ namespace OHOS {
 namespace Notification {
 class ReminderDataManager final {
 public:
-    ReminderDataManager() {
+    ReminderDataManager()
+    {
         Init(false);
     };
     ~ReminderDataManager() {};

@@ -450,7 +450,6 @@ void ReminderRequest::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedR
     isExpired_ = isExpired == "true" ? true : false;
 
     // state
-    // RecoveryUint8FromDb(resultSet, Instance::STATE, DbRecoveryType::INT, state_);
     state_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::STATE, DbRecoveryType::INT));
 
     // action buttons
@@ -1355,7 +1354,7 @@ void ReminderRequest::UpdateNotificationCommon()
 
 void ReminderRequest::UpdateNotificationBundleInfo()
 {
-    ANSR_LOGD("~~~~Bundle name=%{public}s, bundleName_=%{public}s",
+    ANSR_LOGD("Bundle name=%{public}s, bundleName_=%{public}s",
         notificationRequest_->GetOwnerBundleName().c_str(), bundleName_.c_str());
     if (!(notificationRequest_->GetOwnerBundleName()).empty()) {
         return;
@@ -1365,7 +1364,6 @@ void ReminderRequest::UpdateNotificationBundleInfo()
     notificationRequest_->SetCreatorBundleName(bundleName_);
 
     notificationRequest_->SetCreatorUid(uid_);
-    // notificationRequest_->SetCreatorPid(pid);
 
     OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid_, userId_);
     notificationRequest_->SetCreatorUserId(userId_);
