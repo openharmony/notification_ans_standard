@@ -20,6 +20,7 @@
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
+#include "reminder_store.h"
 #include "system_ability_definition.h"
 #include "want_agent_helper.h"
 
@@ -37,6 +38,7 @@ const uint8_t ReminderRequest::REMINDER_STATUS_ACTIVE = 1;
 const uint8_t ReminderRequest::REMINDER_STATUS_ALERTING = 2;
 const uint8_t ReminderRequest::REMINDER_STATUS_SHOWING = 4;
 const uint8_t ReminderRequest::REMINDER_STATUS_SNOOZE = 8;
+const int ReminderRequest::BASE_YEAR = 1900;
 const std::string ReminderRequest::NOTIFICATION_LABEL = "REMINDER_AGENT";
 const std::string ReminderRequest::REMINDER_EVENT_ALARM_ALERT = "ohos.event.notification.reminder.ALARM_ALERT";
 const std::string ReminderRequest::REMINDER_EVENT_CLOSE_ALERT = "ohos.event.notification.reminder.CLOSE_ALERT";
@@ -45,13 +47,13 @@ const std::string ReminderRequest::REMINDER_EVENT_ALERT_TIMEOUT = "ohos.event.no
 const std::string ReminderRequest::REMINDER_EVENT_REMOVE_NOTIFICATION =
     "ohos.event.notification.reminder.REMOVE_NOTIFICATION";
 const std::string ReminderRequest::PARAM_REMINDER_ID = "REMINDER_ID";
-const int ReminderRequest::BASE_YEAR = 1900;
+const std::string ReminderRequest::SEP_BUTTON_SINGLE = "<SEP,/>";
+const std::string ReminderRequest::SEP_BUTTON_MULTI = "<SEP#/>";
+const std::string ReminderRequest::SEP_WANT_AGENT = "<SEP#/>";
 
 ReminderRequest::ReminderRequest()
 {
-    wantAgentInfo_ = wantAgentInfo_ == nullptr ? std::make_shared<WantAgentInfo>() : wantAgentInfo_;
-    maxScreenWantAgentInfo_ =
-        maxScreenWantAgentInfo_ == nullptr ? std::make_shared<MaxScreenAgentInfo>() : maxScreenWantAgentInfo_;
+    InitServerObj();
 }
 
 ReminderRequest::ReminderRequest(const ReminderRequest &other)
@@ -79,12 +81,16 @@ ReminderRequest::ReminderRequest(const ReminderRequest &other)
     this->actionButtonMap_ = other.actionButtonMap_;
 }
 
+ReminderRequest::ReminderRequest(int32_t reminderId)
+{
+    reminderId_ = reminderId;
+    InitServerObj();
+}
+
 ReminderRequest::ReminderRequest(ReminderType reminderType)
 {
     reminderType_ = reminderType;
-    wantAgentInfo_ = wantAgentInfo_ == nullptr ? std::make_shared<WantAgentInfo>() : wantAgentInfo_;
-    maxScreenWantAgentInfo_ =
-        maxScreenWantAgentInfo_ == nullptr ? std::make_shared<MaxScreenAgentInfo>() : maxScreenWantAgentInfo_;
+    InitServerObj();
 }
 
 bool ReminderRequest::CanRemove() const
@@ -167,6 +173,11 @@ void ReminderRequest::InitReminderId()
 void ReminderRequest::InitUserId(const int &userId)
 {
     userId_ = userId;
+}
+
+void ReminderRequest::InitUid(const int32_t &uid)
+{
+    uid_ = uid;
 }
 
 bool ReminderRequest::IsExpired() const
@@ -372,6 +383,165 @@ bool ReminderRequest::OnTimeZoneChange()
         triggerTimeInMilli_, GetDurationSinceEpochInMilli(newZoneTriggerTime), nextTriggerTime);
 }
 
+int64_t ReminderRequest::RecoveryInt64FromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+    const std::string &columnName, const DbRecoveryType &columnType)
+{
+    if (columnType == DbRecoveryType::INT) {
+        int value;
+        resultSet->GetInt(ReminderStore::GetColumnIndex(columnName), value);
+        return static_cast<int64_t>(value);
+    }
+    if (columnType == DbRecoveryType::LONG) {
+        int64_t value;
+        resultSet->GetLong(ReminderStore::GetColumnIndex(columnName), value);
+        return value;
+    }
+    ANSR_LOGE("Recovery data error");
+    return 0;
+}
+
+void ReminderRequest::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+{
+    // reminderId
+    resultSet->GetInt(ReminderStore::GetColumnIndex(Instance::REMINDER_ID), reminderId_);
+
+    // userId
+    resultSet->GetInt(ReminderStore::GetColumnIndex(Instance::USER_ID), userId_);
+
+    // bundleName
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::PKG_NAME), bundleName_);
+
+    // uid
+    resultSet->GetInt(ReminderStore::GetColumnIndex(Instance::UID), uid_);
+
+    // reminderType
+    int reminderType;
+    resultSet->GetInt(ReminderStore::GetColumnIndex(Instance::REMINDER_TYPE), reminderType);
+    reminderType_ = ReminderType(reminderType);
+
+    // reminderTime
+    reminderTimeInMilli_ =
+        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::REMINDER_TIME, DbRecoveryType::LONG));
+
+    // triggerTime
+    triggerTimeInMilli_ =
+        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::TRIGGER_TIME, DbRecoveryType::LONG));
+
+    // timeInterval
+    uint64_t timeIntervalInSecond =
+        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::TIME_INTERVAL, DbRecoveryType::LONG));
+    SetTimeInterval(timeIntervalInSecond);
+
+    // snoozeTimes
+    snoozeTimes_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::SNOOZE_TIMES, DbRecoveryType::INT));
+
+    // dynamicSnoozeTimes
+    snoozeTimesDynamic_ =
+        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::DYNAMIC_SNOOZE_TIMES, DbRecoveryType::INT));
+
+    // ringDuration
+    uint64_t ringDurationInSecond =
+        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::RING_DURATION, DbRecoveryType::LONG));
+    SetRingDuration(ringDurationInSecond);
+
+    // isExpired
+    std::string isExpired;
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::IS_EXPIRED), isExpired);
+    isExpired_ = isExpired == "true" ? true : false;
+
+    // state
+    // RecoveryUint8FromDb(resultSet, Instance::STATE, DbRecoveryType::INT, state_);
+    state_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::STATE, DbRecoveryType::INT));
+
+    // action buttons
+    RecoveryActionButton(resultSet);
+
+    // slotType
+    int slotType;
+    resultSet->GetInt(ReminderStore::GetColumnIndex(Instance::SLOT_ID), slotType);
+    slotType_ = NotificationConstant::SlotType(slotType);
+
+    // notification id
+    resultSet->GetInt(ReminderStore::GetColumnIndex(Instance::NOTIFICATION_ID), notificationId_);
+
+    // title
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::TITLE), title_);
+
+    // content
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::CONTENT), content_);
+
+    // snoozeContent
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::SNOOZE_CONTENT), snoozeContent_);
+
+    // expiredContent
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::EXPIRED_CONTENT), expiredContent_);
+
+    InitNotificationRequest();  // must set before wantAgent & maxScreenWantAgent
+
+    // wantAgent
+    std::string wantAgent;
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::AGENT), wantAgent);
+    RecoveryWantAgent(wantAgent, 0);
+
+    // maxScreenWantAgent
+    std::string maxScreenWantAgent;
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::MAX_SCREEN_AGENT), maxScreenWantAgent);
+    RecoveryWantAgent(wantAgent, 1);
+}
+
+void ReminderRequest::RecoveryActionButton(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+{
+    std::string actionButtonInfo;
+    resultSet->GetString(ReminderStore::GetColumnIndex(Instance::ACTION_BUTTON_INFO), actionButtonInfo);
+    std::vector<std::string> multiButton = StringSplit(actionButtonInfo, SEP_BUTTON_MULTI);
+    for (auto it = multiButton.begin(); it != multiButton.end(); ++it) {
+        std::vector<std::string> singleButton = StringSplit(*it, SEP_BUTTON_SINGLE);
+        SetActionButton(singleButton.at(1), ActionButtonType(std::stoi(singleButton.at(0), nullptr)));
+    }
+}
+
+std::vector<std::string> ReminderRequest::StringSplit(std::string source, const std::string &split) const
+{
+    size_t pos = 0;
+    std::vector<std::string> result;
+    while ((pos = source.find(split)) != std::string::npos) {
+        std::string token = source.substr(0, pos);
+        if (!token.empty()) {
+            result.push_back(token);
+        }
+        source.erase(0, pos + split.length());
+    }
+    if (!source.empty()) {
+        result.push_back(source);
+    }
+    return result;
+}
+
+void ReminderRequest::RecoveryWantAgent(std::string wantAgentInfo, const uint8_t &type)
+{
+    std::vector<std::string> info = StringSplit(wantAgentInfo, ReminderRequest::SEP_WANT_AGENT);
+    uint8_t minLen = 2;
+    if (info.size() < minLen) {
+        ANSR_LOGW("RecoveryWantAgent fail");
+        return;
+    }
+    // AppExecFwk::ElementName wantAgent("", info.at(0), info.at(1));
+    ANSR_LOGD("pkg=%{public}s, ability=%{public}s", info.at(0).c_str(), info.at(1).c_str());
+    if (type == 0) {
+        auto wantAgentInfo = std::make_shared<ReminderRequest::WantAgentInfo>();
+        wantAgentInfo->pkgName = info.at(0);
+        wantAgentInfo->abilityName = info.at(1);
+        SetWantAgentInfo(wantAgentInfo);
+    } else if (type == 1) {
+        auto maxScreenWantAgentInfo = std::make_shared<ReminderRequest::MaxScreenAgentInfo>();
+        maxScreenWantAgentInfo->pkgName = info.at(0);
+        maxScreenWantAgentInfo->abilityName = info.at(1);
+        SetMaxScreenWantAgentInfo(maxScreenWantAgentInfo);
+    } else {
+        ANSR_LOGW("RecoveryWantAgent type not support");
+    }
+}
+
 ReminderRequest& ReminderRequest::SetMaxScreenWantAgentInfo(
     const std::shared_ptr<MaxScreenAgentInfo> &maxScreenWantAgentInfo)
 {
@@ -456,6 +626,11 @@ bool ReminderRequest::ShouldShowImmediately() const
         return false;
     }
     return true;
+}
+
+uint8_t ReminderRequest::GetConstStateInactive()
+{
+    return REMINDER_STATUS_INACTIVE;
 }
 
 std::map<ReminderRequest::ActionButtonType, ReminderRequest::ActionButtonInfo> ReminderRequest::GetActionButtons(
@@ -560,6 +735,16 @@ uint64_t ReminderRequest::GetTriggerTimeInMilli() const
     return triggerTimeInMilli_;
 }
 
+int ReminderRequest::GetUserId() const
+{
+    return userId_;
+}
+
+int32_t ReminderRequest::GetUid() const
+{
+    return uid_;
+}
+
 std::shared_ptr<ReminderRequest::WantAgentInfo> ReminderRequest::GetWantAgentInfo() const
 {
     return wantAgentInfo_;
@@ -604,6 +789,11 @@ void ReminderRequest::UpdateNotificationRequest(UpdateNotificationType type, std
             AppExecFwk::ElementName maxScreenWantAgent(
                 "", maxScreenWantAgentInfo_->pkgName, maxScreenWantAgentInfo_->abilityName);
             SetMaxScreenWantAgent(maxScreenWantAgent);
+            break;
+        }
+        case UpdateNotificationType::BUNDLE_INFO: {
+            ANSR_LOGI("UpdateNotification hap information");
+            UpdateNotificationBundleInfo();
             break;
         }
         case UpdateNotificationType::CONTENT: {
@@ -870,6 +1060,13 @@ bool ReminderRequest::InitNotificationRequest()
     return true;
 }
 
+void ReminderRequest::InitServerObj()
+{
+    wantAgentInfo_ = wantAgentInfo_ == nullptr ? std::make_shared<WantAgentInfo>() : wantAgentInfo_;
+    maxScreenWantAgentInfo_ =
+        maxScreenWantAgentInfo_ == nullptr ? std::make_shared<MaxScreenAgentInfo>() : maxScreenWantAgentInfo_;
+}
+
 bool ReminderRequest::IsAlerting() const
 {
     return (state_ & REMINDER_STATUS_ALERTING) != 0;
@@ -890,6 +1087,21 @@ uint64_t ReminderRequest::GetDurationSinceEpochInMilli(const time_t target)
 std::string ReminderRequest::GetDateTimeInfo(const time_t &timeInSecond) const
 {
     return GetTimeInfoInner(timeInSecond, TimeFormat::YMDHMS);
+}
+
+std::string ReminderRequest::GetButtonInfo() const
+{
+    std::string info = "";
+    bool isFirst = true;
+    for (auto it = actionButtonMap_.begin(); it != actionButtonMap_.end(); ++it) {
+        if (!isFirst) {
+            info += SEP_BUTTON_MULTI;
+        }
+        ActionButtonInfo buttonInfo = it->second;
+        info += std::to_string(static_cast<uint8_t>(it->first)) + SEP_BUTTON_SINGLE + buttonInfo.title;
+        isFirst = false;
+    }
+    return info;
 }
 
 uint64_t ReminderRequest::GetNowInstantMilli() const
@@ -1121,7 +1333,7 @@ void ReminderRequest::UpdateNotificationCommon()
 {
     time_t now;
     (void)time(&now);  // unit is seconds.
-    notificationRequest_->SetDeliveryTime(static_cast<int64_t>(now) * MILLI_SECONDS);
+    notificationRequest_->SetDeliveryTime(GetDurationSinceEpochInMilli(now));
     notificationRequest_->SetLabel(NOTIFICATION_LABEL);
     notificationRequest_->SetShowDeliveryTime(true);
     notificationRequest_->SetTapDismissed(true);
@@ -1141,6 +1353,24 @@ void ReminderRequest::UpdateNotificationCommon()
     notificationRequest_->SetFlags(flags);
 }
 
+void ReminderRequest::UpdateNotificationBundleInfo()
+{
+    ANSR_LOGD("~~~~Bundle name=%{public}s, bundleName_=%{public}s",
+        notificationRequest_->GetOwnerBundleName().c_str(), bundleName_.c_str());
+    if (!(notificationRequest_->GetOwnerBundleName()).empty()) {
+        return;
+    }
+
+    notificationRequest_->SetOwnerBundleName(bundleName_);
+    notificationRequest_->SetCreatorBundleName(bundleName_);
+
+    notificationRequest_->SetCreatorUid(uid_);
+    // notificationRequest_->SetCreatorPid(pid);
+
+    OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid_, userId_);
+    notificationRequest_->SetCreatorUserId(userId_);
+}
+
 void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
 {
     if (notificationRequest_ == nullptr) {
@@ -1153,6 +1383,7 @@ void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
             // snooze the reminder by manual
             extendContent = GetShowTime(triggerTimeInMilli_) +
                 snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")");
+            notificationRequest_->SetTapDismissed(false);
         } else {
             // the reminder is expired now, when timeInterval is 0
             extendContent = GetShowTime(reminderTimeInMilli_) +
@@ -1246,6 +1477,126 @@ int ReminderRequest::GetUserId(const int &uid)
     int userId = -1;
     AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
     return userId;
+}
+
+void ReminderRequest::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+    const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values)
+{
+    values.PutInt(Instance::REMINDER_ID, reminder->GetReminderId());
+    values.PutString(Instance::PKG_NAME, bundleOption->GetBundleName());
+    values.PutInt(Instance::USER_ID, reminder->GetUserId());
+    values.PutInt(Instance::UID, reminder->GetUid());
+    values.PutString(Instance::APP_LABEL, "");  // no use, compatible with old version.
+    values.PutInt(Instance::REMINDER_TYPE, static_cast<int>(reminder->GetReminderType()));
+    values.PutLong(Instance::REMINDER_TIME, reminder->GetReminderTimeInMilli());
+    values.PutLong(Instance::TRIGGER_TIME, reminder->GetTriggerTimeInMilli());
+    values.PutLong(
+        Instance::RTC_TRIGGER_TIME, reminder->GetTriggerTimeInMilli());  // no use, compatible with old version.
+    values.PutLong(Instance::TIME_INTERVAL, reminder->GetTimeInterval());
+    values.PutInt(Instance::SNOOZE_TIMES, reminder->GetSnoozeTimes());
+    values.PutInt(Instance::DYNAMIC_SNOOZE_TIMES, reminder->GetSnoozeTimesDynamic());
+    values.PutLong(Instance::RING_DURATION, reminder->GetRingDuration());
+    values.PutString(Instance::IS_EXPIRED, reminder->IsExpired() ? "true" : "false");
+    values.PutString(Instance::IS_ACTIVE, "");  // no use, compatible with old version.
+    values.PutInt(Instance::STATE, reminder->GetState());
+    values.PutString(Instance::ZONE_ID, "");  // no use, compatible with old version.
+    values.PutString(Instance::HAS_SCHEDULED_TIMEOUT, "");  // no use, compatible with old version.
+    values.PutString(Instance::ACTION_BUTTON_INFO, reminder->GetButtonInfo());
+    values.PutInt(Instance::SLOT_ID, reminder->GetSlotType());
+    values.PutInt(Instance::NOTIFICATION_ID, reminder->GetNotificationId());
+    values.PutString(Instance::TITLE, reminder->GetTitle());
+    values.PutString(Instance::CONTENT, reminder->GetContent());
+    values.PutString(Instance::SNOOZE_CONTENT, reminder->GetSnoozeContent());
+    values.PutString(Instance::EXPIRED_CONTENT, reminder->GetExpiredContent());
+    auto wantAgentInfo = reminder->GetWantAgentInfo();
+    if (wantAgentInfo == nullptr) {
+        std::string info = "null" + ReminderRequest::SEP_WANT_AGENT + "null";
+        values.PutString(Instance::AGENT, info);
+    } else {
+        values.PutString(Instance::AGENT, wantAgentInfo->pkgName
+            + ReminderRequest::SEP_WANT_AGENT + wantAgentInfo->abilityName);
+    }
+    auto maxScreenWantAgentInfo = reminder->GetMaxScreenWantAgentInfo();
+    if (maxScreenWantAgentInfo == nullptr) {
+        std::string info = "null" + ReminderRequest::SEP_WANT_AGENT + "null";
+        values.PutString(Instance::MAX_SCREEN_AGENT, info);
+    } else {
+        values.PutString(Instance::MAX_SCREEN_AGENT, maxScreenWantAgentInfo->pkgName
+            + ReminderRequest::SEP_WANT_AGENT + maxScreenWantAgentInfo->abilityName);
+    }
+}
+
+const std::string ReminderRequest::Instance::REMINDER_ID = "reminder_id";
+const std::string ReminderRequest::Instance::PKG_NAME = "package_name";
+const std::string ReminderRequest::Instance::USER_ID = "user_id";
+const std::string ReminderRequest::Instance::UID = "uid";
+const std::string ReminderRequest::Instance::APP_LABEL = "app_label";
+const std::string ReminderRequest::Instance::REMINDER_TYPE = "reminder_type";
+const std::string ReminderRequest::Instance::REMINDER_TIME = "reminder_time";
+const std::string ReminderRequest::Instance::TRIGGER_TIME = "trigger_time";
+const std::string ReminderRequest::Instance::RTC_TRIGGER_TIME = "rtc_trigger_time";
+const std::string ReminderRequest::Instance::TIME_INTERVAL = "time_interval";
+const std::string ReminderRequest::Instance::SNOOZE_TIMES = "snooze_times";
+const std::string ReminderRequest::Instance::DYNAMIC_SNOOZE_TIMES = "dynamic_snooze_times";
+const std::string ReminderRequest::Instance::RING_DURATION = "ring_duration";
+const std::string ReminderRequest::Instance::IS_EXPIRED = "is_expired";
+const std::string ReminderRequest::Instance::IS_ACTIVE = "is_active";
+const std::string ReminderRequest::Instance::STATE = "state";
+const std::string ReminderRequest::Instance::ZONE_ID = "zone_id";
+const std::string ReminderRequest::Instance::HAS_SCHEDULED_TIMEOUT = "has_ScheduledTimeout";
+const std::string ReminderRequest::Instance::ACTION_BUTTON_INFO = "button_info";
+const std::string ReminderRequest::Instance::SLOT_ID = "slot_id";
+const std::string ReminderRequest::Instance::NOTIFICATION_ID = "notification_id";
+const std::string ReminderRequest::Instance::TITLE = "title";
+const std::string ReminderRequest::Instance::CONTENT = "content";
+const std::string ReminderRequest::Instance::SNOOZE_CONTENT = "snooze_content";
+const std::string ReminderRequest::Instance::EXPIRED_CONTENT = "expired_content";
+const std::string ReminderRequest::Instance::AGENT = "agent";
+const std::string ReminderRequest::Instance::MAX_SCREEN_AGENT = "maxScreen_agent";
+
+std::string ReminderRequest::Instance::SQL_ADD_COLUMNS = "";
+std::vector<std::string> ReminderRequest::Instance::COLUMNS;
+
+void ReminderRequest::Instance::Init()
+{
+    AddColumn(REMINDER_ID, "INTEGER PRIMARY KEY", false);
+    AddColumn(PKG_NAME, "TEXT NOT NULL", false);
+    AddColumn(USER_ID, "INT NOT NULL", false);
+    AddColumn(UID, "INT NOT NULL", false);
+    AddColumn(APP_LABEL, "TEXT", false);
+    AddColumn(REMINDER_TYPE, "INT NOT NULL", false);
+    AddColumn(REMINDER_TIME, "BIGINT NOT NULL", false);
+    AddColumn(TRIGGER_TIME, "BIGINT NOT NULL", false);
+    AddColumn(RTC_TRIGGER_TIME, "BIGINT NOT NULL", false);
+    AddColumn(TIME_INTERVAL, "BIGINT NOT NULL", false);
+    AddColumn(SNOOZE_TIMES, "INT NOT NULL", false);
+    AddColumn(DYNAMIC_SNOOZE_TIMES, "INT NOT NULL", false);
+    AddColumn(RING_DURATION, "BIGINT NOT NULL", false);
+    AddColumn(IS_EXPIRED, "TEXT NOT NULL", false);
+    AddColumn(IS_ACTIVE, "TEXT NOT NULL", false);
+    AddColumn(STATE, "INT NOT NULL", false);
+    AddColumn(ZONE_ID, "TEXT", false);
+    AddColumn(HAS_SCHEDULED_TIMEOUT, "TEXT", false);
+    AddColumn(ACTION_BUTTON_INFO, "TEXT", false);
+    AddColumn(SLOT_ID, "INT", false);
+    AddColumn(NOTIFICATION_ID, "INT NOT NULL", false);
+    AddColumn(TITLE, "TEXT", false);
+    AddColumn(CONTENT, "TEXT", false);
+    AddColumn(SNOOZE_CONTENT, "TEXT", false);
+    AddColumn(EXPIRED_CONTENT, "TEXT", false);
+    AddColumn(AGENT, "TEXT", false);
+    AddColumn(MAX_SCREEN_AGENT, "TEXT", false);
+}
+
+void ReminderRequest::Instance::AddColumn(
+    const std::string &name, const std::string &type, const bool &isEnd)
+{
+    COLUMNS.push_back(name);
+    if (!isEnd) {
+        SQL_ADD_COLUMNS += name + " " + type + ", ";
+    } else {
+        SQL_ADD_COLUMNS += name + " " + type;
+    }
 }
 }
 }

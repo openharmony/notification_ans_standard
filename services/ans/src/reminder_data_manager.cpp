@@ -149,6 +149,7 @@ void ReminderDataManager::CancelAllReminders(const sptr<NotificationBundleOption
             vit = reminderVector_.erase(vit);
             notificationBundleOptionMap_.erase(mit);
             totalCount_--;
+            store_->Delete(reminderId);
             continue;
         }
         ++vit;
@@ -190,6 +191,15 @@ void ReminderDataManager::AddToShowedReminders(const sptr<ReminderRequest> &remi
     showedReminderVector_.push_back(reminder);
 }
 
+void ReminderDataManager::OnServiceStart()
+{
+    std::vector<sptr<ReminderRequest>> immediatelyShowReminders;
+    GetImmediatelyShowRemindersLocked(immediatelyShowReminders);
+    ANSR_LOGD("immediatelyShowReminders size=%{public}d", immediatelyShowReminders.size());
+    HandleImmediatelyShow(immediatelyShowReminders, false);
+    StartRecentReminder();
+}
+
 void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOption> bundleOption)
 {
     std::string bundleName = bundleOption->GetBundleName();
@@ -219,6 +229,7 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
             showedReminderVector_.erase(it);
             --it;
         }
+        store_->UpdateOrInsert((*it), bundleOption);
     }
 }
 
@@ -340,6 +351,7 @@ void ReminderDataManager::CloseReminder(const sptr<ReminderRequest> &reminder, b
     }
     reminder->OnClose(true);
     RemoveFromShowedReminders(reminder);
+    store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
     if (cancelNotification) {
         CancelNotification(reminder);
     }
@@ -347,8 +359,15 @@ void ReminderDataManager::CloseReminder(const sptr<ReminderRequest> &reminder, b
 
 std::shared_ptr<ReminderDataManager> ReminderDataManager::GetInstance()
 {
+    return REMINDER_DATA_MANAGER;
+}
+
+std::shared_ptr<ReminderDataManager> ReminderDataManager::InitInstance(
+    sptr<AdvancedNotificationService> &advancedNotificationService)
+{
     if (REMINDER_DATA_MANAGER == nullptr) {
         REMINDER_DATA_MANAGER = std::make_shared<ReminderDataManager>();
+        REMINDER_DATA_MANAGER->advancedNotificationService_ = advancedNotificationService;
         ReminderEventManager reminderEventManager(REMINDER_DATA_MANAGER);
     }
     return REMINDER_DATA_MANAGER;
@@ -411,6 +430,7 @@ void ReminderDataManager::TerminateAlerting(const sptr<ReminderRequest> &reminde
     ANSR_LOGD("publish(update) notification.(reminderId=%{public}d)", reminder->GetReminderId());
     UpdateNotification(reminder);
     advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
+    store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
 }
 
 void ReminderDataManager::UpdateAndSaveReminderLocked(
@@ -419,6 +439,7 @@ void ReminderDataManager::UpdateAndSaveReminderLocked(
     std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
     reminder->InitReminderId();
     reminder->InitUserId(ReminderRequest::GetUserId(bundleOption->GetUid()));
+    reminder->InitUid(bundleOption->GetUid());
     int32_t reminderId = reminder->GetReminderId();
     ANSR_LOGD("Containers(map) add. reminderId=%{public}d", reminderId);
     auto ret = notificationBundleOptionMap_.insert(
@@ -430,11 +451,17 @@ void ReminderDataManager::UpdateAndSaveReminderLocked(
     ANSR_LOGD("Containers(vector) add. reminderId=%{public}d", reminderId);
     reminderVector_.push_back(reminder);
     totalCount_++;
+    store_->UpdateOrInsert(reminder, bundleOption);
 }
 
 void ReminderDataManager::SetService(AdvancedNotificationService *advancedNotificationService)
 {
     advancedNotificationService_ = advancedNotificationService;
+    if (advancedNotificationService_ == nullptr) {
+        ANSR_LOGD("~~~~advancedNotificationService_ is null");
+    } else {
+        ANSR_LOGD("~~~~advancedNotificationService_ is not null");
+    }
 }
 
 void ReminderDataManager::ShowActiveReminder()
@@ -531,17 +558,7 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         reminder->OnShow(false, isSysTimeChanged, false);
         return;
     }
-    if (isNeedToPlaySound) {
-        PlaySoundAndVibration(reminder);  // play sound and vibration
-        reminder->OnShow(true, isSysTimeChanged, true);
-        if (needScheduleTimeout) {
-            StartTimer(reminder, TimerType::ALERTING_TIMER);
-        } else {
-            TerminateAlerting(1, reminder);
-        }
-    } else {
-        reminder->OnShow(false, isSysTimeChanged, true);
-    }
+    reminder->OnShow(isNeedToPlaySound, isSysTimeChanged, true);
     AddToShowedReminders(reminder);
     UpdateNotification(reminder);  // this should be called after OnShow
     ANSR_LOGD("publish notification.(reminderId=%{public}d)", reminder->GetReminderId());
@@ -550,8 +567,18 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         reminder->OnShowFail();
         RemoveFromShowedReminders(reminder);
     } else {
+        if (isNeedToPlaySound) {
+            PlaySoundAndVibration(reminder);  // play sound and vibration
+            if (needScheduleTimeout) {
+                StartTimer(reminder, TimerType::ALERTING_TIMER);
+            } else {
+                TerminateAlerting(1, reminder);
+            }
+        }
         HandleSameNotificationIdShowing(reminder);
     }
+    store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
+
     if (isNeedToStartNext) {
         StartRecentReminder();
     }
@@ -563,6 +590,7 @@ void ReminderDataManager::UpdateNotification(const sptr<ReminderRequest> &remind
     reminder->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::REMOVAL_WANT_AGENT, "");
     reminder->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::WANT_AGENT, "");
     reminder->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::MAX_SCREEN_WANT_AGENT, "");
+    reminder->UpdateNotificationRequest(ReminderRequest::UpdateNotificationType::BUNDLE_INFO, "");
 }
 
 void ReminderDataManager::SnoozeReminder(const OHOS::EventFwk::Want &want)
@@ -592,6 +620,7 @@ void ReminderDataManager::SnoozeReminderImpl(sptr<ReminderRequest> &reminder)
         StopTimerLocked(TimerType::ALERTING_TIMER);
     }
     reminder->OnSnooze();
+    store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
 
     // 2) Show the notification dialog in the systemUI
     sptr<NotificationBundleOption> bundleOption = FindNotificationBundleOption(reminderId);
@@ -622,11 +651,13 @@ void ReminderDataManager::StartRecentReminder()
     }
     if (activeReminderId_ != -1) {
         activeReminder_->OnStop();
+        store_->UpdateOrInsert(activeReminder_, FindNotificationBundleOption(activeReminderId_));
         StopTimerLocked(TimerType::TRIGGER_TIMER);
     }
     ANSR_LOGI("Start recent reminder");
     StartTimerLocked(reminder, TimerType::TRIGGER_TIMER);
     reminder->OnStart();
+    store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
     SetActiveReminder(reminder);
 }
 
@@ -727,6 +758,7 @@ sptr<ReminderRequest> ReminderDataManager::GetRecentReminderLocked()
         }
         it = reminderVector_.erase(it);
         totalCount_--;
+        store_->Delete(reminderId);
     }
     return nullptr;
 }
@@ -779,8 +811,10 @@ sptr<ReminderRequest> ReminderDataManager::HandleRefreshReminder(uint8_t &type, 
         if (triggerTimeBefore != triggerTimeAfter || reminder->GetReminderId() == alertingReminderId_) {
             CloseReminder(reminder, true);
         }
+        store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
         return nullptr;
     }
+    store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
     return reminder;
 }
 
@@ -810,8 +844,47 @@ void ReminderDataManager::HandleSameNotificationIdShowing(const sptr<ReminderReq
             }
             (*it)->OnSameNotificationIdCovered();
             RemoveFromShowedReminders(*it);
+            store_->UpdateOrInsert((*it), FindNotificationBundleOption((*it)->GetReminderId()));
         }
     }
+}
+
+void ReminderDataManager::Init(bool isFromBootComplete)
+{
+    ANSR_LOGD("ReminderDataManager Init, isFromBootComplete:%{public}d", isFromBootComplete);
+    if (IsReminderAgentReady()) {
+        return;
+    }
+    if (store_ == nullptr) {
+        store_ = std::make_shared<ReminderStore>();
+    }
+    if (store_->Init() != ReminderStore::STATE_OK) {
+        ANSR_LOGW("Db init fail.");
+        return;
+    }
+    LoadReminderFromDb();
+    isReminderAgentReady_ = true;
+    ANSR_LOGD("ReminderAgent is ready.");
+}
+
+void ReminderDataManager::GetImmediatelyShowRemindersLocked(std::vector<sptr<ReminderRequest>> &reminders) const
+{
+    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
+        if ((*it)->ShouldShowImmediately()) {
+            if ((*it)->GetReminderType() != ReminderRequest::ReminderType::TIMER) {
+                (*it)->SetSnoozeTimesDynamic(0);
+            }
+            reminders.push_back(*it);
+        } else {
+            break;
+        }
+    }
+}
+
+bool ReminderDataManager::IsReminderAgentReady() const
+{
+    return isReminderAgentReady_;
 }
 
 bool ReminderDataManager::IsBelongToSameApp(
@@ -828,6 +901,30 @@ bool ReminderDataManager::IsBelongToSameApp(
         return true;
     }
     return false;
+}
+
+void ReminderDataManager::LoadReminderFromDb()
+{
+    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    std::vector<sptr<ReminderRequest>> existReminders = store_->GetAllValidReminders();
+    reminderVector_ = existReminders;
+    ANSR_LOGD("LoadReminderFromDb, reminder size=%{public}d", reminderVector_.size());
+    for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
+        sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption();
+        int32_t reminderId = (*it)->GetReminderId();
+        if (!(store_->GetBundleOption(reminderId, bundleOption))) {
+            ANSR_LOGE("Get bundle option fail, reminderId=%{public}d", reminderId);
+            continue;
+        }
+        auto ret = notificationBundleOptionMap_.insert(
+        std::pair<int32_t, sptr<NotificationBundleOption>>(reminderId, bundleOption));
+        if (!ret.second) {
+            ANSR_LOGE("Containers add to map error");
+            continue;
+        }
+    }
+    totalCount_ = reminderVector_.size();
+    ReminderRequest::GLOBAL_ID = store_->GetMaxId() + 1;
 }
 
 void ReminderDataManager::PlaySoundAndVibrationLocked(const sptr<ReminderRequest> &reminder)
@@ -935,6 +1032,7 @@ void ReminderDataManager::RemoveReminderLocked(const int32_t &reminderId)
             ANSR_LOGD("Containers(vector) remove. reminderId=%{public}d", reminderId);
             it = reminderVector_.erase(it);
             totalCount_--;
+            store_->Delete(reminderId);
             break;
         } else {
             ++it;

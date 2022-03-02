@@ -498,5 +498,121 @@ bool ReminderRequestCalendar::ReadFromParcel(Parcel &parcel)
     }
     return true;
 }
+
+void ReminderRequestCalendar::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+{
+    ReminderRequest::RecoveryFromDb(resultSet);
+
+    // repeatDay
+    repeatDay_ = static_cast<uint32_t>(RecoveryInt64FromDb(resultSet, Instance::REPEAT_DAYS, DbRecoveryType::INT));
+
+    // repeatMonth
+    repeatMonth_ =
+        static_cast<uint16_t>(RecoveryInt64FromDb(resultSet, Instance::REPEAT_MONTHS, DbRecoveryType::INT));
+
+    // firstDesignateYear
+    firstDesignateYear_ =
+        static_cast<uint16_t>(RecoveryInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_YEAR, DbRecoveryType::INT));
+
+    // firstDesignateMonth
+    firstDesignateMonth_ =
+        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_MONTH, DbRecoveryType::INT));
+
+    // firstDesignateDay
+    firstDesignateDay_ =
+        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_DAY, DbRecoveryType::INT));
+
+    // year
+    year_ = static_cast<uint16_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_YEAR, DbRecoveryType::INT));
+
+    // month
+    month_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_MONTH, DbRecoveryType::INT));
+
+    // day
+    day_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_DAY, DbRecoveryType::INT));
+
+    // hour
+    hour_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_HOUR, DbRecoveryType::INT));
+
+    // minute
+    minute_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_MINUTE, DbRecoveryType::INT));
+}
+
+void ReminderRequestCalendar::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+    const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values)
+{
+    uint32_t repeatDay = 0;
+    uint16_t repeatMonth = 0;
+    uint16_t firstDesignateYear = 0;
+    uint8_t firstDesignateMonth = 0;
+    uint8_t firstDesignateDay = 0;
+    uint16_t year = 0;
+    uint8_t month = 0;
+    uint8_t day = 0;
+    uint8_t hour = 0;
+    uint8_t minute = 0;
+    if (reminder->GetReminderType() == ReminderRequest::ReminderType::CALENDAR) {
+        ReminderRequestCalendar* calendar = static_cast<ReminderRequestCalendar*>(reminder.GetRefPtr());
+        repeatDay = calendar->GetRepeatDay();
+        repeatMonth = calendar->GetRepeatMonth();
+        firstDesignateYear = calendar->GetFirstDesignateYear();
+        firstDesignateMonth = calendar->GetFirstDesignageMonth();
+        firstDesignateDay = calendar->GetFirstDesignateDay();
+        year = calendar->GetYear();
+        month = calendar->GetMonth();
+        day = calendar->GetDay();
+        hour = calendar->GetHour();
+        minute = calendar->GetMinute();
+    }
+    values.PutInt(Instance::REPEAT_DAYS, repeatDay);
+    values.PutInt(Instance::REPEAT_MONTHS, repeatMonth);
+    values.PutInt(Instance::FIRST_DESIGNATE_YEAR, firstDesignateYear);
+    values.PutInt(Instance::FIRST_DESIGNATE_MONTH, firstDesignateMonth);
+    values.PutInt(Instance::FIRST_DESIGNATE_DAY, firstDesignateDay);
+    values.PutInt(Instance::CALENDAR_YEAR, year);
+    values.PutInt(Instance::CALENDAR_MONTH, month);
+    values.PutInt(Instance::CALENDAR_DAY, day);
+    values.PutInt(Instance::CALENDAR_HOUR, hour);
+    values.PutInt(Instance::CALENDAR_MINUTE, minute);
+}
+
+const std::string ReminderRequestCalendar::Instance::REPEAT_DAYS = "repeat_days";
+const std::string ReminderRequestCalendar::Instance::REPEAT_MONTHS = "repeat_months";
+const std::string ReminderRequestCalendar::Instance::FIRST_DESIGNATE_YEAR = "first_designate_year";
+const std::string ReminderRequestCalendar::Instance::FIRST_DESIGNATE_MONTH = "first_designate_month";
+const std::string ReminderRequestCalendar::Instance::FIRST_DESIGNATE_DAY = "first_designate_day";
+const std::string ReminderRequestCalendar::Instance::CALENDAR_YEAR = "calendar_year";
+const std::string ReminderRequestCalendar::Instance::CALENDAR_MONTH = "calendar_month";
+const std::string ReminderRequestCalendar::Instance::CALENDAR_DAY = "calendar_day";
+const std::string ReminderRequestCalendar::Instance::CALENDAR_HOUR = "calendar_hour";
+const std::string ReminderRequestCalendar::Instance::CALENDAR_MINUTE = "calendar_minute";
+
+std::string ReminderRequestCalendar::Instance::SQL_ADD_COLUMNS = "";
+std::vector<std::string> ReminderRequestCalendar::Instance::COLUMNS;
+
+void ReminderRequestCalendar::Instance::Init()
+{
+    AddColumn(REPEAT_DAYS, "INT", false);
+    AddColumn(REPEAT_MONTHS, "INT", false);
+    AddColumn(FIRST_DESIGNATE_YEAR, "INT", false);
+    AddColumn(FIRST_DESIGNATE_MONTH, "INT", false);
+    AddColumn(FIRST_DESIGNATE_DAY, "INT", false);
+    AddColumn(CALENDAR_YEAR, "INT", false);
+    AddColumn(CALENDAR_MONTH, "INT", false);
+    AddColumn(CALENDAR_DAY, "INT", false);
+    AddColumn(CALENDAR_HOUR, "INT", false);
+    AddColumn(CALENDAR_MINUTE, "INT", false);
+}
+
+void ReminderRequestCalendar::Instance::AddColumn(
+    const std::string &name, const std::string &type, const bool &isEnd)
+{
+    COLUMNS.push_back(name);
+    if (!isEnd) {
+        SQL_ADD_COLUMNS += name + " " + type + ", ";
+    } else {
+        SQL_ADD_COLUMNS += name + " " + type;
+    }
+}
 }
 }

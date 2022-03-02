@@ -52,6 +52,14 @@ public:
     ReminderRequestCalendar(const tm &dateTime,
         const std::vector<uint8_t> &repeatMonths, const std::vector<uint8_t> &repeatDays);
 
+    /**
+     * @brief This constructor should only be used in background proxy service process
+     * when reminder instance recovery from database.
+     *
+     * @param reminderId Indicates reminder id.
+     */
+    ReminderRequestCalendar(int32_t reminderId) : ReminderRequest(reminderId) {};
+
     explicit ReminderRequestCalendar(const ReminderRequestCalendar &other);
     ReminderRequestCalendar& operator = (const ReminderRequestCalendar &other);
     ~ReminderRequestCalendar() override {}
@@ -133,7 +141,31 @@ public:
 
     static const uint8_t MAX_MONTHS_OF_YEAR;
     static const uint8_t MAX_DAYS_OF_MONTH;
+    virtual void RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet) override;
+    static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+        const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
     static uint8_t GetDaysOfMonth(const uint16_t &year, const uint8_t &month);
+
+class Instance {
+public:
+    const static std::string REPEAT_DAYS;
+    const static std::string REPEAT_MONTHS;
+    const static std::string FIRST_DESIGNATE_YEAR;
+    const static std::string FIRST_DESIGNATE_MONTH;
+    const static std::string FIRST_DESIGNATE_DAY;
+    const static std::string CALENDAR_YEAR;
+    const static std::string CALENDAR_MONTH;
+    const static std::string CALENDAR_DAY;
+    const static std::string CALENDAR_HOUR;
+    const static std::string CALENDAR_MINUTE;
+
+    static std::string SQL_ADD_COLUMNS;
+    static std::vector<std::string> COLUMNS;
+    static void Init();
+
+private:
+    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
+};
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
@@ -144,6 +176,12 @@ private:
     uint8_t GetNextDay(const uint16_t &settedYear, const uint8_t &settedMonth, const tm &now, const tm &target) const;
     uint64_t GetNextTriggerTime() const;
     uint64_t GetNextTriggerTimeAsRepeatReminder(const tm &nowTime, const tm &tarTime) const;
+    uint32_t GetRepeatDay() const {
+        return repeatDay_;
+    }
+    uint16_t GetRepeatMonth() const {
+        return repeatMonth_;
+    }
     uint64_t GetTimeInstantMilli(
         uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) const;
 
