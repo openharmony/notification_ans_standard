@@ -304,15 +304,15 @@ void ReminderRequestAlarm::RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSha
 
     // repeatDays
     repeatDays_ =
-        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::REPEAT_DAYS_OF_WEEK, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, REPEAT_DAYS_OF_WEEK, DbRecoveryType::INT));
 
     // hour
     hour_ =
-        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::ALARM_HOUR, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, ALARM_HOUR, DbRecoveryType::INT));
 
     // minute
     minute_ =
-        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::ALARM_MINUTE, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, ALARM_MINUTE, DbRecoveryType::INT));
 }
 
 void ReminderRequestAlarm::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
@@ -327,33 +327,30 @@ void ReminderRequestAlarm::AppendValuesBucket(const sptr<ReminderRequest> &remin
         hour = alarm->GetHour();
         minute = alarm->GetMinute();
     }
-    values.PutInt(Instance::REPEAT_DAYS_OF_WEEK, repeatDays);
-    values.PutInt(Instance::ALARM_HOUR, hour);
-    values.PutInt(Instance::ALARM_MINUTE, minute);
+    values.PutInt(REPEAT_DAYS_OF_WEEK, repeatDays);
+    values.PutInt(ALARM_HOUR, hour);
+    values.PutInt(ALARM_MINUTE, minute);
 }
 
-const std::string ReminderRequestAlarm::Instance::REPEAT_DAYS_OF_WEEK = "repeat_days_of_week";
-const std::string ReminderRequestAlarm::Instance::ALARM_HOUR = "alarm_hour";
-const std::string ReminderRequestAlarm::Instance::ALARM_MINUTE = "alarm_minute";
+const std::string ReminderRequestAlarm::REPEAT_DAYS_OF_WEEK = "repeat_days_of_week";
+const std::string ReminderRequestAlarm::ALARM_HOUR = "alarm_hour";
+const std::string ReminderRequestAlarm::ALARM_MINUTE = "alarm_minute";
 
-std::string ReminderRequestAlarm::Instance::sqlOfAddColumns = "";
-std::vector<std::string> ReminderRequestAlarm::Instance::columns;
-
-void ReminderRequestAlarm::Instance::Init()
+void ReminderRequestAlarm::Init()
 {
     AddColumn(REPEAT_DAYS_OF_WEEK, "INT", false);
     AddColumn(ALARM_HOUR, "INT", false);
     AddColumn(ALARM_MINUTE, "INT", true);
 }
 
-void ReminderRequestAlarm::Instance::AddColumn(
+void ReminderRequestAlarm::AddColumn(
     const std::string &name, const std::string &type, const bool &isEnd)
 {
-    columns.push_back(name);
+    ReminderRequest::columns.push_back(name);
     if (!isEnd) {
-        sqlOfAddColumns += name + " " + type + ", ";
+        ReminderRequest::sqlOfAddColumns += name + " " + type + ", ";
     } else {
-        sqlOfAddColumns += name + " " + type;
+        ReminderRequest::sqlOfAddColumns += name + " " + type;
     }
 }
 }

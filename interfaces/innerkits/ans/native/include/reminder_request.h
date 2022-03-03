@@ -606,43 +606,37 @@ public:
     static const uint8_t REMINDER_STATUS_SHOWING;
     static const uint8_t REMINDER_STATUS_SNOOZE;
 
-class Instance {
-public:
-    const static std::string REMINDER_ID;
-    const static std::string PKG_NAME;
-    const static std::string USER_ID;
-    const static std::string UID;
-    const static std::string APP_LABEL;
-    const static std::string REMINDER_TYPE;
-    const static std::string REMINDER_TIME;
-    const static std::string TRIGGER_TIME;
-    const static std::string RTC_TRIGGER_TIME;
-    const static std::string TIME_INTERVAL;
-    const static std::string SNOOZE_TIMES;
-    const static std::string DYNAMIC_SNOOZE_TIMES;
-    const static std::string RING_DURATION;
-    const static std::string IS_EXPIRED;
-    const static std::string IS_ACTIVE;
-    const static std::string STATE;
-    const static std::string ZONE_ID;
-    const static std::string HAS_SCHEDULED_TIMEOUT;
-    const static std::string ACTION_BUTTON_INFO;
-    const static std::string SLOT_ID;
-    const static std::string NOTIFICATION_ID;
-    const static std::string TITLE;
-    const static std::string CONTENT;
-    const static std::string SNOOZE_CONTENT;
-    const static std::string EXPIRED_CONTENT;
-    const static std::string AGENT;
-    const static std::string MAX_SCREEN_AGENT;
-
+    // For database recovery.
+    static void Init();
+    static const std::string REMINDER_ID;
+    static const std::string PKG_NAME;
+    static const std::string USER_ID;
+    static const std::string UID;
+    static const std::string APP_LABEL;
+    static const std::string REMINDER_TYPE;
+    static const std::string REMINDER_TIME;
+    static const std::string TRIGGER_TIME;
+    static const std::string RTC_TRIGGER_TIME;
+    static const std::string TIME_INTERVAL;
+    static const std::string SNOOZE_TIMES;
+    static const std::string DYNAMIC_SNOOZE_TIMES;
+    static const std::string RING_DURATION;
+    static const std::string IS_EXPIRED;
+    static const std::string IS_ACTIVE;
+    static const std::string STATE;
+    static const std::string ZONE_ID;
+    static const std::string HAS_SCHEDULED_TIMEOUT;
+    static const std::string ACTION_BUTTON_INFO;
+    static const std::string SLOT_ID;
+    static const std::string NOTIFICATION_ID;
+    static const std::string TITLE;
+    static const std::string CONTENT;
+    static const std::string SNOOZE_CONTENT;
+    static const std::string EXPIRED_CONTENT;
+    static const std::string AGENT;
+    static const std::string MAX_SCREEN_AGENT;
     static std::string sqlOfAddColumns;
     static std::vector<std::string> columns;
-    static void Init();
-
-private:
-    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
-};
 
 protected:
     enum class DbRecoveryType : uint8_t {
@@ -702,6 +696,15 @@ private:
      * 2. Remove the snooze action button.
      */
     void UpdateNotificationStateForSnooze();
+
+    /**
+     * @brief Add column to create table of database.
+     *
+     * @param name Indicates the column name.
+     * @param type Indicates the type of the column.
+     * @param isEnd Indicates whether it is the last column.
+     */
+    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
 
     static const uint32_t MIN_TIME_INTERVAL_IN_MILLI;
     static const std::string SEP_BUTTON_SINGLE;

@@ -108,19 +108,8 @@ public:
     static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
         const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
 
-class Instance {
-public:
-    const static std::string REPEAT_DAYS_OF_WEEK;
-    const static std::string ALARM_HOUR;
-    const static std::string ALARM_MINUTE;
-
-    static std::string sqlOfAddColumns;
-    static std::vector<std::string> columns;
+    // For database recovery.
     static void Init();
-
-private:
-    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
-};
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
@@ -173,6 +162,12 @@ private:
     uint8_t hour_ = {0};
     uint8_t minute_ = {0};
     uint8_t repeatDays_ = {0};
+
+    // For database recovery.
+    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
+    static const std::string REPEAT_DAYS_OF_WEEK;
+    static const std::string ALARM_HOUR;
+    static const std::string ALARM_MINUTE;
 };
 }  // namespace Notification
 }  // namespace OHOS

@@ -146,26 +146,8 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
     static uint8_t GetDaysOfMonth(const uint16_t &year, const uint8_t &month);
 
-class Instance {
-public:
-    const static std::string REPEAT_DAYS;
-    const static std::string REPEAT_MONTHS;
-    const static std::string FIRST_DESIGNATE_YEAR;
-    const static std::string FIRST_DESIGNATE_MONTH;
-    const static std::string FIRST_DESIGNATE_DAY;
-    const static std::string CALENDAR_YEAR;
-    const static std::string CALENDAR_MONTH;
-    const static std::string CALENDAR_DAY;
-    const static std::string CALENDAR_HOUR;
-    const static std::string CALENDAR_MINUTE;
-
-    static std::string sqlOfAddColumns;
-    static std::vector<std::string> columns;
+    // For database recovery.
     static void Init();
-
-private:
-    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
-};
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
@@ -216,6 +198,20 @@ private:
     uint8_t second_ {0};
     uint16_t repeatMonth_ {0};
     uint32_t repeatDay_ {0};
+
+    // For database recovery.
+    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
+
+    static const std::string REPEAT_DAYS;
+    static const std::string REPEAT_MONTHS;
+    static const std::string FIRST_DESIGNATE_YEAR;
+    static const std::string FIRST_DESIGNATE_MONTH;
+    static const std::string FIRST_DESIGNATE_DAY;
+    static const std::string CALENDAR_YEAR;
+    static const std::string CALENDAR_MONTH;
+    static const std::string CALENDAR_DAY;
+    static const std::string CALENDAR_HOUR;
+    static const std::string CALENDAR_MINUTE;
 };
 }
 }
