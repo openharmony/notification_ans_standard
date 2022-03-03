@@ -104,7 +104,7 @@ public:
      * @return true if read parcel success.
      */
     bool ReadFromParcel(Parcel &parcel) override;
-    virtual void RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet) override;
+    virtual void RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet) override;
     static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
         const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
 
@@ -114,8 +114,8 @@ public:
     const static std::string ALARM_HOUR;
     const static std::string ALARM_MINUTE;
 
-    static std::string SQL_ADD_COLUMNS;
-    static std::vector<std::string> COLUMNS;
+    static std::string sqlOfAddColumns;
+    static std::vector<std::string> columns;
     static void Init();
 
 private:

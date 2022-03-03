@@ -408,9 +408,9 @@ public:
      *
      * @param resultSet Indicates the resultSet with pointer to the row of record data.
      */
-    virtual void RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
-    void RecoveryActionButton(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
-    void RecoveryWantAgent(std::string wantAgentInfo, const uint8_t &type);
+    virtual void RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
+    void RecoverActionButton(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
+    void RecoverWantAgent(std::string wantAgentInfo, const uint8_t &type);
 
     /**
      * @brief Sets action button.
@@ -559,7 +559,13 @@ public:
      */
     void UpdateNotificationRequest(UpdateNotificationType type, std::string extra);
 
-    static uint8_t GetConstStateInactive();
+    static int GetActualTime(const TimeTransferType &type, int cTime);
+    static int GetCTime(const TimeTransferType &type, int actualTime);
+    static uint64_t GetDurationSinceEpochInMilli(const time_t target);
+    static int32_t GetUid(const int &userId, const std::string &bundleName);
+    static int GetUserId(const int &uid);
+    static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+        const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
 
     static int32_t GLOBAL_ID;
     static const uint64_t INVALID_LONG_LONG_VALUE;
@@ -594,13 +600,11 @@ public:
      */
     static const std::string REMINDER_EVENT_REMOVE_NOTIFICATION;
     static const std::string PARAM_REMINDER_ID;
-    static int GetActualTime(const TimeTransferType &type, int cTime);
-    static int GetCTime(const TimeTransferType &type, int actualTime);
-    static uint64_t GetDurationSinceEpochInMilli(const time_t target);
-    static int32_t GetUid(const int &userId, const std::string &bundleName);
-    static int GetUserId(const int &uid);
-    static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
-        const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
+    static const uint8_t REMINDER_STATUS_INACTIVE;
+    static const uint8_t REMINDER_STATUS_ACTIVE;
+    static const uint8_t REMINDER_STATUS_ALERTING;
+    static const uint8_t REMINDER_STATUS_SHOWING;
+    static const uint8_t REMINDER_STATUS_SNOOZE;
 
 class Instance {
 public:
@@ -632,8 +636,8 @@ public:
     const static std::string AGENT;
     const static std::string MAX_SCREEN_AGENT;
 
-    static std::string SQL_ADD_COLUMNS;
-    static std::vector<std::string> COLUMNS;
+    static std::string sqlOfAddColumns;
+    static std::vector<std::string> columns;
     static void Init();
 
 private:
@@ -652,7 +656,7 @@ protected:
     {
         return INVALID_LONG_LONG_VALUE;
     }
-    int64_t RecoveryInt64FromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+    int64_t RecoverInt64FromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
         const std::string &columnName, const DbRecoveryType &columnType);
     static const int BASE_YEAR;
 
@@ -699,11 +703,6 @@ private:
      */
     void UpdateNotificationStateForSnooze();
 
-    static const uint8_t REMINDER_STATUS_INACTIVE;
-    static const uint8_t REMINDER_STATUS_ACTIVE;
-    static const uint8_t REMINDER_STATUS_ALERTING;
-    static const uint8_t REMINDER_STATUS_SHOWING;
-    static const uint8_t REMINDER_STATUS_SNOOZE;
     static const uint32_t MIN_TIME_INTERVAL_IN_MILLI;
     static const std::string SEP_BUTTON_SINGLE;
     static const std::string SEP_BUTTON_MULTI;

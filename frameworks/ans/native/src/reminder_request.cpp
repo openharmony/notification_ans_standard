@@ -383,25 +383,36 @@ bool ReminderRequest::OnTimeZoneChange()
         triggerTimeInMilli_, GetDurationSinceEpochInMilli(newZoneTriggerTime), nextTriggerTime);
 }
 
-int64_t ReminderRequest::RecoveryInt64FromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
+int64_t ReminderRequest::RecoverInt64FromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
     const std::string &columnName, const DbRecoveryType &columnType)
 {
-    if (columnType == DbRecoveryType::INT) {
-        int value;
-        resultSet->GetInt(ReminderStore::GetColumnIndex(columnName), value);
-        return static_cast<int64_t>(value);
+    if (resultSet == nullptr) {
+        ANSR_LOGE("ResultSet is null");
+        return 0;
     }
-    if (columnType == DbRecoveryType::LONG) {
-        int64_t value;
-        resultSet->GetLong(ReminderStore::GetColumnIndex(columnName), value);
-        return value;
+    switch (columnType) {
+        case (DbRecoveryType::INT): {
+            int value;
+            resultSet->GetInt(ReminderStore::GetColumnIndex(columnName), value);
+            return static_cast<int64_t>(value);
+        }
+        case (DbRecoveryType::LONG): {
+            int64_t value;
+            resultSet->GetLong(ReminderStore::GetColumnIndex(columnName), value);
+            return value;
+        }
     }
-    ANSR_LOGE("Recovery data error");
+    ANSR_LOGE("Recover data error");
     return 0;
 }
 
-void ReminderRequest::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+void ReminderRequest::RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
 {
+    if (resultSet == nullptr) {
+        ANSR_LOGE("ResultSet is null");
+        return;
+    }
+
     // reminderId
     resultSet->GetInt(ReminderStore::GetColumnIndex(Instance::REMINDER_ID), reminderId_);
 
@@ -421,27 +432,27 @@ void ReminderRequest::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedR
 
     // reminderTime
     reminderTimeInMilli_ =
-        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::REMINDER_TIME, DbRecoveryType::LONG));
+        static_cast<uint64_t>(RecoverInt64FromDb(resultSet, Instance::REMINDER_TIME, DbRecoveryType::LONG));
 
     // triggerTime
     triggerTimeInMilli_ =
-        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::TRIGGER_TIME, DbRecoveryType::LONG));
+        static_cast<uint64_t>(RecoverInt64FromDb(resultSet, Instance::TRIGGER_TIME, DbRecoveryType::LONG));
 
     // timeInterval
     uint64_t timeIntervalInSecond =
-        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::TIME_INTERVAL, DbRecoveryType::LONG));
+        static_cast<uint64_t>(RecoverInt64FromDb(resultSet, Instance::TIME_INTERVAL, DbRecoveryType::LONG));
     SetTimeInterval(timeIntervalInSecond);
 
     // snoozeTimes
-    snoozeTimes_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::SNOOZE_TIMES, DbRecoveryType::INT));
+    snoozeTimes_ = static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::SNOOZE_TIMES, DbRecoveryType::INT));
 
     // dynamicSnoozeTimes
     snoozeTimesDynamic_ =
-        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::DYNAMIC_SNOOZE_TIMES, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::DYNAMIC_SNOOZE_TIMES, DbRecoveryType::INT));
 
     // ringDuration
     uint64_t ringDurationInSecond =
-        static_cast<uint64_t>(RecoveryInt64FromDb(resultSet, Instance::RING_DURATION, DbRecoveryType::LONG));
+        static_cast<uint64_t>(RecoverInt64FromDb(resultSet, Instance::RING_DURATION, DbRecoveryType::LONG));
     SetRingDuration(ringDurationInSecond);
 
     // isExpired
@@ -450,10 +461,10 @@ void ReminderRequest::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedR
     isExpired_ = isExpired == "true" ? true : false;
 
     // state
-    state_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::STATE, DbRecoveryType::INT));
+    state_ = static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::STATE, DbRecoveryType::INT));
 
     // action buttons
-    RecoveryActionButton(resultSet);
+    RecoverActionButton(resultSet);
 
     // slotType
     int slotType;
@@ -480,29 +491,36 @@ void ReminderRequest::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedR
     // wantAgent
     std::string wantAgent;
     resultSet->GetString(ReminderStore::GetColumnIndex(Instance::AGENT), wantAgent);
-    RecoveryWantAgent(wantAgent, 0);
+    RecoverWantAgent(wantAgent, 0);
 
     // maxScreenWantAgent
     std::string maxScreenWantAgent;
     resultSet->GetString(ReminderStore::GetColumnIndex(Instance::MAX_SCREEN_AGENT), maxScreenWantAgent);
-    RecoveryWantAgent(wantAgent, 1);
+    RecoverWantAgent(wantAgent, 1);
 }
 
-void ReminderRequest::RecoveryActionButton(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+void ReminderRequest::RecoverActionButton(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
 {
+    if (resultSet == nullptr) {
+        ANSR_LOGE("ResultSet is null");
+        return;
+    }
     std::string actionButtonInfo;
     resultSet->GetString(ReminderStore::GetColumnIndex(Instance::ACTION_BUTTON_INFO), actionButtonInfo);
     std::vector<std::string> multiButton = StringSplit(actionButtonInfo, SEP_BUTTON_MULTI);
-    for (auto it = multiButton.begin(); it != multiButton.end(); ++it) {
-        std::vector<std::string> singleButton = StringSplit(*it, SEP_BUTTON_SINGLE);
+    for (auto button : multiButton) {
+        std::vector<std::string> singleButton = StringSplit(button, SEP_BUTTON_SINGLE);
         SetActionButton(singleButton.at(1), ActionButtonType(std::stoi(singleButton.at(0), nullptr)));
     }
 }
 
 std::vector<std::string> ReminderRequest::StringSplit(std::string source, const std::string &split) const
 {
-    size_t pos = 0;
     std::vector<std::string> result;
+    if (source.empty()) {
+        return result;
+    }
+    size_t pos = 0;
     while ((pos = source.find(split)) != std::string::npos) {
         std::string token = source.substr(0, pos);
         if (!token.empty()) {
@@ -516,28 +534,34 @@ std::vector<std::string> ReminderRequest::StringSplit(std::string source, const 
     return result;
 }
 
-void ReminderRequest::RecoveryWantAgent(std::string wantAgentInfo, const uint8_t &type)
+void ReminderRequest::RecoverWantAgent(std::string wantAgentInfo, const uint8_t &type)
 {
     std::vector<std::string> info = StringSplit(wantAgentInfo, ReminderRequest::SEP_WANT_AGENT);
     uint8_t minLen = 2;
     if (info.size() < minLen) {
-        ANSR_LOGW("RecoveryWantAgent fail");
+        ANSR_LOGW("RecoverWantAgent fail");
         return;
     }
-    // AppExecFwk::ElementName wantAgent("", info.at(0), info.at(1));
     ANSR_LOGD("pkg=%{public}s, ability=%{public}s", info.at(0).c_str(), info.at(1).c_str());
-    if (type == 0) {
-        auto wantAgentInfo = std::make_shared<ReminderRequest::WantAgentInfo>();
-        wantAgentInfo->pkgName = info.at(0);
-        wantAgentInfo->abilityName = info.at(1);
-        SetWantAgentInfo(wantAgentInfo);
-    } else if (type == 1) {
-        auto maxScreenWantAgentInfo = std::make_shared<ReminderRequest::MaxScreenAgentInfo>();
-        maxScreenWantAgentInfo->pkgName = info.at(0);
-        maxScreenWantAgentInfo->abilityName = info.at(1);
-        SetMaxScreenWantAgentInfo(maxScreenWantAgentInfo);
-    } else {
-        ANSR_LOGW("RecoveryWantAgent type not support");
+    switch (type) {
+        case 0: {
+            auto wantAgentInfo = std::make_shared<ReminderRequest::WantAgentInfo>();
+            wantAgentInfo->pkgName = info.at(0);
+            wantAgentInfo->abilityName = info.at(1);
+            SetWantAgentInfo(wantAgentInfo);
+            break;
+        }
+        case 1: {
+            auto maxScreenWantAgentInfo = std::make_shared<ReminderRequest::MaxScreenAgentInfo>();
+            maxScreenWantAgentInfo->pkgName = info.at(0);
+            maxScreenWantAgentInfo->abilityName = info.at(1);
+            SetMaxScreenWantAgentInfo(maxScreenWantAgentInfo);
+            break;
+        }
+        default: {
+            ANSR_LOGW("RecoverWantAgent type not support");
+            break;
+        }
     }
 }
 
@@ -625,11 +649,6 @@ bool ReminderRequest::ShouldShowImmediately() const
         return false;
     }
     return true;
-}
-
-uint8_t ReminderRequest::GetConstStateInactive()
-{
-    return REMINDER_STATUS_INACTIVE;
 }
 
 std::map<ReminderRequest::ActionButtonType, ReminderRequest::ActionButtonInfo> ReminderRequest::GetActionButtons(
@@ -899,12 +918,12 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
         ANSR_LOGE("Failed to write action button size");
         return false;
     }
-    for (auto it = actionButtonMap_.begin(); it != actionButtonMap_.end(); ++it) {
-        if (!parcel.WriteUint8(static_cast<uint8_t>(it->first))) {
+    for (auto button : actionButtonMap_) {
+        if (!parcel.WriteUint8(static_cast<uint8_t>(button.first))) {
             ANSR_LOGE("Failed to write action button type");
             return false;
         }
-        if (!parcel.WriteString(static_cast<std::string>(it->second.title))) {
+        if (!parcel.WriteString(static_cast<std::string>(button.second.title))) {
             ANSR_LOGE("Failed to write action button title");
             return false;
         }
@@ -1092,12 +1111,12 @@ std::string ReminderRequest::GetButtonInfo() const
 {
     std::string info = "";
     bool isFirst = true;
-    for (auto it = actionButtonMap_.begin(); it != actionButtonMap_.end(); ++it) {
+    for (auto button : actionButtonMap_) {
         if (!isFirst) {
             info += SEP_BUTTON_MULTI;
         }
-        ActionButtonInfo buttonInfo = it->second;
-        info += std::to_string(static_cast<uint8_t>(it->first)) + SEP_BUTTON_SINGLE + buttonInfo.title;
+        ActionButtonInfo buttonInfo = button.second;
+        info += std::to_string(static_cast<uint8_t>(button.first)) + SEP_BUTTON_SINGLE + buttonInfo.title;
         isFirst = false;
     }
     return info;
@@ -1189,9 +1208,9 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
     int requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
-    for (auto it = actionButtonMap_.begin(); it != actionButtonMap_.end(); ++it) {
+    for (auto button : actionButtonMap_) {
         auto want = std::make_shared<OHOS::AAFwk::Want>();
-        auto type = it->first;
+        auto type = button.first;
         if (type == ActionButtonType::CLOSE) {
             want->SetAction(REMINDER_EVENT_CLOSE_ALERT);
             ANSR_LOGD("Add action button, type is close");
@@ -1208,7 +1227,7 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
         want->SetParam(PARAM_REMINDER_ID, reminderId_);
         std::vector<std::shared_ptr<AAFwk::Want>> wants;
         wants.push_back(want);
-        auto title = static_cast<std::string>(it->second.title);
+        auto title = static_cast<std::string>(button.second.title);
         AbilityRuntime::WantAgent::WantAgentInfo buttonWantAgentInfo(
             requestCode,
             AbilityRuntime::WantAgent::WantAgentConstant::OperationType::SEND_COMMON_EVENT,
@@ -1359,13 +1378,16 @@ void ReminderRequest::UpdateNotificationBundleInfo()
     if (!(notificationRequest_->GetOwnerBundleName()).empty()) {
         return;
     }
-
     notificationRequest_->SetOwnerBundleName(bundleName_);
     notificationRequest_->SetCreatorBundleName(bundleName_);
 
     notificationRequest_->SetCreatorUid(uid_);
 
-    OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid_, userId_);
+    ErrCode errCode = OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid_, userId_);
+    if (errCode != ERR_OK) {
+        ANSR_LOGE("GetOsAccountLocalIdFromUid fail.");
+        return;
+    }
     notificationRequest_->SetCreatorUserId(userId_);
 }
 
@@ -1552,8 +1574,8 @@ const std::string ReminderRequest::Instance::EXPIRED_CONTENT = "expired_content"
 const std::string ReminderRequest::Instance::AGENT = "agent";
 const std::string ReminderRequest::Instance::MAX_SCREEN_AGENT = "maxScreen_agent";
 
-std::string ReminderRequest::Instance::SQL_ADD_COLUMNS = "";
-std::vector<std::string> ReminderRequest::Instance::COLUMNS;
+std::string ReminderRequest::Instance::sqlOfAddColumns = "";
+std::vector<std::string> ReminderRequest::Instance::columns;
 
 void ReminderRequest::Instance::Init()
 {
@@ -1589,11 +1611,11 @@ void ReminderRequest::Instance::Init()
 void ReminderRequest::Instance::AddColumn(
     const std::string &name, const std::string &type, const bool &isEnd)
 {
-    COLUMNS.push_back(name);
+    columns.push_back(name);
     if (!isEnd) {
-        SQL_ADD_COLUMNS += name + " " + type + ", ";
+        sqlOfAddColumns += name + " " + type + ", ";
     } else {
-        SQL_ADD_COLUMNS += name + " " + type;
+        sqlOfAddColumns += name + " " + type;
     }
 }
 }

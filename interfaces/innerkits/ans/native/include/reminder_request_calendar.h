@@ -141,7 +141,7 @@ public:
 
     static const uint8_t MAX_MONTHS_OF_YEAR;
     static const uint8_t MAX_DAYS_OF_MONTH;
-    virtual void RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet) override;
+    virtual void RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet) override;
     static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
         const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
     static uint8_t GetDaysOfMonth(const uint16_t &year, const uint8_t &month);
@@ -159,8 +159,8 @@ public:
     const static std::string CALENDAR_HOUR;
     const static std::string CALENDAR_MINUTE;
 
-    static std::string SQL_ADD_COLUMNS;
-    static std::vector<std::string> COLUMNS;
+    static std::string sqlOfAddColumns;
+    static std::vector<std::string> columns;
     static void Init();
 
 private:

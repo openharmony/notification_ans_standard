@@ -499,43 +499,43 @@ bool ReminderRequestCalendar::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
-void ReminderRequestCalendar::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+void ReminderRequestCalendar::RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
 {
-    ReminderRequest::RecoveryFromDb(resultSet);
+    ReminderRequest::RecoverFromDb(resultSet);
 
     // repeatDay
-    repeatDay_ = static_cast<uint32_t>(RecoveryInt64FromDb(resultSet, Instance::REPEAT_DAYS, DbRecoveryType::INT));
+    repeatDay_ = static_cast<uint32_t>(RecoverInt64FromDb(resultSet, Instance::REPEAT_DAYS, DbRecoveryType::INT));
 
     // repeatMonth
     repeatMonth_ =
-        static_cast<uint16_t>(RecoveryInt64FromDb(resultSet, Instance::REPEAT_MONTHS, DbRecoveryType::INT));
+        static_cast<uint16_t>(RecoverInt64FromDb(resultSet, Instance::REPEAT_MONTHS, DbRecoveryType::INT));
 
     // firstDesignateYear
     firstDesignateYear_ =
-        static_cast<uint16_t>(RecoveryInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_YEAR, DbRecoveryType::INT));
+        static_cast<uint16_t>(RecoverInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_YEAR, DbRecoveryType::INT));
 
     // firstDesignateMonth
     firstDesignateMonth_ =
-        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_MONTH, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_MONTH, DbRecoveryType::INT));
 
     // firstDesignateDay
     firstDesignateDay_ =
-        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_DAY, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::FIRST_DESIGNATE_DAY, DbRecoveryType::INT));
 
     // year
-    year_ = static_cast<uint16_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_YEAR, DbRecoveryType::INT));
+    year_ = static_cast<uint16_t>(RecoverInt64FromDb(resultSet, Instance::CALENDAR_YEAR, DbRecoveryType::INT));
 
     // month
-    month_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_MONTH, DbRecoveryType::INT));
+    month_ = static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::CALENDAR_MONTH, DbRecoveryType::INT));
 
     // day
-    day_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_DAY, DbRecoveryType::INT));
+    day_ = static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::CALENDAR_DAY, DbRecoveryType::INT));
 
     // hour
-    hour_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_HOUR, DbRecoveryType::INT));
+    hour_ = static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::CALENDAR_HOUR, DbRecoveryType::INT));
 
     // minute
-    minute_ = static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::CALENDAR_MINUTE, DbRecoveryType::INT));
+    minute_ = static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::CALENDAR_MINUTE, DbRecoveryType::INT));
 }
 
 void ReminderRequestCalendar::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
@@ -587,8 +587,8 @@ const std::string ReminderRequestCalendar::Instance::CALENDAR_DAY = "calendar_da
 const std::string ReminderRequestCalendar::Instance::CALENDAR_HOUR = "calendar_hour";
 const std::string ReminderRequestCalendar::Instance::CALENDAR_MINUTE = "calendar_minute";
 
-std::string ReminderRequestCalendar::Instance::SQL_ADD_COLUMNS = "";
-std::vector<std::string> ReminderRequestCalendar::Instance::COLUMNS;
+std::string ReminderRequestCalendar::Instance::sqlOfAddColumns = "";
+std::vector<std::string> ReminderRequestCalendar::Instance::columns;
 
 void ReminderRequestCalendar::Instance::Init()
 {
@@ -607,11 +607,11 @@ void ReminderRequestCalendar::Instance::Init()
 void ReminderRequestCalendar::Instance::AddColumn(
     const std::string &name, const std::string &type, const bool &isEnd)
 {
-    COLUMNS.push_back(name);
+    columns.push_back(name);
     if (!isEnd) {
-        SQL_ADD_COLUMNS += name + " " + type + ", ";
+        sqlOfAddColumns += name + " " + type + ", ";
     } else {
-        SQL_ADD_COLUMNS += name + " " + type;
+        sqlOfAddColumns += name + " " + type;
     }
 }
 }

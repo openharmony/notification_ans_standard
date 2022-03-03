@@ -91,6 +91,7 @@ ohos_moduletest("ans_fw_module_test") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "native_appdatamgr:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -241,6 +242,7 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "native_appdatamgr:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
@@ -314,6 +316,7 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "native_appdatamgr:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

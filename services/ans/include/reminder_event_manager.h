@@ -49,7 +49,7 @@ private:
 
 class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
 public:
-    SystemAbilityStatusChangeListener(std::shared_ptr<ReminderDataManager> &reminderDataManager);
+    explicit SystemAbilityStatusChangeListener(std::shared_ptr<ReminderDataManager> &reminderDataManager);
     ~SystemAbilityStatusChangeListener() {};
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
