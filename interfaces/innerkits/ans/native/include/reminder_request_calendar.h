@@ -58,7 +58,7 @@ public:
      *
      * @param reminderId Indicates reminder id.
      */
-    ReminderRequestCalendar(int32_t reminderId) : ReminderRequest(reminderId) {};
+    explicit ReminderRequestCalendar(int32_t reminderId) : ReminderRequest(reminderId) {};
 
     explicit ReminderRequestCalendar(const ReminderRequestCalendar &other);
     ReminderRequestCalendar& operator = (const ReminderRequestCalendar &other);
@@ -200,8 +200,6 @@ private:
     uint32_t repeatDay_ {0};
 
     // For database recovery.
-    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
-
     static const std::string REPEAT_DAYS;
     static const std::string REPEAT_MONTHS;
     static const std::string FIRST_DESIGNATE_YEAR;

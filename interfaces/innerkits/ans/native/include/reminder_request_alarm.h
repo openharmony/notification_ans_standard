@@ -46,7 +46,7 @@ public:
      *
      * @param reminderId Indicates reminder id.
      */
-    ReminderRequestAlarm(int32_t reminderId) : ReminderRequest(reminderId) {};
+    explicit ReminderRequestAlarm(int32_t reminderId) : ReminderRequest(reminderId) {};
 
     /**
      * @brief Copy construct from an exist reminder.
@@ -164,7 +164,6 @@ private:
     uint8_t repeatDays_ = {0};
 
     // For database recovery.
-    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
     static const std::string REPEAT_DAYS_OF_WEEK;
     static const std::string ALARM_HOUR;
     static const std::string ALARM_MINUTE;
