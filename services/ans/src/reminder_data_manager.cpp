@@ -457,11 +457,6 @@ void ReminderDataManager::UpdateAndSaveReminderLocked(
 void ReminderDataManager::SetService(AdvancedNotificationService *advancedNotificationService)
 {
     advancedNotificationService_ = advancedNotificationService;
-    if (advancedNotificationService_ == nullptr) {
-        ANSR_LOGD("~~~~advancedNotificationService_ is null");
-    } else {
-        ANSR_LOGD("~~~~advancedNotificationService_ is not null");
-    }
 }
 
 void ReminderDataManager::ShowActiveReminder()
