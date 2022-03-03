@@ -198,6 +198,7 @@ private:
         const sptr<NotificationBundleOption> bundleOption, const std::shared_ptr<NotificationRecord> record);
     ErrCode DoDistributedDelete(const std::string deviceId, const sptr<Notification> notification);
     std::string GetNotificationDeviceId(const std::string &key);
+    bool CheckDistributedNotificationType(const sptr<NotificationRequest> &request);
     void OnDistributedPublish(
         const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request);
     void OnDistributedUpdate(
