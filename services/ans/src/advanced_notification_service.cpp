@@ -2738,11 +2738,15 @@ ErrCode AdvancedNotificationService::DoDistributedDelete(
     return ERR_OK;
 }
 
-inline bool CheckDistributedNotificationType(const sptr<NotificationRequest> &request)
+bool AdvancedNotificationService::CheckDistributedNotificationType(const sptr<NotificationRequest> &request)
 {
+    auto deviceTypeList = request->GetNotificationDistributedOptions().GetDevicesSupportDisplay();
+    if (deviceTypeList.empty()) {
+        return true;
+    }
+
     DistributedDatabase::DeviceInfo localDeviceInfo;
     DistributedNotificationManager::GetInstance()->GetLocalDeviceInfo(localDeviceInfo);
-    auto deviceTypeList = request->GetNotificationDistributedOptions().GetDevicesSupportDisplay();
     for (auto device : deviceTypeList) {
         if (device == localDeviceInfo.deviceType) {
             return true;
