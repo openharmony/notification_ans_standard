@@ -870,15 +870,14 @@ void ReminderDataManager::Init(bool isFromBootComplete)
 void ReminderDataManager::GetImmediatelyShowRemindersLocked(std::vector<sptr<ReminderRequest>> &reminders) const
 {
     std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
-    for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
-        if ((*it)->ShouldShowImmediately()) {
-            if ((*it)->GetReminderType() != ReminderRequest::ReminderType::TIMER) {
-                (*it)->SetSnoozeTimesDynamic(0);
-            }
-            reminders.push_back(*it);
-        } else {
+    for (auto reminderSptr : reminderVector_) {
+        if (!(reminderSptr->ShouldShowImmediately())) {
             break;
         }
+        if (reminderSptr->GetReminderType() != ReminderRequest::ReminderType::TIMER) {
+            reminderSptr->SetSnoozeTimesDynamic(0);
+        }
+        reminders.push_back(reminderSptr);
     }
 }
 

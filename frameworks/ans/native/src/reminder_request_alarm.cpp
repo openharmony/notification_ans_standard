@@ -298,21 +298,21 @@ bool ReminderRequestAlarm::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
-void ReminderRequestAlarm::RecoveryFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+void ReminderRequestAlarm::RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
 {
-    ReminderRequest::RecoveryFromDb(resultSet);
+    ReminderRequest::RecoverFromDb(resultSet);
 
     // repeatDays
     repeatDays_ =
-        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::REPEAT_DAYS_OF_WEEK, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::REPEAT_DAYS_OF_WEEK, DbRecoveryType::INT));
 
     // hour
     hour_ =
-        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::ALARM_HOUR, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::ALARM_HOUR, DbRecoveryType::INT));
 
     // minute
     minute_ =
-        static_cast<uint8_t>(RecoveryInt64FromDb(resultSet, Instance::ALARM_MINUTE, DbRecoveryType::INT));
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, Instance::ALARM_MINUTE, DbRecoveryType::INT));
 }
 
 void ReminderRequestAlarm::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
@@ -336,8 +336,8 @@ const std::string ReminderRequestAlarm::Instance::REPEAT_DAYS_OF_WEEK = "repeat_
 const std::string ReminderRequestAlarm::Instance::ALARM_HOUR = "alarm_hour";
 const std::string ReminderRequestAlarm::Instance::ALARM_MINUTE = "alarm_minute";
 
-std::string ReminderRequestAlarm::Instance::SQL_ADD_COLUMNS = "";
-std::vector<std::string> ReminderRequestAlarm::Instance::COLUMNS;
+std::string ReminderRequestAlarm::Instance::sqlOfAddColumns = "";
+std::vector<std::string> ReminderRequestAlarm::Instance::columns;
 
 void ReminderRequestAlarm::Instance::Init()
 {
@@ -349,11 +349,11 @@ void ReminderRequestAlarm::Instance::Init()
 void ReminderRequestAlarm::Instance::AddColumn(
     const std::string &name, const std::string &type, const bool &isEnd)
 {
-    COLUMNS.push_back(name);
+    columns.push_back(name);
     if (!isEnd) {
-        SQL_ADD_COLUMNS += name + " " + type + ", ";
+        sqlOfAddColumns += name + " " + type + ", ";
     } else {
-        SQL_ADD_COLUMNS += name + " " + type;
+        sqlOfAddColumns += name + " " + type;
     }
 }
 }
