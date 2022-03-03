@@ -42,7 +42,7 @@ public:
     static std::vector<int32_t> GetRepeatInfo(int64_t repeatData, int32_t maxRepeatVal);
     static uint8_t GetColumnIndex(const std::string& name);
 
-    static std::vector<std::string> COLUMNS;
+    static std::vector<std::string> columns;
     static const int32_t STATE_FAIL;
     static const int32_t STATE_OK;
 
