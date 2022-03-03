@@ -589,27 +589,16 @@ const std::string ReminderRequestCalendar::CALENDAR_MINUTE = "calendar_minute";
 
 void ReminderRequestCalendar::Init()
 {
-    AddColumn(REPEAT_DAYS, "INT", false);
-    AddColumn(REPEAT_MONTHS, "INT", false);
-    AddColumn(FIRST_DESIGNATE_YEAR, "INT", false);
-    AddColumn(FIRST_DESIGNATE_MONTH, "INT", false);
-    AddColumn(FIRST_DESIGNATE_DAY, "INT", false);
-    AddColumn(CALENDAR_YEAR, "INT", false);
-    AddColumn(CALENDAR_MONTH, "INT", false);
-    AddColumn(CALENDAR_DAY, "INT", false);
-    AddColumn(CALENDAR_HOUR, "INT", false);
-    AddColumn(CALENDAR_MINUTE, "INT", false);
-}
-
-void ReminderRequestCalendar::AddColumn(
-    const std::string &name, const std::string &type, const bool &isEnd)
-{
-    ReminderRequest::columns.push_back(name);
-    if (!isEnd) {
-        ReminderRequest::sqlOfAddColumns += name + " " + type + ", ";
-    } else {
-        ReminderRequest::sqlOfAddColumns += name + " " + type;
-    }
+    ReminderRequest::AddColumn(REPEAT_DAYS, "INT", false);
+    ReminderRequest::AddColumn(REPEAT_MONTHS, "INT", false);
+    ReminderRequest::AddColumn(FIRST_DESIGNATE_YEAR, "INT", false);
+    ReminderRequest::AddColumn(FIRST_DESIGNATE_MONTH, "INT", false);
+    ReminderRequest::AddColumn(FIRST_DESIGNATE_DAY, "INT", false);
+    ReminderRequest::AddColumn(CALENDAR_YEAR, "INT", false);
+    ReminderRequest::AddColumn(CALENDAR_MONTH, "INT", false);
+    ReminderRequest::AddColumn(CALENDAR_DAY, "INT", false);
+    ReminderRequest::AddColumn(CALENDAR_HOUR, "INT", false);
+    ReminderRequest::AddColumn(CALENDAR_MINUTE, "INT", false);
 }
 }
 }

@@ -175,11 +175,11 @@ int64_t ReminderStore::UpdateOrInsert(
     int64_t isSuccess = STATE_FAIL;
     if (rdbStore_ == nullptr) {
         ANSR_LOGE("Rdb store is not initialized.");
-        return false;
+        return isSuccess;
     }
     if (bundleOption == nullptr) {
         ANSR_LOGE("BundleOption is null.");
-        return STATE_FAIL;
+        return isSuccess;
     }
     if (IsReminderExist(reminder)) {
         isSuccess = Update(reminder, bundleOption);
@@ -254,17 +254,6 @@ std::shared_ptr<NativeRdb::AbsSharedResultSet> ReminderStore::Query(const std::s
     std::vector<std::string> whereArgs;
     queryResultSet = rdbStore_->QuerySql(queryCondition, whereArgs);
     return queryResultSet;
-}
-
-std::vector<int32_t> ReminderStore::GetRepeatInfo(int64_t repeatData, int32_t maxRepeatVal)
-{
-    std::vector<int32_t> repeatInfo;
-    for (int i = 1; i <= maxRepeatVal; i++) {
-        if ((repeatData & (1 << (i - 1))) > 0) {
-            repeatInfo.push_back(i);
-        }
-    }
-    return repeatInfo;
 }
 
 uint8_t ReminderStore::GetColumnIndex(const std::string& name)
@@ -365,6 +354,7 @@ sptr<ReminderRequest> ReminderStore::BuildReminder(const std::shared_ptr<NativeR
         }
         default: {
             ANSR_LOGE("ReminderType from database is error, reminderType %{public}d.", reminderType);
+            break;
         }
     }
     if (reminder != nullptr) {

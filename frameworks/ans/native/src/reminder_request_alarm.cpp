@@ -338,20 +338,9 @@ const std::string ReminderRequestAlarm::ALARM_MINUTE = "alarm_minute";
 
 void ReminderRequestAlarm::Init()
 {
-    AddColumn(REPEAT_DAYS_OF_WEEK, "INT", false);
-    AddColumn(ALARM_HOUR, "INT", false);
-    AddColumn(ALARM_MINUTE, "INT", true);
-}
-
-void ReminderRequestAlarm::AddColumn(
-    const std::string &name, const std::string &type, const bool &isEnd)
-{
-    ReminderRequest::columns.push_back(name);
-    if (!isEnd) {
-        ReminderRequest::sqlOfAddColumns += name + " " + type + ", ";
-    } else {
-        ReminderRequest::sqlOfAddColumns += name + " " + type;
-    }
+    ReminderRequest::AddColumn(REPEAT_DAYS_OF_WEEK, "INT", false);
+    ReminderRequest::AddColumn(ALARM_HOUR, "INT", false);
+    ReminderRequest::AddColumn(ALARM_MINUTE, "INT", true);
 }
 }
 }

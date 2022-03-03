@@ -39,7 +39,6 @@ public:
     bool GetBundleOption(const int32_t &reminderId, sptr<NotificationBundleOption> &bundleOption) const;
     int32_t GetMaxId();
     int64_t UpdateOrInsert(const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption);
-    static std::vector<int32_t> GetRepeatInfo(int64_t repeatData, int32_t maxRepeatVal);
     static uint8_t GetColumnIndex(const std::string& name);
 
     static std::vector<std::string> columns;

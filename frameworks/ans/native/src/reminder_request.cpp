@@ -401,6 +401,10 @@ int64_t ReminderRequest::RecoverInt64FromDb(const std::shared_ptr<NativeRdb::Abs
             resultSet->GetLong(ReminderStore::GetColumnIndex(columnName), value);
             return value;
         }
+        default: {
+            ANSR_LOGD("ColumnType not support.");
+            break;
+        }
     }
     ANSR_LOGE("Recover data error");
     return 0;

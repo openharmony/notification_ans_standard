@@ -652,6 +652,18 @@ protected:
     }
     int64_t RecoverInt64FromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet,
         const std::string &columnName, const DbRecoveryType &columnType);
+
+    /**
+     * @brief For database recovery.
+     *
+     * Add column to create table of database.
+     *
+     * @param name Indicates the column name.
+     * @param type Indicates the type of the column.
+     * @param isEnd Indicates whether it is the last column.
+     */
+    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
+
     static const int BASE_YEAR;
 
 private:
@@ -696,15 +708,6 @@ private:
      * 2. Remove the snooze action button.
      */
     void UpdateNotificationStateForSnooze();
-
-    /**
-     * @brief Add column to create table of database.
-     *
-     * @param name Indicates the column name.
-     * @param type Indicates the type of the column.
-     * @param isEnd Indicates whether it is the last column.
-     */
-    static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
 
     static const uint32_t MIN_TIME_INTERVAL_IN_MILLI;
     static const std::string SEP_BUTTON_SINGLE;
