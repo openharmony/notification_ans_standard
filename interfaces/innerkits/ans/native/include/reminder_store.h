@@ -41,8 +41,6 @@ public:
     int64_t UpdateOrInsert(const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption);
     static uint8_t GetColumnIndex(const std::string& name);
 
-    static std::vector<std::string> columns;
-    static const int32_t STATE_FAIL;
     static const int32_t STATE_OK;
 
 private:
@@ -70,13 +68,6 @@ private:
     int64_t Insert(const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption);
     std::shared_ptr<NativeRdb::AbsSharedResultSet> Query(const std::string &queryCondition) const;
     int64_t Update(const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption);
-
-    static const std::string REMINDER_DB_DIR;
-    static const std::string REMINDER_DB_NAME;
-    static const std::string REMINDER_DB_TABLE;
-    static const uint32_t REMINDER_RDB_VERSION;
-    static const uint16_t TIME_INTERVAL_FOR_DELETE;
-    static const uint16_t MILLI_SECONDS;
 
 class ReminderStoreDataCallBack : public NativeRdb::RdbOpenCallback {
 public:

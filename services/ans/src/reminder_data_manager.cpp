@@ -236,7 +236,14 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
 std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerType type) const
 {
     auto sharedTimerInfo = std::make_shared<ReminderTimerInfo>();
-    sharedTimerInfo->SetType(sharedTimerInfo->TIMER_TYPE_WAKEUP|sharedTimerInfo->TIMER_TYPE_EXACT);
+    if (sharedTimerInfo->TIMER_TYPE_WAKEUP > UINT8_MAX || sharedTimerInfo->TIMER_TYPE_EXACT > UINT8_MAX) {
+        ANSR_LOGE("Failed to set timer type.");
+        return nullptr;
+    }
+    uint8_t timerTypeWakeup = static_cast<uint8_t>(sharedTimerInfo->TIMER_TYPE_WAKEUP);
+    uint8_t timerTypeExact = static_cast<uint8_t>(sharedTimerInfo->TIMER_TYPE_EXACT);
+    int timerType = static_cast<int>(timerTypeWakeup | timerTypeExact);
+    sharedTimerInfo->SetType(timerType);
     sharedTimerInfo->SetRepeat(false);
     sharedTimerInfo->SetInterval(0);
 
