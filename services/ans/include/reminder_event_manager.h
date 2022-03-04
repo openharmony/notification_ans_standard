@@ -18,6 +18,7 @@
 
 #include "common_event_subscriber.h"
 #include "reminder_data_manager.h"
+#include "system_ability_status_change_stub.h"
 
 #include <memory>
 
@@ -43,6 +44,16 @@ private:
     sptr<NotificationBundleOption> GetBundleOption(const OHOS::EventFwk::Want &want) const;
     void HandlePackageRemove(OHOS::EventFwk::Want &want) const;
     void HandleProcessDied(OHOS::EventFwk::Want &want) const;
+    std::shared_ptr<ReminderDataManager> reminderDataManager_ = nullptr;
+};
+
+class SystemAbilityStatusChangeListener : public OHOS::SystemAbilityStatusChangeStub {
+public:
+    explicit SystemAbilityStatusChangeListener(std::shared_ptr<ReminderDataManager> &reminderDataManager);
+    ~SystemAbilityStatusChangeListener() {};
+    virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    virtual void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+private:
     std::shared_ptr<ReminderDataManager> reminderDataManager_ = nullptr;
 };
 };

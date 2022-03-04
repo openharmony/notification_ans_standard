@@ -41,6 +41,14 @@ public:
     ReminderRequestAlarm(uint8_t hour, uint8_t minute, std::vector<uint8_t> daysOfWeek);
 
     /**
+     * @brief This constructor should only be used in background proxy service process
+     * when reminder instance recovery from database.
+     *
+     * @param reminderId Indicates reminder id.
+     */
+    explicit ReminderRequestAlarm(int32_t reminderId) : ReminderRequest(reminderId) {};
+
+    /**
      * @brief Copy construct from an exist reminder.
      *
      * @param Indicates the exist alarm reminder.
@@ -96,6 +104,12 @@ public:
      * @return true if read parcel success.
      */
     bool ReadFromParcel(Parcel &parcel) override;
+    virtual void RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet) override;
+    static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+        const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
+
+    // For database recovery.
+    static void Init();
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
@@ -148,6 +162,11 @@ private:
     uint8_t hour_ = {0};
     uint8_t minute_ = {0};
     uint8_t repeatDays_ = {0};
+
+    // For database recovery.
+    static const std::string REPEAT_DAYS_OF_WEEK;
+    static const std::string ALARM_HOUR;
+    static const std::string ALARM_MINUTE;
 };
 }  // namespace Notification
 }  // namespace OHOS
