@@ -30,7 +30,6 @@ config("ansSTSlotGroupTestConfig") {
     "//foundation/appexecfwk/standard/services/bundlemgr/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
     "//foundation/appexecfwk/standard/common/log/include",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
     "${interfaces_path}/innerkits/ans/native/include",
   ]
 
