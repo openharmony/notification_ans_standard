@@ -23,7 +23,6 @@ config("ansfwk_kits_test_config") {
     "//foundation/appexecfwk/standard/services/bundlemgr/include",
     "//utils/system/safwk/native/include",
     "${services_path}/include",
-    "//foundation/distributedschedule/dmsfwk/services/dtbschedmgr/include",
     "//foundation/distributedschedule/safwk/services/safwk/include",
   ]
 }
