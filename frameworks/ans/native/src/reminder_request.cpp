@@ -26,6 +26,11 @@
 
 namespace OHOS {
 namespace Notification {
+namespace
+{
+const int BASE_YEAR = 1900;
+}
+
 int32_t ReminderRequest::GLOBAL_ID = 0;
 const uint64_t ReminderRequest::INVALID_LONG_LONG_VALUE = 0;
 const uint16_t ReminderRequest::INVALID_U16_VALUE = 0;
@@ -38,7 +43,6 @@ const uint8_t ReminderRequest::REMINDER_STATUS_ACTIVE = 1;
 const uint8_t ReminderRequest::REMINDER_STATUS_ALERTING = 2;
 const uint8_t ReminderRequest::REMINDER_STATUS_SHOWING = 4;
 const uint8_t ReminderRequest::REMINDER_STATUS_SNOOZE = 8;
-const int ReminderRequest::BASE_YEAR = 1900;
 const std::string ReminderRequest::NOTIFICATION_LABEL = "REMINDER_AGENT";
 const std::string ReminderRequest::REMINDER_EVENT_ALARM_ALERT = "ohos.event.notification.reminder.ALARM_ALERT";
 const std::string ReminderRequest::REMINDER_EVENT_CLOSE_ALERT = "ohos.event.notification.reminder.CLOSE_ALERT";
@@ -50,6 +54,38 @@ const std::string ReminderRequest::PARAM_REMINDER_ID = "REMINDER_ID";
 const std::string ReminderRequest::SEP_BUTTON_SINGLE = "<SEP,/>";
 const std::string ReminderRequest::SEP_BUTTON_MULTI = "<SEP#/>";
 const std::string ReminderRequest::SEP_WANT_AGENT = "<SEP#/>";
+
+// For database recovery.
+const std::string ReminderRequest::REMINDER_ID = "reminder_id";
+const std::string ReminderRequest::PKG_NAME = "package_name";
+const std::string ReminderRequest::USER_ID = "user_id";
+const std::string ReminderRequest::UID = "uid";
+const std::string ReminderRequest::APP_LABEL = "app_label";
+const std::string ReminderRequest::REMINDER_TYPE = "reminder_type";
+const std::string ReminderRequest::REMINDER_TIME = "reminder_time";
+const std::string ReminderRequest::TRIGGER_TIME = "trigger_time";
+const std::string ReminderRequest::RTC_TRIGGER_TIME = "rtc_trigger_time";
+const std::string ReminderRequest::TIME_INTERVAL = "time_interval";
+const std::string ReminderRequest::SNOOZE_TIMES = "snooze_times";
+const std::string ReminderRequest::DYNAMIC_SNOOZE_TIMES = "dynamic_snooze_times";
+const std::string ReminderRequest::RING_DURATION = "ring_duration";
+const std::string ReminderRequest::IS_EXPIRED = "is_expired";
+const std::string ReminderRequest::IS_ACTIVE = "is_active";
+const std::string ReminderRequest::STATE = "state";
+const std::string ReminderRequest::ZONE_ID = "zone_id";
+const std::string ReminderRequest::HAS_SCHEDULED_TIMEOUT = "has_ScheduledTimeout";
+const std::string ReminderRequest::ACTION_BUTTON_INFO = "button_info";
+const std::string ReminderRequest::SLOT_ID = "slot_id";
+const std::string ReminderRequest::NOTIFICATION_ID = "notification_id";
+const std::string ReminderRequest::TITLE = "title";
+const std::string ReminderRequest::CONTENT = "content";
+const std::string ReminderRequest::SNOOZE_CONTENT = "snooze_content";
+const std::string ReminderRequest::EXPIRED_CONTENT = "expired_content";
+const std::string ReminderRequest::AGENT = "agent";
+const std::string ReminderRequest::MAX_SCREEN_AGENT = "maxScreen_agent";
+
+std::string ReminderRequest::sqlOfAddColumns = "";
+std::vector<std::string> ReminderRequest::columns;
 
 ReminderRequest::ReminderRequest()
 {
@@ -937,12 +973,15 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
 
 ReminderRequest *ReminderRequest::Unmarshalling(Parcel &parcel)
 {
-    auto objptr = new ReminderRequest();
-    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
+    auto objptr = new (std::nothrow) ReminderRequest();
+    if (objptr == nullptr) {
+        ANSR_LOGE("Failed to create reminder due to no memory.");
+        return objptr;
+    }
+    if (!objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
-
     return objptr;
 }
 
@@ -1307,7 +1346,7 @@ void ReminderRequest::SetState(bool deSet, const uint8_t newState, std::string f
     if (deSet) {
         state_ |= newState;
     } else {
-        state_ &= ~newState;
+        state_ &= static_cast<uint8_t>(~newState);
     }
     ANSR_LOGI("Switch the reminder(reminderId=%{public}d) state, from %{public}s to %{public}s, called by %{public}s",
         reminderId_, GetState(oldState).c_str(), GetState(state_).c_str(), function.c_str());
@@ -1386,7 +1425,7 @@ void ReminderRequest::UpdateNotificationBundleInfo()
     notificationRequest_->SetOwnerBundleName(bundleName_);
     notificationRequest_->SetCreatorBundleName(bundleName_);
     notificationRequest_->SetCreatorUid(uid_);
-    ErrCode errCode = OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid_, userId_);
+    ErrCode errCode = AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid_, userId_);
     if (errCode != ERR_OK) {
         ANSR_LOGE("GetOsAccountLocalIdFromUid fail.");
         return;
@@ -1549,38 +1588,7 @@ void ReminderRequest::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
     }
 }
 
-const std::string ReminderRequest::REMINDER_ID = "reminder_id";
-const std::string ReminderRequest::PKG_NAME = "package_name";
-const std::string ReminderRequest::USER_ID = "user_id";
-const std::string ReminderRequest::UID = "uid";
-const std::string ReminderRequest::APP_LABEL = "app_label";
-const std::string ReminderRequest::REMINDER_TYPE = "reminder_type";
-const std::string ReminderRequest::REMINDER_TIME = "reminder_time";
-const std::string ReminderRequest::TRIGGER_TIME = "trigger_time";
-const std::string ReminderRequest::RTC_TRIGGER_TIME = "rtc_trigger_time";
-const std::string ReminderRequest::TIME_INTERVAL = "time_interval";
-const std::string ReminderRequest::SNOOZE_TIMES = "snooze_times";
-const std::string ReminderRequest::DYNAMIC_SNOOZE_TIMES = "dynamic_snooze_times";
-const std::string ReminderRequest::RING_DURATION = "ring_duration";
-const std::string ReminderRequest::IS_EXPIRED = "is_expired";
-const std::string ReminderRequest::IS_ACTIVE = "is_active";
-const std::string ReminderRequest::STATE = "state";
-const std::string ReminderRequest::ZONE_ID = "zone_id";
-const std::string ReminderRequest::HAS_SCHEDULED_TIMEOUT = "has_ScheduledTimeout";
-const std::string ReminderRequest::ACTION_BUTTON_INFO = "button_info";
-const std::string ReminderRequest::SLOT_ID = "slot_id";
-const std::string ReminderRequest::NOTIFICATION_ID = "notification_id";
-const std::string ReminderRequest::TITLE = "title";
-const std::string ReminderRequest::CONTENT = "content";
-const std::string ReminderRequest::SNOOZE_CONTENT = "snooze_content";
-const std::string ReminderRequest::EXPIRED_CONTENT = "expired_content";
-const std::string ReminderRequest::AGENT = "agent";
-const std::string ReminderRequest::MAX_SCREEN_AGENT = "maxScreen_agent";
-
-std::string ReminderRequest::sqlOfAddColumns = "";
-std::vector<std::string> ReminderRequest::columns;
-
-void ReminderRequest::Init()
+void ReminderRequest::InitDbColumns()
 {
     AddColumn(REMINDER_ID, "INTEGER PRIMARY KEY", false);
     AddColumn(PKG_NAME, "TEXT NOT NULL", false);

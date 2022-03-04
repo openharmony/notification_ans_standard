@@ -13,6 +13,18 @@
     },
     "deviceConfig": {},
     "module": {
+    "reqPermissions": [
+      {
+        "name": "ohos.permission.PUBLISH_AGENT_REMINDER",
+        "reason": "SYSTEM_GRANT",
+        "usedScene": {
+          "ability": [
+            ".FormAbility"
+          ],
+          "when": "inuse"
+        }
+      }
+    ],
       "package": "com.example.myapplication",
       "name": ".MyApplication",
       "deviceType": [

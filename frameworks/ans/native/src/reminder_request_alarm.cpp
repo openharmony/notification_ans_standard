@@ -29,6 +29,11 @@ const uint8_t ReminderRequestAlarm::MINUTES_PER_HOUR = 60;
 const int8_t ReminderRequestAlarm::INVALID_INT_VALUE = -1;
 const int8_t ReminderRequestAlarm::DEFAULT_SNOOZE_TIMES = 3;
 
+// For database recovery.
+const std::string ReminderRequestAlarm::REPEAT_DAYS_OF_WEEK = "repeat_days_of_week";
+const std::string ReminderRequestAlarm::ALARM_HOUR = "alarm_hour";
+const std::string ReminderRequestAlarm::ALARM_MINUTE = "alarm_minute";
+
 ReminderRequestAlarm::ReminderRequestAlarm(uint8_t hour, uint8_t minute, const std::vector<uint8_t> daysOfWeek)
     : ReminderRequest(ReminderRequest::ReminderType::ALARM)
 {
@@ -270,7 +275,11 @@ ReminderRequestAlarm *ReminderRequestAlarm::Unmarshalling(Parcel &parcel)
 {
     ANSR_LOGD("New alarm");
     auto objptr = new (std::nothrow) ReminderRequestAlarm();
-    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
+    if (objptr == nullptr) {
+        ANSR_LOGE("Failed to create reminder alarm due to no memory.");
+        return objptr;
+    }
+    if (!objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
@@ -332,11 +341,7 @@ void ReminderRequestAlarm::AppendValuesBucket(const sptr<ReminderRequest> &remin
     values.PutInt(ALARM_MINUTE, minute);
 }
 
-const std::string ReminderRequestAlarm::REPEAT_DAYS_OF_WEEK = "repeat_days_of_week";
-const std::string ReminderRequestAlarm::ALARM_HOUR = "alarm_hour";
-const std::string ReminderRequestAlarm::ALARM_MINUTE = "alarm_minute";
-
-void ReminderRequestAlarm::Init()
+void ReminderRequestAlarm::InitDbColumns()
 {
     ReminderRequest::AddColumn(REPEAT_DAYS_OF_WEEK, "INT", false);
     ReminderRequest::AddColumn(ALARM_HOUR, "INT", false);
