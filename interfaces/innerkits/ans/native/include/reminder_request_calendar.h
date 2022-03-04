@@ -52,6 +52,14 @@ public:
     ReminderRequestCalendar(const tm &dateTime,
         const std::vector<uint8_t> &repeatMonths, const std::vector<uint8_t> &repeatDays);
 
+    /**
+     * @brief This constructor should only be used in background proxy service process
+     * when reminder instance recovery from database.
+     *
+     * @param reminderId Indicates reminder id.
+     */
+    explicit ReminderRequestCalendar(int32_t reminderId) : ReminderRequest(reminderId) {};
+
     explicit ReminderRequestCalendar(const ReminderRequestCalendar &other);
     ReminderRequestCalendar& operator = (const ReminderRequestCalendar &other);
     ~ReminderRequestCalendar() override {}
@@ -133,7 +141,13 @@ public:
 
     static const uint8_t MAX_MONTHS_OF_YEAR;
     static const uint8_t MAX_DAYS_OF_MONTH;
+    virtual void RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet) override;
+    static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+        const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
     static uint8_t GetDaysOfMonth(const uint16_t &year, const uint8_t &month);
+
+    // For database recovery.
+    static void Init();
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
@@ -144,6 +158,14 @@ private:
     uint8_t GetNextDay(const uint16_t &settedYear, const uint8_t &settedMonth, const tm &now, const tm &target) const;
     uint64_t GetNextTriggerTime() const;
     uint64_t GetNextTriggerTimeAsRepeatReminder(const tm &nowTime, const tm &tarTime) const;
+    uint32_t GetRepeatDay() const
+    {
+        return repeatDay_;
+    }
+    uint16_t GetRepeatMonth() const
+    {
+        return repeatMonth_;
+    }
     uint64_t GetTimeInstantMilli(
         uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) const;
 
@@ -176,6 +198,18 @@ private:
     uint8_t second_ {0};
     uint16_t repeatMonth_ {0};
     uint32_t repeatDay_ {0};
+
+    // For database recovery.
+    static const std::string REPEAT_DAYS;
+    static const std::string REPEAT_MONTHS;
+    static const std::string FIRST_DESIGNATE_YEAR;
+    static const std::string FIRST_DESIGNATE_MONTH;
+    static const std::string FIRST_DESIGNATE_DAY;
+    static const std::string CALENDAR_YEAR;
+    static const std::string CALENDAR_MONTH;
+    static const std::string CALENDAR_DAY;
+    static const std::string CALENDAR_HOUR;
+    static const std::string CALENDAR_MINUTE;
 };
 }
 }

@@ -31,7 +31,15 @@ public:
      *
      * @param countDownTimeInSeconds Indicates the duration after which this timer reminder will be triggered.
      */
-    ReminderRequestTimer(uint64_t countDownTimeInSeconds);
+    explicit ReminderRequestTimer(uint64_t countDownTimeInSeconds);
+
+    /**
+     * @brief This constructor should only be used in background proxy service process
+     * when reminder instance recovery from database.
+     *
+     * @param reminderId Indicates reminder id.
+     */
+    explicit ReminderRequestTimer(int32_t reminderId) : ReminderRequest(reminderId) {};
 
     /**
      * @brief Copy construct from an exist reminder.
