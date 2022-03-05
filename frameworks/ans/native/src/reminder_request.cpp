@@ -26,8 +26,7 @@
 
 namespace OHOS {
 namespace Notification {
-namespace
-{
+namespace {
 const int BASE_YEAR = 1900;
 }
 
