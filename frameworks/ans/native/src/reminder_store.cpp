@@ -29,12 +29,12 @@
 namespace OHOS {
 namespace Notification {
 namespace {
-    const std::string REMINDER_DB_DIR = "/data/system_ce/ans_standard/";
-    const std::string REMINDER_DB_NAME = "reminder.db";
-    const std::string REMINDER_DB_TABLE = "reminder";
-    const uint32_t REMINDER_RDB_VERSION = 1;
-    const int32_t STATE_FAIL = -1;
-    std::vector<std::string> columns;
+const std::string REMINDER_DB_DIR = "/data/system_ce/ans_standard/";
+const std::string REMINDER_DB_NAME = "reminder.db";
+const std::string REMINDER_DB_TABLE = "reminder";
+const uint32_t REMINDER_RDB_VERSION = 1;
+const int32_t STATE_FAIL = -1;
+std::vector<std::string> columns;
 }
 
 const int32_t ReminderStore::STATE_OK = 0;
