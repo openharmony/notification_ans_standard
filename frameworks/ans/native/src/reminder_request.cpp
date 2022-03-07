@@ -18,6 +18,7 @@
 #include "ans_log_wrapper.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
+#include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
 #include "reminder_store.h"
@@ -1277,8 +1278,12 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
             wants,
             nullptr
         );
+
+        std::string identity = IPCSkeleton::ResetCallingIdentity();
         std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> buttonWantAgent =
             AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(buttonWantAgentInfo, userId_);
+        IPCSkeleton::SetCallingIdentity(identity);
+
         std::shared_ptr<NotificationActionButton> actionButton
             = NotificationActionButton::Create(nullptr, title, buttonWantAgent);
         notificationRequest_->AddActionButton(actionButton);
@@ -1302,8 +1307,12 @@ void ReminderRequest::AddRemovalWantAgent()
         wants,
         nullptr
     );
+
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
         AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
+    IPCSkeleton::SetCallingIdentity(identity);
+
     notificationRequest_->SetRemovalWantAgent(wantAgent);
 }
 
@@ -1324,7 +1333,10 @@ std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> ReminderRequest::CreateWan
         wants,
         nullptr
     );
-    return AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto wantAgent = AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
+    IPCSkeleton::SetCallingIdentity(identity);
+    return wantAgent;
 }
 
 void ReminderRequest::SetMaxScreenWantAgent(AppExecFwk::ElementName &element)

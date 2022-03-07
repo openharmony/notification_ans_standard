@@ -18,6 +18,7 @@
 #include "ans_log_wrapper.h"
 #include "ans_const_define.h"
 #include "common_event_support.h"
+#include "ipc_skeleton.h"
 #include "notification_slot.h"
 #include "reminder_event_manager.h"
 #include "time_service_client.h"
@@ -250,8 +251,8 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
     int requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
-    auto want = std::make_shared<OHOS::AAFwk::Want>();
 
+    auto want = std::make_shared<OHOS::AAFwk::Want>();
     switch (type) {
         case (TimerType::TRIGGER_TIMER): {
             want->SetAction(ReminderRequest::REMINDER_EVENT_ALARM_ALERT);
@@ -279,8 +280,12 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
         wants,
         nullptr
     );
+
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
         AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, 0);
+    IPCSkeleton::SetCallingIdentity(identity);
+
     sharedTimerInfo->SetWantAgent(wantAgent);
     return sharedTimerInfo;
 }
@@ -660,7 +665,6 @@ void ReminderDataManager::StartRecentReminder()
     StartTimerLocked(reminder, TimerType::TRIGGER_TIMER);
     reminder->OnStart();
     store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
-    SetActiveReminder(reminder);
 }
 
 void ReminderDataManager::StopAlertingReminder(const sptr<ReminderRequest> &reminder)
@@ -1143,13 +1147,13 @@ void ReminderDataManager::ResetStates(TimerType type)
 {
     switch (type) {
         case TimerType::TRIGGER_TIMER: {
-            ANSR_LOGD("ResetStates(activeReminder)");
+            ANSR_LOGD("ResetStates(activeReminderId, timerId(next triggerTime))");
             timerId_ = 0;
             activeReminderId_ = -1;
             break;
         }
         case TimerType::ALERTING_TIMER: {
-            ANSR_LOGD("ResetStates(alertingReminder)");
+            ANSR_LOGD("ResetStates(alertingReminderId, timeId(alerting time out))");
             timerIdAlerting_ = 0;
             alertingReminderId_ = -1;
             break;
