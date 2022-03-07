@@ -13,18 +13,23 @@
  * limitations under the License.
  */
 
+#include "reminder_request.h"
+
 #include "ans_log_wrapper.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
+#include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
 #include "system_ability_definition.h"
 #include "want_agent_helper.h"
 
-#include "reminder_request.h"
-
 namespace OHOS {
 namespace Notification {
+namespace {
+const int BASE_YEAR = 1900;
+}
+
 int32_t ReminderRequest::GLOBAL_ID = 0;
 const uint64_t ReminderRequest::INVALID_LONG_LONG_VALUE = 0;
 const uint16_t ReminderRequest::INVALID_U16_VALUE = 0;
@@ -45,7 +50,6 @@ const std::string ReminderRequest::REMINDER_EVENT_ALERT_TIMEOUT = "ohos.event.no
 const std::string ReminderRequest::REMINDER_EVENT_REMOVE_NOTIFICATION =
     "ohos.event.notification.reminder.REMOVE_NOTIFICATION";
 const std::string ReminderRequest::PARAM_REMINDER_ID = "REMINDER_ID";
-const int ReminderRequest::BASE_YEAR = 1900;
 
 ReminderRequest::ReminderRequest()
 {
@@ -710,12 +714,12 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
         ANSR_LOGE("Failed to write action button size");
         return false;
     }
-    for (auto it = actionButtonMap_.begin(); it != actionButtonMap_.end(); ++it) {
-        if (!parcel.WriteUint8(static_cast<uint8_t>(it->first))) {
+    for (auto button : actionButtonMap_) {
+        if (!parcel.WriteUint8(static_cast<uint8_t>(button.first))) {
             ANSR_LOGE("Failed to write action button type");
             return false;
         }
-        if (!parcel.WriteString(static_cast<std::string>(it->second.title))) {
+        if (!parcel.WriteString(static_cast<std::string>(button.second.title))) {
             ANSR_LOGE("Failed to write action button title");
             return false;
         }
@@ -725,12 +729,15 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
 
 ReminderRequest *ReminderRequest::Unmarshalling(Parcel &parcel)
 {
-    auto objptr = new ReminderRequest();
-    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
+    auto objptr = new (std::nothrow) ReminderRequest();
+    if (objptr == nullptr) {
+        ANSR_LOGE("Failed to create reminder due to no memory.");
+        return objptr;
+    }
+    if (!objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
-
     return objptr;
 }
 
@@ -978,9 +985,9 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
     int requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
-    for (auto it = actionButtonMap_.begin(); it != actionButtonMap_.end(); ++it) {
+    for (auto button : actionButtonMap_) {
         auto want = std::make_shared<OHOS::AAFwk::Want>();
-        auto type = it->first;
+        auto type = button.first;
         if (type == ActionButtonType::CLOSE) {
             want->SetAction(REMINDER_EVENT_CLOSE_ALERT);
             ANSR_LOGD("Add action button, type is close");
@@ -997,7 +1004,7 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
         want->SetParam(PARAM_REMINDER_ID, reminderId_);
         std::vector<std::shared_ptr<AAFwk::Want>> wants;
         wants.push_back(want);
-        auto title = static_cast<std::string>(it->second.title);
+        auto title = static_cast<std::string>(button.second.title);
         AbilityRuntime::WantAgent::WantAgentInfo buttonWantAgentInfo(
             requestCode,
             AbilityRuntime::WantAgent::WantAgentConstant::OperationType::SEND_COMMON_EVENT,
@@ -1005,8 +1012,12 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
             wants,
             nullptr
         );
+
+        std::string identity = IPCSkeleton::ResetCallingIdentity();
         std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> buttonWantAgent =
             AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(buttonWantAgentInfo, userId_);
+        IPCSkeleton::SetCallingIdentity(identity);
+
         std::shared_ptr<NotificationActionButton> actionButton
             = NotificationActionButton::Create(nullptr, title, buttonWantAgent);
         notificationRequest_->AddActionButton(actionButton);
@@ -1030,8 +1041,12 @@ void ReminderRequest::AddRemovalWantAgent()
         wants,
         nullptr
     );
+
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
         AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
+    IPCSkeleton::SetCallingIdentity(identity);
+
     notificationRequest_->SetRemovalWantAgent(wantAgent);
 }
 
@@ -1052,7 +1067,10 @@ std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> ReminderRequest::CreateWan
         wants,
         nullptr
     );
-    return AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto wantAgent = AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, userId_);
+    IPCSkeleton::SetCallingIdentity(identity);
+    return wantAgent;
 }
 
 void ReminderRequest::SetMaxScreenWantAgent(AppExecFwk::ElementName &element)
@@ -1073,7 +1091,7 @@ void ReminderRequest::SetState(bool deSet, const uint8_t newState, std::string f
     if (deSet) {
         state_ |= newState;
     } else {
-        state_ &= ~newState;
+        state_ &= static_cast<uint8_t>(~newState);
     }
     ANSR_LOGI("Switch the reminder(reminderId=%{public}d) state, from %{public}s to %{public}s, called by %{public}s",
         reminderId_, GetState(oldState).c_str(), GetState(state_).c_str(), function.c_str());
@@ -1121,7 +1139,7 @@ void ReminderRequest::UpdateNotificationCommon()
 {
     time_t now;
     (void)time(&now);  // unit is seconds.
-    notificationRequest_->SetDeliveryTime(static_cast<int64_t>(now) * MILLI_SECONDS);
+    notificationRequest_->SetDeliveryTime(GetDurationSinceEpochInMilli(now));
     notificationRequest_->SetLabel(NOTIFICATION_LABEL);
     notificationRequest_->SetShowDeliveryTime(true);
     notificationRequest_->SetTapDismissed(true);
@@ -1153,6 +1171,7 @@ void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
             // snooze the reminder by manual
             extendContent = GetShowTime(triggerTimeInMilli_) +
                 snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")");
+            notificationRequest_->SetTapDismissed(false);
         } else {
             // the reminder is expired now, when timeInterval is 0
             extendContent = GetShowTime(reminderTimeInMilli_) +

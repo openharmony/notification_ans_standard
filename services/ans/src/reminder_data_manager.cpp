@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
+#include "reminder_data_manager.h"
+
 #include "ans_log_wrapper.h"
 #include "ans_const_define.h"
 #include "common_event_support.h"
+#include "ipc_skeleton.h"
 #include "notification_slot.h"
 #include "reminder_event_manager.h"
 #include "time_service_client.h"
 #include "singleton.h"
-
-#include "reminder_data_manager.h"
 
 namespace OHOS {
 namespace Notification {
@@ -225,15 +226,22 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
 std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerType type) const
 {
     auto sharedTimerInfo = std::make_shared<ReminderTimerInfo>();
-    sharedTimerInfo->SetType(sharedTimerInfo->TIMER_TYPE_WAKEUP|sharedTimerInfo->TIMER_TYPE_EXACT);
+    if (sharedTimerInfo->TIMER_TYPE_WAKEUP > UINT8_MAX || sharedTimerInfo->TIMER_TYPE_EXACT > UINT8_MAX) {
+        ANSR_LOGE("Failed to set timer type.");
+        return nullptr;
+    }
+    uint8_t timerTypeWakeup = static_cast<uint8_t>(sharedTimerInfo->TIMER_TYPE_WAKEUP);
+    uint8_t timerTypeExact = static_cast<uint8_t>(sharedTimerInfo->TIMER_TYPE_EXACT);
+    int timerType = static_cast<int>(timerTypeWakeup | timerTypeExact);
+    sharedTimerInfo->SetType(timerType);
     sharedTimerInfo->SetRepeat(false);
     sharedTimerInfo->SetInterval(0);
 
     int requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
-    auto want = std::make_shared<OHOS::AAFwk::Want>();
 
+    auto want = std::make_shared<OHOS::AAFwk::Want>();
     switch (type) {
         case (TimerType::TRIGGER_TIMER): {
             want->SetAction(ReminderRequest::REMINDER_EVENT_ALARM_ALERT);
@@ -261,8 +269,12 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
         wants,
         nullptr
     );
+
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
         AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, 0);
+    IPCSkeleton::SetCallingIdentity(identity);
+
     sharedTimerInfo->SetWantAgent(wantAgent);
     return sharedTimerInfo;
 }
@@ -390,14 +402,14 @@ void ReminderDataManager::TerminateAlerting(const uint16_t waitInSecond, const s
 
 void ReminderDataManager::TerminateAlerting(const sptr<ReminderRequest> &reminder, const std::string &reason)
 {
-    ANSR_LOGI("Terminate the alerting reminder, %{public}s, called by %{public}s",
-        reminder->Dump().c_str(), reason.c_str());
-    StopAlertingReminder(reminder);
-
     if (reminder == nullptr) {
         ANSR_LOGE("TerminateAlerting illegal.");
         return;
     }
+    ANSR_LOGI("Terminate the alerting reminder, %{public}s, called by %{public}s",
+        reminder->Dump().c_str(), reason.c_str());
+    StopAlertingReminder(reminder);
+
     if (!reminder->OnTerminate()) {
         return;
     }
@@ -531,17 +543,7 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         reminder->OnShow(false, isSysTimeChanged, false);
         return;
     }
-    if (isNeedToPlaySound) {  // todo if shouldAlert
-        PlaySoundAndVibration(reminder);  // play sound and vibration
-        reminder->OnShow(true, isSysTimeChanged, true);
-        if (needScheduleTimeout) {
-            StartTimer(reminder, TimerType::ALERTING_TIMER);
-        } else {
-            TerminateAlerting(1, reminder);
-        }
-    } else {
-        reminder->OnShow(false, isSysTimeChanged, true);
-    }
+    reminder->OnShow(isNeedToPlaySound, isSysTimeChanged, true);
     AddToShowedReminders(reminder);
     UpdateNotification(reminder);  // this should be called after OnShow
     ANSR_LOGD("publish notification.(reminderId=%{public}d)", reminder->GetReminderId());
@@ -550,6 +552,14 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         reminder->OnShowFail();
         RemoveFromShowedReminders(reminder);
     } else {
+        if (isNeedToPlaySound) {
+            PlaySoundAndVibration(reminder);  // play sound and vibration
+            if (needScheduleTimeout) {
+                StartTimer(reminder, TimerType::ALERTING_TIMER);
+            } else {
+                TerminateAlerting(1, reminder);
+            }
+        }
         HandleSameNotificationIdShowing(reminder);
     }
     if (isNeedToStartNext) {
@@ -1044,13 +1054,13 @@ void ReminderDataManager::ResetStates(TimerType type)
 {
     switch (type) {
         case TimerType::TRIGGER_TIMER: {
-            ANSR_LOGD("ResetStates(activeReminder)");
+            ANSR_LOGD("ResetStates(activeReminderId, timerId(next triggerTime))");
             timerId_ = 0;
             activeReminderId_ = -1;
             break;
         }
         case TimerType::ALERTING_TIMER: {
-            ANSR_LOGD("ResetStates(alertingReminder)");
+            ANSR_LOGD("ResetStates(alertingReminderId, timeId(alerting time out))");
             timerIdAlerting_ = 0;
             alertingReminderId_ = -1;
             break;
