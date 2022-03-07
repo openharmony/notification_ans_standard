@@ -25,13 +25,25 @@ const uint8_t ReminderRequestCalendar::JANUARY = 1;
 const uint8_t ReminderRequestCalendar::DECEMBER = 12;
 const uint8_t ReminderRequestCalendar::DEFAULT_SNOOZE_TIMES = 3;
 
+// For database recovery.
+const std::string ReminderRequestCalendar::REPEAT_DAYS = "repeat_days";
+const std::string ReminderRequestCalendar::REPEAT_MONTHS = "repeat_months";
+const std::string ReminderRequestCalendar::FIRST_DESIGNATE_YEAR = "first_designate_year";
+const std::string ReminderRequestCalendar::FIRST_DESIGNATE_MONTH = "first_designate_month";
+const std::string ReminderRequestCalendar::FIRST_DESIGNATE_DAY = "first_designate_day";
+const std::string ReminderRequestCalendar::CALENDAR_YEAR = "calendar_year";
+const std::string ReminderRequestCalendar::CALENDAR_MONTH = "calendar_month";
+const std::string ReminderRequestCalendar::CALENDAR_DAY = "calendar_day";
+const std::string ReminderRequestCalendar::CALENDAR_HOUR = "calendar_hour";
+const std::string ReminderRequestCalendar::CALENDAR_MINUTE = "calendar_minute";
+
 ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
     const std::vector<uint8_t> &repeatMonths, const std::vector<uint8_t> &repeatDays)
     : ReminderRequest(ReminderRequest::ReminderType::CALENDAR)
 {
     // 1. record the information which designated by user at first time.
-    firstDesignateYear_ = GetActualTime(TimeTransferType::YEAR, dateTime.tm_year);
-    firstDesignateMonth_ = GetActualTime(TimeTransferType::MONTH, dateTime.tm_mon);
+    firstDesignateYear_ = static_cast<uint16_t>(GetActualTime(TimeTransferType::YEAR, dateTime.tm_year));
+    firstDesignateMonth_ = static_cast<uint8_t>(GetActualTime(TimeTransferType::MONTH, dateTime.tm_mon));
     firstDesignateDay_ = dateTime.tm_mday;
     SetRepeatMonths(repeatMonths);
     SetRepeatDaysOfMonth(repeatDays);
@@ -39,8 +51,8 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
 
     // 2. get the latest valid trigger time.
     InitDateTime(dateTime);
-    hour_ = dateTime_.tm_hour;
-    minute_ = dateTime_.tm_min;
+    hour_ = static_cast<uint8_t>(dateTime_.tm_hour);
+    minute_ = static_cast<uint8_t>(dateTime_.tm_min);
     uint64_t nextTriggerTime = INVALID_LONG_LONG_VALUE;
     if ((nextTriggerTime = GetNextTriggerTime()) != INVALID_LONG_LONG_VALUE) {
         time_t target = static_cast<time_t>(nextTriggerTime / MILLI_SECONDS);
@@ -52,8 +64,8 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
     }
 
     // 2. set the time information (used to transfer to proxy service) which is decided to trigger firstly.
-    year_ = GetActualTime(TimeTransferType::YEAR, dateTime_.tm_year);
-    month_ = GetActualTime(TimeTransferType::MONTH, dateTime_.tm_mon);
+    year_ = static_cast<uint16_t>(GetActualTime(TimeTransferType::YEAR, dateTime_.tm_year));
+    month_ = static_cast<uint8_t>(GetActualTime(TimeTransferType::MONTH, dateTime_.tm_mon));
     day_ = dateTime_.tm_mday;
     second_ = 0;
     SetTriggerTimeInMilli(nextTriggerTime);
@@ -439,7 +451,11 @@ ReminderRequestCalendar *ReminderRequestCalendar::Unmarshalling(Parcel &parcel)
 {
     ANSR_LOGD("New calendar");
     auto objptr = new ReminderRequestCalendar();
-    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
+    if (objptr == nullptr) {
+        ANS_LOGE("Failed to create reminder calendar due to no memory.");
+        return objptr;
+    }
+    if (!objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }
@@ -576,18 +592,7 @@ void ReminderRequestCalendar::AppendValuesBucket(const sptr<ReminderRequest> &re
     values.PutInt(CALENDAR_MINUTE, minute);
 }
 
-const std::string ReminderRequestCalendar::REPEAT_DAYS = "repeat_days";
-const std::string ReminderRequestCalendar::REPEAT_MONTHS = "repeat_months";
-const std::string ReminderRequestCalendar::FIRST_DESIGNATE_YEAR = "first_designate_year";
-const std::string ReminderRequestCalendar::FIRST_DESIGNATE_MONTH = "first_designate_month";
-const std::string ReminderRequestCalendar::FIRST_DESIGNATE_DAY = "first_designate_day";
-const std::string ReminderRequestCalendar::CALENDAR_YEAR = "calendar_year";
-const std::string ReminderRequestCalendar::CALENDAR_MONTH = "calendar_month";
-const std::string ReminderRequestCalendar::CALENDAR_DAY = "calendar_day";
-const std::string ReminderRequestCalendar::CALENDAR_HOUR = "calendar_hour";
-const std::string ReminderRequestCalendar::CALENDAR_MINUTE = "calendar_minute";
-
-void ReminderRequestCalendar::Init()
+void ReminderRequestCalendar::InitDbColumns()
 {
     ReminderRequest::AddColumn(REPEAT_DAYS, "INT", false);
     ReminderRequest::AddColumn(REPEAT_MONTHS, "INT", false);

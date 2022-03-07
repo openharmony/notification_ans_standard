@@ -33,7 +33,12 @@ ReminderRequestTimer::ReminderRequestTimer(uint64_t countDownTimeInSeconds)
     ReminderRequest::SetTriggerTimeInMilli(
         ReminderRequest::GetDurationSinceEpochInMilli(now) + countDownTimeInSeconds_ * ReminderRequest::MILLI_SECONDS);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
-    firstRealTimeInMilliSeconds_ = timer->GetBootTimeMs();
+    int64_t bootTimeMs = timer->GetBootTimeMs();
+    if (bootTimeMs >= 0) {
+        firstRealTimeInMilliSeconds_ = static_cast<uint64_t>(bootTimeMs);
+    } else {
+        ANSR_LOGW("Get boot time error.");
+    }
 }
 
 ReminderRequestTimer::ReminderRequestTimer(const ReminderRequestTimer &other) : ReminderRequest(other)
@@ -113,8 +118,12 @@ bool ReminderRequestTimer::Marshalling(Parcel &parcel) const
 
 ReminderRequestTimer *ReminderRequestTimer::Unmarshalling(Parcel &parcel)
 {
-    auto objptr = new ReminderRequestTimer();
-    if ((objptr != nullptr) && !objptr->ReadFromParcel(parcel)) {
+    auto objptr = new (std::nothrow) ReminderRequestTimer();
+    if (objptr == nullptr) {
+        ANSR_LOGE("Failed to create reminder timer due to no memory.");
+        return objptr;
+    }
+    if (!objptr->ReadFromParcel(parcel)) {
         delete objptr;
         objptr = nullptr;
     }

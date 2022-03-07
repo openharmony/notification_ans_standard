@@ -222,7 +222,7 @@ napi_value ReminderCommon::GenReminder(
         if (propertyVal < 0) {
             reminder->SetSnoozeTimes(0);
         } else {
-            uint8_t snoozeTimes = propertyVal > UINT8_MAX ? UINT8_MAX : propertyVal;
+            uint8_t snoozeTimes = propertyVal > UINT8_MAX ? UINT8_MAX : static_cast<uint8_t>(propertyVal);
             reminder->SetSnoozeTimes(static_cast<uint8_t>(snoozeTimes));
         }
     }

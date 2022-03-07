@@ -18,6 +18,7 @@
 #include "ans_log_wrapper.h"
 #include "ans_const_define.h"
 #include "common_event_support.h"
+#include "ipc_skeleton.h"
 #include "notification_slot.h"
 #include "reminder_event_manager.h"
 #include "time_service_client.h"
@@ -236,15 +237,22 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
 std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerType type) const
 {
     auto sharedTimerInfo = std::make_shared<ReminderTimerInfo>();
-    sharedTimerInfo->SetType(sharedTimerInfo->TIMER_TYPE_WAKEUP|sharedTimerInfo->TIMER_TYPE_EXACT);
+    if (sharedTimerInfo->TIMER_TYPE_WAKEUP > UINT8_MAX || sharedTimerInfo->TIMER_TYPE_EXACT > UINT8_MAX) {
+        ANSR_LOGE("Failed to set timer type.");
+        return nullptr;
+    }
+    uint8_t timerTypeWakeup = static_cast<uint8_t>(sharedTimerInfo->TIMER_TYPE_WAKEUP);
+    uint8_t timerTypeExact = static_cast<uint8_t>(sharedTimerInfo->TIMER_TYPE_EXACT);
+    int timerType = static_cast<int>(timerTypeWakeup | timerTypeExact);
+    sharedTimerInfo->SetType(timerType);
     sharedTimerInfo->SetRepeat(false);
     sharedTimerInfo->SetInterval(0);
 
     int requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
-    auto want = std::make_shared<OHOS::AAFwk::Want>();
 
+    auto want = std::make_shared<OHOS::AAFwk::Want>();
     switch (type) {
         case (TimerType::TRIGGER_TIMER): {
             want->SetAction(ReminderRequest::REMINDER_EVENT_ALARM_ALERT);
@@ -272,8 +280,12 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
         wants,
         nullptr
     );
+
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent =
         AbilityRuntime::WantAgent::WantAgentHelper::GetWantAgent(wantAgentInfo, 0);
+    IPCSkeleton::SetCallingIdentity(identity);
+
     sharedTimerInfo->SetWantAgent(wantAgent);
     return sharedTimerInfo;
 }
@@ -653,7 +665,6 @@ void ReminderDataManager::StartRecentReminder()
     StartTimerLocked(reminder, TimerType::TRIGGER_TIMER);
     reminder->OnStart();
     store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
-    SetActiveReminder(reminder);
 }
 
 void ReminderDataManager::StopAlertingReminder(const sptr<ReminderRequest> &reminder)
@@ -1136,13 +1147,13 @@ void ReminderDataManager::ResetStates(TimerType type)
 {
     switch (type) {
         case TimerType::TRIGGER_TIMER: {
-            ANSR_LOGD("ResetStates(activeReminder)");
+            ANSR_LOGD("ResetStates(activeReminderId, timerId(next triggerTime))");
             timerId_ = 0;
             activeReminderId_ = -1;
             break;
         }
         case TimerType::ALERTING_TIMER: {
-            ANSR_LOGD("ResetStates(alertingReminder)");
+            ANSR_LOGD("ResetStates(alertingReminderId, timeId(alerting time out))");
             timerIdAlerting_ = 0;
             alertingReminderId_ = -1;
             break;
