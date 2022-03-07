@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,9 +99,9 @@ void NotificationSubscriber::SubscriberImpl::OnEnabledNotificationChanged(
 
 bool NotificationSubscriber::SubscriberImpl::GetAnsManagerProxy()
 {
-    if (nullptr == proxy_) {
+    if (proxy_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (nullptr == proxy_) {
+        if (proxy_ == nullptr) {
             sptr<ISystemAbilityManager> systemAbilityManager =
                 SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
             if (!systemAbilityManager) {

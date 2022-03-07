@@ -130,7 +130,7 @@ std::string ReminderRequest::Dump() const
 
 ReminderRequest& ReminderRequest::SetActionButton(const std::string &title, const ActionButtonType &type)
 {
-    if (type != ActionButtonType::CLOSE && type != ActionButtonType::SNOOZE) {
+    if ((type != ActionButtonType::CLOSE) && (type != ActionButtonType::SNOOZE)) {
         ANSR_LOGI("Button type only support: %{public}d or %{public}d",
             static_cast<uint8_t>(ActionButtonType::CLOSE), static_cast<uint8_t>(ActionButtonType::SNOOZE));
         return *this;
@@ -609,7 +609,7 @@ ReminderRequest& ReminderRequest::SetSnoozeTimesDynamic(const uint8_t snooziTime
 
 ReminderRequest& ReminderRequest::SetTimeInterval(const uint64_t timeIntervalInSeconds)
 {
-    if (timeIntervalInSeconds < 0 || timeIntervalInSeconds > (UINT64_MAX / MILLI_SECONDS)) {
+    if ((timeIntervalInSeconds < 0) || (timeIntervalInSeconds > (UINT64_MAX / MILLI_SECONDS))) {
         ANSR_LOGW("SetTimeInterval, replace to set (0s), for the given is out of legal range");
         timeIntervalInMilli_ = 0;
     } else {
@@ -708,7 +708,7 @@ void ReminderRequest::SetReminderTimeInMilli(const uint64_t reminderTimeInMilli)
 
 ReminderRequest& ReminderRequest::SetRingDuration(const uint64_t ringDurationInSeconds)
 {
-    if (ringDurationInSeconds <= 0 || ringDurationInSeconds > (UINT64_MAX / MILLI_SECONDS)) {
+    if ((ringDurationInSeconds <= 0) || (ringDurationInSeconds > (UINT64_MAX / MILLI_SECONDS))) {
         ANSR_LOGW("setRingDuration, replace to set (1s), for the given is out of legal range");
         ringDurationInMilli_ = MILLI_SECONDS;
     } else {
@@ -994,7 +994,7 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
         ANSR_LOGE("Failed to read tempReminderId");
         return false;
     }
-    reminderId_ = tempReminderId == -1 ? reminderId_ : tempReminderId;
+    reminderId_ = (tempReminderId == -1) ? reminderId_ : tempReminderId;
 
     if (!parcel.ReadInt32(notificationId_)) {
         ANSR_LOGE("Failed to read notificationId");
@@ -1149,7 +1149,7 @@ std::string ReminderRequest::GetShowTime(const uint64_t showTime) const
 
 std::string ReminderRequest::GetTimeInfoInner(const time_t &timeInSecond, const TimeFormat &format) const
 {
-    uint8_t dateTimeLen = 80;
+    const uint8_t dateTimeLen = 80;
     char dateTimeBuffer[dateTimeLen];
     struct tm timeInfo;
     (void)localtime_r(&timeInSecond, &timeInfo);
@@ -1365,8 +1365,8 @@ void ReminderRequest::UpdateNotificationCommon()
     notificationNormalContent->SetTitle(title_);
     auto notificationContent = std::make_shared<NotificationContent>(notificationNormalContent);
     notificationRequest_->SetContent(notificationContent);
-    if (reminderType_ == ReminderRequest::ReminderType::TIMER
-        || reminderType_ == ReminderRequest::ReminderType::ALARM) {
+    if ((reminderType_ == ReminderRequest::ReminderType::TIMER) ||
+        (reminderType_ == ReminderRequest::ReminderType::ALARM)) {
         notificationRequest_->SetUnremovable(true);
     }
     auto flags = std::make_shared<NotificationFlags>();
