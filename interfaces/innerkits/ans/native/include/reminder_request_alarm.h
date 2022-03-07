@@ -109,7 +109,7 @@ public:
         const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
 
     // For database recovery.
-    static void Init();
+    static void InitDbColumns();
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;

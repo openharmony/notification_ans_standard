@@ -28,15 +28,16 @@
 
 namespace OHOS {
 namespace Notification {
-const std::string ReminderStore::REMINDER_DB_DIR = "/data/system_ce/ans_standard/";
-const std::string ReminderStore::REMINDER_DB_NAME = "reminder.db";
-const std::string ReminderStore::REMINDER_DB_TABLE = "reminder";
-const uint32_t ReminderStore::REMINDER_RDB_VERSION = 1;
-const int32_t ReminderStore::STATE_FAIL = -1;
+namespace {
+const std::string REMINDER_DB_DIR = "/data/system_ce/ans_standard/";
+const std::string REMINDER_DB_NAME = "reminder.db";
+const std::string REMINDER_DB_TABLE = "reminder";
+const uint32_t REMINDER_RDB_VERSION = 1;
+const int32_t STATE_FAIL = -1;
+std::vector<std::string> columns;
+}
+
 const int32_t ReminderStore::STATE_OK = 0;
-const uint16_t ReminderStore::TIME_INTERVAL_FOR_DELETE = 1800;
-const uint16_t ReminderStore::MILLI_SECONDS = 1000;
-std::vector<std::string> ReminderStore::columns;
 
 int32_t ReminderStore::ReminderStoreDataCallBack::OnCreate(NativeRdb::RdbStore &store)
 {
@@ -66,13 +67,13 @@ int32_t ReminderStore::Init()
         }
     }
 
-    ReminderRequest::Init();
-    ReminderRequestCalendar::Init();
-    ReminderRequestAlarm::Init();
-    ReminderStore::columns.insert(ReminderStore::columns.begin(),
+    ReminderRequest::InitDbColumns();
+    ReminderRequestCalendar::InitDbColumns();
+    ReminderRequestAlarm::InitDbColumns();
+    columns.insert(columns.begin(),
         ReminderRequest::columns.begin(), ReminderRequest::columns.end());
 
-    std::string dbConfig = ReminderStore::REMINDER_DB_DIR + ReminderStore::REMINDER_DB_NAME;
+    std::string dbConfig = REMINDER_DB_DIR + REMINDER_DB_NAME;
     NativeRdb::RdbStoreConfig config_(dbConfig);
     ReminderStoreDataCallBack rdbDataCallBack_;
     rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(config_, REMINDER_RDB_VERSION, rdbDataCallBack_, errCode);
@@ -124,7 +125,7 @@ int32_t ReminderStore::InitData()
         ANSR_LOGE("Init data failed.");
         return STATE_FAIL;
     }
-    return STATE_OK;
+    return ReminderStore::STATE_OK;
 }
 
 int32_t ReminderStore::Delete(int32_t reminderId)
@@ -259,7 +260,7 @@ std::shared_ptr<NativeRdb::AbsSharedResultSet> ReminderStore::Query(const std::s
 uint8_t ReminderStore::GetColumnIndex(const std::string& name)
 {
     uint8_t index = 0;
-    for (auto it = ReminderStore::columns.begin(); it != ReminderStore::columns.end(); ++it) {
+    for (auto it = columns.begin(); it != columns.end(); ++it) {
         if (name == (*it)) {
             break;
         }
