@@ -107,7 +107,7 @@ describe("ReminderHelperTest", function () {
      * @tc.require: SR000GGTRB AR000GH8EC
      */
     it("testReminderHelper003", 0, async function (done) {
-        function reminderCallback(err, data){
+        function reminderCallback(err, data) {
             expect(true).assertEqual(true);
         }
         reminderAgent.addNotificationSlot(0, reminderCallback);
@@ -319,7 +319,7 @@ describe("ReminderHelperTest", function () {
                         firstdiff = publishlength - cancellength;
                         if (firstdiff === 0 || firstdiff === 1) {
                             expect(0).assertEqual(firstdiff);
-                        } 
+                        }
                     });
                 });
             }, 1000);
@@ -355,7 +355,7 @@ describe("ReminderHelperTest", function () {
                         firstdiff = publishlength - cancellength;
                         if (firstdiff === 0 || firstdiff === 1) {
                             expect(0).assertEqual(firstdiff);
-                        } 
+                        }
                     });
                 });
             }, 1000);
