@@ -446,7 +446,7 @@ private:
      * Indicates the total count of reminders in system.
      */
     int16_t totalCount_ {0};
-    sptr<AdvancedNotificationService> advancedNotificationService_ = nullptr;
+    AdvancedNotificationService *advancedNotificationService_ = nullptr;
 };
 }  // namespace OHOS
 }  // namespace Nofitifcation
