@@ -50,7 +50,7 @@ ReminderRequestAlarm::ReminderRequestAlarm(const ReminderRequestAlarm &other) : 
 
 void ReminderRequestAlarm::CheckParamValid() const
 {
-    if (hour_ >= HOURS_PER_DAY || hour_ < 0) {
+    if ((hour_ >= HOURS_PER_DAY) || (hour_ < 0)) {
         ANSR_LOGE("setted hour is not between [0, 24)");
         throw std::invalid_argument("setted hour is not between [0, 24)");
     }
