@@ -147,7 +147,7 @@ public:
     static uint8_t GetDaysOfMonth(const uint16_t &year, const uint8_t &month);
 
     // For database recovery.
-    static void InitDbColumns();
+    static void Init();
 
 protected:
     virtual uint64_t PreGetNextTriggerTimeIgnoreSnooze(bool ignoreRepeat, bool forceToGetNext) const override;
@@ -186,17 +186,7 @@ private:
     static const uint8_t DECEMBER;
     static const uint8_t DEFAULT_SNOOZE_TIMES;
 
-    tm dateTime_ = {
-        .tm_sec = 0,
-        .tm_min = 0,
-        .tm_hour = 0,
-        .tm_mday = 1,
-        .tm_mon = 0,
-        .tm_year = 0,
-        .tm_wday = 0,
-        .tm_yday = 0,
-        .tm_isdst = -1
-    };
+    tm dateTime_;
     uint16_t firstDesignateYear_ {1};
     uint8_t firstDesignateMonth_ {1};
     uint8_t firstDesignateDay_ {1};
