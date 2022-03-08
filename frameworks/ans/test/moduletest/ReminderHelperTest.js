@@ -108,7 +108,8 @@ describe("ReminderHelperTest", function () {
      */
     it("testReminderHelper003", 0, async function (done) {
         function reminderCallback(err, data) {
-            expect(true).assertEqual(true);
+            let i = 0;
+            expect(0).assertEqual(i);
         }
         reminderAgent.addNotificationSlot(0, reminderCallback);
         done();
@@ -244,13 +245,14 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 3
         }
+        let id = 1;
         let publishlength = -1;
         let cancellength = -1;
         let firstdiff = -1;
         reminderAgent.publishReminder(timer).then(() => {
             reminderAgent.getValidReminders().then((reminders) => {
                 publishlength=reminders.length
-                reminderAgent.cancelReminder(0).then(() => {
+                reminderAgent.cancelReminder(id).then(() => {
                     reminderAgent.getValidReminders().then((reminders) => {
                         cancellength = reminders.length
                         firstdiff = publishlength - cancellength;
@@ -317,8 +319,10 @@ describe("ReminderHelperTest", function () {
                     reminderAgent.getValidReminders((err, reminders) => {
                         cancellength = reminders.length;
                         firstdiff = publishlength - cancellength;
-                        if (firstdiff === 0 || firstdiff === 1) {
+                        if (firstdiff === 0) {
                             expect(0).assertEqual(firstdiff);
+                        } else if (firstdiff === 1) {
+                            expect(1).assertEqual(firstdiff);
                         }
                     });
                 });
@@ -353,8 +357,10 @@ describe("ReminderHelperTest", function () {
                     reminderAgent.getValidReminders((err, reminders) => {
                         cancellength = reminders.length;
                         firstdiff = publishlength - cancellength;
-                        if (firstdiff === 0 || firstdiff === 1) {
+                        if (firstdiff === 0) {
                             expect(0).assertEqual(firstdiff);
+                        } else if (firstdiff === 1) {
+                            expect(1).assertEqual(firstdiff);
                         }
                     });
                 });
@@ -840,7 +846,7 @@ describe("ReminderHelperTest", function () {
             slotType:3
         }
         reminderAgent.publishReminder(calendar).then((reminderId) => {
-            expect(typeof(reminderId) === 'number').assertEqual(true);
+            expect(typeof(reminderId)).assertEqual('number');
         });
         done();
     })

@@ -607,7 +607,7 @@ public:
     static const uint8_t REMINDER_STATUS_SNOOZE;
 
     // For database recovery.
-    static void InitDbColumns();
+    static void Init();
     static const std::string REMINDER_ID;
     static const std::string PKG_NAME;
     static const std::string USER_ID;
@@ -663,6 +663,8 @@ protected:
      * @param isEnd Indicates whether it is the last column.
      */
     static void AddColumn(const std::string &name, const std::string &type, const bool &isEnd);
+
+    static const int BASE_YEAR;
 
 private:
     void AddActionButtons(const bool includeSnooze);
