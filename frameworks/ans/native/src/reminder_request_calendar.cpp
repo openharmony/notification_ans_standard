@@ -98,7 +98,7 @@ uint8_t ReminderRequestCalendar::GetDaysOfMonth(const uint16_t &year, const uint
     uint8_t leapParam1 = 4;
     uint8_t leapParam2 = 100;
     if (month == february) {
-        days = ((((0 == year % leapParam1) && (0 != year % leapParam2)) || (0 == year % solarYear))
+        days = ((((year % leapParam1 == 0) && (year % leapParam2 != 0)) || (year % solarYear == 0))
             ? leapMonth : nonLeapMonth);
     } else {
         days = daysArray[month - 1];

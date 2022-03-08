@@ -1362,7 +1362,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreference
                     }
                 }
             } else {
-                ANS_LOGW("Parse disturbe mode failed, use defalut value.");
+                ANS_LOGW("Parse disturbe mode failed, use default value.");
             }
             info.SetDoNotDisturbDate(userId, disturbDate);
         });
@@ -1386,7 +1386,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(NotificationPrefe
                     }
                 }
             } else {
-                ANS_LOGW("Parse disturbe start time failed, use defalut value.");
+                ANS_LOGW("Parse disturbe start time failed, use default value.");
             }
             info.SetDoNotDisturbDate(userId, disturbDate);
         });
@@ -1410,7 +1410,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbEndDate(NotificationPrefere
                     }
                 }
             } else {
-                ANS_LOGW("Parse disturbe end time failed, use defalut value.");
+                ANS_LOGW("Parse disturbe end time failed, use default value.");
             }
             info.SetDoNotDisturbDate(userId, disturbDate);
         });
@@ -1434,7 +1434,7 @@ void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPrefe
                     info.SetEnabledAllNotification(userId, static_cast<bool>(StringToInt(value.ToString())));
                 }
             } else {
-                ANS_LOGW("Parse enable all notification failed, use defalut value.");
+                ANS_LOGW("Parse enable all notification failed, use default value.");
             }
         });
 }
