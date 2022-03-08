@@ -1722,7 +1722,11 @@ ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &remi
         ANSR_LOGW("PrepareNotificationInfo fail");
         return result;
     }
-    ReminderDataManager::GetInstance()->PublishReminder(reminder, bundleOption);
+    auto rdm = ReminderDataManager::GetInstance();
+    if (rdm == nullptr) {
+        return ERR_NO_INIT;
+    }
+    rdm->PublishReminder(reminder, bundleOption);
     return ERR_OK;
 }
 
@@ -1734,7 +1738,11 @@ ErrCode AdvancedNotificationService::CancelReminder(const int32_t reminderId)
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    ReminderDataManager::GetInstance()->CancelReminder(reminderId, bundleOption);
+    auto rdm = ReminderDataManager::GetInstance();
+    if (rdm == nullptr) {
+        return ERR_NO_INIT;
+    }
+    rdm->CancelReminder(reminderId, bundleOption);
     return ERR_OK;
 }
 
@@ -1748,7 +1756,11 @@ ErrCode AdvancedNotificationService::CancelAllReminders()
     }
     int userId = -1;
     AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), userId);
-    ReminderDataManager::GetInstance()->CancelAllReminders(bundleOption, userId);
+    auto rdm = ReminderDataManager::GetInstance();
+    if (rdm == nullptr) {
+        return ERR_NO_INIT;
+    }
+    rdm->CancelAllReminders(bundleOption, userId);
     return ERR_OK;
 }
 
@@ -1761,7 +1773,11 @@ ErrCode AdvancedNotificationService::GetValidReminders(std::vector<sptr<Reminder
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
-    ReminderDataManager::GetInstance()->GetValidReminders(bundleOption, reminders);
+    auto rdm = ReminderDataManager::GetInstance();
+    if (rdm == nullptr) {
+        return ERR_NO_INIT;
+    }
+    rdm->GetValidReminders(bundleOption, reminders);
     ANSR_LOGD("Valid reminders size=%{public}zu", reminders.size());
     return ERR_OK;
 }

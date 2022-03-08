@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -164,7 +164,17 @@ private:
     static const uint8_t DECEMBER;
     static const uint8_t DEFAULT_SNOOZE_TIMES;
 
-    tm dateTime_;
+    tm dateTime_ = {
+        .tm_sec = 0,
+        .tm_min = 0,
+        .tm_hour = 0,
+        .tm_mday = 1,
+        .tm_mon = 0,
+        .tm_year = 0,
+        .tm_wday = 0,
+        .tm_yday = 0,
+        .tm_isdst = -1
+    };
     uint16_t firstDesignateYear_ {1};
     uint8_t firstDesignateMonth_ {1};
     uint8_t firstDesignateDay_ {1};

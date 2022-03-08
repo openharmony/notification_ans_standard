@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
+#include "reminder_timer_info.h"
+
 #include "ans_log_wrapper.h"
 #include "common_event_manager.h"
 #include "reminder_request.h"
-
-#include "reminder_timer_info.h"
 
 using namespace OHOS::EventFwk;
 namespace OHOS {

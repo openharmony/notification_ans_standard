@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -128,6 +128,11 @@ public:
      * @param want Which contains the given reminder.
      */
     void SnoozeReminder(const OHOS::EventFwk::Want &want);
+
+    /**
+     * Starts the recent reminder timing.
+     */
+    void StartRecentReminder();
 
     /**
      * @brief Terminate the alerting reminder.
@@ -322,11 +327,6 @@ private:
     void SnoozeReminderImpl(sptr<ReminderRequest> &reminder);
 
     /**
-     * Starts the recent reminder timing.
-     */
-    void StartRecentReminder();
-
-    /**
      * Starts timing actually.
      *
      * @param reminderRequest Indicates the reminder.
@@ -386,7 +386,7 @@ private:
     static std::shared_ptr<ReminderDataManager> REMINDER_DATA_MANAGER;
 
     /**
-     * Used for multi-thread syncronise.
+     * Used for multi-thread synchronise.
      */
     static std::mutex MUTEX;
     static std::mutex SHOW_MUTEX;
@@ -446,7 +446,7 @@ private:
      * Indicates the total count of reminders in system.
      */
     int16_t totalCount_ {0};
-    AdvancedNotificationService *advancedNotificationService_;
+    AdvancedNotificationService *advancedNotificationService_ = nullptr;
 };
 }  // namespace OHOS
 }  // namespace Nofitifcation

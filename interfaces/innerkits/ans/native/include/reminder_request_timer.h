@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ public:
      *
      * @param countDownTimeInSeconds Indicates the duration after which this timer reminder will be triggered.
      */
-    ReminderRequestTimer(uint64_t countDownTimeInSeconds);
+    explicit ReminderRequestTimer(uint64_t countDownTimeInSeconds);
 
     /**
      * @brief Copy construct from an exist reminder.
@@ -69,8 +69,8 @@ private:
     void CheckParamsValid(const uint64_t countDownTimeInSeconds) const;
     void UpdateTimeInfo(const std::string description);
     uint64_t countDownTimeInSeconds_ {0};
-    uint64_t firstRealTimeInMilliSeconds_ {-1};
-    uint64_t whenToChangeSysTime_ {-1};
+    uint64_t firstRealTimeInMilliSeconds_ {0};
+    uint64_t whenToChangeSysTime_ {0};
 };
 }  // namespace Reminder
 }  // namespace OHOS
