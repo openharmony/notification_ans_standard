@@ -335,7 +335,7 @@ group("moduletest") {
   deps = []
 
   deps += [
-    ":ReminderAgentJsTest",
+    # ":ReminderAgentJsTest",
     ":ans_fw_module_test",
     ":ans_innerkits_module_publish_test",
     ":ans_innerkits_module_setting_test",
