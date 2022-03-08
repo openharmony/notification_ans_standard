@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@ SystemEventObserver::SystemEventObserver(const ISystemEvent &callbacks) : callba
 #endif
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
 
     subscriber_ = std::make_shared<SystemEventSubscriber>(
@@ -46,6 +47,18 @@ SystemEventObserver::~SystemEventObserver()
     EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_);
 }
 
+sptr<NotificationBundleOption> SystemEventObserver::GetBundleOption(AAFwk::Want want)
+{
+    auto element = want.GetElement();
+    std::string bundleName = element.GetBundleName();
+    int uid = want.GetIntParam(AppExecFwk::Constants::UID, -1);
+    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
+    if (bundleOption == nullptr) {
+        ANS_LOGE("Failed to create bundleOption.");
+    }
+    return bundleOption;
+}
+
 void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     auto want = data.GetWant();
@@ -53,11 +66,10 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
     ANS_LOGD("OnReceiveEvent action is %{public}s.", action.c_str());
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         if (callbacks_.onBundleRemoved != nullptr) {
-            auto element = want.GetElement();
-            std::string bundleName = element.GetBundleName();
-            int uid = want.GetIntParam(AppExecFwk::Constants::UID, -1);
-            sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
-            callbacks_.onBundleRemoved(bundleOption);
+            sptr<NotificationBundleOption> bundleOption = GetBundleOption(want);
+            if (bundleOption != nullptr) {
+                callbacks_.onBundleRemoved(bundleOption);
+            }
         }
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
@@ -73,7 +85,16 @@ void SystemEventObserver::OnReceiveEvent(const EventFwk::CommonEventData &data)
         NotificationPreferences::GetInstance().InitSettingFromDisturbDB();
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         int32_t userId = data.GetCode();
-        callbacks_.onResourceRemove(userId);
+        if (callbacks_.onResourceRemove != nullptr) {
+            callbacks_.onResourceRemove(userId);
+        }
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
+        if (callbacks_.onBundleDataCleared != nullptr) {
+            sptr<NotificationBundleOption> bundleOption = GetBundleOption(want);
+            if (bundleOption != nullptr) {
+                callbacks_.onBundleDataCleared(bundleOption);
+            }
+        }
     }
 }
 }  // namespace Notification
