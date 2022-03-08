@@ -573,7 +573,7 @@ protected:
     {
         return INVALID_LONG_LONG_VALUE;
     }
-    static const int BASE_YEAR;
+
 
 private:
     void AddActionButtons(const bool includeSnooze);
