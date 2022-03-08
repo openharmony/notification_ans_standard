@@ -54,6 +54,7 @@ ohos_moduletest("ans_fw_module_test") {
     "mock/blob.cpp",
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_change_notification.cpp",
     "mock/mock_common_event_data.cpp",
@@ -128,6 +129,7 @@ ohos_moduletest("ans_innerkits_module_publish_test") {
     "mock/blob.cpp",
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_change_notification.cpp",
     "mock/mock_common_event_data.cpp",
@@ -203,6 +205,7 @@ ohos_moduletest("ans_innerkits_module_slot_test") {
     "mock/blob.cpp",
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_change_notification.cpp",
     "mock/mock_common_event_data.cpp",
@@ -277,6 +280,7 @@ ohos_moduletest("ans_innerkits_module_setting_test") {
     "mock/blob.cpp",
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_change_notification.cpp",
     "mock/mock_common_event_data.cpp",
@@ -336,9 +340,9 @@ group("moduletest") {
 
   deps += [
     # ":ReminderAgentJsTest",
-    ":ans_fw_module_test",
-    ":ans_innerkits_module_publish_test",
-    ":ans_innerkits_module_setting_test",
-    ":ans_innerkits_module_slot_test",
+    # ":ans_fw_module_test",
+    # ":ans_innerkits_module_publish_test",
+    # ":ans_innerkits_module_setting_test",
+    # ":ans_innerkits_module_slot_test",
   ]
 }

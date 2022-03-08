@@ -2620,7 +2620,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0132, Function | SmallTest | Level1)
 
     sptr<NotificationDoNotDisturbDate> date =
         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::NONE, 0, 0);
-    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(100, date), ERR_OK);
 
     EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
     EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);
@@ -2662,7 +2662,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0133, Function | SmallTest | Level1)
     int64_t endDate = endDuration.count();
     sptr<NotificationDoNotDisturbDate> date =
         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::ONCE, beginDate, endDate);
-    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(100, date), ERR_OK);
 
     EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
     EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);
@@ -2704,7 +2704,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0134, Function | SmallTest | Level1)
     int64_t endDate = endDuration.count();
     sptr<NotificationDoNotDisturbDate> date =
         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::DAILY, beginDate, endDate);
-    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(100, date), ERR_OK);
 
     EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
     EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);
@@ -2746,7 +2746,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0135, Function | SmallTest | Level1)
     int64_t endDate = endDuration.count();
     sptr<NotificationDoNotDisturbDate> date =
         new NotificationDoNotDisturbDate(NotificationConstant::DoNotDisturbType::CLEARLY, beginDate, endDate);
-    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(date), ERR_OK);
+    EXPECT_EQ(g_advancedNotificationService->SetDoNotDisturbDate(100, date), ERR_OK);
 
     EXPECT_EQ(g_advancedNotificationService->Publish(label, req), ERR_OK);
     EXPECT_EQ(g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), nullptr), ERR_OK);

@@ -30,7 +30,6 @@ ohos_moduletest("ans_module_test") {
   sources = [
     "${services_path}/ans/src/advanced_notification_service.cpp",
     "${services_path}/ans/src/advanced_notification_service_ability.cpp",
-    "${services_path}/ans/src/bundle_manager_helper.cpp",
     "${services_path}/ans/src/notification_preferences.cpp",
     "${services_path}/ans/src/notification_preferences_database.cpp",
     "${services_path}/ans/src/notification_preferences_info.cpp",
@@ -45,6 +44,7 @@ ohos_moduletest("ans_module_test") {
     "mock/blob.cpp",
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_event_handler.cpp",
     "mock/mock_ipc.cpp",
