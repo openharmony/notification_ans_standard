@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -246,6 +246,7 @@ AdvancedNotificationService::AdvancedNotificationService()
         std::bind(&AdvancedNotificationService::OnScreenOff, this),
 #endif
         std::bind(&AdvancedNotificationService::OnResourceRemove, this, std::placeholders::_1),
+        std::bind(&AdvancedNotificationService::OnBundleDataCleared, this, std::placeholders::_1),
     };
     systemEventObserver_ = std::make_shared<SystemEventObserver>(iSystemEvent);
 
@@ -3248,6 +3249,34 @@ void AdvancedNotificationService::OnResourceRemove(int32_t userId)
 
     handler_->PostSyncTask(std::bind([&]() {
         NotificationPreferences::GetInstance().RemoveSettings(userId);
+    }));
+}
+
+void AdvancedNotificationService::OnBundleDataCleared(const sptr<NotificationBundleOption> &bundleOption)
+{
+    handler_->PostSyncTask(std::bind([&]() {
+        std::vector<std::string> keys = GetNotificationKeys(bundleOption);
+        for (auto key : keys) {
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+            std::string deviceId = GetNotificationDeviceId(key);
+#endif
+            sptr<Notification> notification = nullptr;
+
+            ErrCode result = RemoveFromNotificationList(key, notification);
+            if (result != ERR_OK) {
+                continue;
+            }
+
+            if (notification != nullptr) {
+                int reason = NotificationConstant::CANCEL_REASON_DELETE;
+                UpdateRecentNotification(notification, true, reason);
+                sptr<NotificationSortingMap> sortingMap = GenerateSortingMap();
+                NotificationSubscriberManager::GetInstance()->NotifyCanceled(notification, sortingMap, reason);
+#ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+                DoDistributedDelete(deviceId, notification);
+#endif
+            }
+        }
     }));
 }
 }  // namespace Notification

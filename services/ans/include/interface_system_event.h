@@ -30,6 +30,7 @@ struct ISystemEvent {
     std::function<void()> onScreenOff;
 #endif
     std::function<void(int32_t userId)> onResourceRemove;
+    std::function<void(const sptr<NotificationBundleOption> &)> onBundleDataCleared;
 };
 }  // namespace Notification
 }  // namespace OHOS
