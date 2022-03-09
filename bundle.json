@@ -38,7 +38,8 @@
     "name": "ans_standard",
     "subsystem": "notification",
     "syscap": [
-      "SystemCapability.DistributedNotificationService"
+      "SystemCapability.Notification.Notification",
+      "SystemCapability.Notification.ReminderAgent"
     ],
     "features": [],
     "adapted_system_type": [

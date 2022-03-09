@@ -567,6 +567,7 @@ ErrCode NotificationPreferences::GetDoNotDisturbDate(const int32_t &userId,
 ErrCode NotificationPreferences::SetDoNotDisturbDate(const int32_t &userId,
     const sptr<NotificationDoNotDisturbDate> date)
 {
+    ANS_LOGE("enter.");
     if (userId <= SUBSCRIBE_USER_INIT) {
         return ERR_ANS_INVALID_PARAM;
     }

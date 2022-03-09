@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1238,11 +1238,7 @@ ErrCode AnsNotification::IsSupportTemplate(const std::string &templateName, bool
 
 bool AnsNotification::IsNonDistributedNotificationType(const NotificationContent::Type &type)
 {
-    if ((type == NotificationContent::Type::CONVERSATION) ||
-        (type == NotificationContent::Type::PICTURE)) {
-        return true;
-    }
-    return false;
+    return ((type == NotificationContent::Type::CONVERSATION) || (type == NotificationContent::Type::PICTURE));
 }
 
 ErrCode AnsNotification::IsAllowedNotify(const int32_t &userId, bool &allowed)

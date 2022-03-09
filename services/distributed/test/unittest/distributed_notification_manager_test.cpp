@@ -173,7 +173,7 @@ HWTEST_F(DistributedNotificationManagerTest, Distributed_Get_Current_Notificatio
 /**
  * @tc.name      : Distributed_Get_Local_DeviceInfo_00100
  * @tc.number    : Distributed_Get_Local_DeviceInfo_00100
- * @tc.desc      : Get local distributed device infomation.
+ * @tc.desc      : Get local distributed device information.
  */
 HWTEST_F(DistributedNotificationManagerTest, Distributed_Get_Local_DeviceInfo_00100, Function | SmallTest | Level1)
 {
