@@ -46,8 +46,8 @@ ohos_shared_library("libans_distributed") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "distributeddatamgr:distributeddata_inner",
-    "dmsfwk_standard:zuri",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

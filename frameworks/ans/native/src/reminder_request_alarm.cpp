@@ -16,6 +16,7 @@
 #include "reminder_request_alarm.h"
 
 #include "ans_log_wrapper.h"
+#include "reminder_store.h"
 
 namespace OHOS {
 namespace Notification {
@@ -27,6 +28,11 @@ const uint16_t ReminderRequestAlarm::SECONDS_PER_HOUR = 3600;
 const uint8_t ReminderRequestAlarm::MINUTES_PER_HOUR = 60;
 const int8_t ReminderRequestAlarm::INVALID_INT_VALUE = -1;
 const int8_t ReminderRequestAlarm::DEFAULT_SNOOZE_TIMES = 3;
+
+// For database recovery.
+const std::string ReminderRequestAlarm::REPEAT_DAYS_OF_WEEK = "repeat_days_of_week";
+const std::string ReminderRequestAlarm::ALARM_HOUR = "alarm_hour";
+const std::string ReminderRequestAlarm::ALARM_MINUTE = "alarm_minute";
 
 ReminderRequestAlarm::ReminderRequestAlarm(uint8_t hour, uint8_t minute, const std::vector<uint8_t> daysOfWeek)
     : ReminderRequest(ReminderRequest::ReminderType::ALARM)
@@ -49,7 +55,7 @@ ReminderRequestAlarm::ReminderRequestAlarm(const ReminderRequestAlarm &other) : 
 
 void ReminderRequestAlarm::CheckParamValid() const
 {
-    if (hour_ >= HOURS_PER_DAY || hour_ < 0) {
+    if ((hour_ >= HOURS_PER_DAY) || (hour_ < 0)) {
         ANSR_LOGE("setted hour is not between [0, 24)");
         throw std::invalid_argument("setted hour is not between [0, 24)");
     }
@@ -299,6 +305,47 @@ bool ReminderRequestAlarm::ReadFromParcel(Parcel &parcel)
     }
     ANSR_LOGD("hour_=%{public}d, minute_=%{public}d, repeatDays_=%{public}d", hour_, minute_, repeatDays_);
     return true;
+}
+
+void ReminderRequestAlarm::RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
+{
+    ReminderRequest::RecoverFromDb(resultSet);
+
+    // repeatDays
+    repeatDays_ =
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, REPEAT_DAYS_OF_WEEK, DbRecoveryType::INT));
+
+    // hour
+    hour_ =
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, ALARM_HOUR, DbRecoveryType::INT));
+
+    // minute
+    minute_ =
+        static_cast<uint8_t>(RecoverInt64FromDb(resultSet, ALARM_MINUTE, DbRecoveryType::INT));
+}
+
+void ReminderRequestAlarm::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
+    const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values)
+{
+    uint8_t repeatDays = 0;
+    uint8_t hour = 0;
+    uint8_t minute = 0;
+    if (reminder->GetReminderType() == ReminderRequest::ReminderType::ALARM) {
+        ReminderRequestAlarm* alarm = static_cast<ReminderRequestAlarm*>(reminder.GetRefPtr());
+        repeatDays = alarm->GetRepeatDay();
+        hour = alarm->GetHour();
+        minute = alarm->GetMinute();
+    }
+    values.PutInt(REPEAT_DAYS_OF_WEEK, repeatDays);
+    values.PutInt(ALARM_HOUR, hour);
+    values.PutInt(ALARM_MINUTE, minute);
+}
+
+void ReminderRequestAlarm::InitDbColumns()
+{
+    ReminderRequest::AddColumn(REPEAT_DAYS_OF_WEEK, "INT", false);
+    ReminderRequest::AddColumn(ALARM_HOUR, "INT", false);
+    ReminderRequest::AddColumn(ALARM_MINUTE, "INT", true);
 }
 }
 }

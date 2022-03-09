@@ -73,7 +73,7 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     size_t argc = PUBLISH_PARAM_LEN;
     napi_value argv[PUBLISH_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    if (argc < 1 || argc > PUBLISH_PARAM_LEN) {
+    if ((argc < 1) || (argc > PUBLISH_PARAM_LEN)) {
         ANSR_LOGW("Wrong number of arguments");
         return nullptr;
     }
@@ -100,7 +100,7 @@ napi_value ParseCanCelParameter(const napi_env &env, const napi_callback_info &i
     size_t argc = CANCEL_PARAM_LEN;
     napi_value argv[CANCEL_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    if (argc < 1 || argc > CANCEL_PARAM_LEN) {
+    if ((argc < 1) || (argc > CANCEL_PARAM_LEN)) {
         ANSR_LOGW("Wrong number of arguments");
         return nullptr;
     }

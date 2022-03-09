@@ -1625,6 +1625,10 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
     if (uid != SYSTEM_SERVICE_UID) {
         return ERR_ANS_NOT_SYSTEM_SERVICE;
     }
+    int userId = SUBSCRIBE_USER_INIT;
+    OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+    request->SetCreatorUserId(userId);
+    ANS_LOGD("%{public}s, uid=%{public}d userId=%{public}d", __FUNCTION__, uid, userId);
 
     if (request->GetCreatorBundleName().empty()) {
         request->SetCreatorBundleName(FOUNDATION_BUNDLE_NAME);
@@ -1714,7 +1718,6 @@ ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &remi
         return result;
     }
 
-    ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationRequest> notificationRequest = reminder->GetNotificationRequest();
     sptr<NotificationBundleOption> bundleOption = nullptr;
     result = PrepareNotificationInfo(notificationRequest, bundleOption);
@@ -1733,7 +1736,6 @@ ErrCode AdvancedNotificationService::PublishReminder(sptr<ReminderRequest> &remi
 ErrCode AdvancedNotificationService::CancelReminder(const int32_t reminderId)
 {
     ANSR_LOGI("Cancel Reminder");
-    ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
@@ -1749,7 +1751,6 @@ ErrCode AdvancedNotificationService::CancelReminder(const int32_t reminderId)
 ErrCode AdvancedNotificationService::CancelAllReminders()
 {
     ANSR_LOGI("Cancel all reminders");
-    ReminderDataManager::GetInstance()->SetService(this);
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
@@ -1767,7 +1768,6 @@ ErrCode AdvancedNotificationService::CancelAllReminders()
 ErrCode AdvancedNotificationService::GetValidReminders(std::vector<sptr<ReminderRequest>> &reminders)
 {
     ANSR_LOGI("GetValidReminders");
-    ReminderDataManager::GetInstance()->SetService(this);
     reminders.clear();
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
@@ -2404,15 +2404,18 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
     ANS_LOGD("%{public}s", __FUNCTION__);
 
     if (!IsSystemApp()) {
+        ANS_LOGW("Not system app!");
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
     if (!CheckPermission(GetClientBundleName())) {
+        ANS_LOGW("Check permission denied!");
         return ERR_ANS_PERMISSION_DENIED;
     }
 
     int userId = SUBSCRIBE_USER_INIT;
     if (!GetActiveUserId(userId)) {
+        ANS_LOGW("No active user found!");
         return ERR_ANS_GET_ACTIVE_USER_FAILED;
     }
 
@@ -3116,7 +3119,9 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(const int32_t &userId,
 ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &userId,
     const sptr<NotificationDoNotDisturbDate> &date)
 {
+    ANS_LOGD("%{public}s enter, userId = %{public}d", __FUNCTION__, userId);
     if (date == nullptr) {
+        ANS_LOGE("Invalid date param");
         return ERR_ANS_INVALID_PARAM;
     }
 
@@ -3124,7 +3129,6 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
 
     int64_t beginDate = ResetSeconds(date->GetBeginDate());
     int64_t endDate = ResetSeconds(date->GetEndDate());
-
     switch (date->GetDoNotDisturbType()) {
         case NotificationConstant::DoNotDisturbType::NONE:
             beginDate = 0;
@@ -3141,7 +3145,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
         default:
             break;
     }
-
+    ANS_LOGD("Before set SetDoNotDisturbDate beginDate = %{public}lld, endDate = %{public}lld", beginDate, endDate);
     const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
         date->GetDoNotDisturbType(),
         beginDate,
@@ -3150,6 +3154,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
 
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
+        ANS_LOGE("Generate invalid bundle option!");
         return ERR_ANS_INVALID_BUNDLE;
     }
 

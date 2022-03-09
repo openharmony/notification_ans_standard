@@ -78,6 +78,7 @@ ohos_shared_library("ans_core") {
     "${frameworks_path}/ans/native/src/reminder_request_alarm.cpp",
     "${frameworks_path}/ans/native/src/reminder_request_calendar.cpp",
     "${frameworks_path}/ans/native/src/reminder_request_timer.cpp",
+    "${frameworks_path}/ans/native/src/reminder_store.cpp",
   ]
 
   configs = [ ":private_config" ]
@@ -92,12 +93,13 @@ ohos_shared_library("ans_core") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
-    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
+    "native_appdatamgr:native_rdb",
     "os_account_standard:os_account_innerkits",
     "samgr_standard:samgr_proxy",
     "time_native:time_service",
