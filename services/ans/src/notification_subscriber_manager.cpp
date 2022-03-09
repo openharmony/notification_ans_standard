@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -306,8 +306,9 @@ void NotificationSubscriberManager::NotifyConsumedInner(
     int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();
     int32_t sendUserId = notification->GetUserId();
     for (auto record : subscriberRecordList_) {
-        ANS_LOGD("%{public}s record->userId = <%{public}d>", __FUNCTION__, record->userId);
         auto BundleNames = notification->GetBundleName();
+        ANS_LOGD("%{public}s record->userId = <%{public}d> BundleName  = <%{public}s",
+            __FUNCTION__, record->userId, BundleNames.c_str());
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
             (record->userId == sendUserId ||
@@ -359,11 +360,7 @@ void NotificationSubscriberManager::NotifyDoNotDisturbDateChangedInner(const spt
 
 bool NotificationSubscriberManager::IsSystemUser(int32_t userId)
 {
-    if (userId >= SUBSCRIBE_USER_SYSTEM_BEGIN && userId <= SUBSCRIBE_USER_SYSTEM_END) {
-        return true;
-    }
-
-    return false;
+    return ((userId >= SUBSCRIBE_USER_SYSTEM_BEGIN) && (userId <= SUBSCRIBE_USER_SYSTEM_END));
 }
 
 void NotificationSubscriberManager::NotifyEnabledNotificationChangedInner(

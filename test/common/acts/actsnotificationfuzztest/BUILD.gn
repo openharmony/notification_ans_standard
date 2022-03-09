@@ -80,7 +80,6 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "ability_runtime:abilitykit_native",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
-    "dmsfwk_standard:zuri",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

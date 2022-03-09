@@ -34,6 +34,14 @@ public:
     explicit ReminderRequestTimer(uint64_t countDownTimeInSeconds);
 
     /**
+     * @brief This constructor should only be used in background proxy service process
+     * when reminder instance recovery from database.
+     *
+     * @param reminderId Indicates reminder id.
+     */
+    explicit ReminderRequestTimer(int32_t reminderId) : ReminderRequest(reminderId) {};
+
+    /**
      * @brief Copy construct from an exist reminder.
      *
      * @param Indicates the exist reminder.

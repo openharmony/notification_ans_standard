@@ -76,6 +76,7 @@ ohos_unittest("ans_unit_test") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
@@ -84,7 +85,6 @@ ohos_unittest("ans_unit_test") {
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
     "distributeddatamgr:distributeddata_inner",
-    "dmsfwk_standard:zuri",
     "eventhandler:libeventhandler",
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",

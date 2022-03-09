@@ -366,21 +366,24 @@ napi_value ReminderCommon::CreateReminderAlarm(
 {
     // hour
     int32_t propertyHourVal = 0;
+    const int32_t maxHour = 23;
     if (!GetInt32(env, value, ReminderAgentNapi::ALARM_HOUR, propertyHourVal, true)) {
         return nullptr;
     }
 
     // minute
     int32_t propertyMinuteVal = 0;
+    const int32_t maxMinute = 59;
     if (!GetInt32(env, value, ReminderAgentNapi::ALARM_MINUTE, propertyMinuteVal, true)) {
         return nullptr;
     }
-    if (propertyHourVal < 0 || propertyHourVal > 23) {
+
+    if ((propertyHourVal < 0) || (propertyHourVal > maxHour)) {
         ANSR_LOGW("Create alarm reminder fail: designated %{public}s must between [0, 23].",
             ReminderAgentNapi::ALARM_HOUR);
         return nullptr;
     }
-    if (propertyMinuteVal < 0 || propertyMinuteVal > 59) {
+    if ((propertyMinuteVal < 0) || (propertyMinuteVal > maxMinute)) {
         ANSR_LOGW("Create alarm reminder fail: designated %{public}s must between [0, 59].",
             ReminderAgentNapi::ALARM_MINUTE);
         return nullptr;
@@ -412,11 +415,11 @@ napi_value ReminderCommon::CreateReminderCalendar(
     int32_t propertyDayVal = 0;
     int32_t propertyHourVal = 0;
     int32_t propertyMinteVal = 0;
-    if (!GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_YEAR, propertyYearVal, true)
-        || !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_MONTH, propertyMonthVal, true)
-        || !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_DAY, propertyDayVal, true)
-        || !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_HOUR, propertyHourVal, true)
-        || !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_MINUTE, propertyMinteVal, true)) {
+    if (!GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_YEAR, propertyYearVal, true) ||
+        !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_MONTH, propertyMonthVal, true) ||
+        !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_DAY, propertyDayVal, true) ||
+        !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_HOUR, propertyHourVal, true) ||
+        !GetInt32(env, dateTimeObj, ReminderAgentNapi::CALENDAR_MINUTE, propertyMinteVal, true)) {
         return nullptr;
     }
     if (!CheckCalendarParams(propertyYearVal, propertyMonthVal, propertyDayVal,
@@ -453,18 +456,18 @@ napi_value ReminderCommon::CreateReminderCalendar(
 bool ReminderCommon::CheckCalendarParams(const int32_t &year, const int32_t &month, const int32_t &day,
     const int32_t &hour, const int32_t &min)
 {
-    if (year < 0 || year > UINT16_MAX) {
+    if ((year < 0) || (year > UINT16_MAX)) {
         ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [0, %{public}d]",
             ReminderAgentNapi::CALENDAR_YEAR, UINT16_MAX);
         return false;
     }
-    if (month < 1 || month > ReminderRequestCalendar::MAX_MONTHS_OF_YEAR) {
+    if ((month < 1 || month) > (ReminderRequestCalendar::MAX_MONTHS_OF_YEAR)) {
         ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [1, %{public}hhu]",
             ReminderAgentNapi::CALENDAR_MONTH, ReminderRequestCalendar::MAX_MONTHS_OF_YEAR);
         return false;
     }
     uint8_t maxDaysOfMonth = ReminderRequestCalendar::GetDaysOfMonth(static_cast<uint16_t>(year), month);
-    if (day < 1 || day > maxDaysOfMonth) {
+    if ((day < 1) || (day > maxDaysOfMonth)) {
         ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [1, %{public}hhu]",
             ReminderAgentNapi::CALENDAR_DAY, maxDaysOfMonth);
         return false;
