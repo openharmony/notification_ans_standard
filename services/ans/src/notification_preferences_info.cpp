@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -188,10 +188,7 @@ uint32_t NotificationPreferencesInfo::BundleInfo::GetGroupSize() const
 bool NotificationPreferencesInfo::BundleInfo::IsExsitSlot(const NotificationConstant::SlotType &type) const
 {
     auto iter = slots_.find(type);
-    if (iter != slots_.end()) {
-        return true;
-    }
-    return false;
+    return (iter != slots_.end());
 }
 
 bool NotificationPreferencesInfo::BundleInfo::IsExsitSlotGroup(const std::string &groupId) const

@@ -181,7 +181,7 @@ HWTEST_F(DistributedDatabaseTest, GetLocalDeviceInfo_00100, Function | SmallTest
 /**
  * @tc.name      : DistributedDatabase_GetDeviceInfoList_00100
  * @tc.number    : GetDeviceInfoList_00100
- * @tc.desc      : Get infomations for all devices.
+ * @tc.desc      : Get informations for all devices.
  */
 HWTEST_F(DistributedDatabaseTest, GetDeviceInfoList_00100, Function | SmallTest | Level1)
 {
