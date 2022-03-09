@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -108,8 +108,7 @@ describe("ReminderHelperTest", function () {
      */
     it("testReminderHelper003", 0, async function (done) {
         function reminderCallback(err, data) {
-            let i = 0;
-            expect(0).assertEqual(i);
+            expect(true).assertEqual(true);
         }
         reminderAgent.addNotificationSlot(0, reminderCallback);
         done();
@@ -245,14 +244,13 @@ describe("ReminderHelperTest", function () {
             reminderType: reminderAgent.ReminderType.REMINDER_TYPE_TIMER,
             triggerTimeInSeconds: 3
         }
-        let id = 1;
         let publishlength = -1;
         let cancellength = -1;
         let firstdiff = -1;
         reminderAgent.publishReminder(timer).then(() => {
             reminderAgent.getValidReminders().then((reminders) => {
                 publishlength=reminders.length
-                reminderAgent.cancelReminder(id).then(() => {
+                reminderAgent.cancelReminder(0).then(() => {
                     reminderAgent.getValidReminders().then((reminders) => {
                         cancellength = reminders.length
                         firstdiff = publishlength - cancellength;
@@ -319,10 +317,8 @@ describe("ReminderHelperTest", function () {
                     reminderAgent.getValidReminders((err, reminders) => {
                         cancellength = reminders.length;
                         firstdiff = publishlength - cancellength;
-                        if (firstdiff === 0) {
+                        if (firstdiff === 0 || firstdiff === 1) {
                             expect(0).assertEqual(firstdiff);
-                        } else if (firstdiff === 1) {
-                            expect(1).assertEqual(firstdiff);
                         }
                     });
                 });
@@ -357,10 +353,8 @@ describe("ReminderHelperTest", function () {
                     reminderAgent.getValidReminders((err, reminders) => {
                         cancellength = reminders.length;
                         firstdiff = publishlength - cancellength;
-                        if (firstdiff === 0) {
+                        if (firstdiff === 0 || firstdiff === 1) {
                             expect(0).assertEqual(firstdiff);
-                        } else if (firstdiff === 1) {
-                            expect(1).assertEqual(firstdiff);
                         }
                     });
                 });
@@ -846,7 +840,7 @@ describe("ReminderHelperTest", function () {
             slotType:3
         }
         reminderAgent.publishReminder(calendar).then((reminderId) => {
-            expect(typeof(reminderId)).assertEqual('number');
+            expect(typeof(reminderId) === 'number').assertEqual(true);
         });
         done();
     })

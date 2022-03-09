@@ -30,7 +30,6 @@ ohos_moduletest("ans_module_test") {
   sources = [
     "${services_path}/ans/src/advanced_notification_service.cpp",
     "${services_path}/ans/src/advanced_notification_service_ability.cpp",
-    "${services_path}/ans/src/bundle_manager_helper.cpp",
     "${services_path}/ans/src/notification_preferences.cpp",
     "${services_path}/ans/src/notification_preferences_database.cpp",
     "${services_path}/ans/src/notification_preferences_info.cpp",
@@ -45,6 +44,7 @@ ohos_moduletest("ans_module_test") {
     "mock/blob.cpp",
     "mock/distributed_kv_data_manager.cpp",
     "mock/mock_bundle_manager.cpp",
+    "mock/mock_bundle_manager_helper.cpp",
     "mock/mock_bundle_mgr_proxy.cpp",
     "mock/mock_event_handler.cpp",
     "mock/mock_ipc.cpp",
@@ -62,6 +62,7 @@ ohos_moduletest("ans_module_test") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
@@ -70,7 +71,6 @@ ohos_moduletest("ans_module_test") {
     "bundle_framework:appexecfwk_core",
     "ces_standard:cesfwk_innerkits",
     "distributeddatamgr:distributeddata_inner",
-    "dmsfwk_standard:zuri",
     "eventhandler:libeventhandler",
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",

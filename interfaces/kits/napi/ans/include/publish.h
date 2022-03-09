@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@ namespace OHOS {
 namespace NotificationNapi {
 using namespace OHOS::Notification;
 napi_value Publish(napi_env env, napi_callback_info info);
+napi_value ShowNotification(napi_env env, napi_callback_info info);
 }  // namespace NotificationNapi
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_PUBLISH_H

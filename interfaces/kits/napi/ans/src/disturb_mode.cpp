@@ -308,13 +308,13 @@ napi_value GetDoNotDisturbDate(napi_env env, napi_callback_info info)
 {
     ANS_LOGI("enter");
 
-    SetDoNotDisturbDateParams params {};
+    GetDoNotDisturbDateParams params {};
     if (ParseParameters(env, info, params) == nullptr) {
         return Common::NapiGetUndefined(env);
     }
 
-    AsyncCallbackInfoSetDoNotDisturb *asynccallbackinfo =
-        new (std::nothrow) AsyncCallbackInfoSetDoNotDisturb {.env = env, .asyncWork = nullptr, .params = params};
+    AsyncCallbackInfoGetDoNotDisturb *asynccallbackinfo =
+        new (std::nothrow) AsyncCallbackInfoGetDoNotDisturb {.env = env, .asyncWork = nullptr, .params = params};
     if (!asynccallbackinfo) {
         return Common::JSParaError(env, params.callback);
     }

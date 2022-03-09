@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -442,7 +442,7 @@ bool NotificationPreferencesDatabase::PutDoNotDisturbDate(
 }
 
 void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
-    const std::string &key, std::function<void(DistributedKv::Value &)> funcion)
+    const std::string &key, std::function<void(DistributedKv::Value &)> callback)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
@@ -454,19 +454,19 @@ void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
     DistributedKv::Key getKey(key);
     status = kvStorePtr_->Get(getKey, value);
     if (status != DistributedKv::Status::SUCCESS) {
-        ANS_LOGE("Get value failed, use defalut value. error code is %{public}d", status);
+        ANS_LOGE("Get value failed, use default value. error code is %{public}d", status);
         return;
     }
 
     if (value.Empty()) {
-        ANS_LOGE("Get value is empty, use defalut value. error code is %{public}d", value.Empty());
+        ANS_LOGE("Get value is empty, use default value. error code is %{public}d", value.Empty());
         return;
     }
-    funcion(value);
+    callback(value);
 }
 
 void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
-    const std::string &key, std::function<void(DistributedKv::Status &, DistributedKv::Value &)> funcion)
+    const std::string &key, std::function<void(DistributedKv::Status &, DistributedKv::Value &)> callback)
 {
     if (!CheckKvStore()) {
         ANS_LOGE("KvStore is nullptr.");
@@ -477,7 +477,7 @@ void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
     DistributedKv::Value value;
     DistributedKv::Key getKey(key);
     status = kvStorePtr_->Get(getKey, value);
-    funcion(status, value);
+    callback(status, value);
 }
 
 bool NotificationPreferencesDatabase::CheckBundle(const std::string &bundleName, const int &bundleUid)
@@ -1362,7 +1362,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreference
                     }
                 }
             } else {
-                ANS_LOGW("Parse disturbe mode failed, use defalut value.");
+                ANS_LOGW("Parse disturbe mode failed, use default value.");
             }
             info.SetDoNotDisturbDate(userId, disturbDate);
         });
@@ -1386,7 +1386,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(NotificationPrefe
                     }
                 }
             } else {
-                ANS_LOGW("Parse disturbe start time failed, use defalut value.");
+                ANS_LOGW("Parse disturbe start time failed, use default value.");
             }
             info.SetDoNotDisturbDate(userId, disturbDate);
         });
@@ -1410,7 +1410,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbEndDate(NotificationPrefere
                     }
                 }
             } else {
-                ANS_LOGW("Parse disturbe end time failed, use defalut value.");
+                ANS_LOGW("Parse disturbe end time failed, use default value.");
             }
             info.SetDoNotDisturbDate(userId, disturbDate);
         });
@@ -1434,7 +1434,7 @@ void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPrefe
                     info.SetEnabledAllNotification(userId, static_cast<bool>(StringToInt(value.ToString())));
                 }
             } else {
-                ANS_LOGW("Parse enable all notification failed, use defalut value.");
+                ANS_LOGW("Parse enable all notification failed, use default value.");
             }
         });
 }

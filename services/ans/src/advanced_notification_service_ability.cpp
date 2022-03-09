@@ -38,11 +38,13 @@ void AdvancedNotificationServiceAbility::OnStart()
     if (!Publish(service_)) {
         return;
     }
+    reminderAgent_ = ReminderDataManager::InitInstance(service_);
 }
 
 void AdvancedNotificationServiceAbility::OnStop()
 {
     service_ = nullptr;
+    reminderAgent_ = nullptr;
 }
 }  // namespace Notification
 }  // namespace OHOS

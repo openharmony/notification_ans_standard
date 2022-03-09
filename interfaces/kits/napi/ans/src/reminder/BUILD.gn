@@ -64,13 +64,14 @@ ohos_shared_library("reminderagent") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
-    "dmsfwk_standard:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "native_appdatamgr:native_rdb",
   ]
 
   relative_install_dir = "module"
