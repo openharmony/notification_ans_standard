@@ -472,7 +472,7 @@ void ReminderDataManager::SetService(AdvancedNotificationService *advancedNotifi
     advancedNotificationService_ = advancedNotificationService;
 }
 
-void ReminderDataManager::ShowActiveReminder(const OHOS::EventFwk::Want &want)
+void ReminderDataManager::ShowActiveReminder(const EventFwk::Want &want)
 {
     int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));
     ANSR_LOGI("Begin to show reminder(reminderId=%{public}d)", reminderId);
