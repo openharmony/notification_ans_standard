@@ -130,8 +130,9 @@ public:
      * @brief Show the reminder.
      *
      * @param isSysTimeChanged Indicates it is triggered as dateTime changed by user or not.
+     * @param want Which contains the given reminder.
      */
-    void ShowActiveReminder();
+    void ShowActiveReminder(const OHOS::EventFwk::Want &want);
 
     /**
      * @brief Snooze the reminder by manual.
