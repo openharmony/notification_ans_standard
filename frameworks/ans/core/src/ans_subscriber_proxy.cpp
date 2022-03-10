@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,7 @@ ErrCode AnsSubscriberProxy::InnerTransact(
 {
     auto remote = Remote();
     if (remote == nullptr) {
-        ANS_LOGW("[InnerTransact] fail: get Remote fail code %{public}d", code);
+        ANS_LOGW("[InnerTransact] fail: get Remote fail code %{public}u", code);
         return ERR_DEAD_OBJECT;
     }
 
