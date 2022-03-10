@@ -136,6 +136,7 @@ public:
     void OnScreenOff();
 #endif
     void OnResourceRemove(int32_t userId);
+    void OnBundleDataCleared(const sptr<NotificationBundleOption> &bundleOption);
 
     // Distributed KvStore
     void OnDistributedKvStoreDeathRecipient();

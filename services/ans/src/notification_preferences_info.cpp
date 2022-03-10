@@ -188,10 +188,7 @@ uint32_t NotificationPreferencesInfo::BundleInfo::GetGroupSize() const
 bool NotificationPreferencesInfo::BundleInfo::IsExsitSlot(const NotificationConstant::SlotType &type) const
 {
     auto iter = slots_.find(type);
-    if (iter != slots_.end()) {
-        return true;
-    }
-    return false;
+    return (iter != slots_.end());
 }
 
 bool NotificationPreferencesInfo::BundleInfo::IsExsitSlotGroup(const std::string &groupId) const
