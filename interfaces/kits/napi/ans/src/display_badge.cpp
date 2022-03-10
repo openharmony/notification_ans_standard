@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -170,26 +170,25 @@ napi_value DisplayBadge(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("DisplayBadge napi_create_async_work start");
             AsyncCallbackInfoEnableBadge *asynccallbackinfo = (AsyncCallbackInfoEnableBadge *)data;
-            ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d enable = %{public}d",
-                asynccallbackinfo->params.option.GetBundleName().c_str(),
-                asynccallbackinfo->params.option.GetUid(),
-                asynccallbackinfo->params.enable);
-            asynccallbackinfo->info.errorCode = NotificationHelper::SetShowBadgeEnabledForBundle(
-                asynccallbackinfo->params.option, asynccallbackinfo->params.enable);
-            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d", asynccallbackinfo->info.errorCode);
+            if (asynccallbackinfo) {
+                ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d enable = %{public}d",
+                    asynccallbackinfo->params.option.GetBundleName().c_str(),
+                    asynccallbackinfo->params.option.GetUid(),
+                    asynccallbackinfo->params.enable);
+                asynccallbackinfo->info.errorCode = NotificationHelper::SetShowBadgeEnabledForBundle(
+                    asynccallbackinfo->params.option, asynccallbackinfo->params.enable);
+                ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d", asynccallbackinfo->info.errorCode);
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("DisplayBadge napi_create_async_work end");
             AsyncCallbackInfoEnableBadge *asynccallbackinfo = (AsyncCallbackInfoEnableBadge *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
@@ -214,17 +213,14 @@ void AsyncCompleteCallbackIsBadgeDisplayed(napi_env env, napi_status status, voi
         return;
     }
     AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = (AsyncCallbackInfoIsDisplayBadge *)data;
-
-    napi_value result = nullptr;
-    napi_get_boolean(env, asynccallbackinfo->enabled, &result);
-    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-
-    if (asynccallbackinfo->info.callback != nullptr) {
-        napi_delete_reference(env, asynccallbackinfo->info.callback);
-    }
-
-    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
     if (asynccallbackinfo) {
+        napi_value result = nullptr;
+        napi_get_boolean(env, asynccallbackinfo->enabled, &result);
+        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+        if (asynccallbackinfo->info.callback != nullptr) {
+            napi_delete_reference(env, asynccallbackinfo->info.callback);
+        }
+        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
         delete asynccallbackinfo;
         asynccallbackinfo = nullptr;
     }
@@ -257,18 +253,20 @@ napi_value IsBadgeDisplayed(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("IsBadgeDisplayed napi_create_async_work start");
             AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = (AsyncCallbackInfoIsDisplayBadge *)data;
-
-            if (asynccallbackinfo->params.hasBundleOption) {
-                ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d",
-                    asynccallbackinfo->params.option.GetBundleName().c_str(),
-                    asynccallbackinfo->params.option.GetUid());
-                asynccallbackinfo->info.errorCode = NotificationHelper::GetShowBadgeEnabledForBundle(
-                    asynccallbackinfo->params.option, asynccallbackinfo->enabled);
-            } else {
-                asynccallbackinfo->info.errorCode = NotificationHelper::GetShowBadgeEnabled(asynccallbackinfo->enabled);
+            if (asynccallbackinfo) {
+                if (asynccallbackinfo->params.hasBundleOption) {
+                    ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d",
+                        asynccallbackinfo->params.option.GetBundleName().c_str(),
+                        asynccallbackinfo->params.option.GetUid());
+                    asynccallbackinfo->info.errorCode = NotificationHelper::GetShowBadgeEnabledForBundle(
+                        asynccallbackinfo->params.option, asynccallbackinfo->enabled);
+                } else {
+                    asynccallbackinfo->info.errorCode = NotificationHelper::GetShowBadgeEnabled(
+                        asynccallbackinfo->enabled);
+                }
+                ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d, enabled = %{public}d",
+                    asynccallbackinfo->info.errorCode, asynccallbackinfo->enabled);
             }
-            ANS_LOGI("asynccallbackinfo->info.errorCode = %{public}d, enabled = %{public}d",
-                asynccallbackinfo->info.errorCode, asynccallbackinfo->enabled);
         },
         AsyncCompleteCallbackIsBadgeDisplayed,
         (void *)asynccallbackinfo,

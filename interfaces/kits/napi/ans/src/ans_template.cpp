@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -89,23 +89,22 @@ napi_value IsSupportTemplate(napi_env env, napi_callback_info info)
             ANS_LOGI("IsSupportTemplate napi_create_async_work start");
             AsyncCallbackInfoTemplate *asyncCallbackinfo = (AsyncCallbackInfoTemplate *)data;
 
-            asyncCallbackinfo->info.errorCode = NotificationHelper::IsSupportTemplate(
-                asyncCallbackinfo->params.templateName, asyncCallbackinfo->params.support);
+            if (asyncCallbackinfo) {
+                asyncCallbackinfo->info.errorCode = NotificationHelper::IsSupportTemplate(
+                    asyncCallbackinfo->params.templateName, asyncCallbackinfo->params.support);
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("IsSupportTemplate napi_create_async_work end");
             AsyncCallbackInfoTemplate *asyncCallbackinfo = (AsyncCallbackInfoTemplate *)data;
-
-            napi_value result = nullptr;
-            napi_get_boolean(env, asyncCallbackinfo->params.support, &result);
-            Common::ReturnCallbackPromise(env, asyncCallbackinfo->info, result);
-
-            if (asyncCallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asyncCallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asyncCallbackinfo->asyncWork);
-            if (asyncCallbackinfo != nullptr) {
+            if (asyncCallbackinfo) {
+                napi_value result = nullptr;
+                napi_get_boolean(env, asyncCallbackinfo->params.support, &result);
+                Common::ReturnCallbackPromise(env, asyncCallbackinfo->info, result);
+                if (asyncCallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asyncCallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asyncCallbackinfo->asyncWork);
                 delete asyncCallbackinfo;
                 asyncCallbackinfo = nullptr;
             }
