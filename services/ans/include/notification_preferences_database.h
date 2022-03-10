@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,9 +71,9 @@ private:
     bool PutBundleToDisturbeDB(
         const std::string &bundleKey, const NotificationPreferencesInfo::BundleInfo &bundleInfo);
 
-    void GetValueFromDisturbeDB(const std::string &key, std::function<void(DistributedKv::Value &)> funcion);
+    void GetValueFromDisturbeDB(const std::string &key, std::function<void(DistributedKv::Value &)> function);
     void GetValueFromDisturbeDB(const std::string &key,
-        std::function<void(DistributedKv::Status &, DistributedKv::Value &)> funcion);
+        std::function<void(DistributedKv::Status &, DistributedKv::Value &)> function);
     bool GetRemoveGroupKeysFromDisturbeDB(
         const std::string &bundleKey, const std::string &groupId, std::vector<DistributedKv::Key> &keys);
 
