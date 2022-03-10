@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,7 +83,7 @@ ErrCode NotificationPreferences::AddNotificationSlotGroups(
         }
     }
 
-    if (result == ERR_OK &&
+    if ((result == ERR_OK) &&
         (!preferncesDB_->PutGroupsToDisturbeDB(bundleOption->GetBundleName(), bundleOption->GetUid(), groups))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
@@ -173,7 +173,7 @@ ErrCode NotificationPreferences::RemoveNotificationSlotGroups(
             return result;
         }
     }
-    if (result == ERR_OK && (!preferncesDB_->RemoveGroupsFromDisturbeDB(GenerateBundleKey(bundleOption), groupIds))) {
+    if ((result == ERR_OK) && (!preferncesDB_->RemoveGroupsFromDisturbeDB(GenerateBundleKey(bundleOption), groupIds))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
 
@@ -226,7 +226,7 @@ ErrCode NotificationPreferences::UpdateNotificationSlots(
         }
     }
 
-    if (result == ERR_OK &&
+    if ((result == ERR_OK) &&
         (!preferncesDB_->PutSlotsToDisturbeDB(bundleOption->GetBundleName(), bundleOption->GetUid(), slots))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }
@@ -255,7 +255,7 @@ ErrCode NotificationPreferences::UpdateNotificationSlotGroups(
         }
     }
 
-    if (result == ERR_OK &&
+    if ((result == ERR_OK) &&
         (!preferncesDB_->PutGroupsToDisturbeDB(bundleOption->GetBundleName(), bundleOption->GetUid(), groups))) {
         return ERR_ANS_PREFERENCES_NOTIFICATION_DB_OPERATION_FAILED;
     }

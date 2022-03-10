@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -148,7 +148,7 @@ public:
     }
     /**
      * @brief Query the AbilityInfo by the given Want.
-     * @param want Indicates the infomation of the ability.
+     * @param want Indicates the information of the ability.
      * @param abilityInfo Indicates the obtained AbilityInfo object.
      * @return Returns true if the AbilityInfo is successfully obtained; returns false otherwise.
      */
@@ -355,11 +355,11 @@ public:
         return true;
     }
     /**
-     * @brief Dump the bundle informations with specifc flags.
+     * @brief Dump the bundle informations with specific flags.
      * @param flag Indicates the information contained in the dump result.
      * @param bundleName Indicates the bundle name if needed.
      * @param userId Indicates the user ID.
-     * @param result Indicates the dump infomation result.
+     * @param result Indicates the dump information result.
      * @return Returns true if the dump result is successfully obtained; returns false otherwise.
      */
     virtual bool DumpInfos(
