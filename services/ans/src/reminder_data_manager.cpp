@@ -256,6 +256,7 @@ std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerTyp
     switch (type) {
         case (TimerType::TRIGGER_TIMER): {
             want->SetAction(ReminderRequest::REMINDER_EVENT_ALARM_ALERT);
+            want->SetParam(ReminderRequest::PARAM_REMINDER_ID, activeReminderId_);
             break;
         }
         case (TimerType::ALERTING_TIMER): {
@@ -342,7 +343,7 @@ void ReminderDataManager::CloseReminder(const OHOS::EventFwk::Want &want, bool c
     int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));
     sptr<ReminderRequest> reminder = FindReminderRequestLocked(reminderId);
     if (reminder == nullptr) {
-        ANSR_LOGW("Invilate reminder id: %{public}d", reminderId);
+        ANSR_LOGW("Invalid reminder id: %{public}d", reminderId);
         return;
     }
     CloseReminder(reminder, cancelNotification);
@@ -407,7 +408,7 @@ void ReminderDataManager::TerminateAlerting(const OHOS::EventFwk::Want &want)
     int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));
     sptr<ReminderRequest> reminder = FindReminderRequestLocked(reminderId);
     if (reminder == nullptr) {
-        ANSR_LOGE("Invilate reminder id: %{public}d", reminderId);
+        ANSR_LOGE("Invalid reminder id: %{public}d", reminderId);
         return;
     }
     TerminateAlerting(reminder, "timeOut");
@@ -471,19 +472,22 @@ void ReminderDataManager::SetService(AdvancedNotificationService *advancedNotifi
     advancedNotificationService_ = advancedNotificationService;
 }
 
-void ReminderDataManager::ShowActiveReminder()
+void ReminderDataManager::ShowActiveReminder(const EventFwk::Want &want)
 {
-    ANSR_LOGI("Begin to show reminder.");
-    if (activeReminderId_ == -1) {
-        ANSR_LOGE("Active reminder not exist");
-        return;
-    }
-    if (HandleSysTimeChange(activeReminder_)) {
+    int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));
+    ANSR_LOGI("Begin to show reminder(reminderId=%{public}d)", reminderId);
+    if (reminderId == activeReminderId_) {
         ResetStates(TimerType::TRIGGER_TIMER);
+    }
+    sptr<ReminderRequest> reminder = FindReminderRequestLocked(reminderId);
+    if (reminder == nullptr) {
+        ANSR_LOGW("Invalid reminder id: %{public}d", reminderId);
         return;
     }
-    ShowActiveReminderExtendLocked(activeReminder_);
-    ResetStates(TimerType::TRIGGER_TIMER);
+    if (HandleSysTimeChange(reminder)) {
+        return;
+    }
+    ShowActiveReminderExtendLocked(reminder);
     StartRecentReminder();
 }
 
@@ -605,7 +609,7 @@ void ReminderDataManager::SnoozeReminder(const OHOS::EventFwk::Want &want)
     int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));
     sptr<ReminderRequest> reminder = FindReminderRequestLocked(reminderId);
     if (reminder == nullptr) {
-        ANSR_LOGW("Invilate reminder id: %{public}d", reminderId);
+        ANSR_LOGW("Invalid reminder id: %{public}d", reminderId);
         return;
     }
     SnoozeReminderImpl(reminder);
@@ -1074,10 +1078,10 @@ void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderReques
                 ANSR_LOGE("Trigger timer has already started.");
                 break;
             }
-            triggerTime = reminderRequest->GetTriggerTimeInMilli();
-            timerId_ = timer->CreateTimer(REMINDER_DATA_MANAGER->CreateTimerInfo(type));
-            timer->StartTimer(timerId_, triggerTime);
             SetActiveReminder(reminderRequest);
+            timerId_ = timer->CreateTimer(REMINDER_DATA_MANAGER->CreateTimerInfo(type));
+            triggerTime = reminderRequest->GetTriggerTimeInMilli();
+            timer->StartTimer(timerId_, triggerTime);
             ANSR_LOGD("Start timing (next triggerTime), timerId=%{public}llu", (unsigned long long)timerId_);
             break;
         }

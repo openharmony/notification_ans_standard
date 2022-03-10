@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -132,13 +132,12 @@ napi_value Common::JSParaError(const napi_env &env, const napi_ref &callback)
 {
     if (callback) {
         return Common::NapiGetNull(env);
-    } else {
-        napi_value promise = nullptr;
-        napi_deferred deferred = nullptr;
-        napi_create_promise(env, &deferred, &promise);
-        SetPromise(env, deferred, ERROR, Common::NapiGetNull(env));
-        return promise;
     }
+    napi_value promise = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_create_promise(env, &deferred, &promise);
+    SetPromise(env, deferred, ERROR, Common::NapiGetNull(env));
+    return promise;
 }
 
 napi_value Common::ParseParaOnlyCallback(const napi_env &env, const napi_callback_info &info, napi_ref &callback)
