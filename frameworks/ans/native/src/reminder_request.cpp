@@ -1180,10 +1180,8 @@ std::string ReminderRequest::GetShowTime(const uint64_t showTime) const
 {
     if (reminderType_ == ReminderType::TIMER) {
         return "";
-    } else {
-        const time_t showTimeInSecond = static_cast<time_t>(showTime / MILLI_SECONDS);
-        return GetTimeInfoInner(showTimeInSecond, TimeFormat::HM);
     }
+    return GetTimeInfoInner(static_cast<time_t>(showTime / MILLI_SECONDS), TimeFormat::HM);
 }
 
 std::string ReminderRequest::GetTimeInfoInner(const time_t &timeInSecond, const TimeFormat &format) const

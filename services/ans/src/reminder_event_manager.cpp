@@ -84,7 +84,7 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
     std::string action = want.GetAction();
     ANSR_LOGI("Recieved common event:%{public}s", action.c_str());
     if (action == ReminderRequest::REMINDER_EVENT_ALARM_ALERT) {
-        reminderDataManager_->ShowActiveReminder();
+        reminderDataManager_->ShowActiveReminder(want);
         return;
     }
     if (action == ReminderRequest::REMINDER_EVENT_ALERT_TIMEOUT) {
