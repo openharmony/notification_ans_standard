@@ -21,10 +21,12 @@
 
 #include "ability_context.h"
 #include "ability_info.h"
+#include "access_token_helper.h"
 #include "accesstoken_kit.h"
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "ans_permission_def.h"
 #include "bundle_manager_helper.h"
 #include "ipc_skeleton.h"
 #include "notification_constant.h"
@@ -585,7 +587,7 @@ ErrCode AdvancedNotificationService::AddSlots(const std::vector<sptr<Notificatio
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -854,7 +856,7 @@ ErrCode AdvancedNotificationService::Delete(const std::string &key)
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -892,7 +894,7 @@ ErrCode AdvancedNotificationService::DeleteByBundle(const sptr<NotificationBundl
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -940,7 +942,7 @@ ErrCode AdvancedNotificationService::DeleteAll()
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1002,7 +1004,7 @@ ErrCode AdvancedNotificationService::GetSlotsByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1031,7 +1033,7 @@ ErrCode AdvancedNotificationService::UpdateSlots(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1059,7 +1061,7 @@ ErrCode AdvancedNotificationService::UpdateSlotGroups(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1087,7 +1089,7 @@ ErrCode AdvancedNotificationService::SetShowBadgeEnabledForBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1111,7 +1113,7 @@ ErrCode AdvancedNotificationService::GetShowBadgeEnabledForBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1230,7 +1232,7 @@ ErrCode AdvancedNotificationService::Subscribe(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1251,7 +1253,7 @@ ErrCode AdvancedNotificationService::Unsubscribe(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1309,7 +1311,7 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1350,7 +1352,7 @@ ErrCode AdvancedNotificationService::GetSpecialActiveNotifications(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1435,7 +1437,7 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForAllBundles(const 
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1465,7 +1467,7 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForSpecialBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1503,7 +1505,7 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1563,7 +1565,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
             if (!IsSystemApp()) {
                 return ERR_ANS_NON_SYSTEM_APP;
             }
-            if (!CheckPermission(GetClientBundleName())) {
+            if (!CheckPermission()) {
                 return ERR_ANS_PERMISSION_DENIED;
             }
             targetBundle = GenerateValidBundleOption(bundleOption);
@@ -2105,7 +2107,7 @@ ErrCode AdvancedNotificationService::RemoveNotification(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2169,7 +2171,7 @@ ErrCode AdvancedNotificationService::RemoveAllNotifications(const sptr<Notificat
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2222,7 +2224,7 @@ ErrCode AdvancedNotificationService::GetSlotNumAsBundle(const sptr<NotificationB
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2297,7 +2299,7 @@ ErrCode AdvancedNotificationService::RemoveGroupByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2409,7 +2411,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         ANS_LOGW("Check permission denied!");
         return ERR_ANS_PERMISSION_DENIED;
     }
@@ -2431,7 +2433,7 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(sptr<NotificationDoNotD
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2451,7 +2453,7 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2459,18 +2461,19 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
     return ERR_OK;
 }
 
-bool AdvancedNotificationService::CheckPermission(const std::string &bundleName)
+bool AdvancedNotificationService::CheckPermission()
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
     if (IPCSkeleton::GetCallingUid() == SYSTEM_SERVICE_UID) {
         return true;
     }
-    if (bundleName.empty()) {
-        ANS_LOGE("Bundle name is empty.");
-        return false;
+
+    auto tokenCaller = IPCSkeleton::GetCallingTokenID();
+    bool result = AccessTokenHelper::VerifyCallerPermission(tokenCaller, OHOS_PERMISSION_NOTIFICATION_CONTROLLER);
+    if (!result) {
+        ANS_LOGE("Permission denied");
     }
-    // Add permission check in future
-    return true;
+    return result;
 }
 
 ErrCode AdvancedNotificationService::IsDistributedEnabled(bool &enabled)
@@ -2500,7 +2503,7 @@ ErrCode AdvancedNotificationService::EnableDistributed(bool enabled)
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2523,7 +2526,7 @@ ErrCode AdvancedNotificationService::EnableDistributedByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2588,7 +2591,7 @@ ErrCode AdvancedNotificationService::IsDistributedEnableByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2627,7 +2630,7 @@ ErrCode AdvancedNotificationService::GetDeviceRemindType(NotificationConstant::R
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3000,7 +3003,7 @@ ErrCode AdvancedNotificationService::IsSpecialUserAllowedNotify(const int32_t &u
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3020,7 +3023,7 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledByUser(const int32_t
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3089,7 +3092,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const int32_t &userId,
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3110,7 +3113,7 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(const int32_t &userId,
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
