@@ -333,9 +333,9 @@ void NotificationSubscriberManager::NotifyCanceledInner(
         auto BundleNames = notification->GetBundleName();
         auto iter = std::find(record->bundleList_.begin(), record->bundleList_.end(), BundleNames);
         if (!record->subscribedAll == (iter != record->bundleList_.end()) &&
-            (record->userId == sendUserId ||
-            record->userId == SUBSCRIBE_USER_ALL ||
-            record->userId == recvUserId ||
+            ((record->userId == sendUserId) ||
+            (record->userId == SUBSCRIBE_USER_ALL) ||
+            (record->userId == recvUserId) ||
             IsSystemUser(record->userId) ||   // Delete this, When the systemui subscribe carry the user ID.
             IsSystemUser(sendUserId))) {
             record->subscriber->OnCanceled(notification, notificationMap, deleteReason);

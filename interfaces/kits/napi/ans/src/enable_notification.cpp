@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,16 +151,13 @@ void AsyncCompleteCallbackEnableNotification(napi_env env, napi_status status, v
         ANS_LOGE("Invalid async callback data");
         return;
     }
-    AsyncCallbackInfoEnable *asynccallbackinfo = (AsyncCallbackInfoEnable *)data;
-
-    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-    if (asynccallbackinfo->info.callback != nullptr) {
-        napi_delete_reference(env, asynccallbackinfo->info.callback);
-    }
-
-    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    AsyncCallbackInfoEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoEnable *>(data);
     if (asynccallbackinfo) {
+        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+        if (asynccallbackinfo->info.callback != nullptr) {
+            napi_delete_reference(env, asynccallbackinfo->info.callback);
+        }
+        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
         delete asynccallbackinfo;
         asynccallbackinfo = nullptr;
     }
@@ -191,7 +188,7 @@ napi_value EnableNotification(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("EnableNotification napi_create_async_work start");
-            AsyncCallbackInfoEnable *asynccallbackinfo = (AsyncCallbackInfoEnable *)data;
+            AsyncCallbackInfoEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoEnable *>(data);
             std::string deviceId {""};
             asynccallbackinfo->info.errorCode = NotificationHelper::SetNotificationsEnabledForSpecifiedBundle(
                 asynccallbackinfo->params.option, deviceId, asynccallbackinfo->params.enable);
@@ -217,18 +214,15 @@ void AsyncCompleteCallbackIsNotificationEnabled(napi_env env, napi_status status
         ANS_LOGE("Invalid async callback data");
         return;
     }
-    AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
-
-    napi_value result = nullptr;
-    napi_get_boolean(env, asynccallbackinfo->allowed, &result);
-    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-
-    if (asynccallbackinfo->info.callback != nullptr) {
-        napi_delete_reference(env, asynccallbackinfo->info.callback);
-    }
-
-    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    AsyncCallbackInfoIsEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnable *>(data);
     if (asynccallbackinfo) {
+        napi_value result = nullptr;
+        napi_get_boolean(env, asynccallbackinfo->allowed, &result);
+        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+        if (asynccallbackinfo->info.callback != nullptr) {
+            napi_delete_reference(env, asynccallbackinfo->info.callback);
+        }
+        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
         delete asynccallbackinfo;
         asynccallbackinfo = nullptr;
     }
@@ -259,7 +253,7 @@ napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("IsNotificationEnabled napi_create_async_work start");
-            AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
+            AsyncCallbackInfoIsEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnable *>(data);
 
             if (asynccallbackinfo->params.hasBundleOption) {
                 ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d",
@@ -315,7 +309,7 @@ napi_value IsNotificationEnabledSelf(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("IsNotificationEnabledSelf napi_create_async_work start");
-            AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
+            AsyncCallbackInfoIsEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnable *>(data);
 
             if (asynccallbackinfo->params.hasBundleOption) {
                 ANS_LOGE("Not allowed to query another application");
@@ -364,7 +358,7 @@ napi_value RequestEnableNotification(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("RequestEnableNotification napi_create_async_work start");
-            AsyncCallbackInfoIsEnable *asynccallbackinfo = (AsyncCallbackInfoIsEnable *)data;
+            AsyncCallbackInfoIsEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnable *>(data);
 
             std::string deviceId {""};
             asynccallbackinfo->info.errorCode = NotificationHelper::RequestEnableNotification(deviceId);

@@ -125,7 +125,7 @@ napi_value Publish(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("Publish napi_create_async_work start");
-            AsyncCallbackInfoPublish *asynccallbackinfo = (AsyncCallbackInfoPublish *)data;
+            AsyncCallbackInfoPublish *asynccallbackinfo = static_cast<AsyncCallbackInfoPublish *>(data);
             ANS_LOGI("Publish napi_create_async_work start notificationId = %{public}d, contentType = "
                      "%{public}d",
                 asynccallbackinfo->request.GetNotificationId(),
@@ -136,7 +136,7 @@ napi_value Publish(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Publish napi_create_async_work complete start");
-            AsyncCallbackInfoPublish *asynccallbackinfo = (AsyncCallbackInfoPublish *)data;
+            AsyncCallbackInfoPublish *asynccallbackinfo = static_cast<AsyncCallbackInfoPublish *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
