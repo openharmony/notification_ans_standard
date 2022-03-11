@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2334,7 +2334,7 @@ ErrCode AnsManagerProxy::ReadReminders(
             ANSR_LOGD("[GetValidReminders] calendar");
             reminder = reply.ReadParcelable<ReminderRequestCalendar>();
         } else {
-            ANSR_LOGW("[GetValidReminders] type=%{public}d", typeInfo);
+            ANSR_LOGW("[GetValidReminders] type=%{public}hhu", typeInfo);
             return ERR_ANS_INVALID_PARAM;
         }
         if (!reminder) {
@@ -2350,7 +2350,7 @@ ErrCode AnsManagerProxy::InnerTransact(uint32_t code, MessageOption &flags, Mess
 {
     auto remote = Remote();
     if (remote == nullptr) {
-        ANS_LOGW("[InnerTransact] fail: get Remote fail code %{public}d", code);
+        ANS_LOGW("[InnerTransact] fail: get Remote fail code %{public}u", code);
         return ERR_DEAD_OBJECT;
     }
     int err = remote->SendRequest(code, data, reply, flags);

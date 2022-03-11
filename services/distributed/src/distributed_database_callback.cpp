@@ -34,7 +34,6 @@ void DistributedDatabaseCallback::OnChange(const DistributedKv::ChangeNotificati
 void DistributedDatabaseCallback::OnChange(const DistributedKv::ChangeNotification &changeNotification)
 {
     ANS_LOGI("%{public}s start", __FUNCTION__);
-    // const std::vector<DistributedKv::Entry> entryList;
 
     if (callback_.OnInsert) {
         const std::vector<DistributedKv::Entry> &entryList = changeNotification.GetInsertEntries();
