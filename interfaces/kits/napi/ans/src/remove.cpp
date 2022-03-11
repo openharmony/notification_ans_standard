@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -274,15 +274,12 @@ napi_value Remove(napi_env env, napi_callback_info info)
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Remove napi_create_async_work end");
             AsyncCallbackInfoRemove *asynccallbackinfo = (AsyncCallbackInfoRemove *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
@@ -340,15 +337,12 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("RemoveAll napi_create_async_work end");
             AsyncCallbackInfoRemove *asynccallbackinfo = (AsyncCallbackInfoRemove *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
@@ -373,15 +367,12 @@ void AsyncCompleteCallbackRemoveGroupByBundle(napi_env env, napi_status status, 
         return;
     }
     AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo = (AsyncCallbackInfoRemoveGroupByBundle *)data;
-
-    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-    if (asynccallbackinfo->info.callback != nullptr) {
-        napi_delete_reference(env, asynccallbackinfo->info.callback);
-    }
-
-    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
     if (asynccallbackinfo) {
+        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+        if (asynccallbackinfo->info.callback != nullptr) {
+            napi_delete_reference(env, asynccallbackinfo->info.callback);
+        }
+        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
         delete asynccallbackinfo;
         asynccallbackinfo = nullptr;
     }
