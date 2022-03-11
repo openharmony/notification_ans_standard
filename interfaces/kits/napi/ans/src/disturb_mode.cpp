@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -213,15 +213,12 @@ napi_value SetDoNotDisturbDate(napi_env env, napi_callback_info info)
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("SetDoNotDisturbDate napi_create_async_work end");
             AsyncCallbackInfoSetDoNotDisturb *asynccallbackinfo = (AsyncCallbackInfoSetDoNotDisturb *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
@@ -245,22 +242,19 @@ void AsyncCompleteCallbackGetDoNotDisturbDate(napi_env env, napi_status status, 
         return;
     }
     AsyncCallbackInfoGetDoNotDisturb *asynccallbackinfo = (AsyncCallbackInfoGetDoNotDisturb *)data;
-    napi_value result = Common::NapiGetNull(env);
-    if (asynccallbackinfo->info.errorCode == ERR_OK) {
-        napi_create_object(env, &result);
-        if (!Common::SetDoNotDisturbDate(env, asynccallbackinfo->date, result)) {
-            asynccallbackinfo->info.errorCode = ERROR;
-        }
-    }
-
-    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-
-    if (asynccallbackinfo->info.callback != nullptr) {
-        napi_delete_reference(env, asynccallbackinfo->info.callback);
-    }
-
-    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
     if (asynccallbackinfo) {
+        napi_value result = Common::NapiGetNull(env);
+        if (asynccallbackinfo->info.errorCode == ERR_OK) {
+            napi_create_object(env, &result);
+            if (!Common::SetDoNotDisturbDate(env, asynccallbackinfo->date, result)) {
+                asynccallbackinfo->info.errorCode = ERROR;
+            }
+        }
+        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+        if (asynccallbackinfo->info.callback != nullptr) {
+            napi_delete_reference(env, asynccallbackinfo->info.callback);
+        }
+        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
         delete asynccallbackinfo;
         asynccallbackinfo = nullptr;
     }
@@ -390,17 +384,14 @@ napi_value SupportDoNotDisturbMode(napi_env env, napi_callback_info info)
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("SupportDoNotDisturbMode napi_create_async_work end");
             AsyncCallbackInfoSupportDoNotDisturb *asynccallbackinfo = (AsyncCallbackInfoSupportDoNotDisturb *)data;
-
-            napi_value result = nullptr;
-            napi_get_boolean(env, asynccallbackinfo->isSupported, &result);
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                napi_value result = nullptr;
+                napi_get_boolean(env, asynccallbackinfo->isSupported, &result);
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }

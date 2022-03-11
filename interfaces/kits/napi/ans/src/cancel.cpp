@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -145,21 +145,20 @@ napi_value Cancel(napi_env env, napi_callback_info info)
             ANS_LOGI("Cancel napi_create_async_work start");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
 
-            asynccallbackinfo->info.errorCode =
-                NotificationHelper::CancelNotification(asynccallbackinfo->label, asynccallbackinfo->id);
+            if (asynccallbackinfo) {
+                asynccallbackinfo->info.errorCode =
+                    NotificationHelper::CancelNotification(asynccallbackinfo->label, asynccallbackinfo->id);
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Cancel napi_create_async_work end");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
@@ -202,20 +201,19 @@ napi_value CancelAll(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("CancelAll napi_create_async_work start");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
-            asynccallbackinfo->info.errorCode = NotificationHelper::CancelAllNotifications();
+            if (asynccallbackinfo) {
+                asynccallbackinfo->info.errorCode = NotificationHelper::CancelAllNotifications();
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("CancelAll napi_create_async_work end");
             AsyncCallbackInfoCancel *asynccallbackinfo = (AsyncCallbackInfoCancel *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
@@ -258,22 +256,22 @@ napi_value CancelGroup(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANS_LOGI("CancelGroup napi_create_async_work start");
             AsyncCallbackInfoCancelGroup *asynccallbackinfo = (AsyncCallbackInfoCancelGroup *)data;
-            ANS_LOGI("asynccallbackinfo->params.groupName = %{public}s", asynccallbackinfo->params.groupName.c_str());
-            asynccallbackinfo->info.errorCode =
-                NotificationHelper::CancelGroup(asynccallbackinfo->params.groupName);
+            if (asynccallbackinfo) {
+                ANS_LOGI("asynccallbackinfo->params.groupName = %{public}s",
+                    asynccallbackinfo->params.groupName.c_str());
+                asynccallbackinfo->info.errorCode =
+                    NotificationHelper::CancelGroup(asynccallbackinfo->params.groupName);
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("CancelGroup napi_create_async_work end");
             AsyncCallbackInfoCancelGroup *asynccallbackinfo = (AsyncCallbackInfoCancelGroup *)data;
-
-            Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
-            }
-
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
             if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
                 delete asynccallbackinfo;
                 asynccallbackinfo = nullptr;
             }
