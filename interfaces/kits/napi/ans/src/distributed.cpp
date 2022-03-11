@@ -177,7 +177,7 @@ void AsyncCompleteCallbackIsDistributedEnabled(napi_env env, napi_status status,
         return;
     }
     ANS_LOGI("IsDistributedEnabled napi_create_async_work end");
-    AsyncCallbackInfoIsEnabled *asynccallbackinfo = (AsyncCallbackInfoIsEnabled *)data;
+    AsyncCallbackInfoIsEnabled *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnabled *>(data);
     if (asynccallbackinfo) {
         napi_value result = nullptr;
         if (asynccallbackinfo->info.errorCode != ERR_OK) {
@@ -221,7 +221,7 @@ napi_value IsDistributedEnabled(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("IsDistributedEnabled napi_create_async_work start");
-            AsyncCallbackInfoIsEnabled *asynccallbackinfo = (AsyncCallbackInfoIsEnabled *)data;
+            AsyncCallbackInfoIsEnabled *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnabled *>(data);
 
             if (asynccallbackinfo) {
                 asynccallbackinfo->info.errorCode =
@@ -268,7 +268,7 @@ napi_value EnableDistributed(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("EnableDistributed napi_create_async_work start");
-            AsyncCallbackInfoEnabled *asynccallbackinfo = (AsyncCallbackInfoEnabled *)data;
+            AsyncCallbackInfoEnabled *asynccallbackinfo = static_cast<AsyncCallbackInfoEnabled *>(data);
 
             if (asynccallbackinfo) {
                 asynccallbackinfo->info.errorCode =
@@ -277,7 +277,7 @@ napi_value EnableDistributed(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("EnableDistributed napi_create_async_work end");
-            AsyncCallbackInfoEnabled *asynccallbackinfo = (AsyncCallbackInfoEnabled *)data;
+            AsyncCallbackInfoEnabled *asynccallbackinfo = static_cast<AsyncCallbackInfoEnabled *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
@@ -326,14 +326,14 @@ napi_value EnableDistributedByBundle(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("EnableDistributedByBundle napi_create_async_work start");
-            AsyncCallbackInfoEnabledByBundle *asynccallbackinfo = (AsyncCallbackInfoEnabledByBundle *)data;
+            AsyncCallbackInfoEnabledByBundle *asynccallbackinfo = static_cast<AsyncCallbackInfoEnabledByBundle *>(data);
 
             asynccallbackinfo->info.errorCode = NotificationHelper::EnableDistributedByBundle(
                 asynccallbackinfo->params.option, asynccallbackinfo->params.enable);
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("EnableDistributedByBundle napi_create_async_work end");
-            AsyncCallbackInfoEnabledByBundle *asynccallbackinfo = (AsyncCallbackInfoEnabledByBundle *)data;
+            AsyncCallbackInfoEnabledByBundle *asynccallbackinfo = static_cast<AsyncCallbackInfoEnabledByBundle *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {

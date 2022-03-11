@@ -825,7 +825,7 @@ ErrCode AnsNotification::GetDoNotDisturbDate(NotificationDoNotDisturbDate &doNot
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationDoNotDisturbDate> dndDate;
+    sptr<NotificationDoNotDisturbDate> dndDate = nullptr;
     auto ret = ansManagerProxy_->GetDoNotDisturbDate(dndDate);
     if (ret != ERR_OK) {
         ANS_LOGE("Get DoNotDisturbDate failed.");
@@ -985,7 +985,7 @@ ErrCode AnsNotification::PublishReminder(ReminderRequest &reminder)
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
-    sptr<ReminderRequest> tarReminder;
+    sptr<ReminderRequest> tarReminder = nullptr;
     switch (reminder.GetReminderType()) {
         case (ReminderRequest::ReminderType::TIMER): {
             ANSR_LOGI("Publish timer");
@@ -1320,7 +1320,7 @@ ErrCode AnsNotification::GetDoNotDisturbDate(const int32_t &userId, Notification
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
 
-    sptr<NotificationDoNotDisturbDate> dndDate;
+    sptr<NotificationDoNotDisturbDate> dndDate = nullptr;
     auto ret = ansManagerProxy_->GetDoNotDisturbDate(dndDate);
     if (ret != ERR_OK) {
         ANS_LOGE("Get DoNotDisturbDate failed.");

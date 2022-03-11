@@ -404,7 +404,7 @@ napi_value AddSlot(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("AddSlot napi_create_async_work start");
-            auto asynccallbackinfo = (AsyncCallbackInfoAddSlot *)data;
+            auto asynccallbackinfo = static_cast<AsyncCallbackInfoAddSlot *>(data);
             if (asynccallbackinfo->isAddSlotByType) {
                 asynccallbackinfo->info.errorCode = NotificationHelper::AddSlotByType(asynccallbackinfo->inType);
             } else {
@@ -413,7 +413,7 @@ napi_value AddSlot(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("AddSlot napi_create_async_work end");
-            auto asynccallbackinfo = (AsyncCallbackInfoAddSlot *)data;
+            auto asynccallbackinfo = static_cast<AsyncCallbackInfoAddSlot *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
@@ -466,7 +466,7 @@ napi_value AddSlots(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("AddSlots napi_create_async_work end");
-            auto asynccallbackinfo = (AsyncCallbackInfoAddSlots *)data;
+            auto asynccallbackinfo = static_cast<AsyncCallbackInfoAddSlots *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
@@ -514,14 +514,14 @@ napi_value SetSlotByBundle(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("SetSlotByBundle napi_create_async_work start");
-            auto asynccallbackinfo = (AsyncCallbackInfoSetSlotByBundle *)data;
+            auto asynccallbackinfo = static_cast<AsyncCallbackInfoSetSlotByBundle *>(data);
 
             asynccallbackinfo->info.errorCode = NotificationHelper::UpdateNotificationSlots(
                 asynccallbackinfo->params.option, asynccallbackinfo->params.slots);
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("SetSlotByBundle napi_create_async_work end");
-            auto asynccallbackinfo = (AsyncCallbackInfoSetSlotByBundle *)data;
+            auto asynccallbackinfo = static_cast<AsyncCallbackInfoSetSlotByBundle *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
@@ -554,7 +554,7 @@ void AsyncCompleteCallbackGetSlot(napi_env env, napi_status status, void *data)
         return;
     }
 
-    auto asynccallbackinfo = (AsyncCallbackInfoGetSlot *)data;
+    auto asynccallbackinfo = static_cast<AsyncCallbackInfoGetSlot *>(data);
     if (!asynccallbackinfo) {
         ANS_LOGE("asynccallbackinfo is nullptr");
         return;
@@ -605,7 +605,7 @@ napi_value GetSlot(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("GetSlot napi_create_async_work start");
-            auto asynccallbackinfo = (AsyncCallbackInfoGetSlot *)data;
+            auto asynccallbackinfo = static_cast<AsyncCallbackInfoGetSlot *>(data);
 
             asynccallbackinfo->info.errorCode =
                 NotificationHelper::GetNotificationSlot(asynccallbackinfo->outType, asynccallbackinfo->slot);
@@ -655,7 +655,7 @@ napi_value GetSlotNumByBundle(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("GetSlotNumByBundle napi_create_async_work end");
-            auto asynccallbackinfo = (AsyncCallbackInfoGetSlotNumByBundle *)data;
+            auto asynccallbackinfo = static_cast<AsyncCallbackInfoGetSlotNumByBundle *>(data);
             if (asynccallbackinfo) {
                 napi_value result = nullptr;
                 napi_create_int32(env, asynccallbackinfo->num, &result);
