@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "bundle_mgr_interface.h"
 #include "ipc_skeleton.h"
 #include "iremote_object.h"
+#include "notification_bundle_option.h"
 #include "refbase.h"
 #include "remote_death_recipient.h"
 #include "singleton.h"
@@ -33,6 +34,7 @@ class BundleManagerHelper : public DelayedSingleton<BundleManagerHelper> {
 public:
     std::string GetBundleNameByUid(int uid);
     bool IsSystemApp(int uid);
+    bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);
     int GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId);
     bool GetBundleInfoByBundleName(const std::string bundle, const int32_t userId, AppExecFwk::BundleInfo &bundleInfo);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
