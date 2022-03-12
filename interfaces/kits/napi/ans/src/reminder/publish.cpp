@@ -545,14 +545,14 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANSR_LOGI("GetValid reminders napi_create_async_work start");
-            AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+            AsyncCallbackInfo *asynccallbackinfo = static_cast<AsyncCallbackInfo *>(data);
             if (asynccallbackinfo) {
                 asynccallbackinfo->info.errorCode = ReminderHelper::GetValidReminders(
                     asynccallbackinfo->validReminders);
             }
         },
         [](napi_env env, napi_status status, void *data) {
-            AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+            AsyncCallbackInfo *asynccallbackinfo = static_cast<AsyncCallbackInfo *>(data);
 
             if (asynccallbackinfo) {
                 if (asynccallbackinfo->info.errorCode != ERR_OK) {
@@ -611,7 +611,7 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANSR_LOGI("Publish napi_create_async_work start");
-            AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+            AsyncCallbackInfo *asynccallbackinfo = static_cast<AsyncCallbackInfo *>(data);
             if (asynccallbackinfo) {
                 asynccallbackinfo->info.errorCode = ReminderHelper::PublishReminder(*(asynccallbackinfo->reminder));
                 ANSR_LOGD("Return reminderId=%{public}d", asynccallbackinfo->reminder->GetReminderId());
@@ -619,7 +619,7 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANSR_LOGI("Publish napi_create_async_work complete start");
-            AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+            AsyncCallbackInfo *asynccallbackinfo = static_cast<AsyncCallbackInfo *>(data);
 
             // reminderId
             if (asynccallbackinfo) {

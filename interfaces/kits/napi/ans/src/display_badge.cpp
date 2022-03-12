@@ -169,7 +169,7 @@ napi_value DisplayBadge(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("DisplayBadge napi_create_async_work start");
-            AsyncCallbackInfoEnableBadge *asynccallbackinfo = (AsyncCallbackInfoEnableBadge *)data;
+            AsyncCallbackInfoEnableBadge *asynccallbackinfo = static_cast<AsyncCallbackInfoEnableBadge *>(data);
             if (asynccallbackinfo) {
                 ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d enable = %{public}d",
                     asynccallbackinfo->params.option.GetBundleName().c_str(),
@@ -182,7 +182,7 @@ napi_value DisplayBadge(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("DisplayBadge napi_create_async_work end");
-            AsyncCallbackInfoEnableBadge *asynccallbackinfo = (AsyncCallbackInfoEnableBadge *)data;
+            AsyncCallbackInfoEnableBadge *asynccallbackinfo = static_cast<AsyncCallbackInfoEnableBadge *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
@@ -212,7 +212,7 @@ void AsyncCompleteCallbackIsBadgeDisplayed(napi_env env, napi_status status, voi
         ANS_LOGE("Invalid async callback data");
         return;
     }
-    AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = (AsyncCallbackInfoIsDisplayBadge *)data;
+    AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = static_cast<AsyncCallbackInfoIsDisplayBadge *>(data);
     if (asynccallbackinfo) {
         napi_value result = nullptr;
         napi_get_boolean(env, asynccallbackinfo->enabled, &result);
@@ -252,7 +252,7 @@ napi_value IsBadgeDisplayed(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("IsBadgeDisplayed napi_create_async_work start");
-            AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = (AsyncCallbackInfoIsDisplayBadge *)data;
+            AsyncCallbackInfoIsDisplayBadge *asynccallbackinfo = static_cast<AsyncCallbackInfoIsDisplayBadge *>(data);
             if (asynccallbackinfo) {
                 if (asynccallbackinfo->params.hasBundleOption) {
                     ANS_LOGI("option.bundle = %{public}s option.uid = %{public}d",

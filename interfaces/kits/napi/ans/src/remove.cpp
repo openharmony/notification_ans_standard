@@ -259,7 +259,7 @@ napi_value Remove(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("Remove napi_create_async_work start");
-            AsyncCallbackInfoRemove *asynccallbackinfo = (AsyncCallbackInfoRemove *)data;
+            AsyncCallbackInfoRemove *asynccallbackinfo = static_cast<AsyncCallbackInfoRemove *>(data);
 
             if (asynccallbackinfo->params.hashcode.has_value()) {
                 asynccallbackinfo->info.errorCode =
@@ -273,7 +273,7 @@ napi_value Remove(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Remove napi_create_async_work end");
-            AsyncCallbackInfoRemove *asynccallbackinfo = (AsyncCallbackInfoRemove *)data;
+            AsyncCallbackInfoRemove *asynccallbackinfo = static_cast<AsyncCallbackInfoRemove *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
@@ -321,7 +321,7 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("RemoveAll napi_create_async_work start");
-            AsyncCallbackInfoRemove *asynccallbackinfo = (AsyncCallbackInfoRemove *)data;
+            AsyncCallbackInfoRemove *asynccallbackinfo = static_cast<AsyncCallbackInfoRemove *>(data);
 
             if (asynccallbackinfo->params.bundleAndKeyInfo.has_value()) {
                 auto &infos = asynccallbackinfo->params.bundleAndKeyInfo.value();
@@ -336,7 +336,7 @@ napi_value RemoveAll(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("RemoveAll napi_create_async_work end");
-            AsyncCallbackInfoRemove *asynccallbackinfo = (AsyncCallbackInfoRemove *)data;
+            AsyncCallbackInfoRemove *asynccallbackinfo = static_cast<AsyncCallbackInfoRemove *>(data);
             if (asynccallbackinfo) {
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
                 if (asynccallbackinfo->info.callback != nullptr) {
@@ -366,7 +366,7 @@ void AsyncCompleteCallbackRemoveGroupByBundle(napi_env env, napi_status status, 
         ANS_LOGE("Invalid async callback data");
         return;
     }
-    AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo = (AsyncCallbackInfoRemoveGroupByBundle *)data;
+    AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo = static_cast<AsyncCallbackInfoRemoveGroupByBundle *>(data);
     if (asynccallbackinfo) {
         Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
         if (asynccallbackinfo->info.callback != nullptr) {
@@ -403,7 +403,8 @@ napi_value RemoveGroupByBundle(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("RemoveGroupByBundle napi_create_async_work start");
-            AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo = (AsyncCallbackInfoRemoveGroupByBundle *)data;
+            AsyncCallbackInfoRemoveGroupByBundle *asynccallbackinfo =
+                static_cast<AsyncCallbackInfoRemoveGroupByBundle *>(data);
             ANS_LOGI("option.bundle = %{public}s, option.uid = %{public}d, groupName = %{public}s",
                 asynccallbackinfo->params.option.GetBundleName().c_str(),
                 asynccallbackinfo->params.option.GetUid(),

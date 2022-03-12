@@ -173,19 +173,19 @@ inline ErrCode CheckPictureSize(const sptr<NotificationRequest> &request)
             std::static_pointer_cast<NotificationPictureContent>(content->GetNotificationContent());
         if (pictureContent != nullptr) {
             auto picture = pictureContent->GetBigPicture();
-            if (picture != nullptr && (uint32_t)picture->GetByteCount() > MAX_PICTURE_SIZE) {
+            if (picture != nullptr && static_cast<uint32_t>(picture->GetByteCount()) > MAX_PICTURE_SIZE) {
                 result = ERR_ANS_PICTURE_OVER_SIZE;
             }
         }
     }
 
     auto littleIcon = request->GetLittleIcon();
-    if (littleIcon != nullptr && (uint32_t)littleIcon->GetByteCount() > MAX_ICON_SIZE) {
+    if (littleIcon != nullptr && static_cast<uint32_t>(littleIcon->GetByteCount()) > MAX_ICON_SIZE) {
         result = ERR_ANS_ICON_OVER_SIZE;
     }
 
     auto bigIcon = request->GetBigIcon();
-    if (bigIcon != nullptr && (uint32_t)bigIcon->GetByteCount() > MAX_ICON_SIZE) {
+    if (bigIcon != nullptr && static_cast<uint32_t>(bigIcon->GetByteCount()) > MAX_ICON_SIZE) {
         result = ERR_ANS_ICON_OVER_SIZE;
     }
 

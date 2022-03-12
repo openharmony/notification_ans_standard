@@ -353,7 +353,7 @@ napi_value Common::SetNotificationRequestByNumber(
     napi_set_named_property(env, result, "color", value);
 
     // badgeIconStyle ?: number
-    int badgeIconStyle = (int)request->GetBadgeIconStyle();
+    int badgeIconStyle = static_cast<int>(request->GetBadgeIconStyle());
     napi_create_int32(env, badgeIconStyle, &value);
     napi_set_named_property(env, result, "badgeIconStyle", value);
 
@@ -4021,7 +4021,8 @@ napi_value Common::CreateWantAgentByJS(const napi_env &env,
         wantAgent,
         (void *)agent.get(),
         [](napi_env env, void *data, void *hint) {
-            AbilityRuntime::WantAgent::WantAgent *objectInfo = (AbilityRuntime::WantAgent::WantAgent *)data;
+            AbilityRuntime::WantAgent::WantAgent *objectInfo =
+                static_cast<AbilityRuntime::WantAgent::WantAgent *>(data);
             ANS_LOGI("CreateWantAgentByJS this = %{public}p", objectInfo);
 
             if (objectInfo) {

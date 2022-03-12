@@ -677,7 +677,7 @@ void ReminderDataManager::StopAlertingReminder(const sptr<ReminderRequest> &remi
         ANSR_LOGE("StopAlertingReminder illegal.");
         return;
     }
-    if (alertingReminderId_ == -1 || reminder->GetReminderId() != alertingReminderId_) {
+    if ((alertingReminderId_ == -1) || (reminder->GetReminderId() != alertingReminderId_)) {
         ANSR_LOGE("StopAlertingReminder is illegal.");
         return;
     }
@@ -995,7 +995,7 @@ void ReminderDataManager::StopSoundAndVibration(const sptr<ReminderRequest> &rem
         ANSR_LOGE("Stop sound and vibration failed as reminder is null.");
         return;
     }
-    if (alertingReminderId_ == -1 || (reminder->GetReminderId() != alertingReminderId_)) {
+    if ((alertingReminderId_ == -1) || (reminder->GetReminderId() != alertingReminderId_)) {
         ANSR_LOGE("Stop sound and vibration failed as alertingReminder is illegal, alertingReminderId_=" \
             "%{public}d, tarReminderId=%{public}d", alertingReminderId_, reminder->GetReminderId());
         return;
