@@ -546,25 +546,30 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANSR_LOGI("GetValid reminders napi_create_async_work start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
-            asynccallbackinfo->info.errorCode = ReminderHelper::GetValidReminders(asynccallbackinfo->validReminders);
+            if (asynccallbackinfo) {
+                asynccallbackinfo->info.errorCode = ReminderHelper::GetValidReminders(
+                    asynccallbackinfo->validReminders);
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
 
-            if (asynccallbackinfo->info.errorCode != ERR_OK) {
-                asynccallbackinfo->result = NotificationNapi::Common::NapiGetNull(env);
-            } else {
-                GetValidRemindersInner(env, asynccallbackinfo->validReminders, asynccallbackinfo->result);
-            }
+            if (asynccallbackinfo) {
+                if (asynccallbackinfo->info.errorCode != ERR_OK) {
+                    asynccallbackinfo->result = NotificationNapi::Common::NapiGetNull(env);
+                } else {
+                    GetValidRemindersInner(env, asynccallbackinfo->validReminders, asynccallbackinfo->result);
+                }
 
-            NotificationNapi::Common::ReturnCallbackPromise(
-                env, asynccallbackinfo->info, asynccallbackinfo->result);
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
+                NotificationNapi::Common::ReturnCallbackPromise(
+                    env, asynccallbackinfo->info, asynccallbackinfo->result);
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+                delete asynccallbackinfo;
+                asynccallbackinfo = nullptr;
             }
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            delete asynccallbackinfo;
-            asynccallbackinfo = nullptr;
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
@@ -607,29 +612,33 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             ANSR_LOGI("Publish napi_create_async_work start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
-            asynccallbackinfo->info.errorCode = ReminderHelper::PublishReminder(*(asynccallbackinfo->reminder));
-            ANSR_LOGD("Return reminderId=%{public}d", asynccallbackinfo->reminder->GetReminderId());
+            if (asynccallbackinfo) {
+                asynccallbackinfo->info.errorCode = ReminderHelper::PublishReminder(*(asynccallbackinfo->reminder));
+                ANSR_LOGD("Return reminderId=%{public}d", asynccallbackinfo->reminder->GetReminderId());
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             ANSR_LOGI("Publish napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
 
             // reminderId
-            if (asynccallbackinfo->info.errorCode == ERR_OK) {
-                napi_create_int32(env, asynccallbackinfo->reminder->GetReminderId(), &(asynccallbackinfo->result));
-            } else {
-                napi_create_int32(env, -1, &(asynccallbackinfo->result));
-            }
+            if (asynccallbackinfo) {
+                if (asynccallbackinfo->info.errorCode == ERR_OK) {
+                    napi_create_int32(env, asynccallbackinfo->reminder->GetReminderId(), &(asynccallbackinfo->result));
+                } else {
+                    napi_create_int32(env, -1, &(asynccallbackinfo->result));
+                }
 
-            NotificationNapi::Common::ReturnCallbackPromise(
-                env, asynccallbackinfo->info, asynccallbackinfo->result);
-            if (asynccallbackinfo->info.callback != nullptr) {
-                napi_delete_reference(env, asynccallbackinfo->info.callback);
+                NotificationNapi::Common::ReturnCallbackPromise(
+                    env, asynccallbackinfo->info, asynccallbackinfo->result);
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+                delete asynccallbackinfo;
+                asynccallbackinfo = nullptr;
+                ANSR_LOGI("Publish napi_create_async_work complete end");
             }
-            napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            delete asynccallbackinfo;
-            asynccallbackinfo = nullptr;
-            ANSR_LOGI("Publish napi_create_async_work complete end");
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
