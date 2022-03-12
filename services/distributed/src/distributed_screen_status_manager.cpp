@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -183,9 +183,8 @@ ErrCode DistributedScreenStatusManager::CheckRemoteDevicesIsUsing(bool &isUsing)
     for (auto entry : entries) {
         std::string key = entry.key.ToString();
         std::string deviceId = key.substr(0, key.find_first_of(DELIMITER));
-        ANS_LOGD("key-deviceId:%{public}s, value:%{public}s", deviceId.c_str(), entry.value.ToString().c_str());
+        ANS_LOGD("value:%{public}s", entry.value.ToString().c_str());
         for (auto devInfo : devInfoList) {
-            ANS_LOGD("list-deviceId:%{public}s", devInfo.deviceId.c_str());
             if (devInfo.deviceId == deviceId) {
                 isUsing = isUsing || (entry.value.ToString() == SCREEN_STATUS_VALUE_ON);
                 break;
