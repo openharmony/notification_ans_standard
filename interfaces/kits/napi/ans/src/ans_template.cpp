@@ -87,7 +87,7 @@ napi_value IsSupportTemplate(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("IsSupportTemplate napi_create_async_work start");
-            AsyncCallbackInfoTemplate *asyncCallbackinfo = (AsyncCallbackInfoTemplate *)data;
+            AsyncCallbackInfoTemplate *asyncCallbackinfo = static_cast<AsyncCallbackInfoTemplate *>(data);
 
             if (asyncCallbackinfo) {
                 asyncCallbackinfo->info.errorCode = NotificationHelper::IsSupportTemplate(
@@ -96,7 +96,7 @@ napi_value IsSupportTemplate(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("IsSupportTemplate napi_create_async_work end");
-            AsyncCallbackInfoTemplate *asyncCallbackinfo = (AsyncCallbackInfoTemplate *)data;
+            AsyncCallbackInfoTemplate *asyncCallbackinfo = static_cast<AsyncCallbackInfoTemplate *>(data);
             if (asyncCallbackinfo) {
                 napi_value result = nullptr;
                 napi_get_boolean(env, asyncCallbackinfo->params.support, &result);

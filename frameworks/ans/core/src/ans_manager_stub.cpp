@@ -450,7 +450,7 @@ ErrCode AnsManagerStub::HandleGetSlotByType(MessageParcel &data, MessageParcel &
 {
     NotificationConstant::SlotType slotType = static_cast<NotificationConstant::SlotType>(data.ReadInt32());
 
-    sptr<NotificationSlot> slot;
+    sptr<NotificationSlot> slot = nullptr;
     ErrCode result = GetSlotByType(slotType, slot);
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetSlotByType] fail: write result failed, ErrCode=%{public}d", result);
