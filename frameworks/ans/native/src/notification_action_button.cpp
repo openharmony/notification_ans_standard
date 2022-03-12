@@ -26,7 +26,7 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
     const std::string &title, const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent,
     const std::shared_ptr<AAFwk::WantParams> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
     bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
-    const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
+    const std::shared_ptr<NotificationUserInput> &userInput, bool isContextual)
 {
     if (isContextual && (!icon || !wantAgent)) {
         ANS_LOGE("icon or wantAgent can not be null when isContextual is true");
@@ -42,18 +42,10 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
         }
     }
 
+    std::shared_ptr<NotificationUserInput> textInput = userInput;
     std::vector<std::shared_ptr<NotificationUserInput>> onlyInputs = mimeTypeOnlyInputs;
-    std::vector<std::shared_ptr<NotificationUserInput>> textInputs {};
-    for (auto &userInput : userInputs) {
-        if (!userInput) {
-            continue;
-        }
-
-        if (userInput->IsMimeTypeOnly()) {
-            onlyInputs.push_back(userInput);
-        } else {
-            textInputs.push_back(userInput);
-        }
+    if (userInput && (userInput->IsMimeTypeOnly())) {
+        onlyInputs.push_back(userInput);
     }
 
     auto pActionButton = new (std::nothrow) NotificationActionButton(icon,
@@ -63,7 +55,7 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(const
         semanticActionButton,
         autoCreatedReplies,
         onlyInputs,
-        textInputs,
+        textInput,
         isContextual);
     if (pActionButton == nullptr) {
         ANS_LOGE("create NotificationActionButton object failed");
@@ -88,7 +80,7 @@ std::shared_ptr<NotificationActionButton> NotificationActionButton::Create(
         actionButton->GetSemanticActionButton(),
         actionButton->IsAutoCreatedReplies(),
         actionButton->GetMimeTypeOnlyUserInputs(),
-        actionButton->GetUserInputs(),
+        actionButton->GetUserInput(),
         actionButton->IsContextDependent());
 }
 
@@ -96,7 +88,7 @@ NotificationActionButton::NotificationActionButton(const std::shared_ptr<Media::
     const std::string &title, const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent,
     const std::shared_ptr<AAFwk::WantParams> &extras, NotificationConstant::SemanticActionButton semanticActionButton,
     bool autoCreatedReplies, const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
-    const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual)
+    const std::shared_ptr<NotificationUserInput> &userInput, bool isContextual)
     : icon_(icon),
       title_(title),
       wantAgent_(wantAgent),
@@ -104,7 +96,7 @@ NotificationActionButton::NotificationActionButton(const std::shared_ptr<Media::
       semanticActionButton_(semanticActionButton),
       autoCreatedReplies_(autoCreatedReplies),
       mimeTypeOnlyUserInputs_(mimeTypeOnlyInputs),
-      userInputs_(userInputs),
+      userInput_(userInput),
       isContextual_(isContextual)
 {}
 
@@ -167,17 +159,12 @@ std::vector<std::shared_ptr<NotificationUserInput>> NotificationActionButton::Ge
 
 void NotificationActionButton::AddNotificationUserInput(const std::shared_ptr<NotificationUserInput> &userInput)
 {
-    if (!userInput) {
-        ANS_LOGE("The userInput is invalid.");
-        return;
-    }
-
-    userInputs_.emplace_back(userInput);
+    userInput_ = userInput;
 }
 
-std::vector<std::shared_ptr<NotificationUserInput>> NotificationActionButton::GetUserInputs() const
+const std::shared_ptr<NotificationUserInput> NotificationActionButton::GetUserInput() const
 {
-    return userInputs_;
+    return userInput_;
 }
 
 void NotificationActionButton::SetAutoCreatedReplies(bool autoCreatedReplies)
@@ -212,14 +199,12 @@ std::string NotificationActionButton::Dump()
         mimeTypeOnlyUserInputs += ", ";
     }
 
-    std::string userInputs = "";
-    for (auto &item : userInputs_) {
-        if (!item) {
-            userInputs += "nullptr, ";
-            continue;
-        }
-        userInputs += item->Dump();
-        userInputs += ", ";
+    std::string userInput = "";
+    if (userInput_ == nullptr) {
+        userInput += "nullptr, ";
+    } else {
+        userInput += userInput_->Dump();
+        userInput += ", ";
     }
 
     return "NotificationActionButton{ "
@@ -228,7 +213,7 @@ std::string NotificationActionButton::Dump()
             ", autoCreatedReplies = " + (autoCreatedReplies_ ? "true" : "false") +
             ", isContextual = " + (isContextual_ ? "true" : "false") +
             ", mimeTypeOnlyUserInputs = [" + mimeTypeOnlyUserInputs + "]" +
-            ", userInputs = [" + userInputs + "]" +
+            ", userInputs = [" + userInput + "]" +
             " }";
 }
 
@@ -350,23 +335,16 @@ bool NotificationActionButton::Marshalling(Parcel &parcel) const
         }
     }
 
-    if (!parcel.WriteInt32(static_cast<int32_t>(userInputs_.size()))) {
-        ANS_LOGE("Failed to write the size of userInputs");
+    valid = userInput_ ? true : false;
+    if (!parcel.WriteBool(valid)) {
+        ANS_LOGE("Failed to write the flag which indicate whether userInput is null");
         return false;
     }
 
-    for (auto it = userInputs_.begin(); it != userInputs_.end(); ++it) {
-        valid = (*it) ? true : false;
-        if (!parcel.WriteBool(valid)) {
-            ANS_LOGE("Failed to write the flag which indicate whether userInput is null");
+    if (valid) {
+        if (!parcel.WriteParcelable(userInput_.get())) {
+            ANS_LOGE("Failed to write userInput");
             return false;
-        }
-
-        if (valid) {
-            if (!parcel.WriteParcelable(it->get())) {
-                ANS_LOGE("Failed to write userInput");
-                return false;
-            }
         }
     }
 
@@ -427,19 +405,13 @@ bool NotificationActionButton::ReadFromParcel(Parcel &parcel)
         }
     }
 
-    auto vsize = parcel.ReadInt32();
-    for (auto it = 0; it < vsize; ++it) {
-        valid = parcel.ReadBool();
-        NotificationUserInput *member {nullptr};
-        if (valid) {
-            member = parcel.ReadParcelable<NotificationUserInput>();
-            if (member == nullptr) {
-                ANS_LOGE("Failed to read userInput");
-                return false;
-            }
+    valid = parcel.ReadBool();
+    if (valid) {
+        userInput_ = std::shared_ptr<NotificationUserInput>(parcel.ReadParcelable<NotificationUserInput>());
+        if (!userInput_) {
+            ANS_LOGE("Failed to read userInput");
+            return false;
         }
-
-        userInputs_.emplace_back(member);
     }
 
     return true;
