@@ -1591,6 +1591,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
             if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
                 result = ERR_OK;
                 allowed = CheckApiCompatibility(targetBundle);
+                SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
             }
         }
     }));
@@ -3225,24 +3226,12 @@ ErrCode AdvancedNotificationService::GetHasPoppedDialog(
 
 bool AdvancedNotificationService::CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption)
 {
-    AppExecFwk::BundleInfo bundleInfo;
+    ANS_LOGD("%{public}s", __FUNCTION__);
     std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
-    int32_t callingUserId;
-    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), callingUserId);
-    if (bundleManager != nullptr) {
-        if (!bundleManager->GetBundleInfoByBundleName(bundleOption->GetBundleName(), callingUserId, bundleInfo)) {
-            ANS_LOGW("Failed to GetBundleInfoByBundleName, bundlename = %{public}s",
-                bundleOption->GetBundleName().c_str());
-            return false;
-        }
+    if (bundleManager == nullptr) {
+        return false;
     }
-
-    for (auto abilityInfo : bundleInfo.abilityInfos) {
-        if (abilityInfo.isStageBasedModel) {
-            return false;
-        }
-    }
-    return true;
+    return bundleManager->CheckApiCompatibility(bundleOption);
 }
 
 void AdvancedNotificationService::OnResourceRemove(int32_t userId)
