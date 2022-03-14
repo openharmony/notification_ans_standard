@@ -68,12 +68,19 @@ bool NotificationSortingMap::Marshalling(Parcel &parcel) const
         ANS_LOGE("Can't write sorting size");
         return false;
     }
-    for_each(sortings_.begin(), sortings_.end(), [&](std::pair<std::string, NotificationSorting> sorting) {
+
+    int count = 0;
+    for (auto &sorting : sortings_) {
         if (!parcel.WriteParcelable(&sorting.second)) {
             ANS_LOGE("Can't write sorting");
             ret = false;
         }
-    });
+        count++;
+
+        if (count == MAX_ACTIVE_NUM) {
+            break;
+        }
+    }
 
     return ret;
 }
@@ -84,6 +91,7 @@ NotificationSortingMap *NotificationSortingMap::Unmarshalling(Parcel &parcel)
     // read sorting num
     int32_t size = 0;
     parcel.ReadInt32(size);
+    size = (size <= MAX_ACTIVE_NUM) ? size : MAX_ACTIVE_NUM;
 
     for (int i = 0; i < size; i++) {
         // read sorting
