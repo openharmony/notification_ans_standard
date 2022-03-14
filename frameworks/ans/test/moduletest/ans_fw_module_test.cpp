@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -444,9 +444,11 @@ public:
         DistributedKv::StoreId storeId = {.storeId = KVSTORE_SCREEN_STATUS_STORE_ID};
         std::shared_ptr<DistributedKv::AnsTestSingleKvStore> pointer =
             DistributedKv::AnsTestSingleKvStore::GetMockKvStorePointer(appId, storeId);
-        DistributedKv::Key key("<remoteDeviceId>" + DELIMITER + "screen_status");
-        DistributedKv::Value value(isScreenOn ? "on" : "off");
-        pointer->Put(key, value);
+        if (pointer) {
+            DistributedKv::Key key("<remoteDeviceId>" + DELIMITER + "screen_status");
+            DistributedKv::Value value(isScreenOn ? "on" : "off");
+            pointer->Put(key, value);
+        }
     }
 };
 

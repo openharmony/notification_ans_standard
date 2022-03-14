@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -971,16 +971,12 @@ OHOS::Notification::NotificationConstant::SubscribeResult GetParamSubscribeResul
     switch (GetIntParam() % INDEX_THREE) {
         case INDEX_ZERO:
             return OHOS::Notification::NotificationConstant::SubscribeResult::SUCCESS;
-            break;
         case INDEX_ONE:
             return OHOS::Notification::NotificationConstant::SubscribeResult::PREMISSION_FAIL;
-            break;
         case INDEX_TWO:
             return OHOS::Notification::NotificationConstant::SubscribeResult::RESOURCES_FAIL;
-            break;
         default:
             return OHOS::Notification::NotificationConstant::SubscribeResult::SUCCESS;
-            break;
     }
 }
 
@@ -1005,16 +1001,12 @@ std::shared_ptr<OHOS::AppExecFwk::BaseTaskDispatcher> GetParamBaseTaskDispatcher
     switch (GetIntParam() % INDEX_THREE) {
         case INDEX_ZERO:
             return context->CreateSerialDispatcher(GetStringParam(), GetParamTaskPriority());
-            break;
         case INDEX_ONE:
             return context->CreateParallelDispatcher(GetStringParam(), GetParamTaskPriority());
-            break;
         case INDEX_TWO:
             return specTaskDispatcher;
-            break;
         default:
             return context->CreateSerialDispatcher(GetStringParam(), GetParamTaskPriority());
-            break;
     }
 }
 

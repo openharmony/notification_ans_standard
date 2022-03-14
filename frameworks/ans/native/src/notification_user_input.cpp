@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -248,7 +248,7 @@ bool NotificationUserInput::ToJson(nlohmann::json &jsonObject) const
 
 NotificationUserInput *NotificationUserInput::FromJson(const nlohmann::json &jsonObject)
 {
-    if (jsonObject.is_null() or !jsonObject.is_object()) {
+    if (jsonObject.is_null() || !jsonObject.is_object()) {
         ANS_LOGE("Invalid JSON object");
         return nullptr;
     }
