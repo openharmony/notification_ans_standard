@@ -574,7 +574,7 @@ std::vector<std::string> ReminderRequest::StringSplit(std::string source, const 
     return result;
 }
 
-void ReminderRequest::RecoverWantAgent(std::string &wantAgentInfo, const uint8_t &type)
+void ReminderRequest::RecoverWantAgent(const std::string &wantAgentInfo, const uint8_t &type)
 {
     std::vector<std::string> info = StringSplit(wantAgentInfo, ReminderRequest::SEP_WANT_AGENT);
     uint8_t minLen = 2;
@@ -744,7 +744,7 @@ void ReminderRequest::SetReminderTimeInMilli(const uint64_t reminderTimeInMilli)
 
 ReminderRequest& ReminderRequest::SetRingDuration(const uint64_t ringDurationInSeconds)
 {
-    if (ringDurationInSeconds > (UINT64_MAX / MILLI_SECONDS)) {
+    if ((ringDurationInSeconds == 0) || (ringDurationInSeconds > (UINT64_MAX / MILLI_SECONDS))) {
         ANSR_LOGW("setRingDuration, replace to set (1s), for the given is out of legal range");
         ringDurationInMilli_ = MILLI_SECONDS;
     } else {
