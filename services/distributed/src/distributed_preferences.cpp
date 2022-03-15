@@ -78,8 +78,10 @@ void DistributedPreferences::GetDistributedMainKey(std::string &key)
 void DistributedPreferences::GetDistributedBundleKey(
     const sptr<NotificationBundleOption> &bundleOption, std::string &key)
 {
-    key = DISTRIBUTED_LABEL + DELIMITER + BUNDLE_LABEL + DELIMITER + bundleOption->GetBundleName() + DELIMITER +
-          std::to_string(bundleOption->GetUid());
+    if (bundleOption) {
+        key = DISTRIBUTED_LABEL + DELIMITER + BUNDLE_LABEL + DELIMITER + bundleOption->GetBundleName() + DELIMITER +
+            std::to_string(bundleOption->GetUid());
+    }
 }
 
 bool DistributedPreferences::ResolveDistributedKey(const std::string &key, ResolveKey &resolveKey)
