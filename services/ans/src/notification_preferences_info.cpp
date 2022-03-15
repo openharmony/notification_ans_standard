@@ -152,7 +152,9 @@ bool NotificationPreferencesInfo::BundleInfo::GetAllSlotsInGroup(
 
 void NotificationPreferencesInfo::BundleInfo::SetGroup(const sptr<NotificationSlotGroup> &group)
 {
-    groups_.insert_or_assign(group->GetId(), group);
+    if (group) {
+        groups_.insert_or_assign(group->GetId(), group);
+    }
 }
 
 bool NotificationPreferencesInfo::BundleInfo::GetGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group)

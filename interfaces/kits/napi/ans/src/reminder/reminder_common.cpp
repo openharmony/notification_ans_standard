@@ -461,7 +461,7 @@ bool ReminderCommon::CheckCalendarParams(const int32_t &year, const int32_t &mon
             ReminderAgentNapi::CALENDAR_YEAR, UINT16_MAX);
         return false;
     }
-    if ((month < 1) || (month > (ReminderRequestCalendar::MAX_MONTHS_OF_YEAR))) {
+    if ((month < 1) || (month > ReminderRequestCalendar::MAX_MONTHS_OF_YEAR)) {
         ANSR_LOGW("Create calendar reminder fail: designated %{public}s must between [1, %{public}hhu]",
             ReminderAgentNapi::CALENDAR_MONTH, ReminderRequestCalendar::MAX_MONTHS_OF_YEAR);
         return false;

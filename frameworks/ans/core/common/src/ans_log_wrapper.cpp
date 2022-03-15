@@ -21,10 +21,7 @@ AnsLogLevel AnsLogWrapper::level_ = {AnsLogLevel::DEBUG};
 bool AnsLogWrapper::JudgeLevel(const AnsLogLevel &level)
 {
     const AnsLogLevel &curLevel = AnsLogWrapper::GetLogLevel();
-    if (level < curLevel) {
-        return false;
-    }
-    return true;
+    return (level >= curLevel);
 }
 
 std::string AnsLogWrapper::GetBriefFileName(const char *str)
