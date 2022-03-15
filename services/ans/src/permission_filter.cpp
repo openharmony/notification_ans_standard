@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "bundle_manager_helper.h"
 #include "notification_preferences.h"
 
 namespace OHOS {
@@ -34,7 +35,10 @@ ErrCode PermissionFilter::OnPublish(const std::shared_ptr<NotificationRecord> &r
         NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(record->bundleOption, enable);
     if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
         result = ERR_OK;
-        enable = true;
+        std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+        if (bundleManager == nullptr) {
+            enable = bundleManager->CheckApiCompatibility(record->bundleOption);
+        }
     }
     if (result == ERR_OK) {
         if (!enable) {
