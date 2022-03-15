@@ -410,7 +410,7 @@ public:
      */
     virtual void RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
     void RecoverActionButton(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
-    void RecoverWantAgent(std::string &wantAgentInfo, const uint8_t &type);
+    void RecoverWantAgent(const std::string &wantAgentInfo, const uint8_t &type);
 
     /**
      * @brief Sets action button.
