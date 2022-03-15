@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "os_account_manager.h"
 #include "system_ability_definition.h"
 
 #include "ans_const_define.h"
@@ -69,6 +70,25 @@ bool BundleManagerHelper::IsSystemApp(int uid)
     }
 
     return isSystemApp;
+}
+
+bool BundleManagerHelper::CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption)
+{
+    AppExecFwk::BundleInfo bundleInfo;
+    int32_t callingUserId;
+    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), callingUserId);
+    if (!GetBundleInfoByBundleName(bundleOption->GetBundleName(), callingUserId, bundleInfo)) {
+        ANS_LOGW("Failed to GetBundleInfoByBundleName, bundlename = %{public}s",
+            bundleOption->GetBundleName().c_str());
+        return false;
+    }
+
+    for (auto abilityInfo : bundleInfo.abilityInfos) {
+        if (abilityInfo.isStageBasedModel) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool BundleManagerHelper::GetBundleInfoByBundleName(
