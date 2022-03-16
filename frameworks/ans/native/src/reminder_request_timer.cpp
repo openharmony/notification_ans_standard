@@ -85,7 +85,7 @@ void ReminderRequestTimer::CheckParamsValid(const uint64_t countDownTimeInSecond
     }
 }
 
-void ReminderRequestTimer::UpdateTimeInfo(const std::string description)
+void ReminderRequestTimer::UpdateTimeInfo(const std::string &description)
 {
     if (IsExpired()) {
         return;

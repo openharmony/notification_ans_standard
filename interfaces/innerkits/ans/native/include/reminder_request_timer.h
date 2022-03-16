@@ -75,7 +75,7 @@ protected:
 private:
     ReminderRequestTimer() {};
     void CheckParamsValid(const uint64_t countDownTimeInSeconds) const;
-    void UpdateTimeInfo(const std::string description);
+    void UpdateTimeInfo(const std::string &description);
     uint64_t countDownTimeInSeconds_ {0};
     uint64_t firstRealTimeInMilliSeconds_ {0};
     uint64_t whenToChangeSysTime_ {0};
