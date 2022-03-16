@@ -574,7 +574,7 @@ std::vector<std::string> ReminderRequest::StringSplit(std::string source, const 
     return result;
 }
 
-void ReminderRequest::RecoverWantAgent(std::string wantAgentInfo, const uint8_t &type)
+void ReminderRequest::RecoverWantAgent(const std::string &wantAgentInfo, const uint8_t &type)
 {
     std::vector<std::string> info = StringSplit(wantAgentInfo, ReminderRequest::SEP_WANT_AGENT);
     uint8_t minLen = 2;
@@ -585,10 +585,10 @@ void ReminderRequest::RecoverWantAgent(std::string wantAgentInfo, const uint8_t 
     ANSR_LOGD("pkg=%{public}s, ability=%{public}s", info.at(0).c_str(), info.at(1).c_str());
     switch (type) {
         case 0: {
-            auto wantAgentInfo = std::make_shared<ReminderRequest::WantAgentInfo>();
-            wantAgentInfo->pkgName = info.at(0);
-            wantAgentInfo->abilityName = info.at(1);
-            SetWantAgentInfo(wantAgentInfo);
+            auto wai = std::make_shared<ReminderRequest::WantAgentInfo>();
+            wai->pkgName = info.at(0);
+            wai->abilityName = info.at(1);
+            SetWantAgentInfo(wai);
             break;
         }
         case 1: {
@@ -645,7 +645,7 @@ ReminderRequest& ReminderRequest::SetSnoozeTimesDynamic(const uint8_t snooziTime
 
 ReminderRequest& ReminderRequest::SetTimeInterval(const uint64_t timeIntervalInSeconds)
 {
-    if ((timeIntervalInSeconds < 0) || (timeIntervalInSeconds > (UINT64_MAX / MILLI_SECONDS))) {
+    if (timeIntervalInSeconds > (UINT64_MAX / MILLI_SECONDS)) {
         ANSR_LOGW("SetTimeInterval, replace to set (0s), for the given is out of legal range");
         timeIntervalInMilli_ = 0;
     } else {
@@ -744,7 +744,7 @@ void ReminderRequest::SetReminderTimeInMilli(const uint64_t reminderTimeInMilli)
 
 ReminderRequest& ReminderRequest::SetRingDuration(const uint64_t ringDurationInSeconds)
 {
-    if ((ringDurationInSeconds <= 0) || (ringDurationInSeconds > (UINT64_MAX / MILLI_SECONDS))) {
+    if ((ringDurationInSeconds == 0) || (ringDurationInSeconds > (UINT64_MAX / MILLI_SECONDS))) {
         ANSR_LOGW("setRingDuration, replace to set (1s), for the given is out of legal range");
         ringDurationInMilli_ = MILLI_SECONDS;
     } else {
