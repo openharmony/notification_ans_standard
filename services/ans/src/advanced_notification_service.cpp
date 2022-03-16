@@ -1547,31 +1547,48 @@ ErrCode AdvancedNotificationService::IsAllowedNotifySelf(bool &allowed)
     return result;
 }
 
-ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
-    const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
+ErrCode AdvancedNotificationService::GetAppTargetBundle(const sptr<NotificationBundleOption> &bundleOption,
+    sptr<NotificationBundleOption> &targetBundle)
 {
-    ANS_LOGD("%{public}s", __FUNCTION__);
-
     sptr<NotificationBundleOption> clientBundle = GenerateBundleOption();
     if (clientBundle == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
 
-    sptr<NotificationBundleOption> targetBundle = nullptr;
     if (bundleOption == nullptr) {
         targetBundle = clientBundle;
     } else {
         if ((clientBundle->GetBundleName() == bundleOption->GetBundleName()) &&
             (clientBundle->GetUid() == bundleOption->GetUid())) {
-            targetBundle = bundleOption;
+                targetBundle = bundleOption;
         } else {
             if (!IsSystemApp()) {
                 return ERR_ANS_NON_SYSTEM_APP;
             }
-            if (!CheckPermission()) {
-                return ERR_ANS_PERMISSION_DENIED;
-            }
             targetBundle = GenerateValidBundleOption(bundleOption);
+        }
+    }
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
+    const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!CheckPermission()) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    sptr<NotificationBundleOption> targetBundle = nullptr;
+    if (IPCSkeleton::GetCallingUid() == SYSTEM_SERVICE_UID) {
+        if (bundleOption == nullptr) {
+            targetBundle = GenerateValidBundleOption(bundleOption);
+        }
+    } else {
+        ErrCode result = GetAppTargetBundle(bundleOption, targetBundle);
+        if (result != ERR_OK) {
+            return result;
         }
     }
 
