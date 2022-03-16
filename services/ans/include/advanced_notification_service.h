@@ -213,6 +213,8 @@ private:
     ErrCode GetDoNotDisturbDateByUser(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date);
     ErrCode SetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool hasPopped);
     ErrCode GetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool &hasPopped);
+    ErrCode GetAppTargetBundle(const sptr<NotificationBundleOption> &bundleOption,
+        sptr<NotificationBundleOption> &targetBundle);
 
 private:
     static sptr<AdvancedNotificationService> instance_;
