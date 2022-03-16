@@ -26,7 +26,7 @@ namespace OHOS {
 namespace Notification {
 class ReminderEventManager {
 public:
-    ReminderEventManager(std::shared_ptr<ReminderDataManager> &reminderDataManager);
+    explicit ReminderEventManager(std::shared_ptr<ReminderDataManager> &reminderDataManager);
     virtual ~ReminderEventManager() {};
     ReminderEventManager(ReminderEventManager &other) = delete;
     ReminderEventManager& operator = (const ReminderEventManager &other) = delete;
@@ -42,8 +42,8 @@ public:
 
 private:
     sptr<NotificationBundleOption> GetBundleOption(const OHOS::EventFwk::Want &want) const;
-    void HandlePackageRemove(OHOS::EventFwk::Want &want) const;
-    void HandleProcessDied(OHOS::EventFwk::Want &want) const;
+    void HandlePackageRemove(const EventFwk::Want &want) const;
+    void HandleProcessDied(const EventFwk::Want &want) const;
     std::shared_ptr<ReminderDataManager> reminderDataManager_ = nullptr;
 };
 
