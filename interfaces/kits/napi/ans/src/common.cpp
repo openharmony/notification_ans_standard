@@ -173,7 +173,11 @@ napi_value Common::SetNotificationByDistributedOptions(
     NotificationDistributedOptions options = notification->GetNotificationRequest().GetNotificationDistributedOptions();
     napi_value value = nullptr;
     // isDistributed?: boolean
-    napi_get_boolean(env, options.IsDistributed(), &value);
+    if (notification->GetDeviceId().empty()) {
+        napi_get_boolean(env, false, &value);
+    } else {
+        napi_get_boolean(env, options.IsDistributed(), &value);
+    }
     napi_set_named_property(env, result, "isDistributed", value);
 
     // supportDisplayDevices?: Array<string>
