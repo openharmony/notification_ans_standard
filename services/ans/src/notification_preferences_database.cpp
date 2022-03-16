@@ -116,7 +116,7 @@ const std::map<std::string,
         },
         {
             KEY_BUNDLE_POPPED_DIALOG,
-            std::bind(&NotificationPreferencesDatabase::ParseBundleEnableNotification, std::placeholders::_1,
+            std::bind(&NotificationPreferencesDatabase::ParseBundlePoppedDialog, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3),
         },
         {
@@ -1241,7 +1241,7 @@ void NotificationPreferencesDatabase::ParseBundlePoppedDialog(
     NotificationPreferencesInfo::BundleInfo &bundleInfo, const std::string &value) const
 {
     ANS_LOGD("SetBundlePoppedDialog bundle has popped dialog is %{public}s.", value.c_str());
-    bundleInfo.SetEnableNotification(static_cast<bool>(StringToInt(value)));
+    bundleInfo.SetHasPoppedDialog(static_cast<bool>(StringToInt(value)));
 }
 
 void NotificationPreferencesDatabase::ParseBundleUid(
