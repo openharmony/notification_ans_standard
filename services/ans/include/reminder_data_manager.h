@@ -77,7 +77,7 @@ public:
      */
     static std::shared_ptr<ReminderDataManager> GetInstance();
     static std::shared_ptr<ReminderDataManager> InitInstance(
-        sptr<AdvancedNotificationService> &advancedNotificationService);
+        const sptr<AdvancedNotificationService> &advancedNotificationService);
 
     /**
      * Obtains all the valid reminders (which are not expired) relative to the bundle option.
@@ -110,7 +110,7 @@ public:
      * @param reminder Indicates the reminder.
      * @param bundleOption Indicates bundle option the reminder belongs to.
      */
-    void PublishReminder(sptr<ReminderRequest> &reminder, sptr<NotificationBundleOption> &bundleOption);
+    void PublishReminder(const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption);
 
     /**
      * @brief Refresh all reminders when date/time or timeZone of device changed by user.
@@ -248,14 +248,6 @@ private:
      */
     sptr<ReminderRequest> GetRecentReminderLocked();
 
-    /**
-     * Obtains all the reminders of the target bundle name.
-     *
-     * @param bundleName Indicates the bundle name.
-     * @return all the reminders of the target bundle name.
-     */
-    std::vector<sptr<ReminderRequest>> GetSameBundleRemindersLocked(std::string &bundleName);
-
     void HandleImmediatelyShow(std::vector<sptr<ReminderRequest>> &showImmediately, bool isSysTimeChanged);
 
     /**
@@ -265,7 +257,7 @@ private:
      * @param reminder Indicates the target reminder.
      * @return sptr<ReminderRequest> Returns the target reminder if it is need to show immediately, otherwise nullptr.
      */
-    sptr<ReminderRequest> HandleRefreshReminder(uint8_t &type, sptr<ReminderRequest> &reminder);
+    sptr<ReminderRequest> HandleRefreshReminder(const uint8_t &type, sptr<ReminderRequest> &reminder);
 
     /**
      * @brief Handles all the reminders that have the same notification id and belong to same application
@@ -288,7 +280,7 @@ private:
      * @return true if the two reminders belong to the same application.
      */
     bool IsBelongToSameApp(
-        const sptr<ReminderRequest> reminder, const std::string otherPkgName, const int otherUserId);
+        const sptr<ReminderRequest> reminder, const std::string &otherPkgName, const int otherUserId);
 
     void LoadReminderFromDb();
 
