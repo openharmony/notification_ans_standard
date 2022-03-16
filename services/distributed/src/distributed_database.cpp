@@ -69,6 +69,7 @@ void DistributedDatabase::GetKvStore(void)
 
     DistributedKv::Options options;
     options.createIfMissing = true;
+    options.securityLevel = DistributedKv::SecurityLevel::S1;
     options.autoSync = true;
     options.kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION;
     DistributedKv::AppId appId = {.appId = APP_ID};
