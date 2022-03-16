@@ -1381,7 +1381,7 @@ ErrCode AdvancedNotificationService::RequestEnableNotification(const std::string
     }
 
     bool allowedNotify = false;
-    result = IsSpecialBundleAllowedNotify(bundleOption, allowedNotify);
+    result = IsAllowedNotifySelf(bundleOption, allowedNotify);
     if (result != ERR_OK || allowedNotify) {
         ANS_LOGD("Already granted permission");
         return result;
@@ -1529,21 +1529,38 @@ ErrCode AdvancedNotificationService::IsAllowedNotifySelf(bool &allowed)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+    return IsAllowedNotifySelf(bundleOption, allowed);
+}
 
+ErrCode AdvancedNotificationService::IsAllowedNotifySelf(const sptr<NotificationBundleOption> &bundleOption,
+    bool &allowed)
+{
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
+    }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
-        result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
-        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
-            result = ERR_OK;
-            allowed = CheckApiCompatibility(bundleOption);
-            SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
+        allowed = false;
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
+        if (result == ERR_OK && allowed) {
+            result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
+            if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+                result = ERR_OK;
+                allowed = CheckApiCompatibility(bundleOption);
+                SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
+            }
         }
     }));
-
     return result;
 }
 
