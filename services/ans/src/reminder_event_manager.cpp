@@ -129,7 +129,7 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
     }
 }
 
-void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(OHOS::EventFwk::Want &want) const
+void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(const EventFwk::Want &want) const
 {
     OHOS::AppExecFwk::ElementName ele = want.GetElement();
     std::string bundleName = ele.GetBundleName();
@@ -142,7 +142,7 @@ void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(OHOS::Ev
     reminderDataManager_->CancelAllReminders(bundleOption, userId);
 }
 
-void ReminderEventManager::ReminderEventSubscriber::HandleProcessDied(OHOS::EventFwk::Want &want) const
+void ReminderEventManager::ReminderEventSubscriber::HandleProcessDied(const EventFwk::Want &want) const
 {
     sptr<NotificationBundleOption> bundleOption = GetBundleOption(want);
     if (bundleOption == nullptr) {

@@ -36,8 +36,8 @@ std::mutex ReminderDataManager::SHOW_MUTEX;
 std::mutex ReminderDataManager::ALERT_MUTEX;
 std::mutex ReminderDataManager::TIMER_MUTEX;
 
-void ReminderDataManager::PublishReminder(sptr<ReminderRequest> &reminder,
-    sptr<NotificationBundleOption> &bundleOption)
+void ReminderDataManager::PublishReminder(const sptr<ReminderRequest> &reminder,
+    const sptr<NotificationBundleOption> &bundleOption)
 {
     if (CheckReminderLimitExceededLocked(bundleOption->GetBundleName())) {
         return;
@@ -376,7 +376,7 @@ std::shared_ptr<ReminderDataManager> ReminderDataManager::GetInstance()
 }
 
 std::shared_ptr<ReminderDataManager> ReminderDataManager::InitInstance(
-    sptr<AdvancedNotificationService> &advancedNotificationService)
+    const sptr<AdvancedNotificationService> &advancedNotificationService)
 {
     if (REMINDER_DATA_MANAGER == nullptr) {
         REMINDER_DATA_MANAGER = std::make_shared<ReminderDataManager>();
@@ -677,7 +677,7 @@ void ReminderDataManager::StopAlertingReminder(const sptr<ReminderRequest> &remi
         ANSR_LOGE("StopAlertingReminder illegal.");
         return;
     }
-    if (alertingReminderId_ == -1 || reminder->GetReminderId() != alertingReminderId_) {
+    if ((alertingReminderId_ == -1) || (reminder->GetReminderId() != alertingReminderId_)) {
         ANSR_LOGE("StopAlertingReminder is illegal.");
         return;
     }
@@ -773,24 +773,6 @@ sptr<ReminderRequest> ReminderDataManager::GetRecentReminderLocked()
     return nullptr;
 }
 
-std::vector<sptr<ReminderRequest>> ReminderDataManager::GetSameBundleRemindersLocked(std::string &bundleName)
-{
-    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
-    std::vector<sptr<ReminderRequest>> reminders;
-    for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
-        sptr<NotificationBundleOption>  bundleOption = FindNotificationBundleOption((*it)->GetReminderId());
-        if (bundleOption == nullptr) {
-            ANSR_LOGW("GetSameBundleRemindersLocked get notificationBundleOption(reminderId=%{public}d) fail",
-                (*it)->GetReminderId());
-            continue;
-        }
-        if (bundleName == bundleOption->GetBundleName()) {
-            reminders.push_back((*it));
-        }
-    }
-    return reminders;
-}
-
 void ReminderDataManager::HandleImmediatelyShow(
     std::vector<sptr<ReminderRequest>> &showImmediately, bool isSysTimeChanged)
 {
@@ -805,7 +787,7 @@ void ReminderDataManager::HandleImmediatelyShow(
     }
 }
 
-sptr<ReminderRequest> ReminderDataManager::HandleRefreshReminder(uint8_t &type, sptr<ReminderRequest> &reminder)
+sptr<ReminderRequest> ReminderDataManager::HandleRefreshReminder(const uint8_t &type, sptr<ReminderRequest> &reminder)
 {
     reminder->SetReminderTimeInMilli(ReminderRequest::INVALID_LONG_LONG_VALUE);
     uint64_t triggerTimeBefore = reminder->GetTriggerTimeInMilli();
@@ -897,7 +879,7 @@ bool ReminderDataManager::IsReminderAgentReady() const
 }
 
 bool ReminderDataManager::IsBelongToSameApp(
-    const sptr<ReminderRequest> reminder, const std::string otherPkgName, const int otherUserId)
+    const sptr<ReminderRequest> reminder, const std::string &otherPkgName, const int otherUserId)
 {
     ANSR_LOGD("otherUserId=%{public}d, (currently, userId not support)", otherUserId);
     int32_t reminderId = reminder->GetReminderId();
@@ -995,7 +977,7 @@ void ReminderDataManager::StopSoundAndVibration(const sptr<ReminderRequest> &rem
         ANSR_LOGE("Stop sound and vibration failed as reminder is null.");
         return;
     }
-    if (alertingReminderId_ == -1 || (reminder->GetReminderId() != alertingReminderId_)) {
+    if ((alertingReminderId_ == -1) || (reminder->GetReminderId() != alertingReminderId_)) {
         ANSR_LOGE("Stop sound and vibration failed as alertingReminder is illegal, alertingReminderId_=" \
             "%{public}d, tarReminderId=%{public}d", alertingReminderId_, reminder->GetReminderId());
         return;
