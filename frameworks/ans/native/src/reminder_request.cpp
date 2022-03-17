@@ -1421,6 +1421,7 @@ void ReminderRequest::UpdateNotificationCommon()
     flags->SetSoundEnabled(NotificationConstant::FlagStatus::CLOSE);
     flags->SetVibrationEnabled(NotificationConstant::FlagStatus::CLOSE);
     notificationRequest_->SetFlags(flags);
+    notificationRequest_->SetDistributed(false);
 }
 
 void ReminderRequest::UpdateNotificationBundleInfo()
