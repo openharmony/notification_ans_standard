@@ -205,7 +205,7 @@ napi_value SetDoNotDisturbDate(napi_env env, napi_callback_info info)
                 asynccallbackinfo->info.errorCode = NotificationHelper::SetDoNotDisturbDate(
                     asynccallbackinfo->params.date);
             }
-            
+
             ANS_LOGI("SetDoNotDisturbDate date=%{public}s errorCode=%{public}d, hasUserId=%{public}d",
                 asynccallbackinfo->params.date.Dump().c_str(), asynccallbackinfo->info.errorCode,
                 asynccallbackinfo->params.hasUserId);
@@ -241,23 +241,21 @@ void AsyncCompleteCallbackGetDoNotDisturbDate(napi_env env, napi_status status, 
         ANS_LOGE("Invalid async callback data");
         return;
     }
-    AsyncCallbackInfoGetDoNotDisturb *asynccallbackinfo = (AsyncCallbackInfoGetDoNotDisturb *)data;
-    if (asynccallbackinfo) {
-        napi_value result = Common::NapiGetNull(env);
-        if (asynccallbackinfo->info.errorCode == ERR_OK) {
-            napi_create_object(env, &result);
-            if (!Common::SetDoNotDisturbDate(env, asynccallbackinfo->date, result)) {
-                asynccallbackinfo->info.errorCode = ERROR;
-            }
+    AsyncCallbackInfoGetDoNotDisturb *asynccallbackinfo = static_cast<AsyncCallbackInfoGetDoNotDisturb *>(data);
+    napi_value result = Common::NapiGetNull(env);
+    if (asynccallbackinfo->info.errorCode == ERR_OK) {
+        napi_create_object(env, &result);
+        if (!Common::SetDoNotDisturbDate(env, asynccallbackinfo->date, result)) {
+            asynccallbackinfo->info.errorCode = ERROR;
         }
-        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-        if (asynccallbackinfo->info.callback != nullptr) {
-            napi_delete_reference(env, asynccallbackinfo->info.callback);
-        }
-        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
     }
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, GetDoNotDisturbDateParams &params)

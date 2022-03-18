@@ -4023,8 +4023,6 @@ napi_value Common::CreateWantAgentByJS(const napi_env &env,
         [](napi_env env, void *data, void *hint) {
             AbilityRuntime::WantAgent::WantAgent *objectInfo =
                 static_cast<AbilityRuntime::WantAgent::WantAgent *>(data);
-            ANS_LOGI("CreateWantAgentByJS this = %{public}p", objectInfo);
-
             if (objectInfo) {
                 for (auto it = wantAgent_.begin(); it != wantAgent_.end(); ++it) {
                     if ((*it).get() == objectInfo) {

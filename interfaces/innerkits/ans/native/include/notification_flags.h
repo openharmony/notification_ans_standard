@@ -30,7 +30,7 @@ public:
      * Default constructor used to create an empty NotificationFlags instance.
      */
     NotificationFlags() = default;
-    
+
     /**
      * Default deconstructor used to deconstruct.
      */

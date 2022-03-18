@@ -178,21 +178,19 @@ void AsyncCompleteCallbackIsDistributedEnabled(napi_env env, napi_status status,
     }
     ANS_LOGI("IsDistributedEnabled napi_create_async_work end");
     AsyncCallbackInfoIsEnabled *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnabled *>(data);
-    if (asynccallbackinfo) {
-        napi_value result = nullptr;
-        if (asynccallbackinfo->info.errorCode != ERR_OK) {
-            result = Common::NapiGetNull(env);
-        } else {
-            napi_get_boolean(env, asynccallbackinfo->enable, &result);
-        }
-        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-        if (asynccallbackinfo->info.callback != nullptr) {
-            napi_delete_reference(env, asynccallbackinfo->info.callback);
-        }
-        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
+    napi_value result = nullptr;
+    if (asynccallbackinfo->info.errorCode != ERR_OK) {
+        result = Common::NapiGetNull(env);
+    } else {
+        napi_get_boolean(env, asynccallbackinfo->enable, &result);
     }
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value IsDistributedEnabled(napi_env env, napi_callback_info info)
@@ -421,22 +419,20 @@ void AsyncCompleteCallbackIsDistributedEnableByBundle(napi_env env, napi_status 
         return;
     }
     ANS_LOGI("IsDistributedEnableByBundle napi_create_async_work end");
-    AsyncCallbackInfoIsEnabledByBundle *asynccallbackinfo = (AsyncCallbackInfoIsEnabledByBundle *)data;
-    if (asynccallbackinfo) {
-        napi_value result = nullptr;
-        if (asynccallbackinfo->info.errorCode != ERR_OK) {
-            result = Common::NapiGetNull(env);
-        } else {
-            napi_get_boolean(env, asynccallbackinfo->enable, &result);
-        }
-        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-        if (asynccallbackinfo->info.callback != nullptr) {
-            napi_delete_reference(env, asynccallbackinfo->info.callback);
-        }
-        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
+    AsyncCallbackInfoIsEnabledByBundle *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnabledByBundle *>(data);
+    napi_value result = nullptr;
+    if (asynccallbackinfo->info.errorCode != ERR_OK) {
+        result = Common::NapiGetNull(env);
+    } else {
+        napi_get_boolean(env, asynccallbackinfo->enable, &result);
     }
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value IsDistributedEnableByBundle(napi_env env, napi_callback_info info)
@@ -491,27 +487,25 @@ void AsyncCompleteCallbackGetDeviceRemindType(napi_env env, napi_status status, 
         return;
     }
     ANS_LOGI("GetDeviceRemindType napi_create_async_work end");
-    AsyncCallbackInfoGetRemindType *asynccallbackinfo = (AsyncCallbackInfoGetRemindType *)data;
-    if (asynccallbackinfo) {
-        napi_value result = nullptr;
-        if (asynccallbackinfo->info.errorCode != ERR_OK) {
+    AsyncCallbackInfoGetRemindType *asynccallbackinfo = static_cast<AsyncCallbackInfoGetRemindType *>(data);
+    napi_value result = nullptr;
+    if (asynccallbackinfo->info.errorCode != ERR_OK) {
+        result = Common::NapiGetNull(env);
+    } else {
+        DeviceRemindType outType = DeviceRemindType::IDLE_DONOT_REMIND;
+        if (!Common::DeviceRemindTypeCToJS(asynccallbackinfo->remindType, outType)) {
+            asynccallbackinfo->info.errorCode = ERROR;
             result = Common::NapiGetNull(env);
-        } else {
-            DeviceRemindType outType = DeviceRemindType::IDLE_DONOT_REMIND;
-            if (!Common::DeviceRemindTypeCToJS(asynccallbackinfo->remindType, outType)) {
-                asynccallbackinfo->info.errorCode = ERROR;
-                result = Common::NapiGetNull(env);
-            }
-            napi_create_int32(env, (int32_t)outType, &result);
         }
-        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-        if (asynccallbackinfo->info.callback != nullptr) {
-            napi_delete_reference(env, asynccallbackinfo->info.callback);
-        }
-        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
+        napi_create_int32(env, (int32_t)outType, &result);
     }
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
+    }
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value GetDeviceRemindType(napi_env env, napi_callback_info info)
