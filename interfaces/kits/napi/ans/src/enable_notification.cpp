@@ -152,15 +152,13 @@ void AsyncCompleteCallbackEnableNotification(napi_env env, napi_status status, v
         return;
     }
     AsyncCallbackInfoEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoEnable *>(data);
-    if (asynccallbackinfo) {
-        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
-        if (asynccallbackinfo->info.callback != nullptr) {
-            napi_delete_reference(env, asynccallbackinfo->info.callback);
-        }
-        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
     }
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value EnableNotification(napi_env env, napi_callback_info info)
@@ -215,17 +213,15 @@ void AsyncCompleteCallbackIsNotificationEnabled(napi_env env, napi_status status
         return;
     }
     AsyncCallbackInfoIsEnable *asynccallbackinfo = static_cast<AsyncCallbackInfoIsEnable *>(data);
-    if (asynccallbackinfo) {
-        napi_value result = nullptr;
-        napi_get_boolean(env, asynccallbackinfo->allowed, &result);
-        Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
-        if (asynccallbackinfo->info.callback != nullptr) {
-            napi_delete_reference(env, asynccallbackinfo->info.callback);
-        }
-        napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
+    napi_value result = nullptr;
+    napi_get_boolean(env, asynccallbackinfo->allowed, &result);
+    Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
+    if (asynccallbackinfo->info.callback != nullptr) {
+        napi_delete_reference(env, asynccallbackinfo->info.callback);
     }
+    napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)

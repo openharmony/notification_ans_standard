@@ -51,7 +51,7 @@ ANS支持4种类型的通道，分别为：
 
 事件通知子系统
 
-**notification_ans_standard**
+**[notification_ans_standard](https://gitee.com/openharmony/aafwk_standard/blob/master/README_zh.md)**
 
 [aafwk\_standard](https://gitee.com/openharmony/aafwk_standard)
 

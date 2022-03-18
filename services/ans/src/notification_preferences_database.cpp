@@ -225,6 +225,7 @@ bool NotificationPreferencesDatabase::PutGroupsToDisturbeDB(
     for (auto iter : groups) {
         result = GroupToEntry(bundleName, bundleUid, iter, entries);
         if (!result) {
+            ANS_LOGE("Group to entry is null.");
             return result;
         }
     }
