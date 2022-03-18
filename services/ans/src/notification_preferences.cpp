@@ -317,7 +317,7 @@ ErrCode NotificationPreferences::GetNotificationSlotsNumForBundle(
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
     if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
-        num = bundleInfo.GetAllSlotsSize();
+        num = static_cast<int>(bundleInfo.GetAllSlotsSize());
     } else {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }

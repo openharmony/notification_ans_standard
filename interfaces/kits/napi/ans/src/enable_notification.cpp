@@ -160,10 +160,8 @@ void AsyncCompleteCallbackEnableNotification(napi_env env, napi_status status, v
     }
 
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value EnableNotification(napi_env env, napi_callback_info info)
@@ -228,10 +226,8 @@ void AsyncCompleteCallbackIsNotificationEnabled(napi_env env, napi_status status
     }
 
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value IsNotificationEnabled(napi_env env, napi_callback_info info)

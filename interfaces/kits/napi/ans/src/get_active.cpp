@@ -72,10 +72,8 @@ void AsyncCompleteCallbackGetAllActiveNotifications(napi_env env, napi_status st
     }
 
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value GetAllActiveNotifications(napi_env env, napi_callback_info info)
@@ -167,10 +165,8 @@ void AsyncCompleteCallbackGetActiveNotifications(napi_env env, napi_status statu
     }
 
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value GetActiveNotifications(napi_env env, napi_callback_info info)
@@ -241,10 +237,8 @@ void AsyncCompleteCallbackGetActiveNotificationCount(napi_env env, napi_status s
     }
 
     napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-    if (asynccallbackinfo) {
-        delete asynccallbackinfo;
-        asynccallbackinfo = nullptr;
-    }
+    delete asynccallbackinfo;
+    asynccallbackinfo = nullptr;
 }
 
 napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
