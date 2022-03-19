@@ -96,8 +96,12 @@ void ReminderRequestTimer::UpdateTimeInfo(const std::string &description)
     whenToChangeSysTime_ = ReminderRequest::GetDurationSinceEpochInMilli(now);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
     int64_t bootTime = timer->GetBootTimeMs();
+    if (bootTime < 0) {
+        ANSR_LOGW("BootTime is illegal");
+        return;
+    }
     SetTriggerTimeInMilli(whenToChangeSysTime_ + (countDownTimeInSeconds_ * MILLI_SECONDS -
-        (bootTime - firstRealTimeInMilliSeconds_)));
+        (static_cast<uint64_t>(bootTime) - firstRealTimeInMilliSeconds_)));
 }
 
 bool ReminderRequestTimer::Marshalling(Parcel &parcel) const
