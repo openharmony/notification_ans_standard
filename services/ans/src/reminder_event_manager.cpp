@@ -59,7 +59,11 @@ void ReminderEventManager::init(std::shared_ptr<ReminderDataManager> &reminderDa
     IPCSkeleton::SetCallingIdentity(identity);
 
     sptr<SystemAbilityStatusChangeListener> statusChangeListener
-        = new SystemAbilityStatusChangeListener(reminderDataManager);
+        = new (std::nothrow) SystemAbilityStatusChangeListener(reminderDataManager);
+    if (statusChangeListener == nullptr) {
+        ANSR_LOGE("Failed to create statusChangeListener due to no memory.");
+        return;
+    }
     sptr<ISystemAbilityManager> samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         ANSR_LOGD("samgrProxy is null");

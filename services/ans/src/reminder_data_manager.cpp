@@ -901,7 +901,11 @@ void ReminderDataManager::LoadReminderFromDb()
     reminderVector_ = existReminders;
     ANSR_LOGD("LoadReminderFromDb, reminder size=%{public}d", reminderVector_.size());
     for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
-        sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption();
+        sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption();
+        if (bundleOption == nullptr) {
+            ANSR_LOGE("Failed to create bundleOption due to no memory.");
+            break;
+        }
         int32_t reminderId = (*it)->GetReminderId();
         if (!(store_->GetBundleOption(reminderId, bundleOption))) {
             ANSR_LOGE("Get bundle option fail, reminderId=%{public}d", reminderId);
@@ -914,7 +918,7 @@ void ReminderDataManager::LoadReminderFromDb()
             continue;
         }
     }
-    totalCount_ = reminderVector_.size();
+    totalCount_ = static_cast<int16_t>(reminderVector_.size());
     ReminderRequest::GLOBAL_ID = store_->GetMaxId() + 1;
 }
 
