@@ -518,7 +518,7 @@ napi_value ReminderCommon::ParseInt32Array(const napi_env &env, const napi_value
                 return nullptr;
             }
             napi_get_value_int32(env, repeatDayVal, &propertyDayVal);
-            if (propertyDayVal < 1 || propertyDayVal > maxLen) {
+            if (propertyDayVal < 1 || propertyDayVal > static_cast<int32_t>(maxLen)) {
                 ANSR_LOGW("%{public}s's element must between [1, %{public}d].", propertyName, maxLen);
                 return nullptr;
             }
