@@ -342,15 +342,15 @@ sptr<ReminderRequest> ReminderStore::BuildReminder(const std::shared_ptr<NativeR
     sptr<ReminderRequest> reminder = nullptr;
     switch (reminderType) {
         case (static_cast<int32_t>(ReminderRequest::ReminderType::TIMER)): {
-            reminder = new ReminderRequestTimer(reminderId);
+            reminder = new (std::nothrow) ReminderRequestTimer(reminderId);
             break;
         }
         case (static_cast<int32_t>(ReminderRequest::ReminderType::CALENDAR)): {
-            reminder = new ReminderRequestCalendar(reminderId);
+            reminder = new (std::nothrow) ReminderRequestCalendar(reminderId);
             break;
         }
         case (static_cast<int32_t>(ReminderRequest::ReminderType::ALARM)): {
-            reminder = new ReminderRequestAlarm(reminderId);
+            reminder = new (std::nothrow) ReminderRequestAlarm(reminderId);
             break;
         }
         default: {
