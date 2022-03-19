@@ -197,11 +197,11 @@ std::string AnsImageUtil::HexToBin(const std::string &strHex)
         for (size_t j = 0; j < TWO_TIMES; j++) {
             char cCur = strHex[TWO_TIMES * i + j];
             if (cCur >= '0' && cCur <= '9') {
-                cTemp = (cTemp << SHIFT_FOUR) + (cCur - '0');
+                cTemp = (cTemp << SHIFT_FOUR) + static_cast<uint8_t>(cCur - '0');
             } else if (cCur >= 'a' && cCur <= 'f') {
-                cTemp = (cTemp << SHIFT_FOUR) + (cCur - 'a' + NUM_TEN);
+                cTemp = (cTemp << SHIFT_FOUR) + static_cast<uint8_t>(cCur - 'a' + NUM_TEN);
             } else if (cCur >= 'A' && cCur <= 'F') {
-                cTemp = (cTemp << SHIFT_FOUR) + (cCur - 'A' + NUM_TEN);
+                cTemp = (cTemp << SHIFT_FOUR) + static_cast<uint8_t>(cCur - 'A' + NUM_TEN);
             } else {
                 return {};
             }
