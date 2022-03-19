@@ -139,12 +139,9 @@ inline int64_t GetCurrentTime()
 
 inline tm GetLocalTime(time_t time)
 {
-    tm result = {0};
-    tm *lt = localtime(&time);
-    if (lt != nullptr) {
-        result = *lt;
-    }
-    return result;
+    struct tm ret = {0};
+    localtime_r(&time, &ret);
+    return ret;
 }
 
 inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRecord> &record)
@@ -1927,7 +1924,9 @@ std::string AdvancedNotificationService::TimeToString(int64_t time)
     auto timeT = std::chrono::system_clock::to_time_t(timePoint);
 
     std::stringstream stream;
-    stream << std::put_time(std::localtime(&timeT), "%F, %T");
+    struct tm ret = {0};
+    localtime_r(&timeT, &ret);
+    stream << std::put_time(&ret, "%F, %T");
     return stream.str();
 }
 
