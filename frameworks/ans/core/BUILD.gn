@@ -31,8 +31,6 @@ config("public_ans_core_config") {
     "//third_party/json/single_include",
     "//third_party/jsoncpp/include",
   ]
-
-  cflags_cc = [ "-fexceptions" ]
 }
 
 ohos_shared_library("ans_core") {
