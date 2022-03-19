@@ -66,7 +66,7 @@ ReminderRequestCalendar::ReminderRequestCalendar(const tm &dateTime,
     // 2. set the time information (used to transfer to proxy service) which is decided to trigger firstly.
     year_ = static_cast<uint16_t>(GetActualTime(TimeTransferType::YEAR, dateTime_.tm_year));
     month_ = static_cast<uint8_t>(GetActualTime(TimeTransferType::MONTH, dateTime_.tm_mon));
-    day_ = dateTime_.tm_mday;
+    day_ = static_cast<uint8_t>(dateTime_.tm_mday);
     second_ = 0;
     SetTriggerTimeInMilli(nextTriggerTime);
 }
@@ -117,7 +117,7 @@ uint8_t ReminderRequestCalendar::GetNextDay(
             struct tm setTime;
             setTime.tm_year = GetCTime(TimeTransferType::YEAR, settedYear);
             setTime.tm_mon = GetCTime(TimeTransferType::MONTH, settedMonth);
-            setTime.tm_mday = i;
+            setTime.tm_mday = static_cast<int>(i);
             setTime.tm_hour = target.tm_hour;
             setTime.tm_min = target.tm_min;
             setTime.tm_sec = target.tm_sec;
@@ -215,10 +215,10 @@ uint64_t ReminderRequestCalendar::GetTimeInstantMilli(
     struct tm tar;
     tar.tm_year = GetCTime(TimeTransferType::YEAR, year);
     tar.tm_mon =  GetCTime(TimeTransferType::MONTH, month);
-    tar.tm_mday = day;
-    tar.tm_hour = hour;
-    tar.tm_min = minute;
-    tar.tm_sec = second;
+    tar.tm_mday = static_cast<int>(day);
+    tar.tm_hour = static_cast<int>(hour);
+    tar.tm_min = static_cast<int>(minute);
+    tar.tm_sec = static_cast<int>(second);
     tar.tm_isdst = -1;
 
     ANSR_LOGD("tar: %{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",
@@ -235,10 +235,10 @@ void ReminderRequestCalendar::InitDateTime()
 {
     dateTime_.tm_year = GetCTime(TimeTransferType::YEAR, year_);
     dateTime_.tm_mon = GetCTime(TimeTransferType::MONTH, month_);
-    dateTime_.tm_mday = day_;
-    dateTime_.tm_hour = hour_;
-    dateTime_.tm_min = minute_;
-    dateTime_.tm_sec = second_;
+    dateTime_.tm_mday = static_cast<int>(day_);
+    dateTime_.tm_hour = static_cast<int>(hour_);
+    dateTime_.tm_min = static_cast<int>(minute_);
+    dateTime_.tm_sec = static_cast<int>(second_);
     dateTime_.tm_isdst = -1;
 }
 
@@ -450,7 +450,7 @@ bool ReminderRequestCalendar::Marshalling(Parcel &parcel) const
 ReminderRequestCalendar *ReminderRequestCalendar::Unmarshalling(Parcel &parcel)
 {
     ANSR_LOGD("New calendar");
-    auto objptr = new ReminderRequestCalendar();
+    auto objptr = new (std::nothrow) ReminderRequestCalendar();
     if (objptr == nullptr) {
         ANS_LOGE("Failed to create reminder calendar due to no memory.");
         return objptr;
