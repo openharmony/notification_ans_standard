@@ -152,7 +152,7 @@ napi_value ParseGetValidParameter(const napi_env &env, const napi_callback_info 
     size_t argc = GET_VALID_PARAM_LEN;
     napi_value argv[GET_VALID_PARAM_LEN] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
-    if (argc < 0 || argc > GET_VALID_PARAM_LEN) {
+    if (argc > GET_VALID_PARAM_LEN) {
         ANSR_LOGW("Wrong number of arguments");
         return nullptr;
     }
