@@ -1536,6 +1536,10 @@ int32_t ReminderRequest::GetUid(const int &userId, const std::string &bundleName
     AppExecFwk::ApplicationInfo info;
     sptr<ISystemAbilityManager> systemAbilityManager
         = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        ANSR_LOGE("Failed to get uid due to get systemAbilityManager is null.");
+        return -1;
+    }
     sptr<IRemoteObject> remoteObject  = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     sptr<AppExecFwk::IBundleMgr> bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO,

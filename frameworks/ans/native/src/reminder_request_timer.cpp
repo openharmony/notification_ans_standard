@@ -33,11 +33,15 @@ ReminderRequestTimer::ReminderRequestTimer(uint64_t countDownTimeInSeconds)
     ReminderRequest::SetTriggerTimeInMilli(
         ReminderRequest::GetDurationSinceEpochInMilli(now) + countDownTimeInSeconds_ * ReminderRequest::MILLI_SECONDS);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
-    int64_t bootTimeMs = timer->GetBootTimeMs();
-    if (bootTimeMs >= 0) {
-        firstRealTimeInMilliSeconds_ = static_cast<uint64_t>(bootTimeMs);
+    if (timer == nullptr) {
+        ANSR_LOGW("Failed to get boot time due to TimeServiceClient is null.");
     } else {
-        ANSR_LOGW("Get boot time error.");
+        int64_t bootTimeMs = timer->GetBootTimeMs();
+        if (bootTimeMs >= 0) {
+            firstRealTimeInMilliSeconds_ = static_cast<uint64_t>(bootTimeMs);
+        } else {
+            ANSR_LOGW("Get boot time error.");
+        }
     }
 }
 
@@ -95,6 +99,10 @@ void ReminderRequestTimer::UpdateTimeInfo(const std::string &description)
     (void)time(&now);  // unit is seconds.
     whenToChangeSysTime_ = ReminderRequest::GetDurationSinceEpochInMilli(now);
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
+    if (timer == nullptr) {
+        ANSR_LOGW("Failed to updateTime info due to TimeServiceClient is null.");
+        return;
+    }
     int64_t bootTime = timer->GetBootTimeMs();
     if (bootTime < 0) {
         ANSR_LOGW("BootTime is illegal");
