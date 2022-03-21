@@ -86,7 +86,7 @@ public:
      * @param[out] reminders return the valid reminders.
      */
     void GetValidReminders(
-        const sptr<NotificationBundleOption> bundleOption, std::vector<sptr<ReminderRequest>> &reminders);
+        const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<ReminderRequest>> &reminders);
 
     /**
      * @brief Inits and recovery data from database.
@@ -102,7 +102,7 @@ public:
      *
      * @param bundleOption Indicates the bundleOption of third party application.
      */
-    void OnProcessDiedLocked(const sptr<NotificationBundleOption> bundleOption);
+    void OnProcessDiedLocked(const sptr<NotificationBundleOption> &bundleOption);
 
     /**
      * Publishs a scheduled reminder.

@@ -87,6 +87,10 @@ int32_t ReminderStore::Init()
 int32_t ReminderStore::InitData()
 {
     ANSR_LOGD("Reminder data init.");
+    if (rdbStore_ == nullptr) {
+        ANSR_LOGE("Rdb store is not initialized.");
+        return STATE_FAIL;
+    }
     std::string deleteCondition = ReminderRequest::IS_EXPIRED + " is true";
     ReminderStore::Delete(deleteCondition);
 
@@ -193,6 +197,10 @@ int64_t ReminderStore::UpdateOrInsert(
 int64_t ReminderStore::Insert(
     const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption)
 {
+    if (rdbStore_ == nullptr) {
+        ANSR_LOGE("Rdb store is not initialized.");
+        return STATE_FAIL;
+    }
     int64_t rowId = STATE_FAIL;
     NativeRdb::ValuesBucket values;
     ReminderStore::GenerateData(reminder, bundleOption, values);
@@ -209,6 +217,10 @@ int64_t ReminderStore::Insert(
 int64_t ReminderStore::Update(
     const sptr<ReminderRequest> &reminder, const sptr<NotificationBundleOption> &bundleOption)
 {
+    if (rdbStore_ == nullptr) {
+        ANSR_LOGE("Rdb store is not initialized.");
+        return STATE_FAIL;
+    }
     int32_t changedRows = STATE_FAIL;
     NativeRdb::ValuesBucket values;
     ReminderStore::GenerateData(reminder, bundleOption, values);
