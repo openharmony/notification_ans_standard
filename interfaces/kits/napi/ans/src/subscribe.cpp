@@ -1212,18 +1212,20 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
                 return;
             }
             AsyncCallbackInfoSubscribe *asynccallbackinfo = (AsyncCallbackInfoSubscribe *)data;
+            if (!asynccallbackinfo) {
+                ANS_LOGE("Invalid asynccallbackinfo!");
+                return;
+            }
 
             Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
 
             if (asynccallbackinfo->info.callback != nullptr) {
                 napi_delete_reference(env, asynccallbackinfo->info.callback);
             }
-
             napi_delete_async_work(env, asynccallbackinfo->asyncWork);
-            if (asynccallbackinfo) {
-                delete asynccallbackinfo;
-                asynccallbackinfo = nullptr;
-            }
+
+            delete asynccallbackinfo;
+            asynccallbackinfo = nullptr;
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
