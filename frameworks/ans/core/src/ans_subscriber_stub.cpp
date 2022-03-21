@@ -188,6 +188,10 @@ ErrCode AnsSubscriberStub::HandleOnUpdated(MessageParcel &data, MessageParcel &r
 ErrCode AnsSubscriberStub::HandleOnDoNotDisturbDateChange(MessageParcel &data, MessageParcel &reply)
 {
     sptr<NotificationDoNotDisturbDate> date = data.ReadParcelable<NotificationDoNotDisturbDate>();
+    if (!date) {
+        ANS_LOGW("[HandleOnDoNotDisturbDateChange] fail: date ReadParcelable failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
     OnDoNotDisturbDateChange(date);
     return ERR_OK;
 }
@@ -195,6 +199,10 @@ ErrCode AnsSubscriberStub::HandleOnDoNotDisturbDateChange(MessageParcel &data, M
 ErrCode AnsSubscriberStub::HandleOnEnabledNotificationChanged(MessageParcel &data, MessageParcel &reply)
 {
     sptr<EnabledNotificationCallbackData> callbackData = data.ReadParcelable<EnabledNotificationCallbackData>();
+    if (!callbackData) {
+        ANS_LOGW("[HandleOnEnabledNotificationChanged] fail: callbackData ReadParcelable failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
     OnEnabledNotificationChanged(callbackData);
     return ERR_OK;
 }
