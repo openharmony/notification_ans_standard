@@ -173,7 +173,11 @@ napi_value Common::SetNotificationByDistributedOptions(
     NotificationDistributedOptions options = notification->GetNotificationRequest().GetNotificationDistributedOptions();
     napi_value value = nullptr;
     // isDistributed?: boolean
-    napi_get_boolean(env, options.IsDistributed(), &value);
+    if (notification->GetDeviceId().empty()) {
+        napi_get_boolean(env, false, &value);
+    } else {
+        napi_get_boolean(env, options.IsDistributed(), &value);
+    }
     napi_set_named_property(env, result, "isDistributed", value);
 
     // supportDisplayDevices?: Array<string>
@@ -1204,14 +1208,12 @@ napi_value Common::SetNotificationActionButton(
     }
 
     // userInput?: NotificationUserInput
-    if (actionButton->GetUserInputs().size() > 0) {
-        napi_value userInputResult = nullptr;
-        napi_create_object(env, &userInputResult);
-        if (!SetNotificationActionButtonByUserInput(env, actionButton->GetUserInputs().front(), userInputResult)) {
-            return NapiGetBoolean(env, false);
-        }
-        napi_set_named_property(env, result, "userInput", userInputResult);
+    napi_value userInputResult = nullptr;
+    napi_create_object(env, &userInputResult);
+    if (!SetNotificationActionButtonByUserInput(env, actionButton->GetUserInput(), userInputResult)) {
+        return NapiGetBoolean(env, false);
     }
+    napi_set_named_property(env, result, "userInput", userInputResult);
 
     return NapiGetBoolean(env, true);
 }

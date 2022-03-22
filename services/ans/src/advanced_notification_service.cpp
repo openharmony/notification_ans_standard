@@ -21,10 +21,12 @@
 
 #include "ability_context.h"
 #include "ability_info.h"
+#include "access_token_helper.h"
 #include "accesstoken_kit.h"
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "ans_permission_def.h"
 #include "bundle_manager_helper.h"
 #include "ipc_skeleton.h"
 #include "notification_constant.h"
@@ -137,12 +139,9 @@ inline int64_t GetCurrentTime()
 
 inline tm GetLocalTime(time_t time)
 {
-    tm result = {0};
-    tm *lt = localtime(&time);
-    if (lt != nullptr) {
-        result = *lt;
-    }
-    return result;
+    struct tm ret = {0};
+    localtime_r(&time, &ret);
+    return ret;
 }
 
 inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRecord> &record)
@@ -585,7 +584,7 @@ ErrCode AdvancedNotificationService::AddSlots(const std::vector<sptr<Notificatio
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -857,7 +856,7 @@ ErrCode AdvancedNotificationService::Delete(const std::string &key)
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -895,7 +894,7 @@ ErrCode AdvancedNotificationService::DeleteByBundle(const sptr<NotificationBundl
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -943,7 +942,7 @@ ErrCode AdvancedNotificationService::DeleteAll()
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1005,7 +1004,7 @@ ErrCode AdvancedNotificationService::GetSlotsByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1034,7 +1033,7 @@ ErrCode AdvancedNotificationService::UpdateSlots(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1062,7 +1061,7 @@ ErrCode AdvancedNotificationService::UpdateSlotGroups(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1090,7 +1089,7 @@ ErrCode AdvancedNotificationService::SetShowBadgeEnabledForBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1114,7 +1113,7 @@ ErrCode AdvancedNotificationService::GetShowBadgeEnabledForBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1233,7 +1232,7 @@ ErrCode AdvancedNotificationService::Subscribe(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1254,7 +1253,7 @@ ErrCode AdvancedNotificationService::Unsubscribe(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1312,7 +1311,7 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1353,7 +1352,7 @@ ErrCode AdvancedNotificationService::GetSpecialActiveNotifications(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1379,7 +1378,7 @@ ErrCode AdvancedNotificationService::RequestEnableNotification(const std::string
     }
 
     bool allowedNotify = false;
-    result = IsSpecialBundleAllowedNotify(bundleOption, allowedNotify);
+    result = IsAllowedNotifySelf(bundleOption, allowedNotify);
     if (result != ERR_OK || allowedNotify) {
         ANS_LOGD("Already granted permission");
         return result;
@@ -1438,7 +1437,7 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForAllBundles(const 
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1468,7 +1467,7 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledForSpecialBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1506,7 +1505,7 @@ ErrCode AdvancedNotificationService::IsAllowedNotify(bool &allowed)
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -1527,35 +1526,49 @@ ErrCode AdvancedNotificationService::IsAllowedNotifySelf(bool &allowed)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    ErrCode result = ERR_OK;
     sptr<NotificationBundleOption> bundleOption = GenerateBundleOption();
     if (bundleOption == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
+    return IsAllowedNotifySelf(bundleOption, allowed);
+}
 
+ErrCode AdvancedNotificationService::IsAllowedNotifySelf(const sptr<NotificationBundleOption> &bundleOption,
+    bool &allowed)
+{
+    if (bundleOption == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    int userId = SUBSCRIBE_USER_INIT;
+    if (!GetActiveUserId(userId)) {
+        return ERR_ANS_GET_ACTIVE_USER_FAILED;
+    }
+
+    ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
-        result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
-        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
-            result = ERR_OK;
-            allowed = CheckApiCompatibility(bundleOption);
-            SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
+        allowed = false;
+        result = NotificationPreferences::GetInstance().GetNotificationsEnabled(userId, allowed);
+        if (result == ERR_OK && allowed) {
+            result = NotificationPreferences::GetInstance().GetNotificationsEnabledForBundle(bundleOption, allowed);
+            if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+                result = ERR_OK;
+                allowed = CheckApiCompatibility(bundleOption);
+                SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
+            }
         }
     }));
-
     return result;
 }
 
-ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
-    const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
+ErrCode AdvancedNotificationService::GetAppTargetBundle(const sptr<NotificationBundleOption> &bundleOption,
+    sptr<NotificationBundleOption> &targetBundle)
 {
-    ANS_LOGD("%{public}s", __FUNCTION__);
-
     sptr<NotificationBundleOption> clientBundle = GenerateBundleOption();
     if (clientBundle == nullptr) {
         return ERR_ANS_INVALID_BUNDLE;
     }
 
-    sptr<NotificationBundleOption> targetBundle = nullptr;
     if (bundleOption == nullptr) {
         targetBundle = clientBundle;
     } else {
@@ -1566,10 +1579,30 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
             if (!IsSystemApp()) {
                 return ERR_ANS_NON_SYSTEM_APP;
             }
-            if (!CheckPermission(GetClientBundleName())) {
-                return ERR_ANS_PERMISSION_DENIED;
-            }
             targetBundle = GenerateValidBundleOption(bundleOption);
+        }
+    }
+    return ERR_OK;
+}
+
+ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
+    const sptr<NotificationBundleOption> &bundleOption, bool &allowed)
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+
+    if (!CheckPermission()) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    sptr<NotificationBundleOption> targetBundle = nullptr;
+    if (IPCSkeleton::GetCallingUid() == SYSTEM_SERVICE_UID) {
+        if (bundleOption != nullptr) {
+            targetBundle = GenerateValidBundleOption(bundleOption);
+        }
+    } else {
+        ErrCode result = GetAppTargetBundle(bundleOption, targetBundle);
+        if (result != ERR_OK) {
+            return result;
         }
     }
 
@@ -1591,6 +1624,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
             if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
                 result = ERR_OK;
                 allowed = CheckApiCompatibility(targetBundle);
+                SetNotificationsEnabledForSpecialBundle("", bundleOption, allowed);
             }
         }
     }));
@@ -1890,7 +1924,9 @@ std::string AdvancedNotificationService::TimeToString(int64_t time)
     auto timeT = std::chrono::system_clock::to_time_t(timePoint);
 
     std::stringstream stream;
-    stream << std::put_time(std::localtime(&timeT), "%F, %T");
+    struct tm ret = {0};
+    localtime_r(&timeT, &ret);
+    stream << std::put_time(&ret, "%F, %T");
     return stream.str();
 }
 
@@ -2107,7 +2143,7 @@ ErrCode AdvancedNotificationService::RemoveNotification(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2171,7 +2207,7 @@ ErrCode AdvancedNotificationService::RemoveAllNotifications(const sptr<Notificat
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2224,7 +2260,7 @@ ErrCode AdvancedNotificationService::GetSlotNumAsBundle(const sptr<NotificationB
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2299,7 +2335,7 @@ ErrCode AdvancedNotificationService::RemoveGroupByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2411,7 +2447,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const sptr<Notification
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         ANS_LOGW("Check permission denied!");
         return ERR_ANS_PERMISSION_DENIED;
     }
@@ -2433,7 +2469,7 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(sptr<NotificationDoNotD
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2453,7 +2489,7 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2461,18 +2497,19 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
     return ERR_OK;
 }
 
-bool AdvancedNotificationService::CheckPermission(const std::string &bundleName)
+bool AdvancedNotificationService::CheckPermission()
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
     if (IPCSkeleton::GetCallingUid() == SYSTEM_SERVICE_UID) {
         return true;
     }
-    if (bundleName.empty()) {
-        ANS_LOGE("Bundle name is empty.");
-        return false;
+
+    auto tokenCaller = IPCSkeleton::GetCallingTokenID();
+    bool result = AccessTokenHelper::VerifyCallerPermission(tokenCaller, OHOS_PERMISSION_NOTIFICATION_CONTROLLER);
+    if (!result) {
+        ANS_LOGE("Permission denied");
     }
-    // Add permission check in future
-    return true;
+    return result;
 }
 
 ErrCode AdvancedNotificationService::IsDistributedEnabled(bool &enabled)
@@ -2502,7 +2539,7 @@ ErrCode AdvancedNotificationService::EnableDistributed(bool enabled)
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2525,7 +2562,7 @@ ErrCode AdvancedNotificationService::EnableDistributedByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2590,7 +2627,7 @@ ErrCode AdvancedNotificationService::IsDistributedEnableByBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -2629,7 +2666,7 @@ ErrCode AdvancedNotificationService::GetDeviceRemindType(NotificationConstant::R
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3002,7 +3039,7 @@ ErrCode AdvancedNotificationService::IsSpecialUserAllowedNotify(const int32_t &u
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3022,7 +3059,7 @@ ErrCode AdvancedNotificationService::SetNotificationsEnabledByUser(const int32_t
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3091,7 +3128,7 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDate(const int32_t &userId,
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3112,7 +3149,7 @@ ErrCode AdvancedNotificationService::GetDoNotDisturbDate(const int32_t &userId,
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(GetClientBundleName())) {
+    if (!CheckPermission()) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
@@ -3225,24 +3262,12 @@ ErrCode AdvancedNotificationService::GetHasPoppedDialog(
 
 bool AdvancedNotificationService::CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption)
 {
-    AppExecFwk::BundleInfo bundleInfo;
+    ANS_LOGD("%{public}s", __FUNCTION__);
     std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
-    int32_t callingUserId;
-    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(bundleOption->GetUid(), callingUserId);
-    if (bundleManager != nullptr) {
-        if (!bundleManager->GetBundleInfoByBundleName(bundleOption->GetBundleName(), callingUserId, bundleInfo)) {
-            ANS_LOGW("Failed to GetBundleInfoByBundleName, bundlename = %{public}s",
-                bundleOption->GetBundleName().c_str());
-            return false;
-        }
+    if (bundleManager == nullptr) {
+        return false;
     }
-
-    for (auto abilityInfo : bundleInfo.abilityInfos) {
-        if (abilityInfo.isStageBasedModel) {
-            return false;
-        }
-    }
-    return true;
+    return bundleManager->CheckApiCompatibility(bundleOption);
 }
 
 void AdvancedNotificationService::OnResourceRemove(int32_t userId)

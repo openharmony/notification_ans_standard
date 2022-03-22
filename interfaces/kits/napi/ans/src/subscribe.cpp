@@ -1187,6 +1187,10 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             ANS_LOGI("Subscribe napi_create_async_work start");
+            if (!data) {
+                ANS_LOGE("Invalid asynccallbackinfo!");
+                return;
+            }
             AsyncCallbackInfoSubscribe *asynccallbackinfo = (AsyncCallbackInfoSubscribe *)data;
             if (asynccallbackinfo->subscriberInfo.hasSubscribeInfo) {
                 ANS_LOGI("Subscribe with NotificationSubscribeInfo");
@@ -1202,6 +1206,10 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Subscribe napi_create_async_work end");
+            if (!data) {
+                ANS_LOGE("Invalid asynccallbackinfo!");
+                return;
+            }
             AsyncCallbackInfoSubscribe *asynccallbackinfo = (AsyncCallbackInfoSubscribe *)data;
 
             Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));

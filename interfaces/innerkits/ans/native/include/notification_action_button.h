@@ -50,7 +50,7 @@ public:
             NotificationConstant::SemanticActionButton::NONE_ACTION_BUTTON,
         bool autoCreatedReplies = true,
         const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs = {},
-        const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs = {}, bool isContextual = false);
+        const std::shared_ptr<NotificationUserInput> &userInput = {}, bool isContextual = false);
 
     /**
      * A static function used to create a NotificationActionButton instance by copying parameters from an existing
@@ -130,11 +130,11 @@ public:
     void AddNotificationUserInput(const std::shared_ptr<NotificationUserInput> &userInput);
 
     /**
-     * Obtains the NotificationUserInput objects to be collected from the user when this NotificationActionButton
+     * Obtains the NotificationUserInput object to be collected from the user when this NotificationActionButton
      * is sent.
-     * @return the list of NotificationUserInput objects.
+     * @return the NotificationUserInput object.
      */
-    std::vector<std::shared_ptr<NotificationUserInput>> GetUserInputs() const;
+    const std::shared_ptr<NotificationUserInput> GetUserInput() const;
 
     /**
      * Sets whether to allow the platform to automatically generate possible replies and add them to
@@ -222,7 +222,7 @@ private:
         const std::shared_ptr<AAFwk::WantParams> &extras,
         NotificationConstant::SemanticActionButton semanticActionButton, bool autoCreatedReplies,
         const std::vector<std::shared_ptr<NotificationUserInput>> &mimeTypeOnlyInputs,
-        const std::vector<std::shared_ptr<NotificationUserInput>> &userInputs, bool isContextual);
+        const std::shared_ptr<NotificationUserInput> &userInput, bool isContextual);
 
     /**
      * Read a NotificationActionButton object from a Parcel.
@@ -240,7 +240,7 @@ private:
     };
     bool autoCreatedReplies_ {true};
     std::vector<std::shared_ptr<NotificationUserInput>> mimeTypeOnlyUserInputs_ {};
-    std::vector<std::shared_ptr<NotificationUserInput>> userInputs_ {};
+    std::shared_ptr<NotificationUserInput> userInput_ {};
     bool isContextual_ {false};
 };
 }  // namespace Notification

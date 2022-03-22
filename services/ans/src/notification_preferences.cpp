@@ -20,6 +20,7 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "bundle_manager_helper.h"
 #include "nlohmann/json.hpp"
 #include "os_account_manager.h"
 
@@ -316,7 +317,7 @@ ErrCode NotificationPreferences::GetNotificationSlotsNumForBundle(
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
     if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
-        num = bundleInfo.GetAllSlotsSize();
+        num = static_cast<int>(bundleInfo.GetAllSlotsSize());
     } else {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
@@ -611,6 +612,7 @@ ErrCode NotificationPreferences::CheckSlotForCreateSlot(const sptr<NotificationB
     if (!preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.SetBundleName(bundleOption->GetBundleName());
         bundleInfo.SetBundleUid(bundleOption->GetUid());
+        bundleInfo.SetEnableNotification(CheckApiCompatibility(bundleOption));
     }
     bundleInfo.SetSlot(slot);
     preferencesInfo.SetBundleInfo(bundleInfo);
@@ -635,6 +637,7 @@ ErrCode NotificationPreferences::CheckGroupForCreateSlotGroup(const sptr<Notific
     if (!preferencesInfo.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.SetBundleName(bundleOption->GetBundleName());
         bundleInfo.SetBundleUid(bundleOption->GetUid());
+        bundleInfo.SetEnableNotification(CheckApiCompatibility(bundleOption));
     } else {
         if (bundleInfo.GetGroupSize() >= MAX_SLOT_GROUP_NUM) {
             return ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_EXCEED_MAX_NUM;
@@ -745,6 +748,7 @@ ErrCode NotificationPreferences::SetBundleProperty(NotificationPreferencesInfo &
     if (!preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
         bundleInfo.SetBundleName(bundleOption->GetBundleName());
         bundleInfo.SetBundleUid(bundleOption->GetUid());
+        bundleInfo.SetEnableNotification(CheckApiCompatibility(bundleOption));
     }
 
     result = SaveBundleProperty(bundleInfo, bundleOption, type, value);
@@ -889,6 +893,16 @@ void NotificationPreferences::RemoveSettings(int32_t userId)
         preferncesDB_->RemoveNotificationEnable(userId);
         preferncesDB_->RemoveDoNotDisturbDate(userId);
     }
+}
+
+bool NotificationPreferences::CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption) const
+{
+    ANS_LOGD("%{public}s", __FUNCTION__);
+    std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
+    if (bundleManager == nullptr) {
+        return false;
+    }
+    return bundleManager->CheckApiCompatibility(bundleOption);
 }
 }  // namespace Notification
 }  // namespace OHOS

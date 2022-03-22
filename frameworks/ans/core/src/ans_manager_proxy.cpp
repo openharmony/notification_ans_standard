@@ -2316,7 +2316,7 @@ ErrCode AnsManagerProxy::GetValidReminders(std::vector<sptr<ReminderRequest>> &r
 ErrCode AnsManagerProxy::ReadReminders(
     uint8_t &count, MessageParcel &reply, std::vector<sptr<ReminderRequest>> &reminders)
 {
-    for (int i = 0; i < count; i++) {
+    for (uint8_t i = 0; i < count; i++) {
         uint8_t typeInfo = static_cast<uint8_t>(ReminderRequest::ReminderType::INVALID);
         if (!reply.ReadUint8(typeInfo)) {
             ANSR_LOGE("Failed to read reminder type");

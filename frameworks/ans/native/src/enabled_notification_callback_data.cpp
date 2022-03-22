@@ -96,7 +96,7 @@ EnabledNotificationCallbackData *EnabledNotificationCallbackData::Unmarshalling(
 bool EnabledNotificationCallbackData::ReadFromParcel(Parcel &parcel)
 {
     bundle_ = Str16ToStr8(parcel.ReadString16());
-    uid_ = parcel.ReadInt32();
+    uid_ = static_cast<uid_t>(parcel.ReadInt32());
     enable_ = parcel.ReadBool();
 
     return true;

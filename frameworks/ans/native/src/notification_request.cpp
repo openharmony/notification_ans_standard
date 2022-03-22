@@ -1583,19 +1583,19 @@ void NotificationRequest::ConvertJsonToNum(NotificationRequest *target, const nl
     }
 
     if (jsonObject.find("creatorUid") != jsonEnd) {
-        target->creatorUid_ = jsonObject.at("creatorUid").get<uint32_t>();
+        target->creatorUid_ = jsonObject.at("creatorUid").get<int32_t>();
     }
 
     if (jsonObject.find("creatorPid") != jsonEnd) {
-        target->creatorPid_ = jsonObject.at("creatorPid").get<uint32_t>();
+        target->creatorPid_ = jsonObject.at("creatorPid").get<int32_t>();
     }
 
     if (jsonObject.find("creatorUserId") != jsonEnd) {
-        target->creatorUserId_ = jsonObject.at("creatorUserId").get<uint32_t>();
+        target->creatorUserId_ = jsonObject.at("creatorUserId").get<int32_t>();
     }
 
     if (jsonObject.find("receiverUserId") != jsonEnd) {
-        target->receiverUserId_ = jsonObject.at("receiverUserId").get<uint32_t>();
+        target->receiverUserId_ = jsonObject.at("receiverUserId").get<int32_t>();
     }
 }
 

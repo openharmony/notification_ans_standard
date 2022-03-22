@@ -36,8 +36,8 @@ std::mutex ReminderDataManager::SHOW_MUTEX;
 std::mutex ReminderDataManager::ALERT_MUTEX;
 std::mutex ReminderDataManager::TIMER_MUTEX;
 
-void ReminderDataManager::PublishReminder(sptr<ReminderRequest> &reminder,
-    sptr<NotificationBundleOption> &bundleOption)
+void ReminderDataManager::PublishReminder(const sptr<ReminderRequest> &reminder,
+    const sptr<NotificationBundleOption> &bundleOption)
 {
     if (CheckReminderLimitExceededLocked(bundleOption->GetBundleName())) {
         return;
@@ -160,7 +160,7 @@ void ReminderDataManager::CancelAllReminders(const sptr<NotificationBundleOption
 }
 
 void ReminderDataManager::GetValidReminders(
-    const sptr<NotificationBundleOption> bundleOption, std::vector<sptr<ReminderRequest>> &reminders)
+    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<ReminderRequest>> &reminders)
 {
     std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
     for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
@@ -201,7 +201,7 @@ void ReminderDataManager::OnServiceStart()
     StartRecentReminder();
 }
 
-void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOption> bundleOption)
+void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOption> &bundleOption)
 {
     std::string bundleName = bundleOption->GetBundleName();
     int32_t uid = bundleOption->GetUid();
@@ -237,7 +237,7 @@ void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOptio
 std::shared_ptr<ReminderTimerInfo> ReminderDataManager::CreateTimerInfo(TimerType type) const
 {
     auto sharedTimerInfo = std::make_shared<ReminderTimerInfo>();
-    if (sharedTimerInfo->TIMER_TYPE_WAKEUP > UINT8_MAX || sharedTimerInfo->TIMER_TYPE_EXACT > UINT8_MAX) {
+    if ((sharedTimerInfo->TIMER_TYPE_WAKEUP > UINT8_MAX) || (sharedTimerInfo->TIMER_TYPE_EXACT > UINT8_MAX)) {
         ANSR_LOGE("Failed to set timer type.");
         return nullptr;
     }
@@ -376,7 +376,7 @@ std::shared_ptr<ReminderDataManager> ReminderDataManager::GetInstance()
 }
 
 std::shared_ptr<ReminderDataManager> ReminderDataManager::InitInstance(
-    sptr<AdvancedNotificationService> &advancedNotificationService)
+    const sptr<AdvancedNotificationService> &advancedNotificationService)
 {
     if (REMINDER_DATA_MANAGER == nullptr) {
         REMINDER_DATA_MANAGER = std::make_shared<ReminderDataManager>();
@@ -442,6 +442,10 @@ void ReminderDataManager::TerminateAlerting(const sptr<ReminderRequest> &reminde
     }
     ANSR_LOGD("publish(update) notification.(reminderId=%{public}d)", reminder->GetReminderId());
     UpdateNotification(reminder);
+    if (advancedNotificationService_ == nullptr) {
+        ANSR_LOGE("Ans instance is null.");
+        return;
+    }
     advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
     store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
 }
@@ -642,6 +646,10 @@ void ReminderDataManager::SnoozeReminderImpl(sptr<ReminderRequest> &reminder)
     }
     ANSR_LOGD("publish(update) notification.(reminderId=%{public}d)", reminder->GetReminderId());
     UpdateNotification(reminder);
+    if (advancedNotificationService_ == nullptr) {
+        ANSR_LOGE("Ans instance is null");
+        return;
+    }
     advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
     StartRecentReminder();
 }
@@ -773,24 +781,6 @@ sptr<ReminderRequest> ReminderDataManager::GetRecentReminderLocked()
     return nullptr;
 }
 
-std::vector<sptr<ReminderRequest>> ReminderDataManager::GetSameBundleRemindersLocked(std::string &bundleName)
-{
-    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
-    std::vector<sptr<ReminderRequest>> reminders;
-    for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
-        sptr<NotificationBundleOption>  bundleOption = FindNotificationBundleOption((*it)->GetReminderId());
-        if (bundleOption == nullptr) {
-            ANSR_LOGW("GetSameBundleRemindersLocked get notificationBundleOption(reminderId=%{public}d) fail",
-                (*it)->GetReminderId());
-            continue;
-        }
-        if (bundleName == bundleOption->GetBundleName()) {
-            reminders.push_back((*it));
-        }
-    }
-    return reminders;
-}
-
 void ReminderDataManager::HandleImmediatelyShow(
     std::vector<sptr<ReminderRequest>> &showImmediately, bool isSysTimeChanged)
 {
@@ -805,7 +795,7 @@ void ReminderDataManager::HandleImmediatelyShow(
     }
 }
 
-sptr<ReminderRequest> ReminderDataManager::HandleRefreshReminder(uint8_t &type, sptr<ReminderRequest> &reminder)
+sptr<ReminderRequest> ReminderDataManager::HandleRefreshReminder(const uint8_t &type, sptr<ReminderRequest> &reminder)
 {
     reminder->SetReminderTimeInMilli(ReminderRequest::INVALID_LONG_LONG_VALUE);
     uint64_t triggerTimeBefore = reminder->GetTriggerTimeInMilli();
@@ -897,7 +887,7 @@ bool ReminderDataManager::IsReminderAgentReady() const
 }
 
 bool ReminderDataManager::IsBelongToSameApp(
-    const sptr<ReminderRequest> reminder, const std::string otherPkgName, const int otherUserId)
+    const sptr<ReminderRequest> reminder, const std::string &otherPkgName, const int otherUserId)
 {
     ANSR_LOGD("otherUserId=%{public}d, (currently, userId not support)", otherUserId);
     int32_t reminderId = reminder->GetReminderId();
@@ -919,7 +909,11 @@ void ReminderDataManager::LoadReminderFromDb()
     reminderVector_ = existReminders;
     ANSR_LOGD("LoadReminderFromDb, reminder size=%{public}d", reminderVector_.size());
     for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
-        sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption();
+        sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption();
+        if (bundleOption == nullptr) {
+            ANSR_LOGE("Failed to create bundleOption due to no memory.");
+            break;
+        }
         int32_t reminderId = (*it)->GetReminderId();
         if (!(store_->GetBundleOption(reminderId, bundleOption))) {
             ANSR_LOGE("Get bundle option fail, reminderId=%{public}d", reminderId);
@@ -932,7 +926,7 @@ void ReminderDataManager::LoadReminderFromDb()
             continue;
         }
     }
-    totalCount_ = reminderVector_.size();
+    totalCount_ = static_cast<int16_t>(reminderVector_.size());
     ReminderRequest::GLOBAL_ID = store_->GetMaxId() + 1;
 }
 
@@ -966,10 +960,14 @@ void ReminderDataManager::PlaySoundAndVibration(const sptr<ReminderRequest> &rem
 
 std::string ReminderDataManager::GetSoundUri(const sptr<ReminderRequest> &reminder)
 {
+    Uri uri = DEFAULT_NOTIFICATION_SOUND;
+    if (advancedNotificationService_ == nullptr) {
+        ANSR_LOGE("Ans instance is null.");
+        return uri.GetSchemeSpecificPart();
+    }
     sptr<NotificationBundleOption> bundle = FindNotificationBundleOption(reminder->GetReminderId());
     std::vector<sptr<NotificationSlot>> slots;
     ErrCode errCode = advancedNotificationService_->GetSlotsByBundle(bundle, slots);
-    Uri uri = DEFAULT_NOTIFICATION_SOUND;
     if (errCode != ERR_OK) {
         ANSR_LOGW("Get sound uri fail, use default sound instead.");
         return uri.GetSchemeSpecificPart();
@@ -1001,9 +999,13 @@ void ReminderDataManager::StopSoundAndVibration(const sptr<ReminderRequest> &rem
         return;
     }
     ANSR_LOGD("Stop sound and vibration, reminderId=%{public}d", reminder->GetReminderId());
-    soundPlayer_->Stop();
-    soundPlayer_->Release();
-    soundPlayer_ = nullptr;
+    if (soundPlayer_ == nullptr) {
+        ANSR_LOGW("Sound player is null");
+    } else {
+        soundPlayer_->Stop();
+        soundPlayer_->Release();
+        soundPlayer_ = nullptr;
+    }
     sptr<ReminderRequest> nullReminder = nullptr;
     SetAlertingReminder(nullReminder);
 }
@@ -1065,6 +1067,10 @@ void ReminderDataManager::StartTimerLocked(const sptr<ReminderRequest> &reminder
 void ReminderDataManager::StartTimer(const sptr<ReminderRequest> &reminderRequest, TimerType type)
 {
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
+    if (timer == nullptr) {
+        ANS_LOGE("Failed to start timer due to get TimeServiceClient is null.");
+        return;
+    }
     time_t now;
     (void)time(&now);  // unit is seconds.
     if (now < 0) {
@@ -1121,6 +1127,10 @@ void ReminderDataManager::StopTimerLocked(TimerType type)
 void ReminderDataManager::StopTimer(TimerType type)
 {
     sptr<MiscServices::TimeServiceClient> timer = MiscServices::TimeServiceClient::GetInstance();
+    if (timer == nullptr) {
+        ANSR_LOGE("Failed to stop timer due to get TimeServiceClient is null.");
+        return;
+    }
     uint64_t timerId = 0;
     switch (type) {
         case TimerType::TRIGGER_TIMER: {

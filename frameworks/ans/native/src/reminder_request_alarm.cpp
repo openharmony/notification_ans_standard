@@ -55,11 +55,11 @@ ReminderRequestAlarm::ReminderRequestAlarm(const ReminderRequestAlarm &other) : 
 
 void ReminderRequestAlarm::CheckParamValid() const
 {
-    if ((hour_ >= HOURS_PER_DAY) || (hour_ < 0)) {
+    if (hour_ >= HOURS_PER_DAY) {
         ANSR_LOGE("setted hour is not between [0, 24)");
         throw std::invalid_argument("setted hour is not between [0, 24)");
     }
-    if (minute_ < 0 || minute_ >= MINUTES_PER_HOUR) {
+    if (minute_ >= MINUTES_PER_HOUR) {
         ANSR_LOGE("setted minute is not between [0, 60)");
         throw std::invalid_argument("setted minute is not between [0, 60)");
     }
@@ -160,7 +160,12 @@ int8_t ReminderRequestAlarm::GetNextAlarm(const time_t now, const time_t target)
     if (repeatDays_ == 0) {
         return INVALID_INT_VALUE;
     }
-    int today = GetActualTime(TimeTransferType::WEEK, gmtime(&now)->tm_wday);
+    tm *nowTime = gmtime(&now);
+    if (nowTime == nullptr) {
+        ANSR_LOGE("Failed to get next alarm due to gmtime return null.");
+        return 0;
+    }
+    int today = GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday);
     int dayCount = now >= target ? 1 : 0;
     for (; dayCount <= DAYS_PER_WEEK; dayCount++) {
         int day = (today + dayCount) % DAYS_PER_WEEK;
