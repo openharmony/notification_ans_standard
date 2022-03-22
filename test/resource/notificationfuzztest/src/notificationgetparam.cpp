@@ -816,11 +816,11 @@ std::vector<sptr<OHOS::Notification::Notification>> GetParamNotificationSptrVect
 std::shared_ptr<OHOS::AbilityRuntime::WantAgent::PendingWant> GetParamPendingWant()
 {
     sptr<AAFwk::IWantSender> target = new WantSender();
-    sptr<IRemoteObject> whitelistToken = GetParamSptrRemote();
+    sptr<IRemoteObject> allowlistToken = GetParamSptrRemote();
     if (GetBoolParam()) {
         return std::make_shared<OHOS::AbilityRuntime::WantAgent::PendingWant>(target);
     } else {
-        return std::make_shared<OHOS::AbilityRuntime::WantAgent::PendingWant>(target, whitelistToken);
+        return std::make_shared<OHOS::AbilityRuntime::WantAgent::PendingWant>(target, allowlistToken);
     }
 }
 std::shared_ptr<OHOS::AbilityRuntime::AbilityRuntime::WantAgent::WantAgent> GetParamWantAgent()
