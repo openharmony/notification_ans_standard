@@ -3205,7 +3205,6 @@ napi_value Common::GetConversationalMessageOtherInfo(const napi_env &env, const 
         NAPI_ASSERT(env, valuetype == napi_string, "Wrong argument type. String expected.");
         NAPI_CALL(env, napi_get_value_string_utf8(env, uriResult, str, STR_MAX_SIZE - 1, &strLen));
         uri = str;
-        ANS_LOGI("conversationalMessage::uri = %{public}s", str);
     }
 
     std::shared_ptr<Uri> uriPtr = std::make_shared<Uri>(uri);
@@ -3274,7 +3273,6 @@ napi_value Common::GetMessageUserByString(const napi_env &env, const napi_value 
     NAPI_CALL(env, napi_get_value_string_utf8(env, uriResult, str, STR_MAX_SIZE - 1, &strLen));
     Uri uri(str);
     messageUser.SetUri(uri);
-    ANS_LOGI("MessageUser::uri = %{public}s", str);
 
     return NapiGetNull(env);
 }
