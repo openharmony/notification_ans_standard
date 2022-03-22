@@ -216,25 +216,23 @@ private:
         EXPECT_EQ(NotificationConstant::OTHER, notificationRequest.GetSlotType());
         std::vector<std::shared_ptr<NotificationActionButton>> actionButtons = notificationRequest.GetActionButtons();
         for (auto actionButton : actionButtons) {
-            std::vector<std::shared_ptr<NotificationUserInput>> userInputs = actionButton->GetUserInputs();
-            for (auto userInput : userInputs) {
-                EXPECT_EQ(NotificationConstant::FREE_FORM_INPUT, userInput->GetInputsSource(g_want));
-                EXPECT_EQ(nullptr, userInput->GetInputsFromWant(g_want));
-                std::map<std::string, std::shared_ptr<Uri>> map = userInput->GetMimeInputsFromWant(g_want, "");
-                EXPECT_EQ(unsigned(0), map.size());
-                EXPECT_EQ("inputKey", userInput->GetInputKey());
-                EXPECT_NE(nullptr, userInput->GetAdditionalData());
-                EXPECT_EQ(NotificationConstant::InputEditType::EDIT_DISABLED, userInput->GetEditType());
-                for (auto option : userInput->GetOptions()) {
-                    EXPECT_EQ("", option);
-                }
-                for (auto type : userInput->GetPermitMimeTypes()) {
-                    EXPECT_EQ("mimeType", type);
-                }
-                EXPECT_EQ(false, userInput->IsMimeTypeOnly());
-                EXPECT_EQ("tag", userInput->GetTag());
-                EXPECT_EQ(false, userInput->IsPermitFreeFormInput());
+            std::shared_ptr<NotificationUserInput> userInput = actionButton->GetUserInput();
+            EXPECT_EQ(NotificationConstant::FREE_FORM_INPUT, userInput->GetInputsSource(g_want));
+            EXPECT_EQ(nullptr, userInput->GetInputsFromWant(g_want));
+            std::map<std::string, std::shared_ptr<Uri>> map = userInput->GetMimeInputsFromWant(g_want, "");
+            EXPECT_EQ(unsigned(0), map.size());
+            EXPECT_EQ("inputKey", userInput->GetInputKey());
+            EXPECT_NE(nullptr, userInput->GetAdditionalData());
+            EXPECT_EQ(NotificationConstant::InputEditType::EDIT_DISABLED, userInput->GetEditType());
+            for (auto option : userInput->GetOptions()) {
+                EXPECT_EQ("", option);
             }
+            for (auto type : userInput->GetPermitMimeTypes()) {
+                EXPECT_EQ("mimeType", type);
+            }
+            EXPECT_EQ(false, userInput->IsMimeTypeOnly());
+            EXPECT_EQ("tag", userInput->GetTag());
+            EXPECT_EQ(false, userInput->IsPermitFreeFormInput());
         }
     }
 
@@ -1345,9 +1343,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_08000, Function
     std::shared_ptr<Media::PixelMap> dummyIcon;
     auto ab1 = NotificationActionButton::Create(dummyIcon, "ab1_title", wAgent2);
 
-    auto spUserInput3 = NotificationUserInput::Create("uikey3");
     auto spUserInput2 = NotificationUserInput::Create("uikey2");
-    ab1->AddNotificationUserInput(spUserInput3);
     ab1->AddNotificationUserInput(spUserInput2);
     auto spOnlyUserInput1 = NotificationUserInput::Create("uionlykey1");
     spOnlyUserInput1->SetPermitFreeFormInput(false);

@@ -185,11 +185,12 @@ private:
     void UpdateRecentNotification(sptr<Notification> &notification, bool isDelete, int reason);
 
     void AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate);
-    bool CheckPermission(const std::string &bundleName);
+    bool CheckPermission();
     ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
     bool GetActiveUserId(int& userId);
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
     bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);
+    ErrCode IsAllowedNotifySelf(const sptr<NotificationBundleOption> &bundleOption, bool &allowed);
 
     ErrCode SetNotificationRemindType(sptr<Notification> notification, bool isLocal);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
@@ -213,6 +214,8 @@ private:
     ErrCode GetDoNotDisturbDateByUser(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date);
     ErrCode SetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool hasPopped);
     ErrCode GetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool &hasPopped);
+    ErrCode GetAppTargetBundle(const sptr<NotificationBundleOption> &bundleOption,
+        sptr<NotificationBundleOption> &targetBundle);
 
 private:
     static sptr<AdvancedNotificationService> instance_;
