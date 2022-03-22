@@ -715,7 +715,7 @@ public:
      * @return Returns check result.
      */
     static ErrCode IsSupportTemplate(const std::string &templateName, bool &support);
-    
+
     /**
      * Checks whether this application has permission to publish notifications under the user.
      *

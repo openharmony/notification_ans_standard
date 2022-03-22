@@ -29,7 +29,7 @@ public:
      * Default constructor used to create an empty NotificationTemplate instance.
      */
     NotificationTemplate() = default;
-    
+
     /**
      * Default deconstructor used to deconstruct.
      */

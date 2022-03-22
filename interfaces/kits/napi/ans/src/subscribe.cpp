@@ -1165,7 +1165,6 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
         }
         return Common::NapiGetUndefined(env);
     }
-    ANS_LOGI("Subscribe objectInfo = %{public}p", objectInfo);
 
     AsyncCallbackInfoSubscribe *asynccallbackinfo = new (std::nothrow) AsyncCallbackInfoSubscribe {
         .env = env, .asyncWork = nullptr, .objectInfo = objectInfo, .subscriberInfo = subscriberInfo

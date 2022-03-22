@@ -224,7 +224,6 @@ void AsyncCompleteCallbackGetActiveNotificationCount(napi_env env, napi_status s
     } else {
         napi_create_int32(env, asynccallbackinfo->num, &result);
     }
-
     Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
     if (asynccallbackinfo->info.callback != nullptr) {
         napi_delete_reference(env, asynccallbackinfo->info.callback);
