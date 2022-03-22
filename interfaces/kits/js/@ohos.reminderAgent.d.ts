@@ -198,14 +198,14 @@ declare namespace reminderAgent {
     /**
      * Name of the package that is automatically started when the reminder arrives and the device is not in use.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     pkgName: string;
 
     /**
      * Name of the ability that is automatically started when the reminder arrives and the device is not in use.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     abilityName: string;
   }
@@ -250,21 +250,21 @@ declare namespace reminderAgent {
     /**
      * Ringing duration.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     ringDuration?: number;
 
     /**
      * Number of reminder snooze times.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     snoozeTimes?: number;
 
     /**
      * Reminder snooze interval.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     timeInterval?: number;
 
@@ -292,7 +292,7 @@ declare namespace reminderAgent {
     /**
      * Content to be displayed when the reminder is snoozing.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     snoozeContent?: string;
 
@@ -315,21 +315,21 @@ declare namespace reminderAgent {
     /**
      * Reminder time.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     dateTime: LocalDateTime;
 
     /**
      * Month in which the reminder repeats.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     repeatMonths?: Array<number>;
 
     /**
      * Date on which the reminder repeats.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     repeatDays?: Array<number>;
   }
@@ -377,42 +377,42 @@ declare namespace reminderAgent {
     /**
      * value of year.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     year: number;
 
     /**
      * value of month.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     month: number;
 
     /**
      * value of day.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     day: number;
 
     /**
      * value of hour.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     hour: number;
 
     /**
      * value of minute.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     minute: number;
 
     /**
      * value of minute.
      * @since 7
-     * @syscap SystemCapability.Notification.ReminderAgent.
+     * @syscap SystemCapability.Notification.ReminderAgent
      */
     second: number;
   }
