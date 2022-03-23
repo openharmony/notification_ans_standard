@@ -26,7 +26,7 @@ namespace OHOS {
 namespace Notification {
 class ReminderEventManager {
 public:
-    ReminderEventManager(std::shared_ptr<ReminderDataManager> &reminderDataManager);
+    explicit ReminderEventManager(std::shared_ptr<ReminderDataManager> &reminderDataManager);
     virtual ~ReminderEventManager() {};
     ReminderEventManager(ReminderEventManager &other) = delete;
     ReminderEventManager& operator = (const ReminderEventManager &other) = delete;
