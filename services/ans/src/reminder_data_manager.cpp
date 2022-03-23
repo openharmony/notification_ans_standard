@@ -196,7 +196,7 @@ void ReminderDataManager::OnServiceStart()
 {
     std::vector<sptr<ReminderRequest>> immediatelyShowReminders;
     GetImmediatelyShowRemindersLocked(immediatelyShowReminders);
-    ANSR_LOGD("immediatelyShowReminders size=%{public}d", immediatelyShowReminders.size());
+    ANSR_LOGD("immediatelyShowReminders size=%{public}zu", immediatelyShowReminders.size());
     HandleImmediatelyShow(immediatelyShowReminders, false);
     StartRecentReminder();
 }
@@ -907,7 +907,7 @@ void ReminderDataManager::LoadReminderFromDb()
     std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
     std::vector<sptr<ReminderRequest>> existReminders = store_->GetAllValidReminders();
     reminderVector_ = existReminders;
-    ANSR_LOGD("LoadReminderFromDb, reminder size=%{public}d", reminderVector_.size());
+    ANSR_LOGD("LoadReminderFromDb, reminder size=%{public}zu", reminderVector_.size());
     for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
         sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption();
         if (bundleOption == nullptr) {

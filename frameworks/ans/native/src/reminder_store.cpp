@@ -340,7 +340,7 @@ std::vector<sptr<ReminderRequest>> ReminderStore::GetReminders(const std::string
         reminders.push_back(reminder);
         queryResultSet->IsAtLastRow(isAtLastRow);
     }
-    ANSR_LOGD("Size=%{public}d", reminders.size());
+    ANSR_LOGD("Size=%{public}zu", reminders.size());
     return reminders;
 }
 
