@@ -196,15 +196,17 @@ std::string AnsImageUtil::HexToBin(const std::string &strHex)
         uint8_t cTemp = 0;
         for (size_t j = 0; j < TWO_TIMES; j++) {
             char cCur = strHex[TWO_TIMES * i + j];
+            uint8_t value = cTemp << SHIFT_FOUR;
             if (cCur >= '0' && cCur <= '9') {
-                cTemp = (cTemp << SHIFT_FOUR) + static_cast<uint8_t>(cCur - '0');
+                value += (cCur - '0');
             } else if (cCur >= 'a' && cCur <= 'f') {
-                cTemp = (cTemp << SHIFT_FOUR) + static_cast<uint8_t>(cCur - 'a' + NUM_TEN);
+                value += (cCur - 'a' + NUM_TEN);
             } else if (cCur >= 'A' && cCur <= 'F') {
-                cTemp = (cTemp << SHIFT_FOUR) + static_cast<uint8_t>(cCur - 'A' + NUM_TEN);
+                value += (cCur - 'A' + NUM_TEN);
             } else {
                 return {};
             }
+            cTemp = static_cast<uint8_t>(value);
         }
         strBin[i] = cTemp;
     }
