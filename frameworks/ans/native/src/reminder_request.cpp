@@ -1392,7 +1392,7 @@ bool ReminderRequest::UpdateNextReminder(const bool &force)
     } else {
         result = UpdateNextReminder();
     }
-    std::string info = result == true ? "success" : "no next";
+    std::string info = result ? "success" : "no next";
     ANSR_LOGI("updateNextReminder(id=%{public}d, %{public}s): force=%{public}d, trigger time is: %{public}s",
         reminderId_, info.c_str(), force,
         GetDateTimeInfo(static_cast<time_t>(triggerTimeInMilli_ / MILLI_SECONDS)).c_str());
