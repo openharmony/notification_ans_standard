@@ -287,7 +287,7 @@ ErrCode NotificationSubscriberManager::RemoveSubscriberInner(
 
     RemoveRecordInfo(record, subscribeInfo);
 
-    if (record->subscribedAll == false && record->bundleList_.empty()) {
+    if (!record->subscribedAll && record->bundleList_.empty()) {
         record->subscriber->AsObject()->RemoveDeathRecipient(recipient_);
 
         subscriberRecordList_.remove(record);
