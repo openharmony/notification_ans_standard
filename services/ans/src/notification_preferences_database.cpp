@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "notification_preferences_database.h"
 
 #include "ans_const_define.h"

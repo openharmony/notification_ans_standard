@@ -49,7 +49,7 @@ static const std::string DUMP_HELP_MSG =
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
     "  --distributed, -D            list all distributed notifications by remote device\n"
 #endif
-    "  --setRecentCount <N>         set the max count of recent notification keeping in memory\n";
+    "  --setRecentCount <N>         set the max count of recent notifications keeping in memory\n";
 }  // namespace
 
 NotificationShellCommand::NotificationShellCommand(int argc, char *argv[]) : ShellCommand(argc, argv, "anm_dump")
