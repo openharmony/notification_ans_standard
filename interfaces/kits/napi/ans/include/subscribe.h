@@ -52,6 +52,8 @@ public:
 
     void SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref);
 
+    bool SetObjectDeleting(bool status);
+
 private:
     void SetCancelCallbackInfo(const napi_env &env, const napi_ref &ref);
 
@@ -86,6 +88,9 @@ private:
     CallbackInfo disturbModeCallbackInfo_;
     CallbackInfo disturbDateCallbackInfo_;
     CallbackInfo enabledNotificationCallbackInfo_;
+
+    std::mutex delMutex_;
+    bool isDelete_ = false;
 };
 
 struct SubscriberInstancesInfo {
