@@ -3185,7 +3185,8 @@ ErrCode AdvancedNotificationService::SetDoNotDisturbDateByUser(const int32_t &us
         default:
             break;
     }
-    ANS_LOGD("Before set SetDoNotDisturbDate beginDate = %{public}lld, endDate = %{public}lld", beginDate, endDate);
+    ANS_LOGD("Before set SetDoNotDisturbDate beginDate = %{public}lld, endDate = %{public}lld",
+             (long long)beginDate, (long long)endDate);
     const sptr<NotificationDoNotDisturbDate> newConfig = new NotificationDoNotDisturbDate(
         date->GetDoNotDisturbType(),
         beginDate,
