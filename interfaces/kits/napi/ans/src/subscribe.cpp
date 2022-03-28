@@ -851,6 +851,17 @@ void SubscriberInstance::SetDisturbDateCallbackInfo(const napi_env &env, const n
     disturbDateCallbackInfo_.ref = ref;
 }
 
+bool SubscriberInstance::SetObjectDeleting(bool status)
+{
+    std::lock_guard<std::mutex> lock(delMutex_);
+    if (isDelete_ && isDelete_ == status) {
+        return false;
+    } else {
+        isDelete_ = status;
+        return true;
+    }
+}
+
 void SubscriberInstance::SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref)
 {
     if (type == CONSUME) {

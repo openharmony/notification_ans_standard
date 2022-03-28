@@ -100,8 +100,16 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
                 return;
             }
 
-            asynccallbackinfo->info.errorCode =
-                NotificationHelper::UnSubscribeNotification(*(asynccallbackinfo->objectInfo));
+            bool ret = asynccallbackinfo->objectInfo->SetObjectDeleting(true);
+            if (ret) {
+                asynccallbackinfo->info.errorCode =
+                    NotificationHelper::UnSubscribeNotification(*(asynccallbackinfo->objectInfo));
+                if (asynccallbackinfo->info.errorCode != ERR_OK) {
+                    asynccallbackinfo->objectInfo->SetObjectDeleting(false);
+                }
+            } else {
+                asynccallbackinfo->info.errorCode = ERR_ANS_SUBSCRIBER_ALREADY_DELETE;
+            }
         },
         [](napi_env env, napi_status status, void *data) {
             ANS_LOGI("Unsubscribe napi_create_async_work end");
