@@ -28,6 +28,7 @@
 #include "ans_log_wrapper.h"
 #include "ans_permission_def.h"
 #include "bundle_manager_helper.h"
+#include "display_manager.h"
 #include "ipc_skeleton.h"
 #include "notification_constant.h"
 #include "notification_filter.h"
@@ -67,10 +68,11 @@ constexpr int32_t DEFAULT_RECENT_COUNT = 16;
 
 constexpr int HOURS_IN_ONE_DAY = 24;
 
-constexpr int DIALOG_POSTION_X = 150;
-constexpr int DIALOG_POSTION_Y = 300;
-constexpr int DIALOG_WIDTH = 450;
-constexpr int DIALOG_HEIGHT = 300;
+constexpr int DIALOG_DEFAULT_WIDTH = 400;
+constexpr int DIALOG_DEFAULT_HEIGHT = 240;
+constexpr int WINDOW_DEFAULT_WIDTH = 720;
+constexpr int WINDOW_DEFAULT_HEIGHT = 1280;
+constexpr int UI_HALF = 2;
 
 struct RecentNotification {
     sptr<Notification> notification = nullptr;
@@ -1391,17 +1393,24 @@ ErrCode AdvancedNotificationService::RequestEnableNotification(const std::string
         return result;
     }
 
+    int positionX;
+    int positionY;
+    int width;
+    int height;
+    bool wideScreen;
+    GetDisplayPosition(positionX, positionY, width, height, wideScreen);
+
     const std::string params = std::string("{\"requestNotification\":\"Allowed to send notification?\", ") +
         std::string("\"allowButton\":\"Allow\", \"cancelButton\":\"Cancel\", \"uid\":\"") +
         std::to_string(bundleOption->GetUid()) + std::string("\"}");
     Ace::UIServiceMgrClient::GetInstance()->ShowDialog(
         "notification_dialog",
         params,
-        OHOS::Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
-        DIALOG_POSTION_X,
-        DIALOG_POSTION_Y,
-        DIALOG_WIDTH,
-        DIALOG_HEIGHT,
+        Rosen::WindowType::WINDOW_TYPE_SYSTEM_ALARM_WINDOW,
+        positionX,
+        positionY,
+        width,
+        height,
         [this](int32_t id, const std::string& event, const std::string& params) {
             ANS_LOGD("Dialog callback: %{public}s, %{public}s", event.c_str(), params.c_str());
             int32_t uid = std::stoi(params, nullptr);
@@ -3306,6 +3315,44 @@ void AdvancedNotificationService::OnBundleDataCleared(const sptr<NotificationBun
             }
         }
     }));
+}
+
+void AdvancedNotificationService::GetDisplayPosition(
+    int& offsetX, int& offsetY, int& width, int& height, bool& wideScreen)
+{
+    wideScreen = false;
+    auto display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    if (display == nullptr) {
+        ANS_LOGD("dialog GetDefaultDisplay fail, try again.");
+        display = Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    }
+
+    if (display != nullptr) {
+        ANS_LOGD("display size: %{public}d x %{public}d",
+            display->GetWidth(), display->GetHeight());
+        if (display->GetWidth() < display->GetHeight()) {
+            float widthRatio = 0.75f;
+            int heightRatio = 5;
+            width = static_cast<int>(display->GetWidth() * widthRatio);
+            height = display->GetHeight() / heightRatio;
+        } else {
+            int widthRatio = 3;
+            int heightRatio = 4;
+            wideScreen = true;
+            width = display->GetWidth() / widthRatio;
+            height = display->GetHeight() / heightRatio;
+        }
+        offsetX = (display->GetWidth() - width) / UI_HALF;
+        offsetY = (display->GetHeight() - height) / UI_HALF;
+    } else {
+        ANS_LOGD("dialog get display fail, use default wide.");
+        width = DIALOG_DEFAULT_WIDTH;
+        height = DIALOG_DEFAULT_HEIGHT;
+        offsetX = (WINDOW_DEFAULT_WIDTH - width) / UI_HALF;
+        offsetY = (WINDOW_DEFAULT_HEIGHT - height) / UI_HALF;
+    }
+    ANS_LOGD("GetDisplayPosition: %{public}d, %{public}d (%{public}d x %{public}d)",
+        offsetX, offsetY, width, height);
 }
 }  // namespace Notification
 }  // namespace OHOS

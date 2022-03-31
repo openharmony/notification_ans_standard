@@ -25,6 +25,9 @@ export default {
     },
     onInit() {
         console.info('getParams: ' + JSON.stringify(router.getParams()));
+        this.requestNotification = this.$t('message.requestNotification');
+        this.allowButton = this.$t('message.allowButton');
+        this.cancelButton = this.$t('message.cancelButton');
     },
     onAllow() {
         console.info('clicked allow');
