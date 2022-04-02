@@ -36,6 +36,8 @@ ohos_unittest("ans_reminder_unit_test") {
     "${native_path}/test/unittest/reminder_request_timer_test.cpp",
   ]
 
+  cflags_cc = [ "-fexceptions" ]
+
   configs = [ "//utils/native/base:utils_config" ]
 
   deps = [
@@ -71,5 +73,5 @@ group("unittest") {
   testonly = true
   deps = []
 
-  # deps += [ ":ans_reminder_unit_test" ]
+  deps += [ ":ans_reminder_unit_test" ]
 }
