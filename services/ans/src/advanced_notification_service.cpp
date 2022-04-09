@@ -1799,7 +1799,7 @@ ErrCode AdvancedNotificationService::CancelAllReminders()
     if (rdm == nullptr) {
         return ERR_NO_INIT;
     }
-    rdm->CancelAllReminders(bundleOption, userId);
+    rdm->CancelAllReminders(bundleOption->GetBundleName(), userId);
     return ERR_OK;
 }
 

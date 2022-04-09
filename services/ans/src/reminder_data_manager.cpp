@@ -20,12 +20,19 @@
 #include "common_event_support.h"
 #include "ipc_skeleton.h"
 #include "notification_slot.h"
+#include "os_account_manager.h"
 #include "reminder_event_manager.h"
 #include "time_service_client.h"
 #include "singleton.h"
 
 namespace OHOS {
 namespace Notification {
+namespace
+{
+const std::string ALL_PACKAGES = "allPackages";
+const int MAIN_USER_ID = 100;
+}
+
 const int16_t ReminderDataManager::MAX_NUM_REMINDER_LIMIT_SYSTEM = 2000;
 const int16_t ReminderDataManager::MAX_NUM_REMINDER_LIMIT_APP = 30;
 const uint8_t ReminderDataManager::TIME_ZONE_CHANGE = 0;
@@ -39,7 +46,7 @@ std::mutex ReminderDataManager::TIMER_MUTEX;
 void ReminderDataManager::PublishReminder(const sptr<ReminderRequest> &reminder,
     const sptr<NotificationBundleOption> &bundleOption)
 {
-    if (CheckReminderLimitExceededLocked(bundleOption->GetBundleName())) {
+    if (CheckReminderLimitExceededLocked(bundleOption)) {
         return;
     }
     UpdateAndSaveReminderLocked(reminder, bundleOption);
@@ -69,6 +76,98 @@ void ReminderDataManager::CancelReminder(
     StartRecentReminder();
 }
 
+void ReminderDataManager::CancelAllReminders(const std::string &packageName, const int &userId)
+{
+    ANSR_LOGD("CancelAllReminders, userId=%{public}d, pkgName=%{public}s",
+        userId, packageName.c_str());
+    CancelRemindersImplLocked(packageName, userId);
+}
+
+void ReminderDataManager::GetValidReminders(
+    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<ReminderRequest>> &reminders)
+{
+    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
+        if ((*it)->IsExpired()) {
+            continue;
+        }
+        int32_t reminderId = (*it)->GetReminderId();
+        auto mit = notificationBundleOptionMap_.find(reminderId);
+        if (mit == notificationBundleOptionMap_.end()) {
+            ANSR_LOGE("Get bundle option occur error, reminderId=%{public}d", reminderId);
+        } else {
+            if (IsBelongToSameApp(mit->second, bundleOption)) {
+                reminders.push_back(*it);
+            }
+        }
+    }
+}
+
+void ReminderDataManager::CancelAllReminders(const int &userId)
+{
+    ANSR_LOGD("CancelAllReminders, userId=%{public}d", userId);
+    CancelRemindersImplLocked(ALL_PACKAGES, userId);
+}
+
+void ReminderDataManager::CancelRemindersImplLocked(const std::string &packageName, const int &userId)
+{
+    MUTEX.lock();
+    if (activeReminderId_ != -1 && IsMatched(activeReminder_, packageName, userId)) {
+        activeReminder_->OnStop();
+        StopTimer(TimerType::TRIGGER_TIMER);
+        ANSR_LOGD("Stop active reminder, reminderId=%{public}d", activeReminderId_);
+    }
+    for (auto vit = reminderVector_.begin(); vit != reminderVector_.end();) {
+        int32_t reminderId = (*vit)->GetReminderId();
+        auto mit = notificationBundleOptionMap_.find(reminderId);
+        if (mit == notificationBundleOptionMap_.end()) {
+            ANSR_LOGE("Get bundle option occur error, reminderId=%{public}d", reminderId);
+            ++vit;
+            continue;
+        }
+        if (IsMatched(*vit, packageName, userId)) {
+            if ((*vit)->IsAlerting()) {
+                StopAlertingReminder(*vit);
+            }
+            CancelNotification(*vit);
+            RemoveFromShowedReminders(*vit);
+            ANSR_LOGD("Containers(vector/map) remove. reminderId=%{public}d", reminderId);
+            vit = reminderVector_.erase(vit);
+            notificationBundleOptionMap_.erase(mit);
+            totalCount_--;
+            continue;
+        }
+        ++vit;
+    }
+    if (packageName == ALL_PACKAGES) {
+        store_->DeleteUser(userId);
+    } else {
+        store_->Delete(packageName, userId);
+    }
+    MUTEX.unlock();
+    StartRecentReminder();
+}
+
+bool ReminderDataManager::IsMatched(const sptr<ReminderRequest> &reminder,
+    const std::string &packageName, const int &userId) const
+{
+    auto mit = notificationBundleOptionMap_.find(reminder->GetReminderId());
+    if (mit == notificationBundleOptionMap_.end()) {
+        ANS_LOGE("Failed to get bundle information. reminderId=%{public}d", reminder->GetReminderId());
+        return true;
+    }
+    if (ReminderRequest::GetUserId(mit->second->GetUid()) != userId) {
+        return false;
+    }
+    if (packageName == ALL_PACKAGES) {
+        return true;
+    }
+    if (mit->second->GetBundleName() == packageName) {
+        return true;
+    }
+    return false;
+}
+
 void ReminderDataManager::CancelNotification(const sptr<ReminderRequest> &reminder) const
 {
     if (!(reminder->IsShowing())) {
@@ -90,7 +189,7 @@ void ReminderDataManager::CancelNotification(const sptr<ReminderRequest> &remind
         notification->GetNotificationId(), ReminderRequest::NOTIFICATION_LABEL, bundleOption);
 }
 
-bool ReminderDataManager::CheckReminderLimitExceededLocked(const std::string &bundleName) const
+bool ReminderDataManager::CheckReminderLimitExceededLocked(const sptr<NotificationBundleOption> &bundleOption) const
 {
     std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
     if (totalCount_ >= ReminderDataManager::MAX_NUM_REMINDER_LIMIT_SYSTEM) {
@@ -107,7 +206,7 @@ bool ReminderDataManager::CheckReminderLimitExceededLocked(const std::string &bu
         if (mit == notificationBundleOptionMap_.end()) {
             ANSR_LOGE("Error occur when get bundle option, reminderId=%{public}d", (*it)->GetReminderId());
         } else {
-            if (mit->second->GetBundleName() == bundleName) {
+            if (IsBelongToSameApp(mit->second, bundleOption)) {
                 count++;
             }
         }
@@ -118,65 +217,6 @@ bool ReminderDataManager::CheckReminderLimitExceededLocked(const std::string &bu
         return true;
     }
     return false;
-}
-
-void ReminderDataManager::CancelAllReminders(const sptr<NotificationBundleOption> &bundleOption, int userId)
-{
-    MUTEX.lock();
-    auto it = notificationBundleOptionMap_.find(activeReminderId_);
-    if (it != notificationBundleOptionMap_.end()) {
-        if (it->second->GetBundleName() == bundleOption->GetBundleName()) {
-            activeReminder_->OnStop();
-            StopTimer(TimerType::TRIGGER_TIMER);
-            ANSR_LOGD("Stop active reminder, reminderId=%{public}d", activeReminderId_);
-        }
-    }
-    for (auto vit = reminderVector_.begin(); vit != reminderVector_.end();) {
-        int32_t reminderId = (*vit)->GetReminderId();
-        auto mit = notificationBundleOptionMap_.find(reminderId);
-        if (mit == notificationBundleOptionMap_.end()) {
-            ANSR_LOGE("Get bundle option occur error, reminderId=%{public}d", reminderId);
-            ++vit;
-            continue;
-        }
-        if (mit->second->GetBundleName() == bundleOption->GetBundleName()) {
-            ANSR_LOGD("currently, userId is not supported. userId=%{public}d", userId);
-            if ((*vit)->IsAlerting()) {
-                StopAlertingReminder(*vit);
-            }
-            CancelNotification(*vit);
-            RemoveFromShowedReminders(*vit);
-            ANSR_LOGD("Containers(vector/map) remove. reminderId=%{public}d", reminderId);
-            vit = reminderVector_.erase(vit);
-            notificationBundleOptionMap_.erase(mit);
-            totalCount_--;
-            store_->Delete(reminderId);
-            continue;
-        }
-        ++vit;
-    }
-    MUTEX.unlock();
-    StartRecentReminder();
-}
-
-void ReminderDataManager::GetValidReminders(
-    const sptr<NotificationBundleOption> &bundleOption, std::vector<sptr<ReminderRequest>> &reminders)
-{
-    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
-    for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
-        if ((*it)->IsExpired()) {
-            continue;
-        }
-        int32_t reminderId = (*it)->GetReminderId();
-        auto mit = notificationBundleOptionMap_.find(reminderId);
-        if (mit == notificationBundleOptionMap_.end()) {
-            ANSR_LOGE("Get bundle option occur error, reminderId=%{public}d", reminderId);
-        } else {
-            if (mit->second->GetBundleName() == bundleOption->GetBundleName()) {
-                reminders.push_back(*it);
-            }
-        }
-    }
 }
 
 void ReminderDataManager::AddToShowedReminders(const sptr<ReminderRequest> &reminder)
@@ -192,6 +232,16 @@ void ReminderDataManager::AddToShowedReminders(const sptr<ReminderRequest> &remi
     showedReminderVector_.push_back(reminder);
 }
 
+void ReminderDataManager::OnRemoveUser(const int& userId)
+{
+    ANSR_LOGD("Remove user id: %{public}d", userId);
+    if (!IsReminderAgentReady()) {
+        ANSR_LOGW("Give up to remove user id: %{public}d for reminderAgent is not ready", userId);
+        return;
+    }
+    CancelAllReminders(userId);
+}
+
 void ReminderDataManager::OnServiceStart()
 {
     std::vector<sptr<ReminderRequest>> immediatelyShowReminders;
@@ -199,6 +249,16 @@ void ReminderDataManager::OnServiceStart()
     ANSR_LOGD("immediatelyShowReminders size=%{public}zu", immediatelyShowReminders.size());
     HandleImmediatelyShow(immediatelyShowReminders, false);
     StartRecentReminder();
+}
+
+void ReminderDataManager::OnSwitchUser(const int& userId)
+{
+    ANSR_LOGD("Switch user id from %{public}d to %{public}d", currentUserId_, userId);
+    currentUserId_ = userId;
+    std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
+    if ((alertingReminderId_ != -1) && IsReminderAgentReady()) {
+        TerminateAlerting(alertingReminder_, "OnSwitchUser");
+    }
 }
 
 void ReminderDataManager::OnProcessDiedLocked(const sptr<NotificationBundleOption> &bundleOption)
@@ -327,6 +387,7 @@ sptr<NotificationBundleOption> ReminderDataManager::FindNotificationBundleOption
 {
     auto it = notificationBundleOptionMap_.find(reminderId);
     if (it == notificationBundleOptionMap_.end()) {
+        ANSR_LOGW("Failed to get bundle option.");
         return nullptr;
     } else {
         return it->second;
@@ -476,6 +537,52 @@ void ReminderDataManager::SetService(AdvancedNotificationService *advancedNotifi
     advancedNotificationService_ = advancedNotificationService;
 }
 
+bool ReminderDataManager::ShouldAlert(const sptr<ReminderRequest> &reminder) const
+{
+    if (reminder == nullptr) {
+        return false;
+    }
+    int32_t reminderId = reminder->GetReminderId();
+    sptr<NotificationBundleOption> bundleOption = FindNotificationBundleOption(reminderId);
+    if (bundleOption == nullptr) {
+        ANSR_LOGD("The reminder (reminderId=%{public}d) is silent", reminderId);
+        return false;
+    }
+    int userId = ReminderRequest::GetUserId(bundleOption->GetUid());
+    if (currentUserId_ != userId) {
+        ANSR_LOGD("The reminder (reminderId=%{public}d) is silent for not in active user, " \
+            "current user id: %{public}d, reminder user id: %{public}d", reminderId, currentUserId_, userId);
+        return false;
+    }
+
+    sptr<NotificationDoNotDisturbDate> date;
+    ErrCode errCode = advancedNotificationService_->GetDoNotDisturbDate(date);
+    if (errCode != ERR_OK) {
+        ANSR_LOGE("The reminder (reminderId=%{public}d) is silent for get disturbDate error", reminderId);
+        return false;
+    }
+    if (date->GetDoNotDisturbType() == NotificationConstant::DoNotDisturbType::NONE) {
+        return true;
+    }
+    std::vector<sptr<NotificationSlot>> slots;
+    errCode = advancedNotificationService_->GetSlotsByBundle(bundleOption, slots);
+    if (errCode != ERR_OK) {
+        ANSR_LOGE("The reminder (reminderId=%{public}d) is silent for get slots error", reminderId);
+        return false;
+    }
+    for (auto slot : slots) {
+        if (slot->GetType() != reminder->GetSlotType()) {
+            continue;
+        }
+        if (slot->IsEnableBypassDnd()) {
+            ANSR_LOGD("Not silent for enable by pass Dnd, reminderId=%{public}d", reminderId);
+            return true;
+        }
+    }
+    ANSR_LOGD("The reminder (reminderId=%{public}d) is silent for Dnd", reminderId);
+    return false;
+}
+
 void ReminderDataManager::ShowActiveReminder(const EventFwk::Want &want)
 {
     int32_t reminderId = static_cast<int32_t>(want.GetIntParam(ReminderRequest::PARAM_REMINDER_ID, -1));
@@ -571,9 +678,17 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
     if (advancedNotificationService_ == nullptr) {
         ANSR_LOGE("ShowReminder fail");
         reminder->OnShow(false, isSysTimeChanged, false);
+        store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
         return;
     }
-    reminder->OnShow(isNeedToPlaySound, isSysTimeChanged, true);
+    if (!IsAllowedNotify(reminder)) {
+        ANSR_LOGD("Not allow to notify.");
+        reminder->OnShow(false, isSysTimeChanged, false);
+        store_->UpdateOrInsert(reminder, FindNotificationBundleOption(reminder->GetReminderId()));
+        return;
+    }
+    bool toPlaySound = isNeedToPlaySound && ShouldAlert(reminder) ? true : false;
+    reminder->OnShow(toPlaySound, isSysTimeChanged, true);
     AddToShowedReminders(reminder);
     UpdateNotification(reminder);  // this should be called after OnShow
     ANSR_LOGD("publish notification.(reminderId=%{public}d)", reminder->GetReminderId());
@@ -582,7 +697,7 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
         reminder->OnShowFail();
         RemoveFromShowedReminders(reminder);
     } else {
-        if (isNeedToPlaySound) {
+        if (toPlaySound) {
             PlaySoundAndVibration(reminder);  // play sound and vibration
             if (needScheduleTimeout) {
                 StartTimer(reminder, TimerType::ALERTING_TIMER);
@@ -824,6 +939,12 @@ void ReminderDataManager::HandleSameNotificationIdShowing(const sptr<ReminderReq
     int32_t notificationId = reminder->GetNotificationId();
     ANSR_LOGD("HandleSameNotificationIdShowing notificationId=%{public}d", notificationId);
     int32_t curReminderId = reminder->GetReminderId();
+    auto mit = notificationBundleOptionMap_.find(curReminderId);
+    if (mit == notificationBundleOptionMap_.end()) {
+        ANSR_LOGE("Error occur when get bundle option, reminderId=%{public}d", curReminderId);
+        return;
+    }
+
     for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
         int32_t tmpId = (*it)->GetReminderId();
         if (tmpId == curReminderId) {
@@ -837,8 +958,7 @@ void ReminderDataManager::HandleSameNotificationIdShowing(const sptr<ReminderReq
             ANSR_LOGW("Get notificationBundleOption(reminderId=%{public}d) fail", tmpId);
             continue;
         }
-        if (notificationId == (*it)->GetNotificationId() &&
-            IsBelongToSameApp(reminder, bundleOption->GetBundleName(), 0)) {
+        if (notificationId == (*it)->GetNotificationId() && IsBelongToSameApp(bundleOption, mit->second)) {
             if ((*it)->IsAlerting()) {
                 StopAlertingReminder(*it);
             }
@@ -863,8 +983,22 @@ void ReminderDataManager::Init(bool isFromBootComplete)
         return;
     }
     LoadReminderFromDb();
+    InitUserId();
     isReminderAgentReady_ = true;
     ANSR_LOGD("ReminderAgent is ready.");
+}
+
+void ReminderDataManager::InitUserId()
+{
+    std::vector<int> activeUserId;
+    AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeUserId);
+    if (activeUserId.size() > 0) {
+        currentUserId_ = activeUserId[0];
+        ANSR_LOGD("Init user id=%{public}d", currentUserId_);
+    } else {
+        currentUserId_ = MAIN_USER_ID;
+        ANSR_LOGE("Failed to get active user id.");
+    }
 }
 
 void ReminderDataManager::GetImmediatelyShowRemindersLocked(std::vector<sptr<ReminderRequest>> &reminders) const
@@ -881,25 +1015,37 @@ void ReminderDataManager::GetImmediatelyShowRemindersLocked(std::vector<sptr<Rem
     }
 }
 
+bool ReminderDataManager::IsAllowedNotify(const sptr<ReminderRequest> &reminder) const
+{
+    if (reminder == nullptr) {
+        return false;
+    }
+    int32_t reminderId = reminder->GetReminderId();
+    auto mit = notificationBundleOptionMap_.find(reminderId);
+    if (mit == notificationBundleOptionMap_.end()) {
+        ANSR_LOGE("Get bundle option occur error, reminderId=%{public}d", reminderId);
+        return false;
+    }
+    bool isAllowed = false;
+    ErrCode errCode = advancedNotificationService_->IsSpecialBundleAllowedNotify(mit->second, isAllowed);
+    if (errCode != ERR_OK) {
+        ANSR_LOGE("Failed to call IsSpecialBundleAllowedNotify, errCode=%{public}d", errCode);
+        return false;
+    }
+    return isAllowed;
+}
+
 bool ReminderDataManager::IsReminderAgentReady() const
 {
     return isReminderAgentReady_;
 }
 
-bool ReminderDataManager::IsBelongToSameApp(
-    const sptr<ReminderRequest> reminder, const std::string &otherPkgName, const int otherUserId)
+bool ReminderDataManager::IsBelongToSameApp(const sptr<NotificationBundleOption> &bundleOption,
+    const sptr<NotificationBundleOption> &other) const
 {
-    ANSR_LOGD("otherUserId=%{public}d, (currently, userId not support)", otherUserId);
-    int32_t reminderId = reminder->GetReminderId();
-    sptr<NotificationBundleOption>  bundleOption = FindNotificationBundleOption(reminderId);
-    if (bundleOption == nullptr) {
-        ANSR_LOGW("IsBelongToSameApp get notificationBundleOption(reminderId=%{public}d) fail", reminderId);
-        return false;
-    }
-    if (bundleOption->GetBundleName() == otherPkgName) {
-        return true;
-    }
-    return false;
+    int userIdSrc = ReminderRequest::GetUserId(bundleOption->GetUid());
+    int userIdTar = ReminderRequest::GetUserId(other->GetUid());
+    return ((bundleOption->GetBundleName() == other->GetBundleName()) && (userIdSrc == userIdTar)) ? true : false;
 }
 
 void ReminderDataManager::LoadReminderFromDb()
@@ -911,8 +1057,8 @@ void ReminderDataManager::LoadReminderFromDb()
     for (auto it = reminderVector_.begin(); it != reminderVector_.end(); ++it) {
         sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption();
         if (bundleOption == nullptr) {
-            ANSR_LOGE("Failed to create bundleOption due to no memory.");
-            break;
+            ANS_LOGE("Failed to create bundle option due to low memory.");
+            return;
         }
         int32_t reminderId = (*it)->GetReminderId();
         if (!(store_->GetBundleOption(reminderId, bundleOption))) {

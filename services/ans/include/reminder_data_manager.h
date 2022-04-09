@@ -41,10 +41,10 @@ public:
     /**
      * @brief Cancels all the reminders relative to the bundle option.
      *
-     * @param bundleOption Indicates the bundle option.
+     * @param packageName Indicates the package name.
      * @param userId Indicates the user id which the bundle belong to.
      */
-    void CancelAllReminders(const sptr<NotificationBundleOption> &bundleOption, int userId);
+    void CancelAllReminders(const std::string &packageName, const int &userId);
 
     /**
      * @brief Cancels the target reminder relative to the reminder id and bundle option.
@@ -95,7 +95,13 @@ public:
      */
     void Init(bool isFromBootComplete);
 
+    void InitUserId();
+
+    void OnRemoveUser(const int& userId);
+
     void OnServiceStart();
+
+    void OnSwitchUser(const int& userId);
 
     /**
      * @brief Triggered when third party application died.
@@ -125,6 +131,8 @@ public:
      * @param Indicates the single instance of ans notification service.
      */
     void SetService(AdvancedNotificationService *advancedNotificationService);
+
+    bool ShouldAlert(const sptr<ReminderRequest> &reminder) const;
 
     /**
      * @brief Show the reminder.
@@ -185,6 +193,16 @@ private:
      */
     void AddToShowedReminders(const sptr<ReminderRequest> &reminder);
 
+    void CancelAllReminders(const int &userId);
+
+    /**
+     * @brief Cancels all the reminders of the target bundle or user.
+     *
+     * @param packageName Indicates the packageName need to cancel.
+     * @param userId Indicates the userId to cancel.
+     */
+    void CancelRemindersImplLocked(const std::string &packageName, const int &userId);
+
     /**
      * Cancels the notification relative to the reminder.
      *
@@ -198,7 +216,7 @@ private:
      * @param bundleName Indicates the target bundle.
      * @return true if number limit is exceeded.
      */
-    bool CheckReminderLimitExceededLocked(const std::string &bundleName) const;
+    bool CheckReminderLimitExceededLocked(const sptr<NotificationBundleOption> &bundleOption) const;
     void CloseReminder(const sptr<ReminderRequest> &reminder, bool cancelNotification);
 
     /**
@@ -269,18 +287,29 @@ private:
 
     bool HandleSysTimeChange(const sptr<ReminderRequest> reminder) const;
 
-    bool IsReminderAgentReady() const;
-
     /**
-     * Judge the two reminders is belong to the same application or not.
+     * @brief Judge the two reminders is belong to the same application or not.
      *
-     * @param reminder Indicates the first reminder.
-     * @param otherPkgName Indicates the package name of second reminder.
-     * @param otherUserId Indicates the user id of second reminder.
+     * @param bundleOption Indicates the bundleOption of first reminder.
+     * @param other Indicates the bundleOption of second reminder.
      * @return true if the two reminders belong to the same application.
      */
-    bool IsBelongToSameApp(
-        const sptr<ReminderRequest> reminder, const std::string &otherPkgName, const int otherUserId);
+    bool IsBelongToSameApp(const sptr<NotificationBundleOption> &bundleOption,
+        const sptr<NotificationBundleOption> &other) const;
+
+    /**
+     * @brief Judges whether the reminder is matched with the bundleOption or userId.
+     *
+     * @param reminder Indicates the target reminder.
+     * @param packageName Indicates the package name.
+     * @param userId Indicates the user id.
+     * @return true If the reminder is matched with the bundleOption or userId.
+     */
+    bool IsMatched(const sptr<ReminderRequest> &reminder, const std::string &packageName, const int &userId) const;
+
+    bool IsAllowedNotify(const sptr<ReminderRequest> &reminder) const;
+
+    bool IsReminderAgentReady() const;
 
     void LoadReminderFromDb();
 
@@ -462,6 +491,7 @@ private:
      * Indicates the total count of reminders in system.
      */
     int16_t totalCount_ {0};
+    int currentUserId_ {0};
     sptr<AdvancedNotificationService> advancedNotificationService_ = nullptr;
     std::shared_ptr<ReminderStore> store_ = nullptr;
 };

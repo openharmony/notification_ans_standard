@@ -147,7 +147,7 @@ int32_t ReminderStore::DeleteUser(int32_t userId)
 
 int32_t ReminderStore::Delete(const std::string &pkg, int32_t userId)
 {
-    std::string deleteCondition = ReminderRequest::PKG_NAME + " = " + pkg + " and "
+    std::string deleteCondition = ReminderRequest::PKG_NAME + " = \"" + pkg + "\" and "
         + ReminderRequest::USER_ID + " = " + std::to_string(userId);
     return ReminderStore::Delete(deleteCondition);
 }
