@@ -27,8 +27,7 @@
 
 namespace OHOS {
 namespace Notification {
-namespace
-{
+namespace {
 const std::string ALL_PACKAGES = "allPackages";
 const int MAIN_USER_ID = 100;
 }
@@ -768,8 +767,6 @@ void ReminderDataManager::SnoozeReminderImpl(sptr<ReminderRequest> &reminder)
     advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
     StartRecentReminder();
 }
-
-// snoozeReminder(bool snoozeAll)
 
 void ReminderDataManager::StartRecentReminder()
 {
