@@ -134,11 +134,11 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
         return;
     }
     if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        reminderDataManager_->OnSwitchUser(data.GetCode());
+        reminderDataManager_->OnUserSwitch(data.GetCode());
         return;
     }
     if (action == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
-        reminderDataManager_->OnRemoveUser(data.GetCode());
+        reminderDataManager_->OnUserRemove(data.GetCode());
         return;
     }
 }

@@ -231,7 +231,7 @@ void ReminderDataManager::AddToShowedReminders(const sptr<ReminderRequest> &remi
     showedReminderVector_.push_back(reminder);
 }
 
-void ReminderDataManager::OnRemoveUser(const int& userId)
+void ReminderDataManager::OnUserRemove(const int& userId)
 {
     ANSR_LOGD("Remove user id: %{public}d", userId);
     if (!IsReminderAgentReady()) {
@@ -250,13 +250,13 @@ void ReminderDataManager::OnServiceStart()
     StartRecentReminder();
 }
 
-void ReminderDataManager::OnSwitchUser(const int& userId)
+void ReminderDataManager::OnUserSwitch(const int& userId)
 {
     ANSR_LOGD("Switch user id from %{public}d to %{public}d", currentUserId_, userId);
     currentUserId_ = userId;
     std::lock_guard<std::mutex> lock(ReminderDataManager::MUTEX);
     if ((alertingReminderId_ != -1) && IsReminderAgentReady()) {
-        TerminateAlerting(alertingReminder_, "OnSwitchUser");
+        TerminateAlerting(alertingReminder_, "OnUserSwitch");
     }
 }
 
