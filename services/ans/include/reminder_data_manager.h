@@ -97,11 +97,11 @@ public:
 
     void InitUserId();
 
-    void OnRemoveUser(const int& userId);
+    void OnUserRemove(const int& userId);
 
     void OnServiceStart();
 
-    void OnSwitchUser(const int& userId);
+    void OnUserSwitch(const int& userId);
 
     /**
      * @brief Triggered when third party application died.
