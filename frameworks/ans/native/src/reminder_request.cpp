@@ -1544,6 +1544,7 @@ int32_t ReminderRequest::GetUid(const int &userId, const std::string &bundleName
     sptr<AppExecFwk::IBundleMgr> bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
     bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO,
         static_cast<int32_t>(userId), info);
+    ANSR_LOGD("uid=%{public}d", info.uid);
     return static_cast<int32_t>(info.uid);
 }
 
@@ -1551,6 +1552,7 @@ int ReminderRequest::GetUserId(const int &uid)
 {
     int userId = -1;
     AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+    ANSR_LOGD("userId=%{public}d", userId);
     return userId;
 }
 

@@ -47,6 +47,8 @@ void ReminderEventManager::init(std::shared_ptr<ReminderDataManager> &reminderDa
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_PACKAGE_RESTARTED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED);
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_REMOVED);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     auto subscriber = std::make_shared<ReminderEventSubscriber>(subscriberInfo, reminderDataManager);
 
@@ -131,6 +133,14 @@ void ReminderEventManager::ReminderEventSubscriber::OnReceiveEvent(const EventFw
         reminderDataManager_->RefreshRemindersDueToSysTimeChange(ReminderDataManager::DATE_TIME_CHANGE);
         return;
     }
+    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        reminderDataManager_->OnUserSwitch(data.GetCode());
+        return;
+    }
+    if (action == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
+        reminderDataManager_->OnUserRemove(data.GetCode());
+        return;
+    }
 }
 
 void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(const EventFwk::Want &want) const
@@ -138,12 +148,7 @@ void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(const Ev
     OHOS::AppExecFwk::ElementName ele = want.GetElement();
     std::string bundleName = ele.GetBundleName();
     int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
-    sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption(bundleName, -1);
-    if (bundleOption == nullptr) {
-        ANSR_LOGE("new NotificationBundleOption fail due to no memory.");
-        return;
-    }
-    reminderDataManager_->CancelAllReminders(bundleOption, userId);
+    reminderDataManager_->CancelAllReminders(bundleName, userId);
 }
 
 void ReminderEventManager::ReminderEventSubscriber::HandleProcessDied(const EventFwk::Want &want) const
