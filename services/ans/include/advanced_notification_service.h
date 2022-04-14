@@ -191,6 +191,7 @@ private:
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
     bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);
     ErrCode IsAllowedNotifySelf(const sptr<NotificationBundleOption> &bundleOption, bool &allowed);
+    void GetDisplayPosition(int& offsetX, int& offsetY, int& width, int& height, bool& wideScreen);
 
     ErrCode SetNotificationRemindType(sptr<Notification> notification, bool isLocal);
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
