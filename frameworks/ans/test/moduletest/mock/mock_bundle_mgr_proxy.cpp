@@ -124,11 +124,6 @@ bool BundleMgrProxy::QueryKeepAliveBundleInfos(std::vector<BundleInfo> &bundleIn
     return true;
 }
 
-std::string BundleMgrProxy::GetAbilityLabel(const std::string &bundleName, const std::string &className)
-{
-    return "reply.ReadString()";
-}
-
 bool BundleMgrProxy::GetBundleArchiveInfo(const std::string &hapFilePath, const BundleFlag flag, BundleInfo &bundleInfo)
 {
     return true;
@@ -218,11 +213,6 @@ bool BundleMgrProxy::IsApplicationEnabled(const std::string &bundleName)
 bool BundleMgrProxy::IsAbilityEnabled(const AbilityInfo &abilityInfo)
 {
     return true;
-}
-
-std::string BundleMgrProxy::GetAbilityIcon(const std::string &bundleName, const std::string &className)
-{
-    return "AbilityIcon";
 }
 
 bool BundleMgrProxy::CanRequestPermission(

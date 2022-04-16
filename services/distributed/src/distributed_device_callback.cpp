@@ -36,7 +36,6 @@ void DistributedDeviceCallback::OnDeviceChanged(
     }
 
     if (type == DistributedKv::DeviceChangeType::DEVICE_OFFLINE) {
-        ANS_LOGI("device %{public}s is OFFLINE", info.deviceId.c_str());
         if (callback_.OnDisconnected) {
             callback_.OnDisconnected(info.deviceId);
         }

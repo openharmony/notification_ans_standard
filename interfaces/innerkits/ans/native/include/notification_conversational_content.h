@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,7 @@ public:
      * @param messageUser Indicates the MessageUser who sends all Message objects in this conversation-like
      * notification. This parameter cannot be null.
      */
-    NotificationConversationalContent(const MessageUser &messageUser);
+    explicit NotificationConversationalContent(const MessageUser &messageUser);
 
     /**
      * Default deconstructor used to deconstruct.
