@@ -87,7 +87,8 @@
         "//base/notification/ans_standard/services/test/moduletest:moduletest",
         "//base/notification/ans_standard/frameworks/ans/test/moduletest:moduletest",
         "//base/notification/ans_standard/frameworks/ans/native/test/unittest:unittest",
-        "//base/notification/ans_standard/test:systemtest"
+        "//base/notification/ans_standard/test:systemtest",
+        "//base/notification/ans_standard/test/fuzztest:fuzztest"
       ]
     }
   }
