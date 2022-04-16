@@ -206,16 +206,6 @@ public:
         return true;
     };
     /**
-     * @brief Obtains the label of a specified ability.
-     * @param bundleName Indicates the bundle name.
-     * @param className Indicates the ability class name.
-     * @return Returns the label of the ability if exist; returns empty string otherwise.
-     */
-    virtual std::string GetAbilityLabel(const std::string &bundleName, const std::string &className) override
-    {
-        return "";
-    }
-    /**
      * @brief Obtains information about an application bundle contained in a ohos Ability Package (HAP).
      * @param hapFilePath Indicates the absolute file path of the HAP.
      * @param flag Indicates the information contained in the BundleInfo object to be returned.
@@ -478,16 +468,6 @@ public:
     virtual bool IsAbilityEnabled(const AbilityInfo &abilityInfo) override
     {
         return true;
-    }
-    /**
-     * @brief Obtains the icon of a specified ability.
-     * @param bundleName Indicates the bundle name.
-     * @param className Indicates the ability class name.
-     * @return Returns the icon resource string of the ability if exist; returns empty string otherwise.
-     */
-    virtual std::string GetAbilityIcon(const std::string &bundleName, const std::string &className) override
-    {
-        return "abilityicon";
     }
     /**
      * @brief Obtains the interface used to install and uninstall bundles.
