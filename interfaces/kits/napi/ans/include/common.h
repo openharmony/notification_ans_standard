@@ -24,7 +24,7 @@ namespace OHOS {
 namespace NotificationNapi {
 using namespace OHOS::Notification;
 
-const std::int32_t STR_MAX_SIZE = 64;
+const std::int32_t STR_MAX_SIZE = 200;
 const std::int32_t LONG_STR_MAX_SIZE = 1024;
 const int NO_ERROR = 0;
 const int ERROR = -1;
