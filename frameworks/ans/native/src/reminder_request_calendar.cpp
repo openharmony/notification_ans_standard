@@ -322,7 +322,7 @@ void ReminderRequestCalendar::SetRepeatDaysOfMonth(const std::vector<uint8_t> &r
 std::vector<uint8_t> ReminderRequestCalendar::GetRepeatMonths() const
 {
     std::vector<uint8_t> repeatMonths;
-    for (int i = 0; i < MAX_MONTHS_OF_YEAR; i++) {
+    for (int32_t i = 0; i < MAX_MONTHS_OF_YEAR; i++) {
         if (IsRepeatMonth(i + 1)) {
             repeatMonths.push_back(i + 1);
         }
@@ -333,7 +333,7 @@ std::vector<uint8_t> ReminderRequestCalendar::GetRepeatMonths() const
 std::vector<uint8_t> ReminderRequestCalendar::GetRepeatDays() const
 {
     std::vector<uint8_t> repeatDays;
-    for (int i = 0; i < MAX_DAYS_OF_MONTH; i++) {
+    for (int32_t i = 0; i < MAX_DAYS_OF_MONTH; i++) {
         if (IsRepeatDay(i + 1)) {
             repeatDays.push_back(i + 1);
         }

@@ -62,7 +62,7 @@ public:
      *
      * @return vector of repeat days.
      */
-    std::vector<int> GetDaysOfWeek() const;
+    std::vector<int32_t> GetDaysOfWeek() const;
 
     /**
      * @brief Obtains the setted {@link hour_}.
@@ -137,7 +137,7 @@ private:
      * @param day Indicates the day of week.
      * @return true if it is a repeat day.
      */
-    bool IsRepeatDay(int day) const;
+    bool IsRepeatDay(int32_t day) const;
     bool IsRepeatReminder() const;
     void SetDaysOfWeek(bool set, std::vector<uint8_t> daysOfWeek);
 

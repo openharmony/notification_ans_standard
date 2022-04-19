@@ -147,7 +147,7 @@ void ReminderEventManager::ReminderEventSubscriber::HandlePackageRemove(const Ev
 {
     OHOS::AppExecFwk::ElementName ele = want.GetElement();
     std::string bundleName = ele.GetBundleName();
-    int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
+    int32_t userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
     reminderDataManager_->CancelAllReminders(bundleName, userId);
 }
 
@@ -166,7 +166,7 @@ sptr<NotificationBundleOption> ReminderEventManager::ReminderEventSubscriber::Ge
 {
     OHOS::AppExecFwk::ElementName ele = want.GetElement();
     std::string bundleName = ele.GetBundleName();
-    int userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
+    int32_t userId = want.GetIntParam(OHOS::AppExecFwk::Constants::USER_ID, -1);
     int32_t uid = ReminderRequest::GetUid(userId, bundleName);
     ANSR_LOGD("bundleName=%{public}s, userId=%{public}d, uid=%{public}d", bundleName.c_str(), userId, uid);
     sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption(bundleName, uid);

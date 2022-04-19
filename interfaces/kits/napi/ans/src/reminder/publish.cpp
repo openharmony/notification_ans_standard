@@ -299,7 +299,7 @@ void ParseReminderAlarm(const napi_env &env, ReminderRequest &reminder, napi_val
     // daysOfWeek
     napi_create_array(env, &value);
     napi_set_named_property(env, result, ALARM_DAYS_OF_WEEK, value);
-    int count = 0;
+    int32_t count = 0;
     for (auto day : alarm.GetDaysOfWeek()) {
         if (day) {
             napi_value napiDay = nullptr;
@@ -335,7 +335,7 @@ void ParseReminderCalendar(const napi_env &env, ReminderRequest &reminder, napi_
     // repeatMonths
     napi_create_array(env, &value);
     napi_set_named_property(env, result, CALENDAR_REPEAT_MONTHS, value);
-    int count = 0;
+    int32_t count = 0;
     for (auto month : calendar.GetRepeatMonths()) {
         napi_value napiDay = nullptr;
         napi_create_int32(env, month, &napiDay);
@@ -385,7 +385,7 @@ void ParseActionButtons(const napi_env &env, ReminderRequest &reminder, napi_val
     napi_value array = nullptr;
     napi_create_array(env, &array);
     napi_set_named_property(env, result, ACTION_BUTTON, array);
-    int index = 0;
+    int32_t index = 0;
     for (std::map<ReminderRequest::ActionButtonType, ReminderRequest::ActionButtonInfo>::iterator it
         = actionButtonsMap.begin(); it != actionButtonsMap.end(); ++it) {
         // create obj
@@ -499,7 +499,7 @@ napi_value SetValidReminder(const napi_env &env, ReminderRequest &reminder, napi
 
 void GetValidRemindersInner(napi_env env, std::vector<sptr<ReminderRequest>>& validReminders, napi_value& arr)
 {
-    int count = 0;
+    int32_t count = 0;
     napi_create_array(env, &arr);
     for (auto reminder : validReminders) {
         if (reminder == nullptr) {
