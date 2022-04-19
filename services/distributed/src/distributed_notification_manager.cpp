@@ -19,6 +19,7 @@
 
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "ans_watchdog.h"
 
 namespace OHOS {
 namespace Notification {
@@ -30,6 +31,7 @@ DistributedNotificationManager::DistributedNotificationManager()
 {
     runner_ = OHOS::AppExecFwk::EventRunner::Create();
     handler_ = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner_);
+    AnsWatchdog::AddHandlerThread(handler_, runner_);
 
     DistributedDatabaseCallback::IDatabaseChange databaseCallback = {
         .OnInsert = std::bind(&DistributedNotificationManager::OnDatabaseInsert,
