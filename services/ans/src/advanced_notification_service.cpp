@@ -1595,7 +1595,9 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
     }
 
     sptr<NotificationBundleOption> targetBundle = nullptr;
-    if (IPCSkeleton::GetCallingUid() == SYSTEM_SERVICE_UID) {
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+    if (isSubsystem) {
         if (bundleOption != nullptr) {
             targetBundle = GenerateValidBundleOption(bundleOption);
         }
@@ -1659,10 +1661,13 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    int uid = IPCSkeleton::GetCallingUid();
-    if (uid != SYSTEM_SERVICE_UID) {
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+    if (!isSubsystem) {
         return ERR_ANS_NOT_SYSTEM_SERVICE;
     }
+    
+    int uid = IPCSkeleton::GetCallingUid();
     int userId = SUBSCRIBE_USER_INIT;
     OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
     request->SetCreatorUserId(userId);
@@ -1718,11 +1723,13 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
 ErrCode AdvancedNotificationService::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    int uid = IPCSkeleton::GetCallingUid();
-    if (uid != SYSTEM_SERVICE_UID) {
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+    if (!isSubsystem) {
         return ERR_ANS_NOT_SYSTEM_SERVICE;
     }
 
+    int uid = IPCSkeleton::GetCallingUid();
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         sptr<Notification> notification = nullptr;
@@ -2500,7 +2507,9 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
 bool AdvancedNotificationService::CheckPermission()
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    if (IPCSkeleton::GetCallingUid() == SYSTEM_SERVICE_UID) {
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+    if (isSubsystem) {
         return true;
     }
 
