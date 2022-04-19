@@ -36,6 +36,7 @@ config("public_ans_core_config") {
 ohos_shared_library("ans_core") {
   sources = [
     "${core_path}/common/src/ans_log_wrapper.cpp",
+    "${core_path}/common/src/ans_watchdog.cpp",
     "${core_path}/src/ans_image_util.cpp",
     "${core_path}/src/ans_manager_death_recipient.cpp",
     "${core_path}/src/ans_manager_proxy.cpp",
@@ -94,6 +95,8 @@ ohos_shared_library("ans_core") {
     "ability_base:zuri",
     "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
+    "eventhandler:libeventhandler",
+    "hicollie_native:libhicollie",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",

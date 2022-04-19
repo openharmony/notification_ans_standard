@@ -26,6 +26,7 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "ans_watchdog.h"
 #include "ans_permission_def.h"
 #include "bundle_manager_helper.h"
 #include "display_manager.h"
@@ -234,6 +235,7 @@ AdvancedNotificationService::AdvancedNotificationService()
 {
     runner_ = OHOS::AppExecFwk::EventRunner::Create();
     handler_ = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner_);
+    AnsWatchdog::AddHandlerThread(handler_, runner_);
     recentInfo_ = std::make_shared<RecentInfo>();
     distributedKvStoreDeathRecipient_ = std::make_shared<DistributedKvStoreDeathRecipient>(
         std::bind(&AdvancedNotificationService::OnDistributedKvStoreDeathRecipient, this));
