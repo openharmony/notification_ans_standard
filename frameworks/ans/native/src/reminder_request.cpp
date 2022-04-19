@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace Notification {
 namespace {
-const int BASE_YEAR = 1900;
+const int32_t BASE_YEAR = 1900;
 }
 
 int32_t ReminderRequest::GLOBAL_ID = 0;
@@ -206,7 +206,7 @@ void ReminderRequest::InitReminderId()
     ANSR_LOGI("reminderId_=%{public}d", reminderId_);
 }
 
-void ReminderRequest::InitUserId(const int &userId)
+void ReminderRequest::InitUserId(const int32_t &userId)
 {
     userId_ = userId;
 }
@@ -290,8 +290,8 @@ bool ReminderRequest::HandleTimeZoneChange(
     if (isExpired_) {
         return false;
     }
-    ANSR_LOGD("Handle timezone change, oldZoneTriggerTime:%{public}llu, newZoneTriggerTime:%{public}llu",
-        (unsigned long long)oldZoneTriggerTime, (unsigned long long)newZoneTriggerTime);
+    ANSR_LOGD("Handle timezone change, oldZoneTriggerTime:%{public}" PRIu64 "\
+        , newZoneTriggerTime:%{public}" PRIu64 "", oldZoneTriggerTime, newZoneTriggerTime);
     if (oldZoneTriggerTime == newZoneTriggerTime) {
         return false;
     }
@@ -428,7 +428,7 @@ int64_t ReminderRequest::RecoverInt64FromDb(const std::shared_ptr<NativeRdb::Abs
     }
     switch (columnType) {
         case (DbRecoveryType::INT): {
-            int value;
+            int32_t value;
             resultSet->GetInt(ReminderStore::GetColumnIndex(columnName), value);
             return static_cast<int64_t>(value);
         }
@@ -466,7 +466,7 @@ void ReminderRequest::RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedRe
     resultSet->GetInt(ReminderStore::GetColumnIndex(UID), uid_);
 
     // reminderType
-    int reminderType;
+    int32_t reminderType;
     resultSet->GetInt(ReminderStore::GetColumnIndex(REMINDER_TYPE), reminderType);
     reminderType_ = ReminderType(reminderType);
 
@@ -507,7 +507,7 @@ void ReminderRequest::RecoverFromDb(const std::shared_ptr<NativeRdb::AbsSharedRe
     RecoverActionButton(resultSet);
 
     // slotType
-    int slotType;
+    int32_t slotType;
     resultSet->GetInt(ReminderStore::GetColumnIndex(SLOT_ID), slotType);
     slotType_ = NotificationConstant::SlotType(slotType);
 
@@ -651,8 +651,8 @@ ReminderRequest& ReminderRequest::SetTimeInterval(const uint64_t timeIntervalInS
     } else {
         uint64_t timeIntervalInMilli = timeIntervalInSeconds * MILLI_SECONDS;
         if (timeIntervalInMilli > 0 && timeIntervalInMilli < MIN_TIME_INTERVAL_IN_MILLI) {
-            ANSR_LOGW("SetTimeInterval, replace to set %{public}u, for the given is 0<%{public}llu<%{public}u",
-                MIN_TIME_INTERVAL_IN_MILLI / MILLI_SECONDS, (unsigned long long)timeIntervalInSeconds,
+            ANSR_LOGW("SetTimeInterval, replace to set %{public}u, for the given is 0<%{public}" PRIu64 "<%{public}u",
+                MIN_TIME_INTERVAL_IN_MILLI / MILLI_SECONDS, timeIntervalInSeconds,
                 MIN_TIME_INTERVAL_IN_MILLI / MILLI_SECONDS);
             timeIntervalInMilli_ = MIN_TIME_INTERVAL_IN_MILLI;
         } else {
@@ -793,7 +793,7 @@ uint64_t ReminderRequest::GetTriggerTimeInMilli() const
     return triggerTimeInMilli_;
 }
 
-int ReminderRequest::GetUserId() const
+int32_t ReminderRequest::GetUserId() const
 {
     return userId_;
 }
@@ -1089,7 +1089,7 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
         ANSR_LOGE("Failed to read buttonMapSize");
         return false;
     }
-    for (int i = 0; i < buttonMapSize; i++) {
+    for (int32_t i = 0; i < buttonMapSize; i++) {
         uint8_t buttonType = static_cast<uint8_t>(ActionButtonType::INVALID);
         if (!parcel.ReadUint8(buttonType)) {
             ANSR_LOGE("Failed to read buttonType");
@@ -1246,7 +1246,7 @@ std::string ReminderRequest::GetState(const uint8_t state) const
 
 void ReminderRequest::AddActionButtons(const bool includeSnooze)
 {
-    int requestCode = 10;
+    int32_t requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
     for (auto button : actionButtonMap_) {
@@ -1290,7 +1290,7 @@ void ReminderRequest::AddActionButtons(const bool includeSnooze)
 
 void ReminderRequest::AddRemovalWantAgent()
 {
-    int requestCode = 10;
+    int32_t requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
     auto want = std::make_shared<OHOS::AAFwk::Want>();
@@ -1317,7 +1317,7 @@ void ReminderRequest::AddRemovalWantAgent()
 std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> ReminderRequest::CreateWantAgent(
     AppExecFwk::ElementName &element) const
 {
-    int requestCode = 10;
+    int32_t requestCode = 10;
     std::vector<AbilityRuntime::WantAgent::WantAgentConstant::Flags> flags;
     flags.push_back(AbilityRuntime::WantAgent::WantAgentConstant::Flags::UPDATE_PRESENT_FLAG);
     auto want = std::make_shared<OHOS::AAFwk::Want>();
@@ -1491,7 +1491,7 @@ void ReminderRequest::UpdateNotificationStateForSnooze()
     UpdateActionButtons(true);
 }
 
-int ReminderRequest::GetActualTime(const TimeTransferType &type, int cTime)
+int32_t ReminderRequest::GetActualTime(const TimeTransferType &type, int32_t cTime)
 {
     switch (type) {
         case (TimeTransferType::YEAR):  // year
@@ -1499,7 +1499,7 @@ int ReminderRequest::GetActualTime(const TimeTransferType &type, int cTime)
         case (TimeTransferType::MONTH):  // month
             return 1 + cTime;
         case (TimeTransferType::WEEK): {  // week
-            int sunDay = 7;
+            int32_t sunDay = 7;
             if (cTime == 0) {
                 return sunDay;
             } else {
@@ -1511,7 +1511,7 @@ int ReminderRequest::GetActualTime(const TimeTransferType &type, int cTime)
     }
 }
 
-int ReminderRequest::GetCTime(const TimeTransferType &type, int actualTime)
+int32_t ReminderRequest::GetCTime(const TimeTransferType &type, int32_t actualTime)
 {
     switch (type) {
         case (TimeTransferType::YEAR):  // year
@@ -1519,7 +1519,7 @@ int ReminderRequest::GetCTime(const TimeTransferType &type, int actualTime)
         case (TimeTransferType::MONTH):  // month
             return actualTime - 1;
         case (TimeTransferType::WEEK): {  // week
-            int sunDay = 7;
+            int32_t sunDay = 7;
             if (actualTime == sunDay) {
                 return 0;
             } else {
@@ -1531,7 +1531,7 @@ int ReminderRequest::GetCTime(const TimeTransferType &type, int actualTime)
     }
 }
 
-int32_t ReminderRequest::GetUid(const int &userId, const std::string &bundleName)
+int32_t ReminderRequest::GetUid(const int32_t &userId, const std::string &bundleName)
 {
     AppExecFwk::ApplicationInfo info;
     sptr<ISystemAbilityManager> systemAbilityManager
@@ -1542,15 +1542,14 @@ int32_t ReminderRequest::GetUid(const int &userId, const std::string &bundleName
     }
     sptr<IRemoteObject> remoteObject  = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     sptr<AppExecFwk::IBundleMgr> bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
-    bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO,
-        static_cast<int32_t>(userId), info);
+    bundleMgr->GetApplicationInfo(bundleName, AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, userId, info);
     ANSR_LOGD("uid=%{public}d", info.uid);
     return static_cast<int32_t>(info.uid);
 }
 
-int ReminderRequest::GetUserId(const int &uid)
+int32_t ReminderRequest::GetUserId(const int32_t &uid)
 {
-    int userId = -1;
+    int32_t userId = -1;
     AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
     ANSR_LOGD("userId=%{public}d", userId);
     return userId;
@@ -1564,7 +1563,7 @@ void ReminderRequest::AppendValuesBucket(const sptr<ReminderRequest> &reminder,
     values.PutInt(USER_ID, reminder->GetUserId());
     values.PutInt(UID, reminder->GetUid());
     values.PutString(APP_LABEL, "");  // no use, compatible with old version.
-    values.PutInt(REMINDER_TYPE, static_cast<int>(reminder->GetReminderType()));
+    values.PutInt(REMINDER_TYPE, static_cast<int32_t>(reminder->GetReminderType()));
     values.PutLong(REMINDER_TIME, reminder->GetReminderTimeInMilli());
     values.PutLong(TRIGGER_TIME, reminder->GetTriggerTimeInMilli());
     values.PutLong(

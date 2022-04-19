@@ -44,7 +44,7 @@ public:
      * @param packageName Indicates the package name.
      * @param userId Indicates the user id which the bundle belong to.
      */
-    void CancelAllReminders(const std::string &packageName, const int &userId);
+    void CancelAllReminders(const std::string &packageName, const int32_t &userId);
 
     /**
      * @brief Cancels the target reminder relative to the reminder id and bundle option.
@@ -97,11 +97,11 @@ public:
 
     void InitUserId();
 
-    void OnUserRemove(const int& userId);
+    void OnUserRemove(const int32_t& userId);
 
     void OnServiceStart();
 
-    void OnUserSwitch(const int& userId);
+    void OnUserSwitch(const int32_t& userId);
 
     /**
      * @brief Triggered when third party application died.
@@ -193,7 +193,7 @@ private:
      */
     void AddToShowedReminders(const sptr<ReminderRequest> &reminder);
 
-    void CancelAllReminders(const int &userId);
+    void CancelAllReminders(const int32_t &userId);
 
     /**
      * @brief Cancels all the reminders of the target bundle or user.
@@ -201,7 +201,7 @@ private:
      * @param packageName Indicates the packageName need to cancel.
      * @param userId Indicates the userId to cancel.
      */
-    void CancelRemindersImplLocked(const std::string &packageName, const int &userId);
+    void CancelRemindersImplLocked(const std::string &packageName, const int32_t &userId);
 
     /**
      * Cancels the notification relative to the reminder.
@@ -305,7 +305,7 @@ private:
      * @param userId Indicates the user id.
      * @return true If the reminder is matched with the bundleOption or userId.
      */
-    bool IsMatched(const sptr<ReminderRequest> &reminder, const std::string &packageName, const int &userId) const;
+    bool IsMatched(const sptr<ReminderRequest> &reminder, const std::string &packageName, const int32_t &userId) const;
 
     bool IsAllowedNotify(const sptr<ReminderRequest> &reminder) const;
 
