@@ -22,6 +22,7 @@
 #include "ans_const_define.h"
 #include "ans_inner_errors.h"
 #include "ans_log_wrapper.h"
+#include "ans_watchdog.h"
 #include "ipc_skeleton.h"
 #include "os_account_manager.h"
 #include "remote_death_recipient.h"
@@ -39,6 +40,7 @@ NotificationSubscriberManager::NotificationSubscriberManager()
 {
     runner_ = OHOS::AppExecFwk::EventRunner::Create();
     handler_ = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner_);
+    AnsWatchdog::AddHandlerThread(handler_, runner_);
     recipient_ =
         new RemoteDeathRecipient(std::bind(&NotificationSubscriberManager::OnRemoteDied, this, std::placeholders::_1));
 }
