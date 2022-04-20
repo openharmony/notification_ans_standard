@@ -58,7 +58,7 @@ ohos_shared_library("libans") {
     "${core_path}:ans_core",
     "${frameworks_path}/ans/dialog/dialog_ui/js:dialog_js_files_etc",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "//foundation/ace/ace_engine/interfaces/innerkits/ui_service_manager:ui_service_mgr",
+    "//foundation/arkui/ace_engine/interfaces/inner_api/ui_service_manager:ui_service_mgr",
     "//utils/native/base:utils",
   ]
 
