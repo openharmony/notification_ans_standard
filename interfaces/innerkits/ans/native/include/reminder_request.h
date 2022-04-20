@@ -268,7 +268,7 @@ public:
      */
     uint64_t GetTriggerTimeInMilli() const;
 
-    int GetUserId() const;
+    int32_t GetUserId() const;
     int32_t GetUid() const;
 
     /**
@@ -293,7 +293,7 @@ public:
      *
      * @param userId Indicates the userId which the reminder belong to.
      */
-    void InitUserId(const int &userId);
+    void InitUserId(const int32_t &userId);
 
     /**
      * @brief Inites reminder uid when publish reminder success.
@@ -559,11 +559,11 @@ public:
      */
     void UpdateNotificationRequest(UpdateNotificationType type, std::string extra);
 
-    static int GetActualTime(const TimeTransferType &type, int cTime);
-    static int GetCTime(const TimeTransferType &type, int actualTime);
+    static int32_t GetActualTime(const TimeTransferType &type, int32_t cTime);
+    static int32_t GetCTime(const TimeTransferType &type, int32_t actualTime);
     static uint64_t GetDurationSinceEpochInMilli(const time_t target);
-    static int32_t GetUid(const int &userId, const std::string &bundleName);
-    static int GetUserId(const int &uid);
+    static int32_t GetUid(const int32_t &userId, const std::string &bundleName);
+    static int32_t GetUserId(const int32_t &uid);
     static void AppendValuesBucket(const sptr<ReminderRequest> &reminder,
         const sptr<NotificationBundleOption> &bundleOption, NativeRdb::ValuesBucket &values);
 
@@ -724,7 +724,7 @@ private:
     uint8_t state_ {0};
     int32_t notificationId_ {0};
     int32_t reminderId_ {-1};
-    int userId_ {-1};
+    int32_t userId_ {-1};
     int32_t uid_ {-1};
 
     // Indicates the reminder has been shown in the past time.
