@@ -23,5 +23,12 @@ bool AccessTokenHelper::VerifyCallerPermission(
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenCaller, permission);
     return (result == Security::AccessToken::PERMISSION_GRANTED);
 }
+
+bool AccessTokenHelper::VerifyNativeToken(const Security::AccessToken::AccessTokenID &callerToken)
+{
+    Security::AccessToken::ATokenTypeEnum tokenType =
+        Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    return tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+}
 }  // namespace Notification
 }  // namespace OHOS
