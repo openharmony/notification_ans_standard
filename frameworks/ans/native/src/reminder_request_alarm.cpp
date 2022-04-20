@@ -165,10 +165,10 @@ int8_t ReminderRequestAlarm::GetNextAlarm(const time_t now, const time_t target)
         ANSR_LOGE("Failed to get next alarm due to gmtime return null.");
         return 0;
     }
-    int today = GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday);
-    int dayCount = now >= target ? 1 : 0;
+    int32_t today = GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday);
+    int32_t dayCount = now >= target ? 1 : 0;
     for (; dayCount <= DAYS_PER_WEEK; dayCount++) {
-        int day = (today + dayCount) % DAYS_PER_WEEK;
+        int32_t day = (today + dayCount) % DAYS_PER_WEEK;
         day = (day == 0) ? SUNDAY : day;
         if (IsRepeatDay(day)) {
             break;
@@ -178,17 +178,17 @@ int8_t ReminderRequestAlarm::GetNextAlarm(const time_t now, const time_t target)
     return dayCount;
 }
 
-bool ReminderRequestAlarm::IsRepeatDay(int day) const
+bool ReminderRequestAlarm::IsRepeatDay(int32_t day) const
 {
     return (repeatDays_ & (1 << (day - 1))) > 0;
 }
 
-std::vector<int> ReminderRequestAlarm::GetDaysOfWeek() const
+std::vector<int32_t> ReminderRequestAlarm::GetDaysOfWeek() const
 {
-    std::vector<int> repeatDays;
-    int days[] = {1, 2, 3, 4, 5, 6, 7};
-    int len = sizeof(days) / sizeof(int);
-    for (int i = 0; i < len; i++) {
+    std::vector<int32_t> repeatDays;
+    int32_t days[] = {1, 2, 3, 4, 5, 6, 7};
+    int32_t len = sizeof(days) / sizeof(int32_t);
+    for (int32_t i = 0; i < len; i++) {
         if (IsRepeatDay(days[i])) {
             repeatDays.push_back(days[i]);
         }
