@@ -143,7 +143,7 @@ uint64_t ReminderRequestAlarm::GetNextTriggerTime(bool forceToGetNext) const
     struct tm test;
     (void)localtime_r(&nextTriggerTime, &test);
     ANSR_LOGI("NextTriggerTime: year=%{public}d, mon=%{public}d, day=%{public}d, hour=%{public}d, "
-        "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}" PRId64 "",
+        "min=%{public}d, sec=%{public}d, week=%{public}d, nextTriggerTime=%{public}lld",
         GetActualTime(TimeTransferType::YEAR, test.tm_year),
         GetActualTime(TimeTransferType::MONTH, test.tm_mon),
         test.tm_mday, test.tm_hour, test.tm_min, test.tm_sec,
