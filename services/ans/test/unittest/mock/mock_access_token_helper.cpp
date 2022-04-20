@@ -22,5 +22,10 @@ bool AccessTokenHelper::VerifyCallerPermission(
 {
     return true;
 }
+
+bool AccessTokenHelper::VerifyNativeToken(const Security::AccessToken::AccessTokenID &callerToken)
+{
+    return true;
+}
 }  // namespace Notification
 }  // namespace OHOS
