@@ -50,8 +50,6 @@ ohos_unittest("ans_distributed_unit_test") {
     "${services_path}/distributed/test/unittest/mock/mock_change_notification.cpp",
     "${services_path}/distributed/test/unittest/mock/mock_distributed_kv_data_manager.cpp",
     "${services_path}/distributed/test/unittest/mock/mock_event_handler.cpp",
-    "${services_path}/distributed/test/unittest/mock/mock_event_runner.cpp",
-    "${services_path}/distributed/test/unittest/mock/mock_inner_event.cpp",
   ]
 
   configs = [
@@ -72,6 +70,7 @@ ohos_unittest("ans_distributed_unit_test") {
     "ability_base:zuri",
     "bundle_framework:appexecfwk_base",
     "distributeddatamgr:distributeddata_inner",
+    "eventhandler:libeventhandler",
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

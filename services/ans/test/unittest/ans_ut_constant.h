@@ -20,6 +20,8 @@
 
 namespace OHOS {
 namespace Notification {
+constexpr unsigned int NATIVE_TOKEN = 0;
+constexpr unsigned int NON_NATIVE_TOKEN = 1;
 constexpr int SYSTEM_APP_UID = 100;
 constexpr int NON_SYSTEM_APP_UID = 1000;
 constexpr int NON_BUNDLE_NAME_UID = 2000;
