@@ -19,8 +19,6 @@ config("ansfwk_kits_test_config") {
 
   include_dirs = [
     "//utils/native/base/include",
-    "//foundation/appexecfwk/standard/common/log/include",
-    "//foundation/appexecfwk/standard/services/bundlemgr/include",
     "//utils/system/safwk/native/include",
     "${services_path}/include",
     "//foundation/distributedschedule/safwk/services/safwk/include",
