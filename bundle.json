@@ -58,7 +58,7 @@
         "hiviewdfx_hilog_native",
         "appexecfwk_standard",
         "time_native",
-        "ces_standard",
+        "common_event_service",
         "napi",
         "safwk",
         "distributeddatamgr",
