@@ -35,8 +35,6 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
     "//base/notification/ans_standard/services/ans/include",
     "//third_party/json/single_include",
-    "//foundation/appexecfwk/standard/kits/appkit/native/app/include",
-    "//foundation/appexecfwk/adapter/interfaces/innerkits/appexecfwk_base/include",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
     "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
     "//foundation/aafwk/standard/services/abilitymgr/include",
