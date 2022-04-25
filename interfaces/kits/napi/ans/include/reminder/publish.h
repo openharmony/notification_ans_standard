@@ -54,6 +54,15 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info);
  * @return opaque pointer that is used to represent a JavaScript value
  */
 napi_value PublishReminder(napi_env env, napi_callback_info info);
+
+/**
+ * @brief Adds a slot type.
+ *
+ * @param env Indicates the context.
+ * @param info Indicates the opaque datatype about the context.
+ * @return opaque pointer that is used to represent a JavaScript value.
+ */
+napi_value AddSlot(napi_env env, napi_callback_info info);
 }  // namespace ReminderAgentNapi
 }  // namespace OHOS
 

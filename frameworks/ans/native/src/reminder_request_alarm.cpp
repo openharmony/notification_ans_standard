@@ -160,12 +160,9 @@ int8_t ReminderRequestAlarm::GetNextAlarm(const time_t now, const time_t target)
     if (repeatDays_ == 0) {
         return INVALID_INT_VALUE;
     }
-    tm *nowTime = gmtime(&now);
-    if (nowTime == nullptr) {
-        ANSR_LOGE("Failed to get next alarm due to gmtime return null.");
-        return 0;
-    }
-    int32_t today = GetActualTime(TimeTransferType::WEEK, nowTime->tm_wday);
+    struct tm nowTime;
+    (void)gmtime_r(&now, &nowTime);
+    int32_t today = GetActualTime(TimeTransferType::WEEK, nowTime.tm_wday);
     int32_t dayCount = now >= target ? 1 : 0;
     for (; dayCount <= DAYS_PER_WEEK; dayCount++) {
         int32_t day = (today + dayCount) % DAYS_PER_WEEK;
