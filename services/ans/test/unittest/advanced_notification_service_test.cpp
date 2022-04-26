@@ -1602,6 +1602,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11000,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11100, Function | SmallTest | Level1)
 {
+    IPCSkeleton::SetCallingTokenID(NON_NATIVE_TOKEN);
     sptr<NotificationRequest> req = new NotificationRequest();
     EXPECT_NE(req, nullptr);
     req->SetSlotType(NotificationConstant::SlotType::OTHER);
@@ -1617,6 +1618,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11100,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11200, Function | SmallTest | Level1)
 {
+    IPCSkeleton::SetCallingTokenID(NATIVE_TOKEN);
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     std::string label = "testLabel";
     {
@@ -1635,6 +1637,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11200,
  */
 HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11300, Function | SmallTest | Level1)
 {
+    IPCSkeleton::SetCallingTokenID(NATIVE_TOKEN);
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     std::string label = "testLabel";
     {
@@ -1643,7 +1646,7 @@ HWTEST_F(AdvancedNotificationServiceTest, AdvancedNotificationServiceTest_11300,
         req->SetLabel(label);
         EXPECT_EQ(advancedNotificationService_->PublishContinuousTaskNotification(req), (int)ERR_OK);
     }
-    IPCSkeleton::SetCallingUid(SYSTEM_APP_UID);
+    IPCSkeleton::SetCallingTokenID(NON_NATIVE_TOKEN);
     EXPECT_EQ(
         advancedNotificationService_->CancelContinuousTaskNotification(label, 1), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
 }
