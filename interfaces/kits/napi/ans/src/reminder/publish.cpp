@@ -258,6 +258,8 @@ napi_value CancelReminder(napi_env env, napi_callback_info info)
         [](napi_env env, napi_status status, void *data) {
             ANSR_LOGI("Cancel napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+            std::unique_ptr<AsyncCallbackInfo> callbackPtr { asynccallbackinfo };
+
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, NotificationNapi::Common::NapiGetNull(env));
             ANSR_LOGI("Cancel napi_create_async_work complete end");
@@ -311,6 +313,8 @@ napi_value CancelAllReminders(napi_env env, napi_callback_info info)
         [](napi_env env, napi_status status, void *data) {
             ANSR_LOGD("CancelAll napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = (AsyncCallbackInfo *)data;
+            std::unique_ptr<AsyncCallbackInfo> callbackPtr { asynccallbackinfo };
+
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, NotificationNapi::Common::NapiGetNull(env));
             ANSR_LOGD("CancelAll napi_create_async_work complete end");
@@ -608,6 +612,7 @@ napi_value GetValidReminders(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             AsyncCallbackInfo *asynccallbackinfo = static_cast<AsyncCallbackInfo *>(data);
+            std::unique_ptr<AsyncCallbackInfo> callbackPtr { asynccallbackinfo };
 
             if (asynccallbackinfo) {
                 if (asynccallbackinfo->info.errorCode != ERR_OK) {
@@ -674,6 +679,7 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
         [](napi_env env, napi_status status, void *data) {
             ANSR_LOGI("Publish napi_create_async_work complete start");
             AsyncCallbackInfo *asynccallbackinfo = static_cast<AsyncCallbackInfo *>(data);
+            std::unique_ptr<AsyncCallbackInfo> callbackPtr { asynccallbackinfo };
 
             // reminderId
             if (asynccallbackinfo) {
@@ -690,6 +696,7 @@ napi_value PublishReminder(napi_env env, napi_callback_info info)
         },
         (void *)asynccallbackinfo,
         &asynccallbackinfo->asyncWork);
+
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
     callbackPtr.release();
 
@@ -741,6 +748,8 @@ napi_value AddSlot(napi_env env, napi_callback_info info)
         },
         [](napi_env env, napi_status status, void *data) {
             AsyncCallbackInfo *asynccallbackinfo = static_cast<AsyncCallbackInfo *>(data);
+            std::unique_ptr<AsyncCallbackInfo> callbackPtr { asynccallbackinfo };
+
             NotificationNapi::Common::ReturnCallbackPromise(
                 env, asynccallbackinfo->info, NotificationNapi::Common::NapiGetNull(env));
             ANSR_LOGD("AddSlot napi_create_async_work complete end.");
