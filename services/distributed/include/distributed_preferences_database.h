@@ -36,10 +36,46 @@ public:
     DistributedPreferencesDatabase();
     ~DistributedPreferencesDatabase();
 
+    /**
+     * @brief Put a key-value to database.
+     *
+     * @param key Indicates the key.
+     * @param value Indicates the value.
+     * @return Whether to put key-value success.
+     */
     bool PutToDistributedDB(const std::string &key, const std::string &value);
+
+    /**
+     * @brief Get the value of its key from database.
+     *
+     * @param key Indicates key.
+     * @param value Indicates value.
+     * @return Whether to get key-value success.
+     */
     bool GetFromDistributedDB(const std::string &key, std::string &value);
+
+    /**
+     * @brief Get all entries which key start with prefixKey.
+     *
+     * @param perfixkey Indicates the prefix to be searched.
+     * @param entries Indicates the entries will be returned in this parameter.
+     * @return Whether to get entries success.
+     */
     bool GetEntriesFromDistributedDB(const std::string &prefixKey, std::vector<Entry> &entries);
+
+    /**
+     * @brief Delete a key-value of its key from database.
+     *
+     * @param key Indicates the key.
+     * @return Whether to delete key-value success.
+     */
     bool DeleteToDistributedDB(const std::string &key);
+
+    /**
+     * @brief Clear all data in database and Delete the database.
+     *
+     * @return Whether to clear database success.
+     */
     bool ClearDatabase(void);
 
 private:

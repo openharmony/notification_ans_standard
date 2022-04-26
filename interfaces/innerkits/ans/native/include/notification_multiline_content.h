@@ -23,95 +23,105 @@ namespace OHOS {
 namespace Notification {
 class NotificationMultiLineContent : public NotificationBasicContent {
 public:
-    /**
-     * Default constructor used to create a NotificationMultiLineContent instance.
-     */
     NotificationMultiLineContent() = default;
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationMultiLineContent() = default;
 
     /**
-     * Sets the title to be displayed when this multi-line notification is expanded.
+     * @brief Sets the title to be displayed when this multi-line notification is expanded.
      * After this title is set, the title set by setTitle(string) will be displayed only
      * when this notification is in the collapsed state.
+     *
      * @param exTitle Indicates the title to be displayed when this notification is expanded.
      */
     void SetExpandedTitle(const std::string &exTitle);
 
     /**
-     * Obtains the title that will be displayed for this multi-line notification when it is expanded.
-     * @return the title to be displayed when this notification is expanded.
+     * @brief Obtains the title that will be displayed for this multi-line notification when it is expanded.
+     *
+     * @return Returns the title to be displayed when this notification is expanded.
      */
     std::string GetExpandedTitle() const;
 
     /**
-     * Sets the brief text to be included in a multi-line notification.
+     * @brief Sets the brief text to be included in a multi-line notification.
      * The brief text is a summary of this multi-line notification and is displayed in the first line of
      * the notification. Similar to setAdditionalText(string), the font of the brief text is also
      * smaller than the notification text set by calling setText(string).
      * The positions where the brief text and additional text will display may conflict.
      * If both texts are set, only the additional text will be displayed.
+     *
      * @param briefText Indicates the brief text to be included.
      */
     void SetBriefText(const std::string &briefText);
 
     /**
-     * Obtains the brief text that has been set by calling setBriefText(string) for this multi-line notification.
-     * @return the brief text of this notification.
+     * @brief Obtains the brief text that has been set by calling setBriefText(string) for this multi-line notification.
+     *
+     * @return Returns the brief text of this notification.
      */
     std::string GetBriefText() const;
 
     /**
-     * Adds a single line of text to this notification.
+     * @brief Adds a single line of text to this notification.
      * You can call this method up to seven times to add seven lines to a notification.
+     *
      * @param oneLine Indicates the single line of text to be included.
      */
     void AddSingleLine(const std::string &oneLine);
 
     /**
-     * Obtains the list of lines included in this multi-line notification.
-     * @return the list of lines included in this notification.
+     * @brief Obtains the list of lines included in this multi-line notification.
+     *
+     * @return Returns the list of lines included in this notification.
      */
     std::vector<std::string> GetAllLines() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump() override;
 
     /**
-     * Converts a NotificationMultiLineContent object into a Json.
+     * @brief Converts a NotificationMultiLineContent object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationMultiLineContent object from a Json.
+     * @brief Creates a NotificationMultiLineContent object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationMultiLineContent.
+     * @return Returns the NotificationMultiLineContent object.
      */
     static NotificationMultiLineContent *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationMultiLineContent
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationMultiLineContent object.
      */
     static NotificationMultiLineContent *Unmarshalling(Parcel &parcel);
 
 protected:
     /**
-     * Read a NotificationMultiLineContent object from a Parcel.
-     * @param parcel the parcel
+     * @brief Read a NotificationMultiLineContent object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel) override;
 

@@ -27,23 +27,26 @@ namespace Notification {
 class NotificationUserInput : public Parcelable, public NotificationJsonConvertionBase {
 public:
     /**
-     * Sets the input source of this NotificationUserInput object.
+     * @brief Sets the input source of this NotificationUserInput object.
+     *
      * @param want Indicates the Want to which the input result is to be added.
      * @param source Indicates the input source. For available values, see NotificationConstant::InputSource.
      */
     static void SetInputsSource(AAFwk::Want &want, NotificationConstant::InputsSource source);
 
     /**
-     * Obtains the input source of this NotificationUserInput object.
+     * @brief Obtains the input source of this NotificationUserInput object.
+     *
      * @param want Indicates the Want containing the input result.
-     * @return the input source of this NotificationUserInput object,
-     * as enumerated in NotificationConstant::InputSource.
+     * @return Returns the input source of this NotificationUserInput object, as enumerated in
+     * NotificationConstant::InputSource.
      */
     static NotificationConstant::InputsSource GetInputsSource(const AAFwk::Want &want);
 
     /**
-     * Adds a list of NotificationUserInput objects to a Want. This method should only be called by user input
+     * @brief Adds a list of NotificationUserInput objects to a Want. This method should only be called by user input
      * collection services when sending input results to an WantAgent.
+     *
      * @param userInputs Indicates the list of NotificationUserInput objects for which the input results are provided.
      * @param want Indicates the Want to which the input results are to be added.
      * @param additional Indicates the AAFwk::WantParams object holding the input results.
@@ -53,15 +56,17 @@ public:
         AAFwk::Want &want, const AAFwk::WantParams &additional);
 
     /**
-     * Obtains the input text results from a specified Want.
+     * @brief Obtains the input text results from a specified Want.
+     *
      * @param want Indicates the Want object containing one or more user input results.
-     * @return the AAFwk::WantParams object containing the input text results.
+     * @return Returns the AAFwk::WantParams object containing the input text results.
      */
     static std::shared_ptr<AAFwk::WantParams> GetInputsFromWant(const AAFwk::Want &want);
 
     /**
-     * Adds the given NotificationUserInput object of a specified MIME type to an Want. This method is similar to
+     * @brief Adds the given NotificationUserInput object of a specified MIME type to an Want. This method is similar to
      * addInputsToWant(NotificationUserInput, Want, AAFwk::WantParams) except that the MIME type must be specified.
+     *
      * @param userInput Indicates the NotificationUserInput object for which the input results are provided.
      * @param want Indicates the Want to which the input results are to be added.
      * @param results Indicates a map containing the MIME type and its URI result.
@@ -70,27 +75,30 @@ public:
         const std::map<std::string, std::shared_ptr<Uri>> &results);
 
     /**
-     * Obtains the input results of a particular MIME type from a specified Want. This method is similar to
+     * @brief Obtains the input results of a particular MIME type from a specified Want. This method is similar to
      * GetInputsFromWant(Want) but uses the key of the NotificationUserInput.
+     *
      * @param want Indicates the Want object containing one or more user input results.
      * @param inputKey Indicates the key of the NotificationUserInput results to obtain.
-     * @return a map containing the MIME type and its URI result.
+     * @return Returns a map containing the MIME type and its URI result.
      */
     static std::map<std::string, std::shared_ptr<Uri>> GetMimeInputsFromWant(
         const AAFwk::Want &want, const std::string &inputKey);
 
 public:
     /**
-     * A static function used to create a NotificationUserInput instance with the input parameters passed.
+     * @brief A static function used to create a NotificationUserInput instance with the input parameters passed.
+     *
      * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
      * when the input is collected from the user.
-     * @return the shared_ptr object owns the created NotificationUserInput object otherwise return empty object if
-     * inputKey is empty.
+     * @return Returns the shared_ptr object owns the created NotificationUserInput object otherwise return empty
+     * object if inputKey is empty.
      */
     static std::shared_ptr<NotificationUserInput> Create(const std::string &inputKey);
 
     /**
-     * A static function used to create a NotificationUserInput instance with the input parameters passed.
+     * @brief A static function used to create a NotificationUserInput instance with the input parameters passed.
+     *
      * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
      * when the input is collected from the user.
      * @param tag Indicates the tag to be displayed.
@@ -102,67 +110,72 @@ public:
      * @param additional Indicates the AAFwk::WantParams object containing the additional data.
      * @param editType Indicates the edit type to set. For details about available values, see
      * NotificationConstant::InputEditType.
-     * @return the shared_ptr object owns the created NotificationUserInput object otherwise return empty object if
-     * permitFreeFormInput is false but editType is InputEditType::EDIT_ENABLED.
+     * @return Returns the shared_ptr object owns the created NotificationUserInput object otherwise return empty
+     * object if permitFreeFormInput is false but editType is InputEditType::EDIT_ENABLED.
      */
     static std::shared_ptr<NotificationUserInput> Create(const std::string &inputKey, const std::string &tag,
         const std::vector<std::string> &options, bool permitFreeFormInput, const std::set<std::string> &permitMimeTypes,
         const std::shared_ptr<AAFwk::WantParams> &additional, NotificationConstant::InputEditType editType);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationUserInput() = default;
 
     /**
-     * Obtains the key of this NotificationUserInput object.
-     * @return the key of this NotificationUserInput object.
+     * @brief Obtains the key of this NotificationUserInput object.
+     *
+     * @return Returns the key of this NotificationUserInput object.
      */
     std::string GetInputKey() const;
 
     /**
-     * Adds additional data to this Builder.
+     * @brief Adds additional data to this Builder.
      * The value of AAFwk::WantParams will replace the existing extras value in this Builder.
+     *
      * @param additional Indicates the AAFwk::WantParams object containing the additional data.
      */
     void AddAdditionalData(AAFwk::WantParams &additional);
 
     /**
-     * Obtains the additional data included in this NotificationUserInput object.
-     * @return the additional data in this NotificationUserInput object.
+     * @brief Obtains the additional data included in this NotificationUserInput object.
+     *
+     * @return Returns the additional data in this NotificationUserInput object.
      */
     const std::shared_ptr<AAFwk::WantParams> GetAdditionalData() const;
 
     /**
-     * Sets the edit type of the options provided by this NotificationUserInput object.
+     * @brief Sets the edit type of the options provided by this NotificationUserInput object.
      * The edit type determines whether an option can be edited when the user taps the option.
+     *
      * @param inputEditType Indicates the edit type to set. For details about available values,
      * see NotificationConstant::InputEditType.
      */
     void SetEditType(NotificationConstant::InputEditType inputEditType);
 
     /**
-     * Obtains the edit type of the options provided by this NotificationUserInput object.
-     * @return the edit type of options.
+     * @brief Obtains the edit type of the options provided by this NotificationUserInput object.
+     *
+     * @return Returns the edit type of options.
      */
     NotificationConstant::InputEditType GetEditType() const;
 
     /**
-     * Sets the options provided to users to satisfy user input needs. All options are displayed in a single line.
-     * Due to limited space, some or all of the options may be hidden if the options are too long or
+     * @brief Sets the options provided to users to satisfy user input needs. All options are displayed in a single
+     * line.Due to limited space, some or all of the options may be hidden if the options are too long or
      * there are too many options.
+     *
      * @param options Indicates the list of predefined options to be provided for user input.
      */
     void SetOptions(const std::vector<std::string> &options);
 
     /**
-     * Obtains the options provided to the user to satisfy user input needs.
-     * @return the list of predefined options.
+     * @brief Obtains the options provided to the user to satisfy user input needs.
+     *
+     * @return Returns the list of predefined options.
      */
     std::vector<std::string> GetOptions() const;
 
     /**
-     * Sets whether users can input values of the given MIME type.
+     * @brief Sets whether users can input values of the given MIME type.
+     *
      * @param mimeType Indicates the MIME type allowed.
      * @param doPermit Specifies whether to allow the given MIME type.
      * The value true means to allow it, and the value false means not.
@@ -170,31 +183,36 @@ public:
     void SetPermitMimeTypes(const std::string &mimeType, bool doPermit);
 
     /**
-     * Obtains the MIME types allowed by this NotificationUserInput object.
-     * @return the list of allowed MIME types.
+     * @brief Obtains the MIME types allowed by this NotificationUserInput object.
+     *
+     * @return Returns the list of allowed MIME types.
      */
     std::set<std::string> GetPermitMimeTypes() const;
 
     /**
-     * Checks whether this NotificationUserInput object allows only values of particular MIME types.
-     * @return true if this object allows only values of particular MIME types; returns false otherwise.
+     * @brief Checks whether this NotificationUserInput object allows only values of particular MIME types.
+     *
+     * @return Returns true if this object allows only values of particular MIME types; returns false otherwise.
      */
     bool IsMimeTypeOnly() const;
 
     /**
-     * Sets the tag to be displayed to the user when collecting this input from the user.
+     * @brief Sets the tag to be displayed to the user when collecting this input from the user.
+     *
      * @param tag Indicates the tag to be displayed.
      */
     void SetTag(const std::string tag);
 
     /**
-     * Obtains the tag to be displayed to the user when collecting this input from the user.
-     * @return the tag to be displayed to the user.
+     * @brief Obtains the tag to be displayed to the user when collecting this input from the user.
+     *
+     * @return Returns the tag to be displayed to the user.
      */
     std::string GetTag() const;
 
     /**
-     * Sets whether users can input arbitrary text values.
+     * @brief Sets whether users can input arbitrary text values.
+     *
      * @param permitFreeFormInput Specifies whether to allow arbitrary text values. The default value is true,
      * indicating that arbitrary text values are allowed. If this parameter is set to false, you must either call
      * SetOptions(std::vector<std::string>) to set a non-null and non-empty list or call
@@ -203,57 +221,65 @@ public:
     void SetPermitFreeFormInput(bool permitFreeFormInput);
 
     /**
-     * Checks whether users can provide arbitrary values for this NotificationUserInput object.
-     * @return true if this object allows arbitrary values; returns false otherwise.
+     * @brief Checks whether users can provide arbitrary values for this NotificationUserInput object.
+     *
+     * @return Returns true if this object allows arbitrary values; returns false otherwise.
      */
     bool IsPermitFreeFormInput() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Dumps a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump();
 
     /**
-     * Converts a NotificationUserInput object into a Json.
+     * @brief Converts a NotificationUserInput object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationUserInput object from a Json.
+     * @brief Creates a NotificationUserInput object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationUserInput.
+     * @return Returns the NotificationUserInput object.
      */
     static NotificationUserInput *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationUserInput
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationUserInput object.
      */
     static NotificationUserInput *Unmarshalling(Parcel &parcel);
 
 private:
-    /**
-     * Default constructor used to create a NotificationUserInput instance.
-     */
     NotificationUserInput() = default;
 
     /**
-     * A constructor used to create a NotificationUserInput instance with the input parameters passed.
+     * @brief A constructor used to create a NotificationUserInput instance with the input parameters passed.
+     *
      * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
      * when the input is collected from the user.
      */
     explicit NotificationUserInput(const std::string &inputKey);
 
     /**
-     * A constructor used to create a NotificationUserInput instance with the input parameters passed.
+     * @brief A constructor used to create a NotificationUserInput instance with the input parameters passed.
+     *
      * @param inputKey Indicates the AAFwk::WantParams key used to identify this input
      * when the input is collected from the user.
      * @param tag Indicates the tag to be displayed.
@@ -272,8 +298,10 @@ private:
         const std::shared_ptr<AAFwk::WantParams> &additional, NotificationConstant::InputEditType editType);
 
     /**
-     * Read a NotificationUserInput object from a Parcel.
-     * @param parcel the parcel
+     * @brief Read a NotificationUserInput object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 

@@ -29,9 +29,22 @@ public:
     INotificationFilter() {};
     virtual ~INotificationFilter() {};
 
+    /**
+     * @brief Start the filter.
+     */
     virtual void OnStart() = 0;
+
+    /**
+     * @brief Stop the filter.
+     */
     virtual void OnStop() = 0;
 
+    /**
+     * @brief Filters the publish operation.
+     *
+     * @param record Indicates the NotificationRecord.
+     * @return Returns the filter result.
+     */
     virtual ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) = 0;
 };
 }  // namespace Notification

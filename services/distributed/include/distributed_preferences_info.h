@@ -25,10 +25,53 @@ class DistributedPreferencesInfo {
 public:
     DistributedPreferencesInfo();
     ~DistributedPreferencesInfo();
+
+    /**
+     * @brief Set whether the device supports distributed notifications.
+     *
+     * @param enable Specifies whether to enable the device to support distributed notification.
+     */
     void SetDistributedEnable(bool enable);
+
+    /**
+     * @brief  Check if the device supports distributed notification.
+     *
+     * @return True if the device supports distributed notification; false otherwise.
+     */
     bool GetDistributedEnable(void);
+
+    /**
+     * @brief Set whether an application supports distributed notifications.
+     *
+     * @param bundleOption Indicates the bundle name and uid of an application.
+     * @param enabled Specifies whether to enable an application to support distributed notification.
+     * @return Returns enable distributed by bundle result.
+     */
+
+    /**
+     * @brief Set whether an application supports distributed notifications.
+     *
+     * @param bundleName Indicates the bundle name of an application.
+     * @param uid Indicates the uid of an application.
+     * @param enable Specifies whether to enable an application to support distributed notification.
+     */
     void SetDistributedBundleEnable(const std::string &bundleName, int32_t uid, bool enable);
+
+    /**
+     * @brief Check whether an application supports distributed notifications.
+     *
+     * @param bundleName Indicates the bundle name of an application.
+     * @param uid Indicates the uid of an application.
+     * @return True if the application supports distributed notification; false otherwise.
+     */
     bool GetDistributedBundleEnable(const std::string &bundleName, int32_t uid);
+
+    /**
+     * @brief Remove the setting of whether the application supports distributed notification.
+     *
+     * @param bundleName Indicates the bundle name of an application.
+     * @param uid Indicates the uid of an application.
+     */
     void DeleteDistributedBundleInfo(const std::string &bundleName, int32_t uid);
 
 private:

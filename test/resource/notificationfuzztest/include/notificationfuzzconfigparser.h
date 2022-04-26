@@ -33,6 +33,12 @@ struct FuzzTestData {
 
 class NotificationFuzzConfigParser {
 public:
+    /**
+     * @brief Loads interface list from the configuration file.
+     *
+     * @param path The path of configuration file.
+     * @param ftd Records the configuration file.
+     */
     void ParseFromFile4FuzzTest(const std::string &path, FuzzTestData &ftd) const
     {
         std::cout << __func__ << std::endl;

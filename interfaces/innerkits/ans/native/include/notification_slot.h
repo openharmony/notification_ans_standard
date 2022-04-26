@@ -39,19 +39,16 @@ public:
     };
 
     /**
-     * A constructor used to initialize the type of a NotificationSlot object.
+     * @brief A constructor used to initialize the type of a NotificationSlot object.
      *
      * @param type  Specifies the type of the NotificationSlot object,
      */
     NotificationSlot(NotificationConstant::SlotType type = NotificationConstant::SlotType::CUSTOM);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationSlot();
 
     /**
-     * Obtains whether the notification light is enabled in a NotificationSlot object,
+     * @brief Obtains whether the notification light is enabled in a NotificationSlot object,
      * which is set by SetEnableLight(bool).
      *
      * @return Returns true if the notification light is enabled; returns false otherwise.
@@ -59,7 +56,7 @@ public:
     bool CanEnableLight() const;
 
     /**
-     * Specifies whether to enable the notification light when a notification is received on the device,
+     * @brief Specifies whether to enable the notification light when a notification is received on the device,
      * provided that this device has a notification light.
      * @note SetEnableLight must be set before the NotificationHelper:AddNotificationSlot(NotificationSlot) method is
      * called. Otherwise, the settings will not take effect.
@@ -71,7 +68,7 @@ public:
     void SetEnableLight(bool isLightEnabled);
 
     /**
-     * Obtains the vibration status of a NotificationSlot object,
+     * @brief Obtains the vibration status of a NotificationSlot object,
      * which is set by SetEnableVibration(bool).
      *
      * @return Returns true if vibration is enabled; returns false otherwise.
@@ -79,7 +76,7 @@ public:
     bool CanVibrate() const;
 
     /**
-     * Sets whether to enable vibration when a notification is received.
+     * @brief Sets whether to enable vibration when a notification is received.
      * @note SetEnableVibration(bool) must be set before the NotificationHelper::AddNotificationSlot(NotificationSlot)
      * method is called. Otherwise, the settings will not take effect.
      *
@@ -89,25 +86,25 @@ public:
     void SetEnableVibration(bool vibration);
 
     /**
-     * Obtains the description of a NotificationSlot object, which is set by SetDescription(string).
+     * @brief Obtains the description of a NotificationSlot object, which is set by SetDescription(string).
      *
      * @return Returns the description of the NotificationSlot object.
      */
     std::string GetDescription() const;
 
     /**
-     * Sets the description for a NotificationSlot object.
+     * @brief Sets the description for a NotificationSlot object.
      * @note The setting of setDescription is effective regardless of whether a NotificationSlot object has been created
      * by NotificationHelper::AddNotificationSlot(NotificationSlot).
      *
-     * @param description Describes the NotificationSlot object.
+     * @param description describes the NotificationSlot object.
      *                    The description is visible to users and its length must not exceed 1000 characters
      *                    (the excessive part is automatically truncated).
      */
     void SetDescription(const std::string &description);
 
     /**
-     * Obtains the ID of a NotificationSlot object.
+     * @brief Obtains the ID of a NotificationSlot object.
      *
      * @return Returns the ID of the NotificationSlot object,
      *         which is set by NotificationSlot(string, string, NotificationLevel).
@@ -115,7 +112,7 @@ public:
     std::string GetId() const;
 
     /**
-     * Obtains the color of the notification light in a NotificationSlot object,
+     * @brief Obtains the color of the notification light in a NotificationSlot object,
      * which is set by SetLedLightColor(int32_t).
      *
      * @return Returns the color of the notification light.
@@ -123,7 +120,7 @@ public:
     int32_t GetLedLightColor() const;
 
     /**
-     * Sets the color of the notification light to flash when a notification is received on the device,
+     * @brief Sets the color of the notification light to flash when a notification is received on the device,
      * provided that this device has a notification light and setEnableLight is called with the value true.
      * @note SetLedLightColor must be set before the NotificationHelper::AddNotificationSlot(NotificationSlot) method is
      * called. Otherwise, the settings will not take effect.
@@ -133,14 +130,14 @@ public:
     void SetLedLightColor(int32_t color);
 
     /**
-     * Obtains the level of a NotificationSlot object, which is set by SetLevel(NotificationLevel).
+     * @brief Obtains the level of a NotificationSlot object, which is set by SetLevel(NotificationLevel).
      *
      * @return Returns the level of the NotificationSlot object.
      */
     NotificationLevel GetLevel() const;
 
     /**
-     * Sets the level of a NotificationSlot object.
+     * @brief Sets the level of a NotificationSlot object.
      * @note SetLevel must be set before the NotificationHelper::AddNotificationSlot(NotificationSlot) method is called.
      *       Otherwise, the settings will not take effect.
      *
@@ -150,14 +147,14 @@ public:
     void SetLevel(NotificationLevel level);
 
     /**
-     * Obtains the type of a NotificationSlot object, which is set by SetType(SlotType).
+     * @brief Obtains the type of a NotificationSlot object, which is set by SetType(SlotType).
      *
      * @return Returns the Type of the NotificationSlot object.
      */
     NotificationConstant::SlotType GetType() const;
 
     /**
-     * Sets the type of a NotificationSlot object.
+     * @brief Sets the type of a NotificationSlot object.
      * @note Settype must be set before the NotificationHelper::AddNotificationSlot(NotificationSlot) method is called.
      *       Otherwise, the settings will not take effect.
      *
@@ -167,7 +164,7 @@ public:
     void SetType(NotificationConstant::SlotType type);
 
     /**
-     * Obtains the notification display effect of a NotificationSlot object on the lock screen,
+     * @brief Obtains the notification display effect of a NotificationSlot object on the lock screen,
      * which is set by SetLockscreenVisibleness(int32_t).
      * @note This method specifies different effects for displaying notifications on the lock screen in order to protect
      * user privacy. The setting takes effect only when the lock screen notifications function is enabled for an
@@ -178,7 +175,7 @@ public:
     NotificationConstant::VisiblenessType GetLockScreenVisibleness() const;
 
     /**
-     * Sets whether and how to display notifications on the lock screen.
+     * @brief Sets whether and how to display notifications on the lock screen.
      *
      * @param visibleness Specifies the notification display effect on the lock screen, which can be set to
      *                    NO_OVERRIDE, PUBLIC, PRIVATE, or SECRET.
@@ -186,14 +183,14 @@ public:
     void SetLockscreenVisibleness(NotificationConstant::VisiblenessType visibleness);
 
     /**
-     * Obtains the name of a NotificationSlot object.
+     * @brief Obtains the name of a NotificationSlot object.
      *
      * @return Returns the name of the NotificationSlot object, which is set by SetName(string).
      */
     std::string GetName() const;
 
     /**
-     * Obtains the ID of the NotificationSlotGroup object to which this NotificationSlot object belongs,
+     * @brief Obtains the ID of the NotificationSlotGroup object to which this NotificationSlot object belongs,
      * which is set by SetSlotGroup(string).
      *
      * @return Returns the ID of the NotificationSlotGroup to which this NotificationSlot object belongs.
@@ -201,9 +198,10 @@ public:
     std::string GetSlotGroup() const;
 
     /**
-     * Binds a NotificationSlot object to a specified NotificationSlotGroup.
+     * @brief Binds a NotificationSlot object to a specified NotificationSlotGroup.
      * @note SetSlotGroup must be called before the NotificationHelper::AddNotificationSlot(NotificationSlot) method is
      * called. Otherwise, this method will not take effect.
+     *
      * @param groupId Indicates the ID of the NotificationSlotGroup object to bind,
      *                which must have been created by calling
      * NotificationHelper::AddNotificationSlotGroup(NotificationSlotGroup).
@@ -211,14 +209,14 @@ public:
     void SetSlotGroup(const std::string &groupId);
 
     /**
-     * Obtains the prompt tone of a NotificationSlot object, which is set by SetSound(Uri).
+     * @brief Obtains the prompt tone of a NotificationSlot object, which is set by SetSound(Uri).
      *
      * @return Returns the prompt tone of the NotificationSlot object.
      */
     Uri GetSound() const;
 
     /**
-     * Sets a prompt tone for a NotificationSlot object, which will be played after a notification is received.
+     * @brief Sets a prompt tone for a NotificationSlot object, which will be played after a notification is received.
      * @note SetSound must be set before the NotificationHelper:AddNotificationSlot(NotificationSlot) method is called.
      *       Otherwise, the settings will not take effect.
      *
@@ -227,14 +225,14 @@ public:
     void SetSound(const Uri &sound);
 
     /**
-     * Obtains the vibration style of notifications in this NotificationSlot.
+     * @brief Obtains the vibration style of notifications in this NotificationSlot.
      *
      * @return Returns the vibration style of this NotificationSlot.
      */
     std::vector<int64_t> GetVibrationStyle() const;
 
     /**
-     * Sets the vibration style for notifications in this NotificationSlot.
+     * @brief Sets the vibration style for notifications in this NotificationSlot.
      * @note If an empty array or null is passed to this method, the system then calls
      *       SetEnableVibration(bool) with the input parameter set to false.
      *       If a valid value is passed to this method, the system calls SetEnableVibration(bool) with the input
@@ -246,7 +244,7 @@ public:
     void SetVibrationStyle(const std::vector<int64_t> &vibration);
 
     /**
-     * Obtains whether DND mode is bypassed for a NotificationSlot object,
+     * @brief Obtains whether DND mode is bypassed for a NotificationSlot object,
      * which is set by EnableBypassDnd(bool).
      *
      * @return Returns true if DND mode is bypassed; returns false otherwise.
@@ -254,7 +252,7 @@ public:
     bool IsEnableBypassDnd() const;
 
     /**
-     * Sets whether to bypass Do not disturb (DND) mode in the system.
+     * @brief Sets whether to bypass Do not disturb (DND) mode in the system.
      * @note The setting of EnableBypassDnd takes effect only when the Allow interruptions function
      *       is enabled for an application in system notification settings.
      *
@@ -265,7 +263,7 @@ public:
     void EnableBypassDnd(bool isBypassDnd);
 
     /**
-     * Obtains the application icon badge status of a NotificationSlot object,
+     * @brief Obtains the application icon badge status of a NotificationSlot object,
      * which is set by EnableBadge(bool).
      *
      * @return Returns true if the application icon badge is enabled; returns false otherwise.
@@ -273,7 +271,7 @@ public:
     bool IsShowBadge() const;
 
     /**
-     * Sets whether to display application icon badges (digits or dots in the corner of the application icon)
+     * @brief Sets whether to display application icon badges (digits or dots in the corner of the application icon)
      * on the home screen after a notification is received.
      * @note EnableBadge must be set before the NotificationHelper:AddNotificationSlot(NotificationSlot) method is
      * called. Otherwise, the settings will not take effect.
@@ -285,14 +283,14 @@ public:
     void EnableBadge(bool isShowBadge);
 
     /**
-     * Dumps a string representation of the object.
+     * @brief Dumps a string representation of the object.
      *
-     * @return A string representation of the object.
+     * @return Returns a string representation of the object.
      */
     std::string Dump() const;
 
     /**
-     * Marshals a NotificationSlot object into a Parcel.
+     * @brief Marshals a NotificationSlot object into a Parcel.
      *
      * @param parcel Indicates the Parcel object for marshalling.
      * @return Returns true if the marshalling is successful; returns false otherwise.
@@ -300,40 +298,40 @@ public:
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshals a NotificationSlot object from a Parcel.
+     * @brief Unmarshals a NotificationSlot object from a Parcel.
      *
      * @param parcel Indicates the Parcel object for unmarshalling.
-     * @return Returns true if the unmarshalling is successful; returns false otherwise.
+     * @return Returns the NotificationSlot object.
      */
     static NotificationSlot *Unmarshalling(Parcel &parcel);
 
 private:
     /**
-     * Read NotificationSlot object from a Parcel.
+     * @brief Read NotificationSlot object from a Parcel.
      *
-     * @param parcel the parcel
-     * @return read from parcel success or fail
+     * @param parcel Indicates the Parcel object for unmarshalling.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 
     /**
-     * Merge the contents of vector and output a string
+     * @brief Merge the contents of vector and output a string
      *
-     * @param mergeVector The vector which will be merged
+     * @param mergeVector Indicates the vector which will be merged
      * @return Returns the string that has contents of the vector
      */
     std::string MergeVectorToString(const std::vector<int64_t> &mergeVector) const;
 
     /**
-     * If string length exceed 1000 characters, the excessive part is automatically truncated.
+     * @brief If string length exceed 1000 characters, the excessive part is automatically truncated.
      *
-     * @param in The sting which will be truncated
+     * @param in Indicates the sting which will be truncated
      * @return Returns the string that has been truncated.
      */
     std::string TruncateString(const std::string &in);
 
     /**
-     * Sets the name of a NotificationSlot object.
+     * @brief Sets the name of a NotificationSlot object.
      * @note The setting of SetName is effective regardless of whether a NotificationSlot object has been created by
      *       NotificationHelper:AddNotificationSlot(NotificationSlot).
      *

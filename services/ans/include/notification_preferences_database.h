@@ -28,30 +28,157 @@ class NotificationPreferencesDatabase final {
 public:
     NotificationPreferencesDatabase();
     ~NotificationPreferencesDatabase();
+
+    /**
+     * @brief Put notification slots into disturbe DB.
+     *
+     * @param bundleName Indicates bunlde name.
+     * @param bundleUid Indicates bunlde uid.
+     * @param slots Indicates notification slots.
+     * @return Return true on success, false on failure.
+     */
     bool PutSlotsToDisturbeDB(
-	    const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlot>> &slots);
+        const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlot>> &slots);
+
+    /**
+     * @brief Put notification slot groups into disturbe DB.
+     *
+     * @param bundleName Indicates bunlde name.
+     * @param bundleUid Indicates bunlde uid.
+     * @param groups Indicates notification groups.
+     * @return Return true on success, false on failure.
+     */
     bool PutGroupsToDisturbeDB(
-	    const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlotGroup>> &groups);
+        const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlotGroup>> &groups);
+
+    /**
+     * @brief Put notification bundle into disturbe DB.
+     *
+     * @param bundleInfo Indicates bunlde info.
+     * @return Return true on success, false on failure.
+     */
     bool PutBundlePropertyToDisturbeDB(const NotificationPreferencesInfo::BundleInfo &bundleInfo);
 
+    /**
+     * @brief Put show badge in the of bundle into disturbe DB.
+     *
+     * @param bundleInfo Indicates bunlde info.
+     * @param enable Indicates to whether show badge.
+     * @return Return true on success, false on failure.
+     */
     bool PutShowBadge(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &enable);
+
+    /**
+     * @brief Put importance in the of bundle into disturbe DB.
+     *
+     * @param bundleInfo Indicates bunlde info.
+     * @param importance Indicates to importance level  which can be LEVEL_NONE,
+               LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
+     * @return Return true on success, false on failure.
+     */
     bool PutImportance(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &importance);
+
+    /**
+     * @brief Put badge total nums in the of  bundle into disturbe DB.
+     *
+     * @param bundleInfo Indicates bunlde info.
+     * @param totalBadgeNum Indicates to total badge num.
+     * @return Return true on success, false on failure.
+     */
     bool PutTotalBadgeNums(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &totalBadgeNum);
+
+    /**
+     * @brief Put private notification allowed in the of  bundle into disturbe DB.
+     *
+     * @param bundleInfo Indicates bunlde info.
+     * @param allow Indicates to whether to allow
+     * @return Return true on success, false on failure.
+     */
     bool PutPrivateNotificationsAllowed(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &allow);
+
+    /**
+     * @brief Put enable notification in the of  bundle into disturbe DB.
+     *
+     * @param bundleInfo Indicates bunlde info.
+     * @param enabled Indicates to whether to enabled
+     * @return Return true on success, false on failure.
+     */
     bool PutNotificationsEnabledForBundle(
         const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &enabled);
+
+    /**
+     * @brief Put enable notification into disturbe DB.
+     *
+     * @param userId Indicates user.
+     * @param enabled Indicates to whether to enabled
+     * @return Return true on success, false on failure.
+     */
     bool PutNotificationsEnabled(const int32_t &userId, const bool &enabled);
     bool PutHasPoppedDialog(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const bool &hasPopped);
+
+    /**
+     * @brief Put do not disturbe date into disturbe DB.
+     *
+     * @param userId Indicates user.
+     * @param date Indicates to do not disturbe date.
+     * @return Return true on success, false on failure.
+     */
     bool PutDoNotDisturbDate(const int32_t &userId, const sptr<NotificationDoNotDisturbDate> &date);
 
+    /**
+     * @brief Parse notification info from disturbe DB.
+     *
+     * @param info Indicates notification info.
+     * @return Return true on success, false on failure.
+     */
     bool ParseFromDisturbeDB(NotificationPreferencesInfo &info);
 
+    /**
+     * @brief Delete all data from disturbe DB.
+     *
+     * @return Return true on success, false on failure.
+     */
     bool RemoveAllDataFromDisturbeDB();
+
+    /**
+     * @brief Delete bundle data from disturbe DB.
+     *
+     * @param bundleKey Indicates the bundle key.
+     * @return Return true on success, false on failure.
+     */
     bool RemoveBundleFromDisturbeDB(const std::string &bundleKey);
+
+    /**
+     * @brief Delete slot from disturbe DB.
+     *
+     * @param bundleKey Indicates to which a bundle.
+     * @param type Indicates to slot type.
+     * @return Return true on success, false on failure.
+     */
     bool RemoveSlotFromDisturbeDB(const std::string &bundleKey, const NotificationConstant::SlotType &type);
+
+    /**
+     * @brief Delete all slots in the of bundle from disturbe DB.
+     *
+     * @param bundleKey Indicates to which a bundle.
+     * @return Return true on success, false on failure.
+     */
     bool RemoveAllSlotsFromDisturbeDB(const std::string &bundleKey);
+
+    /**
+     * @brief Delete some groups in the of bundle from disturbe DB.
+     *
+     * @param bundleKey Indicates to which a bundle.
+     * @param groupId Indicates to group id in the of bundle.
+     * @return Return true on success, false on failure.
+     */
     bool RemoveGroupsFromDisturbeDB(const std::string &bundleKey, const std::vector<std::string> &groupId);
 
+    /**
+     * @brief Deal death recipient.
+     *
+     * @return Return true on success, false on failure.
+     */
     bool StoreDeathRecipient();
 
     bool RemoveNotificationEnable(const int32_t userId);

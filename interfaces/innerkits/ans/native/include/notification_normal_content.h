@@ -23,44 +23,46 @@ namespace OHOS {
 namespace Notification {
 class NotificationNormalContent : public NotificationBasicContent {
 public:
-    /**
-     * Default constructor used to create a NotificationNormalContent instance.
-     */
     NotificationNormalContent() = default;
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationNormalContent() = default;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump() override;
 
     /**
-     * Converts a NotificationNormalContent object into a Json.
+     * @brief Converts a NotificationNormalContent object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationNormalContent object from a Json.
+     * @brief Creates a NotificationNormalContent object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationNormalContent.
+     * @return Returns the NotificationNormalContent object.
      */
     static NotificationNormalContent *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationNormalContent
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationNormalContent object.
      */
     static NotificationNormalContent *Unmarshalling(Parcel &parcel);
 };

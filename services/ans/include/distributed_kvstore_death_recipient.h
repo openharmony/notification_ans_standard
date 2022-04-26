@@ -24,14 +24,25 @@ namespace OHOS {
 namespace Notification {
 class DistributedKvStoreDeathRecipient : public DistributedKv::KvStoreDeathRecipient {
 public:
+    /**
+     * @brief The constructor.
+     *
+     * @param callback Indicates the callback.
+     */
     explicit DistributedKvStoreDeathRecipient(const std::function<void()> &callback)
     {
         callback_ = callback;
     }
 
+    /**
+     * @brief The deconstructor.
+     */
     virtual ~DistributedKvStoreDeathRecipient()
     {}
 
+    /**
+     * @brief Obtains the death event. Inherited from DistributedKv::KvStoreDeathRecipient.
+     */
     void OnRemoteDied() override
     {
         if (callback_ != nullptr) {

@@ -139,198 +139,221 @@ public:
     static const uint32_t COLOR_DEFAULT;
 
 public:
-    /**
-     * Default constructor used to create a NotificationRequest instance.
-     */
     NotificationRequest() = default;
 
     /**
-     * A constructor used to create a NotificationRequest instance with the input parameter notificationId passed.
-     * @param notificationId notification ID
+     * @brief A constructor used to create a NotificationRequest instance with the input parameter notificationId
+     * passed.
+     *
+     * @param notificationId Indicates notification ID.
      */
     explicit NotificationRequest(int32_t notificationId);
 
     /**
-     * A constructor used to create a NotificationRequest instance by copying parameters from an existing one.
-     * @param other the existing object
+     * @brief A constructor used to create a NotificationRequest instance by copying parameters from an existing one.
+     *
+     * @param other Indicates the existing object.
      */
     NotificationRequest(const NotificationRequest &other);
 
     /**
-     * A constructor used to create a NotificationRequest instance by copying parameters from an existing one.
-     * @param other the existing object
+     * @brief A constructor used to create a NotificationRequest instance by copying parameters from an existing one.
+     *
+     * @param other Indicates the existing object.
      */
     NotificationRequest &operator=(const NotificationRequest &other);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     virtual ~NotificationRequest();
 
     /**
-     * Checks whether this notification is in progress.
-     * @return true if this notification is in progress; returns false otherwise.
+     * @brief Checks whether this notification is in progress.
+     *
+     * @return Returns true if this notification is in progress; returns false otherwise.
      */
     bool IsInProgress() const;
 
     /**
-     * Sets whether this notification is in progress.
+     * @brief Sets whether this notification is in progress.
      * Users cannot directly dismiss notifications in progress because
      * they usually contain some ongoing background services such as music playback.
+     *
      * @param isOngoing Specifies whether this notification is in progress.
      */
     void SetInProgress(bool isOngoing);
 
     /**
-     * Checks whether this notification is unremovable.
-     * @return true if this notification is unremovable; returns false otherwise.
+     * @brief Checks whether this notification is unremovable.
+     *
+     * @return Returns true if this notification is unremovable; returns false otherwise.
      */
     bool IsUnremovable() const;
 
     /**
-     * Sets whether this notification is unremovable.
+     * @brief Sets whether this notification is unremovable.
      * If it is set to be unremovable, it cannot be removed by users.
+     *
      * @param isUnremovable Specifies whether this notification is unremovable.
      */
     void SetUnremovable(bool isUnremovable);
 
     /**
-     * Sets the number to be displayed for this notification.
+     * @brief Sets the number to be displayed for this notification.
+     *
      * @param number Indicates the number to set.
      */
     void SetBadgeNumber(int32_t number);
 
     /**
-     * Obtains the number to be displayed for this notification.
-     * @return the number to be displayed for this notification.
+     * @brief Obtains the number to be displayed for this notification.
+     *
+     * @return Returns the number to be displayed for this notification.
      */
     int32_t GetBadgeNumber() const;
 
     /**
-     * Sets the current notification ID to uniquely identify the notification in the application.
+     * @brief Sets the current notification ID to uniquely identify the notification in the application.
      * After a notification is received, its ID is obtained by using the getNotificationId() method.
+     *
      * @param notificationId Indicates the ID of the notification to be set.
      */
     void SetNotificationId(int32_t notificationId);
 
     /**
-     * Obtains the notification ID, which is unique in the current application.
+     * @brief Obtains the notification ID, which is unique in the current application.
+     *
      * @return the notification ID.
      */
     int32_t GetNotificationId() const;
 
     /**
-     * Adds an WantAgent to this notification.
-     * After a notification is tapped,
-     * subsequent operations such as ability and common events will be triggered as set by WantAgent.
+     * @brief Adds an WantAgent to this notification.
+     * After a notification is tapped, subsequent operations such as ability and common events will be triggered as
+     * set by WantAgent.
+     *
      * @param wantAgent Indicates the operation triggered by tapping the notification, which can be set by
      * WantAgent.
      */
     void SetWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
-     * Obtains the WantAgent contained in this notification.
-     * @return the WantAgent contained in this notification.
+     * @brief Obtains the WantAgent contained in this notification.
+     *
+     * @return Returns the WantAgent contained in this notification.
      */
     const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetWantAgent() const;
 
     /**
-     * Sets an WantAgent object that is triggered when the user explicitly removes this notification.
+     * @brief Sets an WantAgent object that is triggered when the user explicitly removes this notification.
+     *
      * @param wantAgent Indicates the WantAgent object to be triggered.
      */
     void SetRemovalWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
-     * Obtains the WantAgent object that is triggered when the user explicitly removes this notification.
-     * @return the WantAgent object to be triggered.
+     * @brief Obtains the WantAgent object that is triggered when the user explicitly removes this notification.
+     *
+     * @return Returns the WantAgent object to be triggered.
      */
     const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetRemovalWantAgent() const;
 
     /**
-     * Sets the WantAgent to start when the device is not in use,
+     * @brief Sets the WantAgent to start when the device is not in use,
      * instead of showing this notification in the status bar.
      * When the device is in use, the system UI displays a pop-up notification
      * instead of starting the WantAgent specified by maxScreenWantAgent.
      * Your application must have the ohos.permission.USE_WHOLE_SCREEN permission to use this method.
+     *
      * @param wantAgent Indicates the WantAgent object containing information about the to-be-started ability that
      * uses the Page template.
      */
     void SetMaxScreenWantAgent(const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent);
 
     /**
-     * Obtains the full-screen WantAgent set by calling setMaxScreenWantAgent(WantAgent).
-     * @return the full-screen WantAgent.
+     * @brief Obtains the full-screen WantAgent set by calling setMaxScreenWantAgent(WantAgent).
+     *
+     * @return Returns the full-screen WantAgent.
      */
     const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetMaxScreenWantAgent() const;
 
     /**
-     * Sets extra parameters that are stored as key-value pairs for the notification.
+     * @brief Sets extra parameters that are stored as key-value pairs for the notification.
+     *
      * @param extras Indicates the WantParams object containing the extra parameters in key-value pair format.
      */
     void SetAdditionalData(const std::shared_ptr<AAFwk::WantParams> &extras);
 
     /**
-     * Obtains the WantParams object set in the notification.
-     * @return the WantParams object.
+     * @brief Obtains the WantParams object set in the notification.
+     *
+     * @return Returns the WantParams object.
      */
     const std::shared_ptr<AAFwk::WantParams> GetAdditionalData() const;
 
     /**
-     * Sets the time to deliver a notification.
+     * @brief Sets the time to deliver a notification.
+     *
      * @param deliveryTime Indicates the time in milliseconds.
      */
     void SetDeliveryTime(int64_t deliveryTime);
 
     /**
-     * Obtains the time when a notification is delivered.
-     * @return the time in milliseconds.
+     * @brief Obtains the time when a notification is delivered.
+     *
+     * @return Returns the time in milliseconds.
      */
     int64_t GetDeliveryTime() const;
 
     /**
-     * Checks whether the notification delivery time is displayed for this notification.
-     * @return true if the time is displayed; returns false otherwise.
+     * @brief Checks whether the notification delivery time is displayed for this notification.
+     *
+     * @return Returns true if the time is displayed; returns false otherwise.
      */
     bool IsShowDeliveryTime() const;
 
     /**
-     * Sets whether to show the notification delivery time for this notification.
+     * @brief Sets whether to show the notification delivery time for this notification.
      * This method is valid only when the notification delivery time has been set by calling setDeliveryTime(int64_t).
+     *
      * @param showDeliveryTime Specifies whether to show the notification delivery time.
      */
     void SetShowDeliveryTime(bool showDeliveryTime);
 
     /**
-     * Adds a NotificationActionButton to this notification.
+     * @brief Adds a NotificationActionButton to this notification.
      * An operation button is usually placed next to the notification content by the system.
      * Each action button must contain an icon, a title, and an WantAgent. When a notification is expanded,
      * a maximum of three action buttons can be displayed from left to right in the order they were added.
      * When the notification is collapsed, no action buttons will be displayed.
+     *
      * @param actionButton Indicates the NotificationActionButton object to add.
      */
     void AddActionButton(const std::shared_ptr<NotificationActionButton> &actionButton);
 
     /**
-     * Obtains the list of all NotificationActionButton objects included in this notification.
-     * @return the list of NotificationActionButton objects.
+     * @brief Obtains the list of all NotificationActionButton objects included in this notification.
+     *
+     * @return Returns the list of NotificationActionButton objects.
      */
     const std::vector<std::shared_ptr<NotificationActionButton>> GetActionButtons() const;
 
     /**
-     * Clear the list of all NotificationActionButton objects included in this notification.
+     * @brief Clear the list of all NotificationActionButton objects included in this notification.
      */
     void ClearActionButtons();
 
     /**
-     * Checks whether the platform is allowed to generate contextual NotificationActionButton objects for this
+     * @brief Checks whether the platform is allowed to generate contextual NotificationActionButton objects for this
      * notification.
-     * @return true if the platform is allowed to generate contextual NotificationActionButton objects;
+     *
+     * @return Returns true if the platform is allowed to generate contextual NotificationActionButton objects;
      * returns false otherwise.
      */
     bool IsPermitSystemGeneratedContextualActionButtons() const;
 
     /**
-     * Sets whether to allow the platform to generate contextual NotificationActionButton objects for this notification.
+     * @brief Sets whether to allow the platform to generate contextual NotificationActionButton objects for this
+     * notification.
+     *
      * @param permitted Specifies whether to allow the platform to generate contextual NotificationActionButton objects.
      * The default value true indicates that the platform is allowed to generate contextual action buttons,
      * and the value false indicates not.
@@ -338,35 +361,40 @@ public:
     void SetPermitSystemGeneratedContextualActionButtons(bool permitted);
 
     /**
-     * Adds a MessageUser object and associates it with this notification.
+     * @brief Adds a MessageUser object and associates it with this notification.
+     *
      * @param messageUser Indicates the MessageUser object to add.
      */
     void AddMessageUser(const std::shared_ptr<MessageUser> &messageUser);
 
     /**
-     * Obtains all MessageUser objects associated with this notification.
-     * @return the list of MessageUser objects associated with this notification.
+     * @brief Obtains all MessageUser objects associated with this notification.
+     *
+     * @return Returns the list of MessageUser objects associated with this notification.
      */
     const std::vector<std::shared_ptr<MessageUser>> GetMessageUsers() const;
 
     /**
-     * Checks whether this notification is set to alert only once,
+     * @brief Checks whether this notification is set to alert only once,
      * which means that sound or vibration will no longer be played
      * for notifications with the same ID upon their updates.
-     * @return true if this notification is set to alert only once; returns false otherwise.
+     *
+     * @return Returns true if this notification is set to alert only once; returns false otherwise.
      */
     bool IsAlertOneTime() const;
 
     /**
-     * Sets whether to have this notification alert only once.
+     * @brief Sets whether to have this notification alert only once.
      * If a notification alerts only once, sound or vibration will no longer be played
      * for notifications with the same ID upon their updates after they are published.
+     *
      * @param isAlertOnce Specifies whether to have this notification alert only once.
      */
     void SetAlertOneTime(bool isAlertOnce);
 
     /**
-     * Sets the time to delete a notification.
+     * @brief Sets the time to delete a notification.
+     *
      * @param deletedTime Indicates the time in milliseconds.
      * The default value is 0, indicating that the notification will not be automatically deleted.
      * To enable the notification to be automatically deleted, set this parameter to an integer greater than 0.
@@ -374,98 +402,112 @@ public:
     void SetAutoDeletedTime(int64_t deletedTime);
 
     /**
-     * Obtains the period during which a notification is deleted.
-     * @return the period in milliseconds.
+     * @brief Obtains the period during which a notification is deleted.
+     *
+     * @return Returns the period in milliseconds.
      */
     int64_t GetAutoDeletedTime() const;
 
     /**
-     * Sets the little icon of the notification.
+     * @brief Sets the little icon of the notification.
+     *
      * @param littleIcon Indicates the icon of the notification.
      */
     void SetLittleIcon(const std::shared_ptr<Media::PixelMap> &littleIcon);
 
     /**
-     * Obtains the icon of the notification.
-     * @return the notification icon.
+     * @brief Obtains the icon of the notification.
+     *
+     * @return Returns the notification icon.
      */
     const std::shared_ptr<Media::PixelMap> GetLittleIcon() const;
 
     /**
-     * Sets the large icon of this notification, which is usually displayed on the right of the notification.
+     * @brief Sets the large icon of this notification, which is usually displayed on the right of the notification.
+     *
      * @param bigIcon Indicates the large icon to set. It must be a PixelMap object.
      */
     void SetBigIcon(const std::shared_ptr<Media::PixelMap> &bigIcon);
 
     /**
-     * Obtains the large icon of this notification.
-     * @return the large icon of this notification.
+     * @brief Obtains the large icon of this notification.
+     *
+     * @return Returns the large icon of this notification.
      */
     const std::shared_ptr<Media::PixelMap> GetBigIcon() const;
 
     /**
-     * Sets the classification of this notification, which describes the purpose of this notification.
+     * @brief Sets the classification of this notification, which describes the purpose of this notification.
      * Notification classifications are used to filter and sort notifications.
+     *
      * @param classification Indicates the notification classification predefined in the system,
      * such as CLASSIFICATION_CALL or CLASSIFICATION_NAVIGATION etc.
      */
     void SetClassification(const std::string &classification);
 
     /**
-     * Obtains the classification of this notification.
-     * @return the classification of this notification.
+     * @brief Obtains the classification of this notification.
+     *
+     * @return Returns the classification of this notification.
      */
     std::string GetClassification() const;
 
     /**
-     * Sets the background color of this notification.
+     * @brief Sets the background color of this notification.
      * This method is valid only when background color has been enabled by calling setColorEnabled(bool).
+     *
      * @param color Indicates the background color to set. For details about the value range, see Color.
      */
     void SetColor(uint32_t color);
 
     /**
-     * Obtains the background color of this notification.
+     * @brief Obtains the background color of this notification.
      * The return value, except for the default color COLOR_DEFAULT,
      * is the bitwise OR operation result of 0xFF000000 and the ARGB value set by setColor(uint32_t).
-     * @return the background color of this notification.
+     *
+     * @return Returns the background color of this notification.
      */
     uint32_t GetColor() const;
 
     /**
-     * Checks whether background color is enabled for this notification.
-     * @return true if background color is enabled; returns false otherwise.
+     * @brief Checks whether background color is enabled for this notification.
+     *
+     * @return Returns true if background color is enabled; returns false otherwise.
      */
     bool IsColorEnabled() const;
 
     /**
-     * Sets whether to enable background color for this notification.
+     * @brief Sets whether to enable background color for this notification.
      * If colorEnabled is set to true, this method takes effect only
      * when the notification content type has been set to NotificationRequest.
      * NotificationMediaContent in the NotificationRequest object through
      * NotificationRequest::setContent(NotificationContent) and an AVToken has been attached to
      * that NotificationMediaContent object through NotificationMediaContent::setAVToken(AVToken).
+     *
      * @param colorEnabled Specifies whether to enable background color.
      */
     void SetColorEnabled(bool colorEnabled);
 
     /**
-     * Sets the notification content type to NotificationNormalContent, NotificationLongTextContent,
+     * @brief Sets the notification content type to NotificationNormalContent, NotificationLongTextContent,
      * or NotificationPictureContent etc.
      * Each content type indicates a particular notification content.
+     *
      * @param content Indicates the notification content type.
      */
     void SetContent(const std::shared_ptr<NotificationContent> &content);
 
     /**
-     * Obtains the notification content set by calling the setContent(NotificationContent) method.
-     * @return the notification content.
+     * @brief Obtains the notification content set by calling the setContent(NotificationContent) method.
+     *
+     * @return Returns the notification content.
      */
     const std::shared_ptr<NotificationContent> GetContent() const;
 
     /**
-     * Obtains the notification type.
-     * @return the type of the current notification, which can be
+     * @brief Obtains the notification type.
+     *
+     * @return Returns the type of the current notification, which can be
      * NotificationContent::Type::BASIC_TEXT,
      * NotificationContent::Type::LONG_TEXT,
      * NotificationContent::Type::PICTURE,
@@ -476,52 +518,58 @@ public:
     NotificationContent::Type GetNotificationType() const;
 
     /**
-     * Checks whether the notification creation time is displayed as a countdown timer.
-     * @return true if the time is displayed as a countdown timer; returns false otherwise.
+     * @brief Checks whether the notification creation time is displayed as a countdown timer.
+     *
+     * @return Returns true if the time is displayed as a countdown timer; returns false otherwise.
      */
     bool IsCountdownTimer() const;
 
     /**
-     * Sets whether to show the notification creation time as a countdown timer.
+     * @brief Sets whether to show the notification creation time as a countdown timer.
      * This method is valid only when setShowStopwatch(boolean) is set to true.
+     *
      * @param isCountDown Specifies whether to show the notification creation time as a countdown timer.
      */
     void SetCountdownTimer(bool isCountDown);
 
     /**
-     * Sets the group alert type for this notification,
+     * @brief Sets the group alert type for this notification,
      * which determines how the group overview and other notifications in a group are published.
      * The group information must have been set by calling setGroupValue(string).
      * Otherwise, this method does not take effect.
+     *
      * @param type Indicates the group alert type to set. which can be GroupAlertType::ALL (default value),
      * GroupAlertType::OVERVIEW, or GroupAlertType::CHILD etc.
      */
     void SetGroupAlertType(NotificationRequest::GroupAlertType type);
 
     /**
-     * Obtains the group alert type of this notification.
-     * @return the group alert type of this notification.
+     * @brief Obtains the group alert type of this notification.
+     *
+     * @return Returns the group alert type of this notification.
      */
     NotificationRequest::GroupAlertType GetGroupAlertType() const;
 
     /**
-     * Checks whether this notification is the group overview.
-     * @return true if this notification is the group overview; returns false otherwise.
+     * @brief Checks whether this notification is the group overview.
+     *
+     * @return Returns true if this notification is the group overview; returns false otherwise.
      */
     bool IsGroupOverview() const;
 
     /**
-     * Sets whether to use this notification as the overview of its group.
+     * @brief Sets whether to use this notification as the overview of its group.
      * This method helps display the notifications that are assigned the same group name by calling
      * setGroupName(string) as one stack in the notification bar.
      * Each group requires only one group overview. After a notification is set as the group overview,
      * it becomes invisible if another notification in the same group is published.
+     *
      * @param overView Specifies whether to set this notification as the group overview.
      */
     void SetGroupOverview(bool overView);
 
     /**
-     * Sets the group information for this notification.
+     * @brief Sets the group information for this notification.
      * If no groups are set for notifications, all notifications from the same application will appear
      * in the notification bar as one stack with the number of stacked notifications displayed.
      * If notifications are grouped and there are multiple groups identified by different groupName,
@@ -530,185 +578,211 @@ public:
      * setGroupOverview(bool), and other notifications are considered as child notifications.
      * Otherwise, notifications will not be displayed as one group even if they are assigned the same groupName by
      * calling setGroupName(string).
+     *
      * @param groupName Specifies whether to set this notification as the group overview.
      */
     void SetGroupName(const std::string &groupName);
 
     /**
-     * Obtains the group information about this notification.
-     * @return the group information about this notification.
+     * @brief Obtains the group information about this notification.
+     *
+     * @return Returns the group information about this notification.
      */
     std::string GetGroupName() const;
 
     /**
-     * Checks whether this notification is relevant only to the local device and cannot be displayed on remote devices.
-     * @return true if this notification is relevant only to the local device; returns false otherwise.
+     * @brief Checks whether this notification is relevant only to the local device and cannot be displayed on remote
+     * devices.
+     *
+     * @return Returns true if this notification is relevant only to the local device; returns false otherwise.
      */
     bool IsOnlyLocal() const;
 
     /**
-     * Sets whether this notification is relevant only to the local device and cannot be displayed on remote devices.
-     * This method takes effect only for notifications published by calling
+     * @brief Sets whether this notification is relevant only to the local device and cannot be displayed on remote
+     * devices.This method takes effect only for notifications published by calling
      * NotificationHelper::publishNotification(NotificationRequest) or
      * NotificationHelper#publishNotification(string, NotificationRequest).
      * Notifications published using NotificationHelper::publishNotification(NotificationRequest, string)
      * in a distributed system will not be affected.
+     *
      * @param flag Specifies whether this notification can be displayed only on the local device.
      */
     void SetOnlyLocal(bool flag);
 
     /**
-     * Sets the text that will be displayed as a link to the settings of the application.
+     * @brief Sets the text that will be displayed as a link to the settings of the application.
      * Calling this method is invalid if the notification content type has been set to NotificationLongTextContent
      * or NotificationPictureContent in the NotificationRequest object through setContent(NotificationContent).
+     *
      * @param text Indicates the text to be included. You can set it to any valid link.
      */
     void SetSettingsText(const std::string &text);
 
     /**
-     * Obtains the text that will be displayed as a link to the settings of the application.
-     * @return the text displayed as the link to the application settings.
+     * @brief Obtains the text that will be displayed as a link to the settings of the application.
+     *
+     * @return Returns the text displayed as the link to the application settings.
      */
     std::string GetSettingsText() const;
 
     /**
-     * Deprecated.
-     * Obtains the time when a notification is created.
-     * @return the time in milliseconds.
+     * @brief Deprecated. Obtains the time when a notification is created.
+     *
+     * @return Returns the time in milliseconds.
      */
     int64_t GetCreateTime() const;
 
     /**
-     * Checks whether the notification creation time is displayed as a stopwatch.
-     * @return true if the time is displayed as a stopwatch; returns false otherwise.
+     * @brief Checks whether the notification creation time is displayed as a stopwatch.
+     *
+     * @return Returns true if the time is displayed as a stopwatch; returns false otherwise.
      */
     bool IsShowStopwatch() const;
 
     /**
-     * Sets whether to show the notification creation time as a stopwatch.
+     * @brief Sets whether to show the notification creation time as a stopwatch.
      * This method is valid only when the notification creation time has been set by calling setDeliveryTime(int64_t).
      * When the notification creation time is set to be shown as a stopwatch, the interval between the current time
      * and the creation time set by setDeliveryTime(int64_t) is dynamically displayed for this notification
      * in Minutes: Seconds format. If the interval is longer than 60 minutes, it will be displayed
      * in Hours: Minutes: Seconds format. If this method and setShowDeliveryTime(boolean) are both set to true, only
      * this method takes effect, that is, the notification creation time will be shown as a stopwatch.
+     *
      * @param isShow Specifies whether to show the notification creation time as a stopwatch.
      */
     void SetShowStopwatch(bool isShow);
 
     /**
-     * Sets the slot type of a notification to bind the created NotificationSlot object.
+     * @brief Sets the slot type of a notification to bind the created NotificationSlot object.
      * You can use NotificationSlot to create a slot object,
      * then set the notification vibration and lock screen display, and use the current method to bind the slot.
      * The value must be the type of an existing NotificationSlot object.
+     *
      * @param slotType Indicates the unique type of the NotificationSlot object.
      */
     void SetSlotType(NotificationConstant::SlotType slotType);
 
     /**
-     * Obtains the slot type of a notification set by calling the setSlotType(string) method.
-     * @return the notification slot type.
+     * @brief Obtains the slot type of a notification set by calling the setSlotType(string) method.
+     *
+     * @return Returns the notification slot type.
      */
     NotificationConstant::SlotType GetSlotType() const;
 
     /**
-     * Sets a key used for sorting notifications from the same application bundle.
+     * @brief Sets a key used for sorting notifications from the same application bundle.
+     *
      * @param key Indicates the key to set.
      */
     void SetSortingKey(const std::string &key);
 
     /**
-     * Obtains the key used for sorting notifications from the same application bundle.
-     * @return the key for sorting notifications.
+     * @brief Obtains the key used for sorting notifications from the same application bundle.
+     *
+     * @return Returns the key for sorting notifications.
      */
     std::string GetSortingKey() const;
 
     /**
-     * Sets the scrolling text to be displayed in the status bar when this notification is received.
+     * @brief Sets the scrolling text to be displayed in the status bar when this notification is received.
+     *
      * @param text Indicates the scrolling text to be displayed.
      */
     void SetStatusBarText(const std::string &text);
 
     /**
-     * Obtains the scrolling text that will be displayed in the status bar when this notification is received.
-     * @return the scrolling notification text.
+     * @brief Obtains the scrolling text that will be displayed in the status bar when this notification is received.
+     *
+     * @return Returns the scrolling notification text.
      */
     std::string GetStatusBarText() const;
 
     /**
-     * Checks whether the current notification will be automatically dismissed after being tapped.
-     * @return true if the notification will be automatically dismissed; returns false otherwise.
+     * @brief Checks whether the current notification will be automatically dismissed after being tapped.
+     *
+     * @return Returns true if the notification will be automatically dismissed; returns false otherwise.
      */
     bool IsTapDismissed() const;
 
     /**
-     * Sets whether to automatically dismiss a notification after being tapped.
+     * @brief Sets whether to automatically dismiss a notification after being tapped.
      * If you set tapDismissed to true,
      * you must call the setWantAgent(WantAgent) method to make the settings take effect.
+     *
      * @param isDismissed Specifies whether a notification will be automatically dismissed after being tapped.
      */
     void SetTapDismissed(bool isDismissed);
 
     /**
-     * Sets the notification display effect, including whether to display this notification on the lock screen,
+     * @brief Sets the notification display effect, including whether to display this notification on the lock screen,
      * and how it will be presented if displayed.
      * For details, see NotificationSlot::setLockscreenVisibleness(int).
      * If the lock screen display effect is set for a NotificationRequest object
      * and its associated NotificationSlot object, the display effect set in the NotificationRequest object prevails.
+     *
      * @param type Indicates the notification display effect on the lock screen.
      */
     void SetVisibleness(NotificationConstant::VisiblenessType type);
 
     /**
-     * Obtains the display effect of this notification on the lock screen.
-     * @return the display effect of this notification on the lock screen.
+     * @brief Obtains the display effect of this notification on the lock screen.
+     *
+     * @return Returns the display effect of this notification on the lock screen.
      */
     NotificationConstant::VisiblenessType GetVisibleness() const;
 
     /**
-     * Sets the badge icon style for this notification.
+     * @brief Sets the badge icon style for this notification.
      * This method does not take effect if the home screen does not support badge icons.
+     *
      * @param style Indicates the type of the badge icon to be displayed for this notification.
      * The value must be BadgeStyle::NONE, BadgeStyle::LITTLE, or BadgeStyle::BIG.
      */
     void SetBadgeIconStyle(NotificationRequest::BadgeStyle style);
 
     /**
-     * Obtains the badge icon style of this notification.
-     * @return the badge icon style of this notification.
+     * @brief Obtains the badge icon style of this notification.
+     *
+     * @return Returns the badge icon style of this notification.
      */
     NotificationRequest::BadgeStyle GetBadgeIconStyle() const;
 
     /**
-     * Sets the shortcut ID for this notification.
+     * @brief Sets the shortcut ID for this notification.
      * After a shortcut ID is set for a notification, the notification will be associated with the corresponding
      * home-screen shortcut, and the shortcut will be hidden when the Home application displays the badge or content
      * of the notification.
+     *
      * @param shortcutId Indicates the shortcut ID to set.
      */
     void SetShortcutId(const std::string &shortcutId);
 
     /**
-     * Obtains the shortcut ID associated with this notification.
-     * @return the shortcut ID of this notification.
+     * @brief Obtains the shortcut ID associated with this notification.
+     *
+     * @return Returns the shortcut ID of this notification.
      */
     std::string GetShortcutId() const;
 
     /**
-     * Sets whether this notification is displayed as a floating icon on top of the screen.
+     * @brief Sets whether this notification is displayed as a floating icon on top of the screen.
+     *
      * @param floatingIcon Specifies whether a notification is displayed as a floating icon on top of the screen.
      */
     void SetFloatingIcon(bool floatingIcon);
 
     /**
-     * Checks whether this notification is displayed as a floating icon on top of the screen.
-     * @return true if this notification is displayed as a floating icon; returns false otherwise.
+     * @brief Checks whether this notification is displayed as a floating icon on top of the screen.
+     *
+     * @return Returns true if this notification is displayed as a floating icon; returns false otherwise.
      */
     bool IsFloatingIcon() const;
 
     /**
-     * Sets how the progress bar will be displayed for this notification.
+     * @brief Sets how the progress bar will be displayed for this notification.
      * A progress bar is usually used in notification scenarios such as download.
+     *
      * @param progress Indicates the current value displayed for the notification progress bar.
      * @param progressMax Indicates the maximum value displayed for the notification progress bar.
      * @param indeterminate Specifies whether the progress bar is indeterminate. The value true indicates that
@@ -717,227 +791,265 @@ public:
     void SetProgressBar(int32_t progress, int32_t progressMax, bool indeterminate);
 
     /**
-     * Obtains the maximum value displayed for the progress bar of this notification.
-     * @return the maximum value of the notification progress bar.
+     * @brief Obtains the maximum value displayed for the progress bar of this notification.
+     *
+     * @return Returns the maximum value of the notification progress bar.
      */
     int32_t GetProgressMax() const;
 
     /**
-     * Obtains the current value displayed for the progress bar of this notification.
-     * @return the current value of the notification progress bar.
+     * @brief Obtains the current value displayed for the progress bar of this notification.
+     *
+     * @return Returns the current value of the notification progress bar.
      */
     int32_t GetProgressValue() const;
 
     /**
-     * Checks whether the progress bar of this notification is indeterminate.
-     * @return true if the notification progress bar is indeterminate; returns false otherwise.
+     * @brief Checks whether the progress bar of this notification is indeterminate.
+     *
+     * @return Returns true if the notification progress bar is indeterminate; returns false otherwise.
      */
     bool IsProgressIndeterminate() const;
 
     /**
-     * Sets the most recent NotificationUserInput records that have been sent through this notification.
+     * @brief Sets the most recent NotificationUserInput records that have been sent through this notification.
      * The most recent input must be stored in index 0,
      * the second most recent input must be stored in index 1, and so on.
      * The system displays a maximum of five inputs.
+     *
      * @param text Indicates the list of inputs to set.
      */
     void SetNotificationUserInputHistory(const std::vector<std::string> &text);
 
     /**
-     * Obtains the most recent NotificationUserInput records
-     * @return the most recent NotificationUserInput records
+     * @brief Obtains the most recent NotificationUserInput records.
+     *
+     * @return Returns the most recent NotificationUserInput records.
      */
     std::vector<std::string> GetNotificationUserInputHistory() const;
 
     /**
-     * Sets an alternative notification to be displayed on the lock screen for this notification.
+     * @brief Sets an alternative notification to be displayed on the lock screen for this notification.
      * The display effect (whether and how this alternative notification will be displayed) is subject to
      * the configuration in NotificationSlot::setLockscreenVisibleness(int).
+     *
      * @param other Indicates the alternative notification to be displayed on the lock screen.
      */
     void SetPublicNotification(const std::shared_ptr<NotificationRequest> &other);
 
     /**
-     * Obtains the alternative notification to be displayed on the lock screen for this notification.
-     * @return the alternative notification to be displayed on the lock screen for this notification.
+     * @brief Obtains the alternative notification to be displayed on the lock screen for this notification.
+     *
+     * @return Returns the alternative notification to be displayed on the lock screen for this notification.
      */
     const std::shared_ptr<NotificationRequest> GetPublicNotification() const;
 
     /**
-     * Obtains the unique hash code of a notification in the current application.
+     * @brief Obtains the unique hash code of a notification in the current application.
      * To obtain a valid hash code, you must have subscribed to and received the notification.
      * A valid notification hash code is a string composed of multiple attributes separated by an underscore (_),
      * including the notification ID, creator bundle name, creator UID, and owner bundle name.
-     * @return the hash code of the notification.
+     *
+     * @return Returns the hash code of the notification.
      */
     std::string GetNotificationHashCode() const;
 
     /**
-     * Sets the bundle name of the notification owner.
+     * @brief Sets the bundle name of the notification owner.
      * The notification owner refers to the application that subscribes to the notification.
-     * @param ownerName the bundle name of the notification owner.
+     *
+     * @param ownerName Indicates the bundle name of the notification owner.
      */
     void SetOwnerBundleName(const std::string &ownerName);
 
     /**
-     * Obtains the bundle name of the notification owner.
+     * @brief Obtains the bundle name of the notification owner.
      * The notification owner refers to the application that subscribes to the notification.
-     * @return the bundle name of the notification owner.
+     *
+     * @return Returns the bundle name of the notification owner.
      */
     std::string GetOwnerBundleName() const;
 
     /**
-     * Sets the bundle name of the notification creator.
+     * @brief Sets the bundle name of the notification creator.
      * The notification creator refers to the application that publishes the notification.
-     * @param creatorName the bundle name of the notification creator.
+     *
+     * @param creatorName Indicates the bundle name of the notification creator.
      */
     void SetCreatorBundleName(const std::string &creatorName);
 
     /**
-     * Obtains the bundle name of the notification creator.
+     * @brief Obtains the bundle name of the notification creator.
      * The notification creator refers to the application that publishes the notification.
-     * @return the bundle name of the notification creator.
+     *
+     * @return Returns the bundle name of the notification creator.
      */
     std::string GetCreatorBundleName() const;
 
     /**
-     * Sets the PID of the notification creator.
-     * @param pid the PID of the notification creator.
+     * @brief Sets the PID of the notification creator.
+     *
+     * @param pid Indicates the PID of the notification creator.
      */
     void SetCreatorPid(pid_t pid);
 
     /**
-     * Obtains the PID of the notification creator.
-     * @return the PID of the notification creator.
+     * @brief Obtains the PID of the notification creator.
+     *
+     * @return Returns the PID of the notification creator.
      */
     pid_t GetCreatorPid() const;
 
     /**
-     * Sets the UID of the notification creator.
-     * @param uid the UID of the notification creator.
+     * @brief Sets the UID of the notification creator.
+     *
+     * @param uid Indicates the UID of the notification creator.
      */
     void SetCreatorUid(pid_t uid);
 
     /**
-     * Obtains the UID of the notification creator.
-     * @return the UID of the notification creator.
+     * @brief Obtains the UID of the notification creator.
+     *
+     * @return Returns the UID of the notification creator.
      */
     pid_t GetCreatorUid() const;
 
     /**
-     * Sets the label of this notification.
-     * @param label the label of this notification.
+     * @brief Sets the label of this notification.
+     *
+     * @param label Indicates the label of this notification.
      */
     void SetLabel(const std::string &label);
 
     /**
-     * Obtains the label of this notification.
+     * @brief Obtains the label of this notification.
      * The label is set via NotificationHelper::publishNotification(string, NotificationRequest).
      * This method returns null if no specific label is set for this notification.
-     * @return the label of this notification.
+     *
+     * @return Returns the label of this notification.
      */
     std::string GetLabel() const;
 
     /**
-     * Sets whether this notification is distributed.
+     * @brief Sets whether this notification is distributed.
+     *
      * @param distribute Specifies whether a notification is displayed as a floating icon on top of the screen.
      */
     void SetDistributed(bool distribute);
 
     /**
-     * Sets devices that support display.
-     * @param devices The devices that support display.
+     * @brief Sets devices that support display.
+     *
+     * @param devices Indicates the devices that support display.
      */
     void SetDevicesSupportDisplay(const std::vector<std::string> &devices);
 
     /**
-     * Sets devices that support operate.
-     * @param devices The devices that support operate.
+     * @brief Sets devices that support operate.
+     *
+     * @param devices Indicates the devices that support operate.
      */
     void SetDevicesSupportOperate(const std::vector<std::string> &devices);
 
     /**
-     * Obtains the distributed Options.
-     * @return the distributed Options.
+     * @brief Obtains the distributed Options.
+     *
+     * @return Returns the distributed Options.
      */
     NotificationDistributedOptions GetNotificationDistributedOptions() const;
 
     /**
-     * Sets the UserId of the notification creator.
-     * @param userId the UserId of the notification creator.
+     * @brief Sets the UserId of the notification creator.
+     *
+     * @param userId Indicates the UserId of the notification creator.
      */
     void SetCreatorUserId(int32_t userId);
 
     /**
-     * Obtains the UserId of the notification creator.
-     * @return the UserId of the notification creator.
+     * @brief Obtains the UserId of the notification creator.
+     *
+     * @return Returns the UserId of the notification creator.
      */
     int32_t GetCreatorUserId() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump();
 
     /**
-     * Converts a NotificationRequest object into a Json.
+     * @brief Converts a NotificationRequest object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationRequest object from a Json.
+     * @brief Creates a NotificationRequest object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationRequest.
+     * @return Returns the NotificationRequest.
      */
     static NotificationRequest *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a NotificationRequest object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a NotificationRequest object into a Parcel.
+     *
+     * @param parcel Indicates the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationRequest.
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationRequest.
      */
     static NotificationRequest *Unmarshalling(Parcel &parcel);
 
     /**
-     * Sets the template of this notification.
-     * @param template the template of this notification.
+     * @brief Sets the template of this notification.
+     *
+     * @param template Indicates the template of this notification.
      */
     void SetTemplate(const std::shared_ptr<NotificationTemplate> &templ);
 
     /**
-     * Obtains the Template of the notification.
-     * @return the Template of the notification.
+     * @brief Obtains the Template of the notification.
+     *
+     * @return Returns the Template of the notification.
      */
     std::shared_ptr<NotificationTemplate> GetTemplate() const;
 
     /**
-     * Sets the flags of this notification.
-     * @param flags the flags of this notification.
+     * @brief Sets the flags of this notification.
+     *
+     * @param flags Indicates the flags of this notification.
      */
     void SetFlags(const std::shared_ptr<NotificationFlags> &flags);
 
     /**
-     * Obtains the flags of the notification.
-     * @return the flags of the notification.
+     * @brief Obtains the flags of the notification.
+     *
+     * @return Returns the flags of the notification.
      */
     std::shared_ptr<NotificationFlags> GetFlags() const;
 
     /**
-     * Sets the UserId of the notification receiver.
-     * @param userId the UserId of the notification receiver.
+     * @brief Sets the userId of the notification receiver.
+     *
+     * @param userId Indicates the userId of the notification receiver.
      */
     void SetReceiverUserId(int32_t userId);
 
     /**
-     * Obtains the UserId of the notification receiver.
-     * @return the UserId of the notification receiver.
+     * @brief Obtains the userId of the notification receiver.
+     *
+     * @return Returns the userId of the notification receiver.
      */
     int32_t GetReceiverUserId() const;
 
@@ -959,14 +1071,17 @@ private:
 
 private:
     /**
-     * Read a NotificationRequest object from a Parcel.
-     * @param parcel the parcel
+     * @brief Read a NotificationRequest object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 
     /**
-     * Obtains the current system time in milliseconds.
-     * @return the current system time in milliseconds.
+     * @brief Obtains the current system time in milliseconds.
+     *
+     * @return Returns the current system time in milliseconds.
      */
     int64_t GetNowSysTime();
 
