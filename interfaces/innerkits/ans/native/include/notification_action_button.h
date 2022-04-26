@@ -28,7 +28,8 @@ namespace Notification {
 class NotificationActionButton : public Parcelable, public NotificationJsonConvertionBase {
 public:
     /**
-     * A static function used to create a NotificationActionButton instance with the input parameters passed.
+     * @brief A static function used to create a NotificationActionButton instance with the input parameters passed.
+     *
      * @param icon Indicates the icon to represent this NotificationActionButton.
      * @param title Indicates the title of this NotificationActionButton.
      * @param wantAgent Indicates the wantAgent to be triggered when this NotificationActionButton is triggered.
@@ -40,8 +41,8 @@ public:
      * @param userInputs Indicates the NotificationUserInput object to add.
      * @param isContextual Indicates whether this NotificationActionButton is a contextual action, that is, whether this
      * NotificationActionButton is dependent on the notification message body.
-     * @return the shared_ptr object owns the created NotificationActionButton object otherwise return empty object if
-     * isContextual is true but icon or wantAgent is empty.
+     * @return Returns the shared_ptr object owns the created NotificationActionButton object otherwise returns empty
+     * object if isContextual is true but icon or wantAgent is empty.
      */
     static std::shared_ptr<NotificationActionButton> Create(const std::shared_ptr<Media::PixelMap> &icon,
         const std::string &title, const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> &wantAgent,
@@ -53,34 +54,36 @@ public:
         const std::shared_ptr<NotificationUserInput> &userInput = {}, bool isContextual = false);
 
     /**
-     * A static function used to create a NotificationActionButton instance by copying parameters from an existing
-     * NotificationActionButton object.
+     * @brief A static function used to create a NotificationActionButton instance by copying parameters from an
+     * existing NotificationActionButton object.
+     *
      * @param actionButton Indicates the existing NotificationActionButton object.
-     * @return the shared_ptr object owns the created NotificationActionButton object otherwise return empty object.
+     * @return Returns the shared_ptr object owns the created NotificationActionButton object otherwise returns
+     * empty object.
      */
     static std::shared_ptr<NotificationActionButton> Create(
         const std::shared_ptr<NotificationActionButton> &actionButton);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationActionButton() = default;
 
     /**
-     * Obtains the icon of this NotificationActionButton.
-     * @return the icon of this NotificationActionButton.
+     * @brief Obtains the icon of this NotificationActionButton.
+     *
+     * @return Returns the icon of this NotificationActionButton.
      */
     const std::shared_ptr<Media::PixelMap> GetIcon() const;
 
     /**
-     * Obtains the title of this NotificationActionButton.
-     * @return the title of this NotificationActionButton.
+     * @brief Obtains the title of this NotificationActionButton.
+     *
+     * @return Returns the title of this NotificationActionButton.
      */
     std::string GetTitle() const;
 
     /**
-     * Obtains the WantAgent of this NotificationActionButton.
-     * @return the WantAgent of this NotificationActionButton.
+     * @brief Obtains the WantAgent of this NotificationActionButton.
+     *
+     * @return Returns the WantAgent of this NotificationActionButton.
      */
     const std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> GetWantAgent() const;
 
@@ -91,121 +94,138 @@ public:
     void AddAdditionalData(AAFwk::WantParams &extras);
 
     /**
-     * Obtains the additional data included in this NotificationActionButton.
-     * @return the additional data included in this NotificationActionButton.
+     * @brief Obtains the additional data included in this NotificationActionButton.
+     *
+     * @return Returns the additional data included in this NotificationActionButton.
      */
     const std::shared_ptr<AAFwk::WantParams> GetAdditionalData() const;
 
     /**
-     * Sets a semantic action for this NotificationActionButton.
-     * @param semanticActionButton Indicates the semantic action to add.
-     * For available values, see NotificationConstant::SemanticActionButton.
+     * @brief Sets a semantic action for this NotificationActionButton.
+     *
+     * @param semanticActionButton Indicates the semantic action to add.For available values,
+     * see NotificationConstant::SemanticActionButton.
      */
     void SetSemanticActionButton(NotificationConstant::SemanticActionButton semanticActionButton);
 
     /**
-     * Obtains the semantic action of this NotificationActionButton.
-     * @return the semantic action of this NotificationActionButton,
-     * as enumerated in NotificationConstant::SemanticActionButton.
+     * @brief Obtains the semantic action of this NotificationActionButton.
+     *
+     * @return Returns the semantic action of this NotificationActionButton, as enumerated in
+     * NotificationConstant::SemanticActionButton.
      */
     NotificationConstant::SemanticActionButton GetSemanticActionButton() const;
 
     /**
-     * Adds a NotificationUserInput object that only allows values of particular MIME types.
+     * @brief Adds a NotificationUserInput object that only allows values of particular MIME types.
+     *
      * @param userInput Indicates the NotificationUserInput object to add.
      */
     void AddMimeTypeOnlyUserInput(const std::shared_ptr<NotificationUserInput> &userInput);
 
     /**
-     * Obtains the NotificationUserInput objects that only allow values of particular MIME types
+     * @brief Obtains the NotificationUserInput objects that only allow values of particular MIME types
      * when this NotificationActionButton is sent.
-     * @return the list of NotificationUserInput objects allowing only values of particular MIME types.
+     *
+     * @return Returns the list of NotificationUserInput objects allowing only values of particular MIME types.
      */
     std::vector<std::shared_ptr<NotificationUserInput>> GetMimeTypeOnlyUserInputs() const;
 
     /**
-     * Adds a NotificationUserInput object used to collect user input.
+     * @brief Adds a NotificationUserInput object used to collect user input.
+     *
      * @param userInput Indicates the NotificationUserInput object to add.
      */
     void AddNotificationUserInput(const std::shared_ptr<NotificationUserInput> &userInput);
 
     /**
-     * Obtains the NotificationUserInput object to be collected from the user when this NotificationActionButton
+     * @brief Obtains the NotificationUserInput object to be collected from the user when this NotificationActionButton
      * is sent.
-     * @return the NotificationUserInput object.
+     *
+     * @return Returns the NotificationUserInput object.
      */
     const std::shared_ptr<NotificationUserInput> GetUserInput() const;
 
     /**
-     * Sets whether to allow the platform to automatically generate possible replies and add them to
+     * @brief Sets whether to allow the platform to automatically generate possible replies and add them to
      * NotificationUserInput::getOptions().
+     *
      * @param autoCreatedReplies Specifies whether to allow the platform to automatically generate possible replies.
      * The value true means to allow generated replies; and the value false means not.
      */
     void SetAutoCreatedReplies(bool autoCreatedReplies);
 
     /**
-     * Checks whether the platform can automatically generate possible replies for this NotificationActionButton.
-     * @return true if the platform can generate replies; returns false otherwise.
+     * @brief Checks whether the platform can automatically generate possible replies for this NotificationActionButton.
+     *
+     * @return Returns true if the platform can generate replies; returns false otherwise.
      */
     bool IsAutoCreatedReplies() const;
 
     /**
-     * Sets whether this NotificationActionButton is a contextual action, that is, whether this
+     * @brief Sets whether this NotificationActionButton is a contextual action, that is, whether this
      * NotificationActionButton is dependent on the notification message body. For example, a contextual
      * NotificationActionButton provides an address in the notification for users to open a map application.
+     *
      * @param isContextual Specifies whether this NotificationActionButton is a contextual action.
      * The value true indicates a contextual action, and the value false indicates not.
      */
     void SetContextDependent(bool isContextual);
 
     /**
-     * Checks whether this NotificationActionButton is a contextual action, that is, whether this
+     * @brief Checks whether this NotificationActionButton is a contextual action, that is, whether this
      * NotificationActionButton is dependent on the notification message body. For example, a contextual
      * NotificationActionButton provides an address in the notification for users to open a map application.
-     * @return true if this NotificationActionButton is a contextual action; returns false otherwise.
+     *
+     * @return Returns true if this NotificationActionButton is a contextual action; returns false otherwise.
      */
     bool IsContextDependent() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump();
 
     /**
-     * Converts a NotificationActionButton object into a Json.
+     * @brief Converts a NotificationActionButton object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationActionButton object from a Json.
+     * @brief Creates a NotificationActionButton object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationActionButton.
+     * @return Returns the NotificationActionButton.
      */
     static NotificationActionButton *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationActionButton
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationActionButton.
      */
     static NotificationActionButton *Unmarshalling(Parcel &parcel);
 
 private:
-    /**
-     * Default constructor used to create a NotificationActionButton instance.
-     */
     NotificationActionButton() = default;
 
     /**
-     * A constructor used to create a NotificationActionButton instance with the input parameters passed.
+     * @brief A constructor used to create a NotificationActionButton instance with the input parameters passed.
+     *
      * @param icon Indicates the icon to represent this NotificationActionButton.
      * @param title Indicates the title of this NotificationActionButton.
      * @param wantAgent Indicates the WantAgent to be triggered when this NotificationActionButton is triggered.
@@ -225,8 +245,10 @@ private:
         const std::shared_ptr<NotificationUserInput> &userInput, bool isContextual);
 
     /**
-     * Read a NotificationActionButton object from a Parcel.
-     * @param parcel the parcel
+     * @brief Read a NotificationActionButton object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 

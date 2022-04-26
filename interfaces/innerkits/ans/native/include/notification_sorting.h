@@ -25,14 +25,8 @@ namespace OHOS {
 namespace Notification {
 class NotificationSorting final : public Parcelable {
 public:
-    /**
-     * @brief Default constructor used to create an empty NotificationSorting instance.
-     */
     NotificationSorting();
 
-    /**
-     * @brief Default deconstructor used to deconstruct.
-     */
     ~NotificationSorting();
 
     /**
@@ -43,9 +37,9 @@ public:
     NotificationSorting(const NotificationSorting &sorting);
 
     /**
-     *  @brief Obtains the sequence number of a notification among all the active notifications.
+     * @brief Obtains the sequence number of a notification among all the active notifications.
      *
-     *  @return Returns the sequence number of the notification.
+     * @return Returns the sequence number of the notification.
      */
     inline int32_t GetRanking() const
     {
@@ -131,7 +125,6 @@ public:
      * @brief Marshals a NotificationSorting object into a Parcel.
      *
      * @param parcel Indicates the Parcel object for marshalling.
-     *
      * @return Returns true if the marshalling is successful; returns false otherwise.
      */
     bool Marshalling(Parcel &parcel) const override;
@@ -139,16 +132,15 @@ public:
     /**
      * @brief Unmarshals a NotificationSorting object from a Parcel.
      *
-     * @param Indicates the Parcel object for unmarshalling.
-     *
-     * @return Returns true if the unmarshalling is successful; returns false otherwise.
+     * @param parcel Indicates the Parcel object for unmarshalling.
+     * @return Returns the NotificationSorting object.
      */
     static NotificationSorting *Unmarshalling(Parcel &parcel);
 
     /**
-     * @brief Dump sorting info
+     * @brief Dumps sorting info
      *
-     * @return Sorting info
+     * @return Returns sorting info.
      */
     std::string Dump() const;
 

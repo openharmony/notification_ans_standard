@@ -24,13 +24,27 @@ namespace OHOS {
 namespace Notification {
 class DistributedDatabaseCallback : public DistributedKv::KvStoreObserver {
 public:
+    /**
+     * @brief Distributed notification Key-Value changed callback function structure.
+     */
     struct IDatabaseChange {
         std::function<void(const std::string &deviceId, const std::string &key, const std::string &value)> OnInsert;
         std::function<void(const std::string &deviceId, const std::string &key, const std::string &value)> OnUpdate;
         std::function<void(const std::string &deviceId, const std::string &key, const std::string &value)> OnDelete;
     };
+
+    /**
+     * @brief The constructor.
+     *
+     * @param callback Key-Value changed callback.
+     */
     explicit DistributedDatabaseCallback(const IDatabaseChange &callback);
+
+    /**
+     * @brief The deconstructor.
+     */
     ~DistributedDatabaseCallback();
+
 private:
     void OnChange(const DistributedKv::ChangeNotification &changeNotification,
         std::shared_ptr<DistributedKv::KvStoreSnapshot> snapshot) override;

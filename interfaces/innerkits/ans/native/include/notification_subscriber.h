@@ -26,14 +26,8 @@ namespace OHOS {
 namespace Notification {
 class NotificationSubscriber {
 public:
-    /**
-     * @brief Default constructor used to create a instance.
-     */
     NotificationSubscriber();
 
-    /**
-     * @brief Default destructor.
-     */
     virtual ~NotificationSubscriber();
 
     /**
@@ -55,7 +49,7 @@ public:
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) = 0;
 
     /**
-     * Called back when the subscriber is connected to the Advanced Notification Service (ANS).
+     * @brief Called back when the subscriber is connected to the Advanced Notification Service (ANS).
      **/
     virtual void OnConnected() = 0;
 
@@ -77,7 +71,7 @@ public:
         const std::shared_ptr<Notification> &request, const std::shared_ptr<NotificationSortingMap> &sortingMap) = 0;
 
     /**
-     * Called back when the subscriber is disconnected from the ANS.
+     * @brief Called back when the subscriber is disconnected from the ANS.
      **/
     virtual void OnDisconnected() = 0;
 

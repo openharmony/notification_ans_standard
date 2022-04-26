@@ -32,12 +32,57 @@ namespace OHOS {
 namespace Notification {
 class BundleManagerHelper : public DelayedSingleton<BundleManagerHelper> {
 public:
+    /**
+     * @brief Obtains the bundle name base on the specified uid.
+     *
+     * @param uid Indicates the specified uid.
+     * @return Returns the bundle name.
+     */
     std::string GetBundleNameByUid(int uid);
+
+    /**
+     * @brief Check whether the caller is a system application base on the specified uid.
+     *
+     * @param uid Indicates the specified uid.
+     * @return Returns the check result.
+     */
     bool IsSystemApp(int uid);
+
+    /**
+     * @brief Check API compatibility.
+     *
+     * @param bundleOption Indicates the bundle option.
+     * @return Returns the check result.
+     */
     bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);
+
+    /**
+     * @brief Obtains the default uid.
+     *
+     * @param bundle Indicates the bundle name.
+     * @param userId Indicates the user id.
+     * @return Returns the uid.
+     */
     int GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId);
+
+    /**
+     * @brief Obtains the bundle info.
+     *
+     * @param bundle Indicates the bundle name.
+     * @param userId Indicates the user id.
+     * @param bundleInfo Indicates the bundle info.
+     * @return Returns the uid.
+     */
     bool GetBundleInfoByBundleName(const std::string bundle, const int32_t userId, AppExecFwk::BundleInfo &bundleInfo);
+
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
+    /**
+     * @brief Check whether the specified bundle has the distributed notification supported.
+     *
+     * @param bundleName Indicates the bundle name.
+     * @param userId Indicates the user id.
+     * @return Returns the check result.
+     */
     bool GetDistributedNotificationEnabled(const std::string &bundleName, const int userId);
 #endif
 

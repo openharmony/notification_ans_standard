@@ -23,18 +23,24 @@ namespace OHOS {
 namespace Notification {
 class NotificationJsonConvertionBase {
 public:
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     virtual ~NotificationJsonConvertionBase() = default;
 
+    /**
+     * @brief Converts NotificationJsonConvertionBase object to json object.
+     *
+     * @param jsonObject Indicates the json object.
+     */
     virtual bool ToJson(nlohmann::json &jsonObject) const = 0;
 };
 
 class NotificationJsonConverter {
 public:
     /**
-     * Convert NotificationJsonConvertionBase object to json object.
+     * @brief Converts NotificationJsonConvertionBase object to json object.
+     *
+     * @param convertionBase Indicates the NotificationJsonConvertionBase object.
+     * @param jsonObject Indicates the json object.
+     * @return Returns true if the conversion is successful; returns false otherwise.
      */
     static bool ConvertToJosn(const NotificationJsonConvertionBase *convertionBase, nlohmann::json &jsonObject)
     {
@@ -46,6 +52,13 @@ public:
         return convertionBase->ToJson(jsonObject);
     }
 
+    /**
+     * @brief Converts NotificationJsonConvertionBase object to json string.
+     *
+     * @param convertionBase Indicates the NotificationJsonConvertionBase object.
+     * @param jsonString Indicates the json string.
+     * @return Returns true if the conversion is successful; returns false otherwise.
+     */
     static bool ConvertToJosnString(const NotificationJsonConvertionBase *convertionBase, std::string &jsonString)
     {
         if (convertionBase == nullptr) {
@@ -63,6 +76,12 @@ public:
         return true;
     }
 
+    /**
+     * @brief Converts json object to a subclass object whose base class is NotificationJsonConvertionBase.
+     *
+     * @param jsonObject Indicates the json object.
+     * @return Returns the subclass object.
+     */
     template <typename T>
     static T *ConvertFromJosn(const nlohmann::json &jsonObject)
     {
@@ -74,6 +93,12 @@ public:
         return T::FromJson(jsonObject);
     }
 
+    /**
+     * @brief Converts json string to a subclass object whose base class is NotificationJsonConvertionBase.
+     *
+     * @param jsonString Indicates the json string.
+     * @return Returns the subclass object.
+     */
     template <typename T>
     static T *ConvertFromJosnString(const std::string &jsonString)
     {

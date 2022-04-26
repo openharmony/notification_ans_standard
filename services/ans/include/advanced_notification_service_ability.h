@@ -26,8 +26,19 @@ namespace OHOS {
 namespace Notification {
 class AdvancedNotificationServiceAbility final : public SystemAbility {
 public:
+    /**
+     * @brief The constructor of service ability.
+     *
+     * @param systemAbilityId Indicates the system ability id.
+     * @param runOnCreate Run the system ability on created.
+     */
     AdvancedNotificationServiceAbility(const int32_t systemAbilityId, bool runOnCreate);
+
+    /**
+     * @brief The deconstructor.
+     */
     ~AdvancedNotificationServiceAbility() final;
+
     DISALLOW_COPY_AND_MOVE(AdvancedNotificationServiceAbility);
     DECLARE_SYSTEM_ABILITY(AdvancedNotificationServiceAbility);
 

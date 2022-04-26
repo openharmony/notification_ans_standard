@@ -31,11 +31,53 @@ namespace OHOS {
 namespace Notification {
 class DistributedPreferences : public DelayedSingleton<DistributedPreferences> {
 public:
+    /**
+     * @brief Set whether the device supports distributed notifications.
+     *
+     * @param enable Specifies whether to enable the device to support distributed notification.
+     * @return Returns enable distributed result.
+     */
     ErrCode SetDistributedEnable(bool isEnable);
+
+    /**
+     * @brief Check if the device supports distributed notification.
+     *
+     * @param enabled True if the device supports distributed notification; false otherwise.
+     * @return Returns is distributed enabled result.
+     */
     ErrCode GetDistributedEnable(bool &isEnable);
+
+    /**
+     * @brief Set whether an application supports distributed notifications.
+     *
+     * @param bundleOption Indicates the bundle name and uid of an application.
+     * @param enabled Specifies whether to enable an application to support distributed notification.
+     * @return Returns enable distributed by bundle result.
+     */
     ErrCode SetDistributedBundleEnable(const sptr<NotificationBundleOption> &bundleOption, bool isEnable);
+
+    /**
+     * @brief Check whether an application supports distributed notifications.
+     *
+     * @param bundleOption Indicates the bundle name and uid of an application.
+     * @param enabled True if the application supports distributed notification; false otherwise.
+     * @return Returns is distributed enabled by bundle result.
+     */
     ErrCode GetDistributedBundleEnable(const sptr<NotificationBundleOption> &bundleOption, bool &isEnable);
+
+    /**
+     * @brief Remove the setting of whether the application supports distributed notification.
+     *
+     * @param bundleOption Indicates the bundle name and uid of an application.
+     * @return Returns remove the setting result.
+     */
     ErrCode DeleteDistributedBundleInfo(const sptr<NotificationBundleOption> &bundleOption);
+
+    /**
+     * @brief Remove all distributed enabled setting info from DB.
+     *
+     * @return Returns remove the setting result.
+     */
     ErrCode ClearDataInRestoreFactorySettings();
 
 private:

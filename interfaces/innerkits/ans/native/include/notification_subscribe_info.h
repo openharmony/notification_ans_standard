@@ -22,21 +22,15 @@ namespace OHOS {
 namespace Notification {
 class NotificationSubscribeInfo final : public Parcelable {
 public:
-    /**
-     * @brief Default constructor used to create a instance.
-     */
     NotificationSubscribeInfo();
 
-    /**
-     * @brief Default deconstructor used to deconstruct.
-     */
     ~NotificationSubscribeInfo();
 
     /**
      * @brief A constructor used to create a NotificationSubscribeInfo instance by copying parameters from an existing
      * one.
      *
-     * @param Indicates the NotificationSubscribeInfo object.
+     * @param subscribeInfo Indicates the NotificationSubscribeInfo object.
      */
     NotificationSubscribeInfo(const NotificationSubscribeInfo &subscribeInfo);
 
@@ -65,7 +59,7 @@ public:
     std::vector<std::string> GetAppNames() const;
 
     /**
-     * @brief application current userid.
+     * @brief Adds application userid.
      *
      * @param appNames Indicates the userid of application.
      **/
@@ -82,6 +76,7 @@ public:
      * @brief Marshals a NotificationSubscribeInfo object into a Parcel.
      *
      * @param parcel Indicates the Parcel object for marshalling.
+     * @return Returns true if the marshalling is successful; returns false otherwise.
      */
     bool Marshalling(Parcel &parcel) const override;
 
@@ -89,13 +84,14 @@ public:
      * @brief Unmarshals a NotificationSubscribeInfo object from a Parcel.
      *
      * @param parcel Indicates the Parcel object for unmarshalling.
+     * @return Returns the NotificationSubscribeInfo object.
      */
     static NotificationSubscribeInfo *Unmarshalling(Parcel &parcel);
 
     /**
-     * @brief Dump subscribe info.
+     * @brief Dumps subscribe info.
      *
-     * @return Return subscribe info.
+     * @return Returns subscribe info.
      */
     std::string Dump();
 

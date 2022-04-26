@@ -34,34 +34,210 @@ public:
     public:
         BundleInfo();
         ~BundleInfo();
+        /**
+         * @brief Set bundle name.
+         *
+         * @param name Indicates the bundle name.
+         */
         void SetBundleName(const std::string &name);
+
+        /**
+         * @brief Get bundle name.
+         *
+         * @return Return bundle name.
+         */
         std::string GetBundleName() const;
+
+        /**
+         * @brief Set bundle importance.
+         *
+         * @param name Indicates the bundle importance.
+         */
         void SetImportance(const int &level);
+
+        /**
+         * @brief Get bundle importance.
+         *
+         * @return Return importance.
+         */
         int GetImportance() const;
+
+        /**
+         * @brief Set bundle Whether to show badge.
+         *
+         * @param name Indicates the set bundle Whether to show badge.
+         */
         void SetIsShowBadge(const bool &isShowBadge);
+
+        /**
+         * @brief Get bundle Whether to show badge.
+         *
+         * @return Return true on success, false on failure.
+         */
         bool GetIsShowBadge() const;
+
+        /**
+         * @brief Set bundle total badge num.
+         *
+         * @param name Indicates the set bundle total badge num.
+         */
         void SetBadgeTotalNum(const int &num);
+
+        /**
+         * @brief Get bundle total badge num.
+         *
+         * @return Return badge total num.
+         */
         int GetBadgeTotalNum() const;
+
+        /**
+         * @brief Set bundle Whether to private allowed.
+         *
+         * @param name Indicates the set Whether to private allowed.
+         */
         void SetIsPrivateAllowed(const bool &isPrivateAllowed);
+
+        /**
+         * @brief Get bundle Whether to private allowed.
+         *
+         * @return Return true on success, false on failure.
+         */
         bool GetIsPrivateAllowed() const;
+
+        /**
+         * @brief Set bundle enable notification.
+         *
+         * @param enable Indicates the set enable notification.
+         */
         void SetEnableNotification(const bool &enable);
+
+        /**
+         * @brief Set bundle enable notification.
+         *
+         * @return Return true on success, false on failure.
+         */
         bool GetEnableNotification() const;
+
         void SetHasPoppedDialog(const bool &hasPopped);
         bool GetHasPoppedDialog() const;
+
+        /**
+         * @brief Set bundle slot.
+         *
+         * @param slot Indicates the set slot.
+         */
         void SetSlot(const sptr<NotificationSlot> &slot);
+
+        /**
+         * @brief Get bundle slot by type.
+         *
+         * @param type Indicates the slot type.
+         * @param slot Indicates the slot object.
+         * @return Return true on success, false on failure.
+         */
         bool GetSlot(const NotificationConstant::SlotType &type, sptr<NotificationSlot> &slot) const;
+
+        /**
+         * @brief Get slots from bundle.
+         *
+         * @param slots Indicates the get slots.
+         * @return Return true on success, false on failure.
+         */
         bool GetAllSlots(std::vector<sptr<NotificationSlot>> &slots);
+
+        /**
+         * @brief Get slot num from bundle.
+         *
+         * @return Return true on success, false on failure.
+         */
         uint32_t GetAllSlotsSize();
+
+        /**
+         * @brief Get all slot from group in bundle.
+         *
+         * @param groupId Indicates a groupId from bundle.
+         * @param slots Indicates get slots from group.
+         * @return Return true on success, false on failure.
+         */
         bool GetAllSlotsInGroup(const std::string &groupId, std::vector<sptr<NotificationSlot>> &slots);
+
+        /**
+         * @brief Get all slot from group in bundle.
+         *
+         * @param groupId Indicates a groupId from bundle.
+         * @param slots Indicates get slots from group.
+         * @return Return true on success, false on failure.
+         */
         bool GetAllSlotsInGroup(const std::string &groupId, std::vector<NotificationSlot> &slots);
+
+        /**
+         * @brief Set bundle group.
+         *
+         * @param group Indicates the set group.
+         */
         void SetGroup(const sptr<NotificationSlotGroup> &group);
+
+        /**
+         * @brief Get group from bundle.
+         *
+         * @param groupId Indicates the get group id in the of bundle.
+         * @param group Indicates the get group.
+         * @return Return true on success, false on failure.
+         */
         bool GetGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group);
+
+        /**
+         * @brief Get all group from bundle.
+         *
+         * @param group Indicates the get groups.
+         * @return Return true on success, false on failure.
+         */
         bool GetAllGroups(std::vector<sptr<NotificationSlotGroup>> &group);
+
+        /**
+         * @brief Get slot group num from bundle.
+         *
+         * @return Return num is group size.
+         */
         uint32_t GetGroupSize() const;
+
+        /**
+         * @brief Check whether to exsist slot in the of bundle.
+         *
+         * @param type Indicates the slot type.
+         * @return Return true on success, false on failure.
+         */
         bool IsExsitSlot(const NotificationConstant::SlotType &type) const;
+
+        /**
+         * @brief Check whether to exsist slot group in the of bundle.
+         *
+         * @param groupId Indicates the slot group id.
+         * @return Return true on success, false on failure.
+         */
         bool IsExsitSlotGroup(const std::string &groupId) const;
+
+        /**
+         * @brief Rremove a slot from bundle.
+         *
+         * @param type Indicates the slot type.
+         * @return Return true on success, false on failure.
+         */
         bool RemoveSlot(const NotificationConstant::SlotType &type);
+
+        /**
+         * @brief Remove all slots from bundle.
+         *
+         * @return Return true on success, false on failure.
+         */
         void RemoveAllSlots();
+
+        /**
+         * @brief remove slot group from bundle.
+         *
+         * @param groupId Indicates the slot group id.
+         * @return Return true on success, false on failure.
+         */
         bool RemoveSlotGroup(const std::string &groupId);
         void SetBundleUid(const int &uid);
         int GetBundleUid() const;
@@ -79,20 +255,81 @@ public:
         std::map<std::string, sptr<NotificationSlotGroup>> groups_;
     };
 
+    /*
+     * @brief Constructor used to create an NotificationPreferencesInfo object.
+     */
     NotificationPreferencesInfo()
     {}
+    /**
+     * @brief Default destructor.
+     */
     ~NotificationPreferencesInfo()
     {}
+
+    /**
+     * set bundle info into preferences info.
+     * @param info Indicates the bundle.
+     */
     void SetBundleInfo(const BundleInfo &info);
+
+    /**
+     * get bundle info from preferences info.
+     * @param bundleOption Indicates the bundle info label.
+     * @param info Indicates the bundle info.
+     * @return Whether to get bundle info success.
+     */
     bool GetBundleInfo(const sptr<NotificationBundleOption> &bundleOption, BundleInfo &info) const;
+
+    /**
+     * remove bundle info from preferences info.
+     * @param bundleOption Indicates the bundle info label.
+     * @return Whether to remove bundle info success.
+     */
     bool RemoveBundleInfo(const sptr<NotificationBundleOption> &bundleOption);
+
+    /**
+     * whether to exsist bundle info in the of preferences info.
+     * @param bundleOption Indicates the bundle info label.
+     * @return Whether to exsist bundle info.
+     */
     bool IsExsitBundleInfo(const sptr<NotificationBundleOption> &bundleOption) const;
+
+    /**
+     * clear bundle info in the of preferences info.
+     */
     void ClearBundleInfo();
+
+    /**
+     * set do not disturb date into preferences info.
+     * @param userId Indicates userId.
+     * @param doNotDisturbDate Indicates do not disturb date.
+     * @return Whether to set do not disturb success.
+     */
     void SetDoNotDisturbDate(const int32_t &userId,
         const sptr<NotificationDoNotDisturbDate> &doNotDisturbDate);
+
+    /**
+     * get do not disturb date from preferences info.
+     * @param userId Indicates userId.
+     * @param doNotDisturbDate Indicates do not disturb date.
+     * @return Whether to get do not disturb success.
+     */
     bool GetDoNotDisturbDate(const int32_t &userId,
         sptr<NotificationDoNotDisturbDate> &doNotDisturbDate) const;
+
+    /**
+     * set enable all notification into preferences info.
+     * @param userId Indicates userId.
+     * @param enable Indicates whether to enable all notification.
+     */
     void SetEnabledAllNotification(const int32_t &userId, const bool &enable);
+
+    /**
+     * get enable all notification from preferences info.
+     * @param userId Indicates userId.
+     * @param enable Indicates whether to enable all notification.
+     * @return Whether to enable all notification success.
+     */
     bool GetEnabledAllNotification(const int32_t &userId, bool &enable) const;
     void RemoveNotificationEnable(const int32_t userId);
     void RemoveDoNotDisturbDate(const int32_t userId);

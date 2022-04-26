@@ -27,17 +27,76 @@ namespace OHOS {
 namespace Notification {
 class ShellCommand {
 public:
+    /**
+     * @brief Constructor.
+     *
+     * @param argc Indicates the count of arguments.
+     * @param argv Indicates the arguments.
+     * @param name Indicates the tool name.
+     */
     ShellCommand(int argc, char *argv[], std::string name);
+
+    /**
+     * @brief Destructor.
+     */
     virtual ~ShellCommand();
 
+    /**
+     * @brief Process the command.
+     *
+     * @return Indicates the command result code.
+     */
     ErrCode OnCommand();
+
+    /**
+     * @brief Execute the command.
+     *
+     * @return Indicates the output text.
+     */
     std::string ExecCommand();
+
+    /**
+     * @brief Get the error message of the command.
+     *
+     * @return Indicates the error message.
+     */
     std::string GetCommandErrorMsg() const;
+
+    /**
+     * @brief Get the error message of the unknown option.
+     *
+     * @param unknownOption Indicates the unknown option.
+     * @return Indicates the error message.
+     */
     std::string GetUnknownOptionMsg(std::string &unknownOption) const;
+
+    /**
+     * @brief Get the message from the code.
+     *
+     * @param code Indicates the code.
+     * @return Indicates the message.
+     */
     std::string GetMessageFromCode(const int32_t code) const;
 
+    /**
+     * @brief Create the command map.
+     *
+     * @return Indicates the result code.
+     */
     virtual ErrCode CreateCommandMap() = 0;
+
+    /**
+     * @brief Create the message map.
+     *
+     * @return Indicates the result code.
+     */
     virtual ErrCode CreateMessageMap() = 0;
+
+    /**
+     * @brief The initialize function.
+     *
+     * @return Indicates the result code.
+     */
     virtual ErrCode init() = 0;
 
 protected:

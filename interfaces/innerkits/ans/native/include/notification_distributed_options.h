@@ -23,96 +23,107 @@ namespace OHOS {
 namespace Notification {
 class NotificationDistributedOptions : public Parcelable, public NotificationJsonConvertionBase {
 public:
-    /**
-     * Default constructor used to create a NotificationDistributedOptions instance.
-     */
     NotificationDistributedOptions() = default;
 
     /**
-     * Constructor used to create a NotificationDistributedOptions instance.
+     * @brief Constructor used to create a NotificationDistributedOptions instance.
+     *
      * @param distribute Specifies whether a notification is distributed.
-     * @param dvsDisplay The devices that support display.
-     * @param dvsOperate The devices that support operate.
+     * @param dvsDisplay Indicates the devices that support display.
+     * @param dvsOperate Indicates the devices that support operate.
      */
     NotificationDistributedOptions(
         bool distribute, const std::vector<std::string> &dvsDisplay, const std::vector<std::string> &dvsOperate);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationDistributedOptions() = default;
 
     /**
-     * Sets whether a notification is distributed.
+     * @brief Sets whether a notification is distributed.
+     *
      * @param distribute Specifies whether a notification is distributed.
      */
     void SetDistributed(bool distribute);
 
     /**
-     * Checks whether a notification is distributed.
-     * @return true if the notification is distributed; returns false otherwise.
+     * @brief Checks whether a notification is distributed.
+     *
+     * @return Returns true if the notification is distributed; returns false otherwise.
      */
     bool IsDistributed() const;
 
     /**
-     * Sets devices that support display.
-     * @param devices The devices that support display.
+     * @brief Sets devices that support display.
+     *
+     * @param devices Indicates the devices that support display.
      */
     void SetDevicesSupportDisplay(const std::vector<std::string> &devices);
 
     /**
-     * Obtains the devices that support display.
-     * @return the devices that support display.
+     * @brief Obtains the devices that support display.
+     *
+     * @return Returns the devices that support display.
      */
     std::vector<std::string> GetDevicesSupportDisplay() const;
 
     /**
-     * Sets devices that support operate.
-     * @param devices The devices that support operate.
+     * @brief Sets devices that support operate.
+     *
+     * @param devices Indicates the devices that support operate.
      */
     void SetDevicesSupportOperate(const std::vector<std::string> &devices);
 
     /**
-     * Obtains the devices that support operate.
-     * @return the devices that support operate.
+     * @brief Obtains the devices that support operate.
+     *
+     * @return Returns the devices that support operate.
      */
     std::vector<std::string> GetDevicesSupportOperate() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump();
 
     /**
-     * Converts a NotificationDistributedOptions object into a Json.
+     * @brief Converts a NotificationDistributedOptions object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationDistributedOptions object from a Json.
+     * @brief Creates a NotificationDistributedOptions object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationDistributedOptions.
+     * @return Returns the NotificationDistributedOptions.
      */
     static NotificationDistributedOptions *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel Indicates the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationDistributedOptions
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationDistributedOptions object.
      */
     static NotificationDistributedOptions *Unmarshalling(Parcel &parcel);
 
 private:
     /**
-     * Read a NotificationDistributedOptions object from a Parcel.
-     * @param parcel the parcel
+     * @brief Read a NotificationDistributedOptions object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 

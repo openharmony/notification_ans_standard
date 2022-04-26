@@ -36,16 +36,68 @@ public:
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Notification.IAnsSubscriber");
 
+    /**
+     * @brief The callback function for the subscriber to establish a connection.
+     */
     virtual void OnConnected() = 0;
+
+    /**
+     * @brief The callback function for subscriber disconnected.
+     */
     virtual void OnDisconnected() = 0;
+
+    /**
+     * @brief The callback function on a notification published.
+     *
+     * @param notification Indicates the consumed notification.
+     */
     virtual void OnConsumed(const sptr<Notification> &notification) = 0;
+
+    /**
+     * @brief The callback function on a notification published.
+     *
+     * @param notification Indicates the consumed notification.
+     * @param notificationMap Indicates the NotificationSortingMap object.
+     */
     virtual void OnConsumed(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap) = 0;
+
+    /**
+     * @brief The callback function on a notification canceled.
+     *
+     * @param notification Indicates the canceled notification.
+     */
     virtual void OnCanceled(const sptr<Notification> &notification) = 0;
+
+    /**
+     * @brief The callback function on a notification canceled.
+     *
+     * @param notification Indicates the canceled notification.
+     * @param notificationMap Indicates the NotificationSortingMap object.
+     * @param deleteReason Indicates the delete reason.
+     */
     virtual void OnCanceled(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap,
         int deleteReason) = 0;
+
+    /**
+     * @brief The callback function on the notifications updated.
+     *
+     * @param notificationMap Indicates the NotificationSortingMap object.
+     */
     virtual void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) = 0;
+
+    /**
+     * @brief The callback function on the do not disturb date changed.
+     *
+     * @param date Indicates the NotificationDoNotDisturbDate object.
+     */
     virtual void OnDoNotDisturbDateChange(const sptr<NotificationDoNotDisturbDate> &date) = 0;
+
+    /**
+     * @brief The callback function on the notification enabled flag changed.
+     *
+     * @param callbackData Indicates the EnabledNotificationCallbackData object.
+     */
     virtual void OnEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData) = 0;
 
 protected:
