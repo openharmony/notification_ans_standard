@@ -30,7 +30,7 @@ static const int32_t GET_VALID_PARAM_LEN = 1;
 static const int32_t ADD_SLOT_PARAM_LEN = 2;
 
 struct AsyncCallbackInfo {
-    AsyncCallbackInfo(napi_env napiEnv) : env(napiEnv) {}
+    explicit AsyncCallbackInfo(napi_env napiEnv) : env(napiEnv) {}
     ~AsyncCallbackInfo()
     {
         if (asyncWork) {
@@ -77,7 +77,8 @@ napi_value GetCallback(const napi_env &env, const napi_value &value, AsyncCallba
 
 void SetAsynccallbackinfo(const napi_env &env, AsyncCallbackInfo& asynccallbackinfo, napi_value& promise)
 {
-    NotificationNapi::Common::PaddingCallbackPromiseInfo(env, asynccallbackinfo.callback, asynccallbackinfo.info, promise);
+    NotificationNapi::Common::PaddingCallbackPromiseInfo(
+        env, asynccallbackinfo.callback, asynccallbackinfo.info, promise);
 }
 
 napi_value ParseParameters(
