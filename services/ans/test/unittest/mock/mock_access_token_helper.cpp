@@ -14,6 +14,7 @@
  */
 
 #include "access_token_helper.h"
+#include "ans_ut_constant.h"
 
 namespace OHOS {
 namespace Notification {
@@ -25,7 +26,7 @@ bool AccessTokenHelper::VerifyCallerPermission(
 
 bool AccessTokenHelper::VerifyNativeToken(const Security::AccessToken::AccessTokenID &callerToken)
 {
-    return true;
+    return callerToken == NATIVE_TOKEN;
 }
 }  // namespace Notification
 }  // namespace OHOS

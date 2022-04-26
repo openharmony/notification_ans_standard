@@ -16,6 +16,7 @@
 #ifndef OHOS_IPC_IPC_SKELETON_H
 #define OHOS_IPC_IPC_SKELETON_H
 
+#include "accesstoken_kit.h"
 #include "iremote_object.h"
 
 namespace OHOS {
@@ -37,6 +38,8 @@ public:
 
     static pid_t GetCallingUid();
 
+    static Security::AccessToken::AccessTokenID GetCallingTokenID();
+
     static std::string GetLocalDeviceID();
 
     static std::string GetCallingDeviceID();
@@ -56,6 +59,8 @@ public:
     static bool SetCallingIdentity(std::string &identity);
 
     static void SetCallingUid(pid_t uid);
+
+    static void SetCallingTokenID(Security::AccessToken::AccessTokenID callerToken);
 };
 } // namespace OHOS
 #endif // OHOS_IPC_IPC_SKELETON_H

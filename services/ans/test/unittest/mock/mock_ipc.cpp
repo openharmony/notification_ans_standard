@@ -21,6 +21,7 @@ using namespace IPC_SINGLE;
 #endif
 
 pid_t uid_ = 1;
+Security::AccessToken::AccessTokenID callerToken_ = 0;
 
 pid_t IPCSkeleton::GetCallingUid()
 {
@@ -32,8 +33,18 @@ pid_t IPCSkeleton::GetCallingPid()
     return 1;
 }
 
+Security::AccessToken::AccessTokenID IPCSkeleton::GetCallingTokenID()
+{
+    return callerToken_;
+}
+
 void IPCSkeleton::SetCallingUid(pid_t uid)
 {
     uid_ = uid;
+}
+
+void IPCSkeleton::SetCallingTokenID(Security::AccessToken::AccessTokenID callerToken)
+{
+    callerToken_ = callerToken;
 }
 }  // namespace OHOS
