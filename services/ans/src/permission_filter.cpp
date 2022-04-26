@@ -36,7 +36,7 @@ ErrCode PermissionFilter::OnPublish(const std::shared_ptr<NotificationRecord> &r
     if (result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
         result = ERR_OK;
         std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
-        if (bundleManager == nullptr) {
+        if (bundleManager != nullptr) {
             enable = bundleManager->CheckApiCompatibility(record->bundleOption);
         }
     }
