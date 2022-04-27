@@ -80,6 +80,11 @@ const std::map<std::string,
             std::bind(&NotificationPreferencesDatabase::ParseSlotEnableBypassDnd, std::placeholders::_1,
                 std::placeholders::_2, std::placeholders::_3),
         },
+        {
+            KEY_SLOT_ENABLED,
+            std::bind(&NotificationPreferencesDatabase::ParseSlotEnabled, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3),
+        },
 };
 
 const std::map<std::string,
@@ -856,6 +861,7 @@ void NotificationPreferencesDatabase::GenerateSlotEntry(const std::string &bundl
     GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_VIBRATION_STYLE),
         VectorToString(slot->GetVibrationStyle()),
         entries);
+    GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_ENABLED), std::to_string(slot->GetEnable()), entries);
 }
 
 bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleName, const int &bundleUid,
@@ -1337,6 +1343,14 @@ void NotificationPreferencesDatabase::ParseSlotEnableBypassDnd(
     ANS_LOGD("ParseSlotEnableBypassDnd slot by pass dnd is %{public}s.", value.c_str());
     bool enable = static_cast<bool>(StringToInt(value));
     slot->EnableBypassDnd(enable);
+}
+
+void NotificationPreferencesDatabase::ParseSlotEnabled(
+    sptr<NotificationSlot> &slot, const std::string &value) const
+{
+    ANS_LOGD("ParseSlotEnabled slot enabled is %{public}s.", value.c_str());
+    bool enabled = static_cast<bool>(StringToInt(value));
+    slot->SetEnable(enabled);
 }
 
 std::string NotificationPreferencesDatabase::GenerateBundleLablel(

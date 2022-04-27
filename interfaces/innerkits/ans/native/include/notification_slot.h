@@ -283,6 +283,21 @@ public:
     void EnableBadge(bool isShowBadge);
 
     /**
+     * @brief Set whether the application slot enable.
+     * @note If the slot enable status is false, the notification cannot be publish.
+     *
+     * @param enabled Specifies whether to enable slot.
+     */
+    void SetEnable(bool enabled);
+
+    /**
+     * @brief Obtains whether the application slot is enabled.
+     *
+     * @return Returns true if the slot enabled; returns false otherwise.
+     */
+    bool GetEnable() const;
+
+    /**
      * @brief Dumps a string representation of the object.
      *
      * @return Returns a string representation of the object.
@@ -356,6 +371,7 @@ private:
     std::string groupId_ {};
     Uri sound_;
     std::vector<int64_t> vibrationValues_ {};
+    bool enabled_ {true};
 
     // no object in parcel
     static constexpr int VALUE_NULL = -1;

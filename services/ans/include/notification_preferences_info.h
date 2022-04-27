@@ -241,6 +241,8 @@ public:
         bool RemoveSlotGroup(const std::string &groupId);
         void SetBundleUid(const int &uid);
         int GetBundleUid() const;
+        void SetSlotEnabled(NotificationConstant::SlotType slotType, bool enabled);
+        bool GetSlotEnabled(NotificationConstant::SlotType slotType, bool &enabled) const;
 
     private:
         std::string bundleName_;

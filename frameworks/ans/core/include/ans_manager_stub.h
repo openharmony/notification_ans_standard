@@ -707,6 +707,10 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
+    virtual ErrCode SetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool enabled) override;
+    virtual ErrCode GetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool &enabled) override;
 
 private:
     static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
@@ -786,6 +790,8 @@ private:
     ErrCode HandleDeleteAllByUser(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleSetEnabledForBundleSlot(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetEnabledForBundleSlot(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);
