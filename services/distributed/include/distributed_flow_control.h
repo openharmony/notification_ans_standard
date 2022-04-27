@@ -23,13 +23,41 @@ namespace OHOS {
 namespace Notification {
 class DistributedFlowControl {
 public:
+    /**
+     * @brief The constructor.
+     *
+     * @param kvManagerSecondMaxinum The maximum number of calls to DistributedKvDataManager interface per second.
+     * @param kvManagerMinuteMaxinum The maximum number of calls to DistributedKvDataManager interface per minute.
+     * @param kvStoreSecondMaxinum The maximum number of calls to SingleKvStore interface per second.
+     * @param kvStoreMinuteMaxinum The maximum number of calls to SingleKvStore interface per minute.
+     */
     DistributedFlowControl(int kvManagerSecondMaxinum = KVMANAGER_MAXINUM_PER_SECOND,
         int kvManagerMinuteMaxinum = KVMANAGER_MAXINUM_PER_MINUTE,
         int kvStoreSecondMaxinum = KVSTORE_MAXINUM_PER_SECOND,
         int kvStoreMinuteMaxinum = KVSTORE_MAXINUM_PER_MINUTE);
+
+    /**
+     * @brief Check if DistributedKvDataManager interface flow control can pass.
+     *
+     * @return True on passed, otherwise false.
+     */
     bool KvManagerFlowControl(void);
+
+    /**
+     * @brief Check if SingleKvStore interface flow control can pass.
+     *
+     * @return True on passed, otherwise false.
+     */
     bool KvStoreFlowControl(void);
+
+    /**
+     * @brief Clear DistributedKvDataManager interface flow control count.
+     */
     void KvManagerFlowControlClear(void);
+
+    /**
+     * @brief Clear SingleKvStore interface flow control count.
+     */
     void KvStoreFlowControlClear(void);
 
 protected:

@@ -24,8 +24,18 @@ namespace Notification {
 class NotificationFuzzTestManager {
 public:
     using Ptr = std::shared_ptr<NotificationFuzzTestManager>;
+
+    /**
+     * @brief Default deconstructor used to deconstruct.
+     */
     ~NotificationFuzzTestManager()
     {}
+
+    /**
+     * @brief Obtains the instance of the fuzz test.
+     *
+     * @return Returns the instance of the fuzz test.
+     */
     static Ptr GetInstance()
     {
         if (instance == nullptr) {
@@ -35,6 +45,9 @@ public:
         return instance;
     }
 
+    /**
+     * @brief Starts the fuzz test.
+     */
     void StartFuzzTest();
 
 private:

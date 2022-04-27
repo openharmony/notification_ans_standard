@@ -31,14 +31,14 @@ namespace AppExecFwk {
 class MockBundleMgrService : public BundleMgrHost {
 public:
     MockBundleMgrService()
-    {
-    }
+    {}
 
     ~MockBundleMgrService()
     {}
 
     /**
      * @brief Obtains the ApplicationInfo based on a given bundle name.
+     *
      * @param appName Indicates the application bundle name to be queried.
      * @param flag Indicates the flag used to specify information contained
      *             in the ApplicationInfo object that will be returned.
@@ -51,8 +51,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains information about all installed applications of a specified user.
+     *
      * @param flag Indicates the flag used to specify information contained
      *             in the ApplicationInfo objects that will be returned.
      * @param userId Indicates the user ID.
@@ -64,8 +66,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the BundleInfo based on a given bundle name.
+     *
      * @param bundleName Indicates the application bundle name to be queried.
      * @param flag Indicates the information contained in the BundleInfo object to be returned.
      * @param bundleInfo Indicates the obtained BundleInfo object.
@@ -77,8 +81,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains BundleInfo of all bundles available in the system.
+     *
      * @param flag Indicates the flag used to specify information contained in the BundleInfo that will be returned.
      * @param bundleInfos Indicates all of the obtained BundleInfo objects.
      * @param userId Indicates the user ID.
@@ -88,9 +94,11 @@ public:
         const BundleFlag flag, std::vector<BundleInfo> &bundleInfos, int32_t userId) override
     {
         return true;
-    };
+    }
+
     /**
      * @brief Obtains the application UID based on the given bundle name and user ID.
+     *
      * @param bundleName Indicates the bundle name of the application.
      * @param userId Indicates the user ID.
      * @return Returns the uid if successfully obtained; returns -1 otherwise.
@@ -99,8 +107,10 @@ public:
     {
         return 0;
     }
+
     /**
      * @brief Obtains the application ID based on the given bundle name and user ID.
+     *
      * @param bundleName Indicates the bundle name of the application.
      * @param userId Indicates the user ID.
      * @return Returns the application ID if successfully obtained; returns empty string otherwise.
@@ -109,8 +119,10 @@ public:
     {
         return "bundlename";
     }
+
     /**
      * @brief Obtains the bundle name of a specified application based on the given UID.
+     *
      * @param uid Indicates the uid.
      * @param bundleName Indicates the obtained bundle name.
      * @return Returns true if the bundle name is successfully obtained; returns false otherwise.
@@ -120,8 +132,10 @@ public:
         bundleName = "hello";
         return true;
     }
+
     /**
      * @brief Obtains all bundle names of a specified application based on the given application UID.
+     *
      * @param uid Indicates the uid.
      * @param bundleNames Indicates the obtained bundle names.
      * @return Returns true if the bundle names is successfully obtained; returns false otherwise.
@@ -131,7 +145,9 @@ public:
         return true;
     }
 
-    /* @brief Obtains the formal name associated with the given UID.
+    /**
+     * @brief Obtains the formal name associated with the given UID.
+     *
      * @param uid Indicates the uid.
      * @param name Indicates the obtained formal name.
      * @return Returns true if the formal name is successfully obtained; returns false otherwise.
@@ -140,8 +156,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains an array of all group IDs associated with a specified bundle.
+     *
      * @param bundleName Indicates the bundle name.
      * @param gids Indicates the group IDs associated with the specified bundle.
      * @return Returns true if the gids is successfully obtained; returns false otherwise.
@@ -150,8 +168,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the type of a specified application based on the given bundle name.
+     *
      * @param bundleName Indicates the bundle name.
      * @return Returns "system" if the bundle is a system application; returns "third-party" otherwise.
      */
@@ -159,8 +179,10 @@ public:
     {
         return "";
     }
+
     /**
      * @brief Check whether the app is system app by it's UID.
+     *
      * @param uid Indicates the uid.
      * @return Returns true if the bundle is a system application; returns false otherwise.
      */
@@ -168,6 +190,7 @@ public:
 
     /**
      * @brief Obtains the BundleInfo of application bundles based on the specified metaData.
+     *
      * @param metaData Indicates the metadata to get in the bundle.
      * @param bundleInfos Indicates all of the obtained BundleInfo objects.
      * @return Returns true if the BundleInfos is successfully obtained; returns false otherwise.
@@ -176,8 +199,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Query the AbilityInfo by the given Want.
+     *
      * @param want Indicates the information of the ability.
      * @param abilityInfo Indicates the obtained AbilityInfo object.
      * @return Returns true if the AbilityInfo is successfully obtained; returns false otherwise.
@@ -186,8 +211,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Query the AbilityInfo by ability.uri in config.json.
+     *
      * @param abilityUri Indicates the uri of the ability.
      * @param abilityInfo Indicates the obtained AbilityInfo object.
      * @return Returns true if the AbilityInfo is successfully obtained; returns false otherwise.
@@ -196,17 +223,21 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the BundleInfo of all keep-alive applications in the system.
+     *
      * @param bundleInfos Indicates all of the obtained BundleInfo objects.
      * @return Returns true if the BundleInfos is successfully obtained; returns false otherwise.
      */
     virtual bool QueryKeepAliveBundleInfos(std::vector<BundleInfo> &bundleInfos) override
     {
         return true;
-    };
+    }
+
     /**
      * @brief Obtains information about an application bundle contained in a ohos Ability Package (HAP).
+     *
      * @param hapFilePath Indicates the absolute file path of the HAP.
      * @param flag Indicates the information contained in the BundleInfo object to be returned.
      * @param bundleInfo Indicates the obtained BundleInfo object.
@@ -217,8 +248,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtain the HAP module info of a specific ability.
+     *
      * @param abilityInfo Indicates the ability.
      * @param hapModuleInfo Indicates the obtained HapModuleInfo object.
      * @return Returns true if the HapModuleInfo is successfully obtained; returns false otherwise.
@@ -227,8 +260,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the Want for starting the main ability of an application based on the given bundle name.
+     *
      * @param bundleName Indicates the bundle name.
      * @param want Indicates the obtained launch Want object.
      * @return Returns true if the launch Want object is successfully obtained; returns false otherwise.
@@ -237,9 +272,11 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Confirms with the permission management module to check whether a request prompt is required for granting
      * a certain permission.
+     *
      * @param bundleName Indicates the name of the bundle to check.
      * @param permission Indicates the permission to check.
      * @param userId Indicates the user id.
@@ -252,8 +289,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Checks whether the publickeys of two bundles are the same.
+     *
      * @param firstBundleName Indicates the first bundle name.
      * @param secondBundleName Indicates the second bundle name.
      * @return Returns SIGNATURE_UNKNOWN_BUNDLE if at least one of the given bundles is not found;
@@ -264,15 +303,19 @@ public:
     {
         return 0;
     }
+
     /**
      * @brief Checks whether a specified bundle has been granted a specific permission.
+     *
      * @param bundleName Indicates the name of the bundle to check.
      * @param permission Indicates the permission to check.
      * @return Returns 0 if the bundle has the permission; returns -1 otherwise.
      */
     virtual int CheckPermission(const std::string &bundleName, const std::string &permission) override;
+
     /**
      * @brief Obtains detailed information about a specified permission.
+     *
      * @param permissionName Indicates the name of the ohos permission.
      * @param permissionDef Indicates the object containing detailed information about the given ohos permission.
      * @return Returns true if the PermissionDef object is successfully obtained; returns false otherwise.
@@ -281,8 +324,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains all known permission groups in the system.
+     *
      * @param permissionDefs Indicates the list of objects containing the permission group information.
      * @return Returns true if the PermissionDef objects is successfully obtained; returns false otherwise.
      */
@@ -290,8 +335,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains all known permission groups in the system.
+     *
      * @param permissions Indicates the permission array.
      * @param appNames Indicates the list of application names that have the specified permissions.
      * @return Returns true if the application names is successfully obtained; returns false otherwise.
@@ -301,8 +348,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Requests a certain permission from user.
+     *
      * @param bundleName Indicates the name of the bundle to request permission.
      * @param permission Indicates the permission to request permission.
      * @param userId Indicates the user id.
@@ -313,8 +362,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Registers a callback for listening for permission changes of all UIDs.
+     *
      * @param callback Indicates the callback method to register.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
@@ -322,8 +373,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Registers a callback for listening for permission changes of specified UIDs.
+     *
      * @param uids Indicates the list of UIDs whose permission changes will be monitored.
      * @param callback Indicates the callback method to register.
      * @return Returns true if this function is successfully called; returns false otherwise.
@@ -333,8 +386,10 @@ public:
     {
         return true;
     }
-     /**
+
+    /**
      * @brief Unregisters a specified callback for listening for permission changes.
+     *
      * @param callback Indicates the callback method to register.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
@@ -342,8 +397,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the FormInfo objects provided by all applications on the device.
+     *
      * @param formInfo list of FormInfo objects if obtained; returns an empty List if no FormInfo is available on the
      * device.
      * @return Returns true if this function is successfully called; returns false otherwise.
@@ -352,8 +409,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the FormInfo objects provided by a specified application on the device.
+     *
      * @param bundleName Indicates the bundle name of the application.
      * @param formInfo list of FormInfo objects if obtained; returns an empty List if no FormInfo is available on the
      * device.
@@ -366,6 +425,7 @@ public:
 
     /**
      * @brief Obtains the FormInfo objects provided by a specified.
+     *
      * @param formInfo list of FormInfo objects if obtained; returns an empty List if no FormInfo is available on the
      * device.
      * @param moduleName Indicates the module name of the application.
@@ -377,8 +437,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Checks whether the system has a specified capability.
+     *
      * @param capName Indicates the name of the system feature to check.
      * @return Returns true if the given feature specified by name is available in the system; returns false otherwise.
      */
@@ -386,8 +448,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the capabilities that are available in the system.
+     *
      * @param systemCaps Indicates the list of capabilities available in the system.
      * @return Returns true if capabilities in the system are successfully obtained; returns false otherwise.
      */
@@ -395,16 +459,20 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Checks whether the current device has been started in safe mode.
+     *
      * @return Returns true if the device is in safe mode; returns false otherwise.
      */
     virtual bool IsSafeMode() override
     {
         return true;
     }
+
     /**
      * @brief Clears application running data of a specified application.
+     *
      * @param bundleName Indicates the bundle name of the application whose data is to be cleared.
      * @return Returns true if the data cleared successfully; returns false otherwise.
      */
@@ -412,8 +480,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Register the specific bundle status callback.
+     *
      * @param bundleStatusCallback Indicates the callback to be invoked for returning the bundle status changed result.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
@@ -421,8 +491,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Clear the specific bundle status callback.
+     *
      * @param bundleStatusCallback Indicates the callback to be cleared.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
@@ -430,16 +502,20 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Unregister all the callbacks of status changed.
+     *
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     virtual bool UnregisterBundleStatusCallback() override
     {
         return true;
     }
+
     /**
      * @brief Dump the bundle information with specific flags.
+     *
      * @param flag Indicates the information contained in the dump result.
      * @param bundleName Indicates the bundle name if needed.
      * @param userId Indicates the user ID.
@@ -451,8 +527,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Checks whether a specified application is enabled.
+     *
      * @param bundleName Indicates the bundle name of the application.
      * @return Returns true if the application is enabled; returns false otherwise.
      */
@@ -460,8 +538,10 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Sets whether to enable a specified ability.
+     *
      * @param abilityInfo Indicates information about the ability to check.
      * @return Returns true if the ability is enabled; returns false otherwise.
      */
@@ -469,16 +549,20 @@ public:
     {
         return true;
     }
+
     /**
      * @brief Obtains the interface used to install and uninstall bundles.
+     *
      * @return Returns a pointer to IBundleInstaller class if exist; returns nullptr otherwise.
      */
     virtual sptr<IBundleInstaller> GetBundleInstaller() override
     {
         return nullptr;
     }
+
     /**
      * @brief Obtains the interface used to create or delete user.
+     *
      * @return Returns a pointer to IBundleUserMgr class if exist; returns nullptr otherwise.
      */
     virtual sptr<IBundleUserMgr> GetBundleUserMgr() override
@@ -486,8 +570,19 @@ public:
         return nullptr;
     }
 
+    /**
+     * @brief Mock to set whether it is system application.
+     *
+     * @param isSystemApp Indicates the system application flag.
+     */
     void MockSetIsSystemApp(bool isSystemApp);
 
+    /**
+     * @brief Get the bundle name by uid.
+     *
+     * @param uid Indicates the uid.
+     * @return Indicates the bundle name.
+     */
     std::string GetBundleNameByUid(pid_t uid)
     {
         return "bundle";

@@ -24,14 +24,28 @@ namespace OHOS {
 namespace Notification {
 class SystemEventSubscriber : public EventFwk::CommonEventSubscriber {
 public:
+    /**
+     * @brief The constructor.
+     *
+     * @param subscribeInfo Indicates the EventFwk::CommonEventSubscribeInfo object.
+     * @param callback Indicates the callback.
+     */
     SystemEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo,
         const std::function<void(const EventFwk::CommonEventData &)> &callback)
         : EventFwk::CommonEventSubscriber(subscribeInfo), callback_(callback)
     {}
 
+    /**
+     * @brief The deconstructor.
+     */
     ~SystemEventSubscriber()
     {}
 
+    /**
+     * @brief Obtains the death event. Inherited from EventFwk::CommonEventSubscriber.
+     *
+     * @param data Indicates the EventFwk::CommonEventData object.
+     */
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override
     {
         if (callback_ != nullptr) {

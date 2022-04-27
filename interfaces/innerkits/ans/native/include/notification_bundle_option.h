@@ -22,70 +22,75 @@ namespace OHOS {
 namespace Notification {
 class NotificationBundleOption : public Parcelable {
 public:
-    /**
-     * A default constructor used to create a NotificationBundleOption instance.
-     */
     NotificationBundleOption() = default;
 
     /**
-     * A constructor used to create a NotificationBundleOption instance based on the creator bundle name and uid.
+     * @brief A constructor used to create a NotificationBundleOption instance based on the creator bundle name and uid.
+     *
      * @param bundleName Indicates the creator bundle name.
      * @param uid Indicates the creator uid.
      */
     NotificationBundleOption(const std::string &bundleName, const int32_t uid);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     virtual ~NotificationBundleOption();
 
     /**
-     * Sets the creator bundle name.
+     * @brief Sets the creator bundle name.
+     *
      * @param bundleName Indicates the creator bundle name.
      */
     void SetBundleName(const std::string &bundleName);
 
     /**
-     * Obtains the creator bundle name.
-     * @return the creator bundle name.
+     * @brief Obtains the creator bundle name.
+     *
+     * @return Returns the creator bundle name.
      */
     std::string GetBundleName() const;
 
     /**
-     * Sets the creator uid.
+     * @brief Sets the creator uid.
+     *
      * @param uid Indicates the creator uid.
      */
     void SetUid(const int32_t uid);
 
     /**
-     * Obtains the creator uid.
-     * @return the creator uid.
+     * @brief Obtains the creator uid.
+     *
+     * @return Returns the creator uid.
      */
     int32_t GetUid() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump();
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel Indicates the object into the parcel
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationBundleOption
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationBundleOption
      */
     static NotificationBundleOption *Unmarshalling(Parcel &parcel);
 
 private:
     /**
-     * Read data from a Parcel.
-     * @param parcel the parcel
-     * @return true if read success; returns false otherwise.
+     * @brief Read data from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if read success; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 

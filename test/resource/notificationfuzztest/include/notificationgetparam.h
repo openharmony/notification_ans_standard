@@ -144,54 +144,120 @@ std::shared_ptr<OHOS::Notification::NotificationDoNotDisturbDate> GetParamNotifi
 OHOS::Notification::NotificationConstant::DoNotDisturbType GetParamDoNotDisturbType();
 class TestRemoteObject : public IRemoteObject {
 public:
+    /**
+     * @brief Default constructor used to construct.
+     */
     TestRemoteObject();
+
+    /**
+     * @brief Default deconstructor used to deconstruct.
+     */
     ~TestRemoteObject();
 
+    /**
+     * @brief Override GetObjectRefCount.
+     *
+     * @return Returns a fixed value of type int_32.
+     */
     int32_t GetObjectRefCount() override
     {
         return 0;
     }
 
+    /**
+     * @brief Override SendRequest.
+     *
+     * @param code The uint32_t type input parameter.
+     * @param data The MessageParcel type input parameter.
+     * @param reply The MessageOption type input parameter.
+     * @param option The MessageOption type input parameter.
+     * @return Returns a fixed value of type int.
+     */
     int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override
     {
         return 0;
     }
 
+    /**
+     * @brief Override IsProxyObject.
+     *
+     * @return Returns a fixed value of type bool.
+     */
     bool IsProxyObject() const override
     {
         return true;
     }
 
+    /**
+     * @brief Override CheckObjectLegality.
+     *
+     * @return Returns a fixed value of type bool.
+     */
     bool CheckObjectLegality() const override
     {
         return true;
     }
 
+    /**
+     * @brief Override AddDeathRecipient.
+     *
+     * @param recipient The DeathRecipient type point input parameter.
+     * @return Returns a fixed value of type bool.
+     */
     bool AddDeathRecipient(const sptr<DeathRecipient> &recipient) override
     {
         return true;
     }
 
+    /**
+     * @brief Override RemoveDeathRecipient.
+     *
+     * @param recipient The DeathRecipient type point input parameter.
+     * @return Returns a fixed value of type bool.
+     */
     bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) override
     {
         return true;
     }
 
+    /**
+     * @brief Override Marshalling.
+     *
+     * @param parcel The Parcel type input parameter.
+     * @return Returns a fixed value of type bool.
+     */
     bool Marshalling(Parcel &parcel) const override
     {
         return true;
     }
 
+    /**
+     * @brief Override AsInterface.
+     *
+     * @return Returns a null pointer.
+     */
     sptr<IRemoteBroker> AsInterface() override
     {
         return nullptr;
     }
 
+    /**
+     * @brief Override Dump.
+     *
+     * @param fd The int type input parameter.
+     * @param args The u16string type vector input parameter.
+     * @return Returns a fixed value of type int.
+     */
     int Dump(int fd, const std::vector<std::u16string> &args) override
     {
         return 0;
     }
 
+    /**
+     * @brief Override GetObjectDescriptor
+     *
+     * @return Returns a random value of type u16string.
+     */
     std::u16string GetObjectDescriptor() const
     {
         std::u16string descriptor = std::u16string();
@@ -201,44 +267,118 @@ public:
 
 class TestIBundleStatusCallback : public OHOS::AppExecFwk::IBundleStatusCallback {
 public:
+    /**
+     * @brief Default constructor used to construct.
+     */
     TestIBundleStatusCallback()
     {}
+
+    /**
+     * @brief Override OnBundleStateChanged.
+     *
+     * @param installType The uint8_t type input parameter.
+     * @param resultCode The int32_t type input parameter.
+     * @param resultMsg The string type input parameter.
+     * @param bundleName The string type input parameter.
+     */
     void OnBundleStateChanged(const uint8_t installType, const int32_t resultCode, const std::string &resultMsg,
         const std::string &bundleName) override
     {}
+
+    /**
+     * @brief Default deconstructor used to deconstruct.
+     */
     virtual ~TestIBundleStatusCallback()
     {}
 };
 
 class TestAnsSubscriber : public OHOS::Notification::NotificationSubscriber {
 public:
+    /**
+     * @brief Default constructor used to create subscriber.
+     */
     TestAnsSubscriber()
     {}
+
+    /**
+     * @brief Default deconstructor used to deconstruct.
+     */
     ~TestAnsSubscriber()
     {}
+
+    /**
+     * @brief Override OnConnected.
+     */
     void OnConnected() override
     {
         std::cout << "TestAnsSubscriber OnConnected" << std::endl;
         mutex.unlock();
     }
+
+    /**
+     * @brief Override OnDisconnected.
+     */
     void OnDisconnected() override
     {
         std::cout << "TestAnsSubscriber OnDisconnected" << std::endl;
         mutex.unlock();
     }
+
+    /**
+     * @brief Override OnDied.
+     */
     void OnDied() override
     {}
+
+    /**
+     * @brief Override OnUpdate.
+     *
+     * @param sortingMap The NotificationSortingMap type point input parameter.
+     */
     void OnUpdate(const std::shared_ptr<OHOS::Notification::NotificationSortingMap> &sortingMap) override
     {}
+
+    /**
+     * @brief Override OnDoNotDisturbDateChange.
+     *
+     * @param date The NotificationDoNotDisturbDate type point input parameter.
+     */
     void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override
     {}
+
+    /**
+     * @brief Override OnCanceled.
+     *
+     * @param request The Notification type point input parameter.
+     */
     void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request) override
     {}
+
+    /**
+     * @brief Override OnCanceled.
+     *
+     * @param request The Notification type point input parameter.
+     * @param request The NotificationSortingMap type point input parameter.
+     * @param deleteReason The int type input parameter.
+     */
     void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request,
         const std::shared_ptr<OHOS::Notification::NotificationSortingMap> &sortingMap, int deleteReason) override
     {}
+
+    /**
+     * @brief Override OnConsumed.
+     *
+     * @param request The Notification type point input parameter.
+     */
     void OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request) override
     {}
+
+    /**
+     * @brief Override OnConsumed.
+     *
+     * @param request The Notification type point input parameter.
+     * @param sortingMap The NotificationSortingMap type point input parameter.
+     */
     void OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request,
         const std::shared_ptr<OHOS::Notification::NotificationSortingMap> &sortingMap) override
     {}
@@ -255,37 +395,99 @@ class TestCompletedCallback : public OHOS::AbilityRuntime::WantAgent::CompletedC
 
 class TestCancelListener : public OHOS::AbilityRuntime::WantAgent::CancelListener {
 public:
+    /**
+     * @brief Override OnCancelled.
+     */
     void OnCancelled(int resultCode) override
     {}
 };
 
 class TestOnPermissionChangedCallback : public OHOS::AppExecFwk::OnPermissionChangedCallback {
 public:
+    /**
+     * @brief Override OnChanged.
+     *
+     * @param uid Records the uid.
+     */
     void OnChanged(const int32_t uid) override
     {}
 };
 
 class TestAbilityLifecycleCallbacks : public OHOS::AppExecFwk::AbilityLifecycleCallbacks {
 public:
+    /**
+     * @brief Default constructor used to construct.
+     */
     TestAbilityLifecycleCallbacks() = default;
+
+    /**
+     * @brief Default deconstructor used to deconstruct.
+     */
     virtual ~TestAbilityLifecycleCallbacks() = default;
+
+    /**
+     * @brief Override OnAbilityStart.
+     *
+     * @param ability The ability to records the start state.
+     */
     virtual void OnAbilityStart(const std::shared_ptr<Ability> &ability)
     {}
+
+    /**
+     * @brief Override OnAbilityInactive.
+     *
+     * @param ability The ability to records the inactive state.
+     */
     virtual void OnAbilityInactive(const std::shared_ptr<Ability> &ability)
     {}
+
+    /**
+     * @brief Override OnAbilityBackground.
+     *
+     * @param ability The ability to records the background state.
+     */
     virtual void OnAbilityBackground(const std::shared_ptr<Ability> &ability)
     {}
+
+    /**
+     * @brief Override OnAbilityForeground.
+     *
+     * @param ability The ability to records the foreground state.
+     */
     virtual void OnAbilityForeground(const std::shared_ptr<Ability> &ability)
     {}
+
+    /**
+     * @brief Override OnAbilityActive.
+     *
+     * @param ability The ability to records the active state.
+     */
     virtual void OnAbilityActive(const std::shared_ptr<Ability> &ability)
     {}
+
+    /**
+     * @brief Override OnAbilityStop.
+     *
+     * @param ability The ability to records the stop state.
+     */
     virtual void OnAbilityStop(const std::shared_ptr<Ability> &ability)
     {}
+
+    /**
+     * @brief Override OnAbilitySaveState.
+     *
+     * @param outState Output status.
+     */
     virtual void OnAbilitySaveState(const OHOS::AppExecFwk::PacMap &outState)
     {}
 };
 class WantSender : public OHOS::AAFwk::WantSenderStub {
 public:
+    /**
+     * @brief Override Send.
+     *
+     * @param senderInfo Sender information.
+     */
     void Send(OHOS::AAFwk::SenderInfo &senderInfo) override
     {}
 };

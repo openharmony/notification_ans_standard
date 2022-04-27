@@ -40,18 +40,40 @@ public:
     AnsLogWrapper() = delete;
     ~AnsLogWrapper() = delete;
 
+    /**
+     * @brief Judge the level of the log.
+     *
+     * @param level Indicates the level of the log.
+     * @return Returns ture on passed, otherwise false.
+     */
     static bool JudgeLevel(const AnsLogLevel &level);
 
+    /**
+     * @brief Set the level of the log.
+     *
+     * @param level Indicates the level of the log.
+     */
     static void SetLogLevel(const AnsLogLevel &level)
     {
         level_ = level;
     }
 
+    /**
+     * @brief Get the level of the log.
+     *
+     * @return Indicates the level of the log.
+     */
     static const AnsLogLevel &GetLogLevel()
     {
         return level_;
     }
 
+    /**
+     * @brief Get the brief name of the file.
+     *
+     * @param str Indicates the full name of the file.
+     * @return Indicates the file name.
+     */
     static std::string GetBriefFileName(const char *str);
 
 private:

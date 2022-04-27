@@ -24,7 +24,7 @@ class NotificationSlotGroup : public Parcelable {
 public:
 
     /**
-     * A constructor used to create a NotificationSlotGroup instance with the group ID and name initialized.
+     * @brief A constructor used to create a NotificationSlotGroup instance with the group ID and name initialized.
      *
      * @param id Indicates the ID of the NotificationSlotGroup.
      *           The ID must be unique and its length must not exceed 1000 characters (the excess part is automatically
@@ -34,42 +34,41 @@ public:
      */
     NotificationSlotGroup(const std::string &id, const std::string &name);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationSlotGroup();
 
     /**
-     * Obtains the description of this NotificationSlotGroup object, which is set by SetDescription(string).
+     * @brief Obtains the description of this NotificationSlotGroup object, which is set by SetDescription(string).
      *
      * @return Returns the description of this NotificationSlotGroup.
      */
     std::string GetDescription() const;
 
     /**
-     * Obtains the ID of this NotificationSlotGroup object, which is set by NotificationSlotGroup(string, string).
+     * @brief Obtains the ID of this NotificationSlotGroup object, which is set by
+     * NotificationSlotGroup(string, string).
      *
      * @return Returns the ID of this NotificationSlotGroup.
      */
     std::string GetId() const;
 
     /**
-     * Obtains the name of this NotificationSlotGroup object, which is set by NotificationSlotGroup(string, string).
+     * @brief Obtains the name of this NotificationSlotGroup object, which is set by
+     * NotificationSlotGroup(string, string).
      *
      * @return Returns the name of this NotificationSlotGroup.
      */
     std::string GetName() const;
 
     /**
-     * Obtains a list of notification slots bound to this NotificationSlotGroup object.
+     * @brief Obtains a list of notification slots bound to this NotificationSlotGroup object.
      * @note NotificationSlot::SetSlotGroup(string) is used to bind a notification slot to a notification slot group.
-     * @param slots Indicates the slots which to set to the slotgroup.
      *
+     * @param slots Indicates the slots which to set to the slotgroup.
      */
     void SetSlots(const std::vector<NotificationSlot> &slots);
 
     /**
-     * Sets a list of notification slots bound to this NotificationSlotGroup object.
+     * @brief Sets a list of notification slots bound to this NotificationSlotGroup object.
      * @note NotificationSlot::SetSlotGroup(string) is used to bind a notification slot to a notification slot group.
      *
      * @return Returns the list of notification slots bound to this NotificationSlotGroup.
@@ -77,29 +76,29 @@ public:
     std::vector<NotificationSlot> GetSlots() const;
 
     /**
-     * Checks whether this NotificationSlotGroup is disabled.
+     * @brief Checks whether this NotificationSlotGroup is disabled.
      *
      * @return Returns true if this NotificationSlotGroup is disabled; returns false otherwise.
      */
     bool IsDisabled() const;
 
     /**
-     * Sets the description for this NotificationSlotGroup object.
+     * @brief Sets the description for this NotificationSlotGroup object.
      *
-     * @param description Describes this NotificationSlotGroup object.
+     * @param description describes this NotificationSlotGroup object.
      *                    Its length must not exceed 1000 characters (the excess part is automatically truncated).
      */
     void SetDescription(const std::string &description);
 
     /**
-     * Dumps a string representation of the object.
+     * @brief Dumps a string representation of the object.
      *
-     * @return A string representation of the object.
+     * @return Returns a string representation of the object.
      */
     std::string Dump() const;
 
     /**
-     * Marshals NotificationSlotGroup objects and writes them into Parcel.
+     * @brief Marshals NotificationSlotGroup objects and writes them into Parcel.
      *
      * @param parcel Indicates the Parcel object for marshalling.
      * @return Returns true if the marshalling is successful; returns false otherwise.
@@ -107,33 +106,29 @@ public:
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshals a NotificationSlotGroup object from a Parcel.
+     * @brief Unmarshals a NotificationSlotGroup object from a Parcel.
      *
      * @param parcel Indicates the Parcel object for unmarshalling.
-     * @return Returns true if the unmarshalling is successful; returns false otherwise.
+     * @return Returns the NotificationSlotGroup object.
      */
     static NotificationSlotGroup *Unmarshalling(Parcel &parcel);
 
     /**
-     * If string length exceed 1000 characters, the excessive part is automatically truncated.
+     * @brief If string length exceed 1000 characters, the excessive part is automatically truncated.
      *
-     * @param truncatedString The sting which will be truncated
+     * @param truncatedString Indicates the sting which will be truncated
      * @return Returns the string that has been truncated.
      */
     std::string TruncateString(const std::string &inPutString);
 
 private:
-
-    /**
-     * Default constructor used to create a NotificationSlotGroup instance.
-     */
     NotificationSlotGroup();
 
     /**
-     * Read NotificationSlotGroup object from a Parcel.
+     * @brief Read NotificationSlotGroup object from a Parcel.
      *
-     * @param parcel the parcel
-     * @return read from parcel success or fail
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 

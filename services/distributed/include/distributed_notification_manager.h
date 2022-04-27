@@ -32,6 +32,9 @@ namespace OHOS {
 namespace Notification {
 class DistributedNotificationManager : public DelayedSingleton<DistributedNotificationManager> {
 public:
+    /**
+     * @brief Distributed notification callback function for remote device.
+     */
     struct IDistributedCallback {
         std::function<void(
             const std::string &deviceId, const std::string &bundleName, sptr<NotificationRequest> &request)>
@@ -44,17 +47,86 @@ public:
             OnDelete;
     };
 
+    /**
+     * @brief Publishes a local notification to remote device.
+     *
+     * @param bundleName Indicates the bundle name of the application whose notifications are to be publish.
+     * @param label Indicates the label of the notifications.
+     * @param id Indicates the bundle uid of the application whose notifications are to be publish.
+     * @param request Indicates the NotificationRequest object for setting the notification content.
+     * @return ErrCode Returns the publish result.
+     */
     ErrCode Publish(
         const std::string &bundleName, const std::string &label, int32_t id, const sptr<NotificationRequest> &request);
+
+    /**
+     * @brief Updates infomation of local notification to remote device.
+     *
+     * @param bundleName Indicates the bundle name of the application whose notifications are to be update.
+     * @param label Indicates the label of the notifications.
+     * @param id Indicates the bundle uid of the application whose notifications are to be update.
+     * @param request Indicates the NotificationRequest object for setting the notification content.
+     * @return ErrCode Returns the update result.
+     */
     ErrCode Update(
         const std::string &bundleName, const std::string &label, int32_t id, const sptr<NotificationRequest> &request);
+
+    /**
+     * @brief Removes a local notification.
+     *
+     * @param bundleName Indicates the bundle name of the application whose notifications are to be remove.
+     * @param label Indicates the label of the notifications.
+     * @param id Indicates the bundle uid of the application whose notifications are to be remove.
+     * @return ErrCode Returns the remove result.
+     */
     ErrCode Delete(const std::string &bundleName, const std::string &label, int32_t id);
+
+    /**
+     * @brief Removes a remote notification.
+     *
+     * @param deviceId Indicates the ID of the device.
+     * @param bundleName Indicates the bundle name of the application whose notifications are to be remove.
+     * @param label Indicates the label of the notifications.
+     * @param id Indicates the bundle uid of the application whose notifications are to be remove.
+     * @return ErrCode Returns the remove result.
+     */
     ErrCode DeleteRemoteNotification(
         const std::string &deviceId, const std::string &bundleName, const std::string &label, int32_t id);
+
+    /**
+     * @brief Register callback of distributed notification changed.
+     *
+     * @param callback Indicates the callback structure
+     * @return ErrCode Returns the register result.
+     */
     ErrCode RegisterCallback(const IDistributedCallback &callback);
+
+    /**
+     * @brief Unregister Callback of Distributed notification changed.
+     *
+     * @return ErrCode Returns the unregister result.
+     */
     ErrCode UngegisterCallback(void);
+
+    /**
+     * @brief Get all distributed notification in database.
+     *
+     * @param requestList Indicates the list of NotificationRequest object for setting the notification content.
+     * @return ErrCode Returns Get all distributed notification result.
+     */
     ErrCode GetCurrentDistributedNotification(std::vector<sptr<NotificationRequest>> &requestList);
+
+    /**
+     * @brief Get local device info.
+     *
+     * @param deviceInfo Indicates the infomation of local device.
+     * @return ErrCode Returns get device infomation result.
+     */
     ErrCode GetLocalDeviceInfo(DistributedDatabase::DeviceInfo &deviceInfo);
+
+    /**
+     * @brief Obtains the death event of the Distributed KvStore service.
+     */
     ErrCode OnDistributedKvStoreDeathRecipient();
 
 private:

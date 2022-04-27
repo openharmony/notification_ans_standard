@@ -23,7 +23,17 @@ namespace OHOS {
 namespace Notification {
 class NotificationShellCommand : public OHOS::Notification::ShellCommand {
 public:
+    /**
+     * @brief The constructor.
+     *
+     * @param argc Indicates the count of arguments.
+     * @param argv Indicates the arguments.
+     */
     NotificationShellCommand(int argc, char *argv[]);
+
+    /**
+     * @brief The deconstructor.
+     */
     ~NotificationShellCommand() override {};
 
 private:

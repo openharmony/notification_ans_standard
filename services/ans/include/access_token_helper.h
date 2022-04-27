@@ -24,6 +24,13 @@ namespace OHOS {
 namespace Notification {
 class AccessTokenHelper {
 public:
+    /**
+     * @brief Verifies that the caller has the specified permission.
+     *
+     * @param tokenCaller The AccessTokenID of caller.
+     * @param permission The permission to be verified.
+     * @return Returns true if the caller has the specified permission, false otherwise.
+     */
     static bool VerifyCallerPermission(
         const Security::AccessToken::AccessTokenID &tokenCaller, const std::string &permission);
     static bool VerifyNativeToken(const Security::AccessToken::AccessTokenID &callerToken);

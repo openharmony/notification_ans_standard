@@ -24,121 +24,123 @@ namespace OHOS {
 namespace Notification {
 class MessageUser final : public Parcelable, public NotificationJsonConvertionBase {
 public:
-    /**
-     * A constructor used to construct MessageUser
-     */
     MessageUser();
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~MessageUser();
 
     /**
-     * Sets the key used to uniquely identify this MessageUser.
-     * @note Sets the key used to uniquely identify this MessageUser.
-     *       If no key is set, the name set by SetName(string) is used to uniquely identify a MessageUser.
+     * @brief Sets the key used to uniquely identify this MessageUser.If no key is set, the name set by SetName(string)
+     * is used to uniquely identify a MessageUser.
+     *
      * @param key Indicates the key to set.
      */
     void SetKey(const std::string &key);
 
     /**
-     * Obtains the key of this MessageUser.
+     * @brief Obtains the key of this MessageUser.
      *
      * @return Returns the key of this MessageUser.
      */
     std::string GetKey() const;
 
     /**
-     * Sets the name of this MessageUser.
+     * @brief Sets the name of this MessageUser.
+     *
      * @name Indicates the name to set.
      */
     void SetName(const std::string &name);
 
     /**
-     * Obtains the name of this MessageUser.
+     * @brief Obtains the name of this MessageUser.
      *
      * @return Returns the name of this MessageUser.
      */
     std::string GetName() const;
 
     /**
-     * Sets the pixel map of this MessageUser.
+     * @brief Sets the pixel map of this MessageUser.
+     *
      * @param pixelMap Indicates the pixel map to set.
      */
     void SetPixelMap(const std::shared_ptr<Media::PixelMap> &pixelMap);
 
     /**
-     * Obtains the pixel map of this MessageUser.
+     * @brief Obtains the pixel map of this MessageUser.
      *
      * @return Returns the pixel map of this MessageUser.
      */
     const std::shared_ptr<Media::PixelMap> GetPixelMap() const;
 
     /**
-     * Sets the URI of this MessageUser.
+     * @brief Sets the URI of this MessageUser.
+     *
      * @param uri Indicates the URI to set.
      */
     void SetUri(const Uri &uri);
 
     /**
-     * Obtains the URI of this MessageUser.
+     * @brief Obtains the URI of this MessageUser.
      *
      * @return Returns the URI of this MessageUser.
      */
     Uri GetUri() const;
 
     /**
-     * Sets whether this MessageUser is a machine.
-     * @param machine Specifies whether this MessageUser is a machine.
-     *                The value true indicates that it is, and the value false indicates not.
+     * @brief Sets whether this MessageUser is a machine.
+     *
+     * @param machine Specifies whether this MessageUser is a machine.The value true indicates that it is,
+     * and the value false indicates not.
      */
     void SetMachine(bool machine);
 
     /**
-     * Checks whether this MessageUser is a machine.
+     * @brief Checks whether this MessageUser is a machine.
      *
      * @return Returns true if this MessageUser is a machine; returns false otherwise.
      */
     bool IsMachine() const;
 
     /**
-     * Sets whether this MessageUser is important.
-     * @note This method can be used to denote users who frequently interact with the user of this device.
-     * @param userImportant Specifies whether this MessageUser is important.
-     *                      The value true indicates that it is important, and the value false indicates not.
+     * @brief Sets whether this MessageUser is important.This method can be used to denote users who frequently
+     * interact with the user of this device.
+     *
+     * @param userImportant Specifies whether this MessageUser is important.The value true indicates that it is
+     * important, and the value false indicates not.
      */
     void SetUserAsImportant(bool userImportant);
 
     /**
-     * Checks whether this MessageUser is important.
+     * @brief Checks whether this MessageUser is important.
      *
      * @return Returns true if this MessageUser is important; returns false otherwise.
      */
     bool IsUserImportant() const;
 
     /**
-     * Dumps a string representation of the object.
+     * @brief Dumps a string representation of the object.
      *
-     * @return A string representation of the object.
+     * @return Returns a string representation of the object.
      */
     std::string Dump() const;
 
     /**
-     * Converts a MessageUser object into a Json.
+     * @brief Converts a MessageUser object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a MessageUser object from a Json.
+     * @brief Creates a MessageUser object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the MessageUser.
+     * @return Returns the MessageUser object.
      */
     static MessageUser *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshals a MessageUser object into a Parcel.
+     * @brief Marshals a MessageUser object into a Parcel.
      *
      * @param parcel Indicates the Parcel object for marshalling.
      * @return Returns true if the marshalling is successful; returns false otherwise.
@@ -146,19 +148,19 @@ public:
     bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshals a MessageUser object from a Parcel.
+     * @brief Unmarshals a MessageUser object from a Parcel.
      *
-     * @param parcel Indicates the Parcel object for unmarshalling.
+     * @param parcel Indicates the parcel object.
      * @return Returns true if the unmarshalling is successful; returns false otherwise.
      */
     static MessageUser *Unmarshalling(Parcel &parcel);
 
 private:
     /**
-     * Read NotificationSlot object from a Parcel.
+     * @brief Read NotificationSlot object from a Parcel.
      *
-     * @param parcel the parcel
-     * @return read from parcel success or fail
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel);
 
