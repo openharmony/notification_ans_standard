@@ -24,16 +24,27 @@ namespace OHOS {
 namespace Notification {
 class RemoteDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
+    /**
+     * The constructor.
+     * @param callback Indicates the callback.
+     */
     explicit RemoteDeathRecipient(std::function<void(const wptr<IRemoteObject> &)> callback)
     {
         callback_ = callback;
     }
+
+    /**
+     * The deconstructor.
+     */
     ~RemoteDeathRecipient()
     {
         callback_ = nullptr;
     }
 
-    // IRemoteObject::DeathRecipient
+    /**
+     * Obtains the death event. Inherited from IRemoteObject::DeathRecipient.
+     * @param object Indicates the death object.
+     */
     void OnRemoteDied(const wptr<IRemoteObject> &object)
     {
         if (callback_ != nullptr) {

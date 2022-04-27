@@ -27,7 +27,7 @@ namespace Notification {
 class AnsNotification {
 public:
     /**
-     * Creates a notification slot.
+     * @brief Creates a notification slot.
      * @note You can call the NotificationRequest::SetSlotType(NotificationConstant::SlotType) method to bind the slot
      * for publishing. A NotificationSlot instance cannot be used directly after being initialized. Instead, you have to
      * call this method to create a notification slot and bind the slot ID to a NotificationRequest object so that the
@@ -42,7 +42,7 @@ public:
     ErrCode AddNotificationSlot(const NotificationSlot &slot);
 
     /**
-     * Adds a notification slot by type.
+     * @brief Adds a notification slot by type.
      *
      * @param slotType Indicates the notification slot type to be added.
      * @return Returns add notification slot result.
@@ -50,7 +50,7 @@ public:
     ErrCode AddSlotByType(const NotificationConstant::SlotType &slotType);
 
     /**
-     * Creates multiple notification slots.
+     * @brief Creates multiple notification slots.
      *
      * @param slots Indicates the notification slots to create.
      * @return Returns add notification slots result.
@@ -58,7 +58,7 @@ public:
     ErrCode AddNotificationSlots(const std::vector<NotificationSlot> &slots);
 
     /**
-     * Deletes a created notification slot based on the slot ID.
+     * @brief Deletes a created notification slot based on the slot ID.
      *
      * @param slotType Indicates the ID of the slot, which is created by AddNotificationSlot
      *                This parameter must be specified.
@@ -67,14 +67,14 @@ public:
     ErrCode RemoveNotificationSlot(const NotificationConstant::SlotType &slotType);
 
     /**
-     * Deletes all notification slots.
+     * @brief Deletes all notification slots.
      *
      * @return Returns remove all slots result.
      */
     ErrCode RemoveAllSlots();
 
     /**
-     * Queries a created notification slot.
+     * @brief Queries a created notification slot.
      *
      * @param slotType Indicates the ID of the slot, which is created by AddNotificationSlot(NotificationSlot). This
      *        parameter must be specified.
@@ -84,14 +84,15 @@ public:
     ErrCode GetNotificationSlot(const NotificationConstant::SlotType &slotType, sptr<NotificationSlot> &slot);
 
     /**
-     * Obtains all notification slots of this application.
+     * @brief Obtains all notification slots of this application.
+     *
      * @param slots Indicates the created NotificationSlot.
      * @return Returns all notification slots of this application.
      */
     ErrCode GetNotificationSlots(std::vector<sptr<NotificationSlot>> &slots);
 
     /**
-     * Creates a notification slot group to which a NotificationSlot object can be bound by
+     * @brief Creates a notification slot group to which a NotificationSlot object can be bound by
      * calling NotificationSlot::SetSlotGroup(string).
      * @note  A NotificationSlotGroup instance cannot be used directly after being initialized.
      *        Instead, you have to call this method to create a notification slot group so that you can bind
@@ -105,7 +106,7 @@ public:
     ErrCode AddNotificationSlotGroup(const NotificationSlotGroup &slotGroup);
 
     /**
-     * Creates multiple notification slot groups.
+     * @brief Creates multiple notification slot groups.
      * @note The precautions for using this method are similar to those for
      * AddNotificationSlotGroup(NotificationSlotGroup).
      *
@@ -115,7 +116,7 @@ public:
     ErrCode AddNotificationSlotGroups(const std::vector<NotificationSlotGroup> &slotGroups);
 
     /**
-     * Deletes a created notification slot group based on the slot group ID.
+     * @brief Deletes a created notification slot group based on the slot group ID.
      *
      * @param slotGroupId  Indicates the ID of the notification slot group, which is created by
      *                     AddNotificationSlotGroup(NotificationSlotGroup) This parameter must be specified.
@@ -124,7 +125,7 @@ public:
     ErrCode RemoveNotificationSlotGroup(const std::string &slotGroupId);
 
     /**
-     * Queries a created notification slot group.
+     * @brief Queries a created notification slot group.
      *
      * @param  groupId Indicates the ID of the slot group.
      * @param  group   Indicates the created NotificationSlotGroup.
@@ -133,7 +134,7 @@ public:
     ErrCode GetNotificationSlotGroup(const std::string &groupId, sptr<NotificationSlotGroup> &group);
 
     /**
-     * Obtains a list of created notification slot groups.
+     * @brief Obtains a list of created notification slot groups.
      *
      * @param  groups Indicates a list of created notification slot groups.
      * @return Returns get notification slot groups result.
@@ -141,7 +142,7 @@ public:
     ErrCode GetNotificationSlotGroups(std::vector<sptr<NotificationSlotGroup>> &groups);
 
     /**
-     * Obtains number of slot.
+     * @brief Obtains number of slot.
      *
      * @param bundleOption Indicates the bundle name and uid of the application.
      * @param num Indicates number of slot.
@@ -150,30 +151,30 @@ public:
     ErrCode GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num);
 
     /**
-     * Publishes a notification.
+     * @brief Publishes a notification.
      * @note If a notification with the same ID has been published by the current application and has not been deleted,
      * this method will update the notification.
      *
      * @param request Indicates the NotificationRequest object for setting the notification content.
      *                This parameter must be specified.
-     * @return returns publish notification result.
+     * @return Returns publish notification result.
      */
     ErrCode PublishNotification(const NotificationRequest &request);
 
     /**
-     * Publishes a notification with a specified label.
+     * @brief Publishes a notification with a specified label.
      * @note If a notification with the same ID has been published by the current application and has not been deleted,
      *       this method will update the notification.
      *
      * @param label Indicates the label of the notification to publish.
      * @param request Indicates the NotificationRequest object for setting the notification content.
      *                This parameter must be specified.
-     * @return returns publish notification result.
+     * @return Returns publish notification result.
      */
     ErrCode PublishNotification(const std::string &label, const NotificationRequest &request);
 
     /**
-     * Publishes a notification on a specified remote device.
+     * @brief Publishes a notification on a specified remote device.
      * @note If a notification with the same ID has been published by the current application and has not been deleted,
      *       this method will update the notification.
      *
@@ -181,38 +182,39 @@ public:
      *                This parameter must be specified.
      * @param deviceId Indicates the ID of the remote device. If this parameter is null or an empty string,
      *                 the notification will be published on the local device.
-     * @return returns publish notification result.
+     * @return Returns publish notification result.
      */
     ErrCode PublishNotification(const NotificationRequest &request, const std::string &deviceId);
 
     /**
-     * Cancels a published notification.
+     * @brief Cancels a published notification.
      *
      * @param notificationId Indicates the unique notification ID in the application.
      *                       The value must be the ID of a published notification.
      *                       Otherwise, this method does not take effect.
-     * @return returns cancel notification result.
+     * @return Returns cancel notification result.
      */
     ErrCode CancelNotification(int32_t notificationId);
 
     /**
-     * Cancels a published notification matching the specified label and notificationId.
+     * @brief Cancels a published notification matching the specified label and notificationId.
      *
      * @param label Indicates the label of the notification to cancel.
      * @param notificationId Indicates the ID of the notification to cancel.
-     * @return returns cancel notification result.
+     * @return Returns cancel notification result.
      */
     ErrCode CancelNotification(const std::string &label, int32_t notificationId);
 
     /**
-     * Cancels all the published notifications.
+     * @brief Cancels all the published notifications.
      * @note To cancel a specified notification, see CancelNotification(int_32).
-     * @return returns cancel all notifications result.
+     *
+     * @return Returns cancel all notifications result.
      */
     ErrCode CancelAllNotifications();
 
     /**
-     * Obtains the number of active notifications of the current application in the system.
+     * @brief Obtains the number of active notifications of the current application in the system.
      *
      * @param num Indicates the number of active notifications of the current application.
      * @return Returns get active notification nums result.
@@ -220,14 +222,15 @@ public:
     ErrCode GetActiveNotificationNums(int32_t &num);
 
     /**
-     * Obtains active notifications of the current application in the system.
+     * @brief Obtains active notifications of the current application in the system.
+     *
      * @param  request Indicates active NotificationRequest objects of the current application.
      * @return Returns get active notifications result.
      */
     ErrCode GetActiveNotifications(std::vector<sptr<NotificationRequest>> &request);
 
     /**
-     * Obtains the map for sorting notifications of the current application.
+     * @brief Obtains the map for sorting notifications of the current application.
      *
      * @param sortingMap Indicates the NotificationSortingMap object for the current application.
      * @return Returns get current app sorting result.
@@ -235,8 +238,8 @@ public:
     ErrCode GetCurrentAppSorting(sptr<NotificationSortingMap> &sortingMap);
 
     /**
-     * Allows another application to act as an agent to publish notifications in the name of your application bundle.
-     * You can revoke this authorization by passing null to this method.
+     * @brief Allows another application to act as an agent to publish notifications in the name of your application
+     * bundle. You can revoke this authorization by passing null to this method.
      *
      * @param agent Indicates the name of the application bundle that can publish notifications for your application.
      * @return Returns set notification agent result.
@@ -244,7 +247,7 @@ public:
     ErrCode SetNotificationAgent(const std::string &agent);
 
     /**
-     * Obtains the name of the application bundle that can publish notifications in the name of your application.
+     * @brief Obtains the name of the application bundle that can publish notifications in the name of your application.
      *
      * @param agent Indicates the name of the application bundle that can publish notifications for your application if
      * any; returns null otherwise.
@@ -253,7 +256,7 @@ public:
     ErrCode GetNotificationAgent(std::string &agent);
 
     /**
-     * Checks whether your application has permission to publish notifications by calling
+     * @brief Checks whether your application has permission to publish notifications by calling
      * PublishNotificationAsBundle(string, NotificationRequest) in the name of another application indicated by the
      * given representativeBundle.
      *
@@ -264,7 +267,7 @@ public:
     ErrCode CanPublishNotificationAsBundle(const std::string &representativeBundle, bool &canPublish);
 
     /**
-     * Publishes a notification in the name of a specified application bundle.
+     * @brief Publishes a notification in the name of a specified application bundle.
      * @note If the notification to be published has the same ID as a published notification that has not been canceled,
      * the existing notification will be replaced by the new one.
      *
@@ -277,14 +280,15 @@ public:
     ErrCode PublishNotificationAsBundle(const std::string &representativeBundle, const NotificationRequest &request);
 
     /**
-     * Sets the number of active notifications of the current application as the number to be displayed on the
+     * @brief Sets the number of active notifications of the current application as the number to be displayed on the
      * notification badge.
+     *
      * @return Returns set notification badge num result.
      */
     ErrCode SetNotificationBadgeNum();
 
     /**
-     * Sets the number to be displayed on the notification badge of the application.
+     * @brief Sets the number to be displayed on the notification badge of the application.
      *
      * @param num Indicates the number to display. A negative number indicates that the badge setting remains unchanged.
      *            The value 0 indicates that no badge is displayed on the application icon.
@@ -294,7 +298,7 @@ public:
     ErrCode SetNotificationBadgeNum(int32_t num);
 
     /**
-     * Checks whether this application has permission to publish notifications. The caller must have
+     * @brief Checks whether this application has permission to publish notifications. The caller must have
      * system permissions to call this method.
      *
      * @param  allowed True if this application has the permission; returns false otherwise
@@ -303,7 +307,7 @@ public:
     ErrCode IsAllowedNotify(bool &allowed);
 
     /**
-     * Checks whether this application has permission to publish notifications.
+     * @brief Checks whether this application has permission to publish notifications.
      *
      * @param  allowed True if this application has the permission; returns false otherwise
      * @return Returns is allowed notify result.
@@ -311,7 +315,7 @@ public:
     ErrCode IsAllowedNotifySelf(bool &allowed);
 
     /**
-     * Allow the current application to publish notifications on a specified device.
+     * @brief Allows the current application to publish notifications on a specified device.
      *
      * @param deviceId Indicates the ID of the device running the application. At present, this parameter can
      *                 only be null or an empty string, indicating the current device.
@@ -320,7 +324,7 @@ public:
     ErrCode RequestEnableNotification(std::string &deviceId);
 
     /**
-     * Checks whether this application is in the suspended state.Applications in this state cannot publish
+     * @brief Checks whether this application is in the suspended state.Applications in this state cannot publish
      * notifications.
      *
      * @param suspended True if this application is suspended; returns false otherwise.
@@ -329,7 +333,7 @@ public:
     ErrCode AreNotificationsSuspended(bool &suspended);
 
     /**
-     * Checks whether this application has permission to modify the Do Not Disturb (DND) notification policy.
+     * @brief Checks whether this application has permission to modify the Do Not Disturb (DND) notification policy.
      *
      * @param hasPermission True if this application is suspended; returns false otherwise.
      * @return Returns has notification policy access permission.
@@ -337,7 +341,7 @@ public:
     ErrCode HasNotificationPolicyAccessPermission(bool &hasPermission);
 
     /**
-     * Obtains the importance level of this application.
+     * @brief Obtains the importance level of this application.
      *
      * @param  importance the importance level of this application, which can be LEVEL_NONE,
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
@@ -346,7 +350,7 @@ public:
     ErrCode GetBundleImportance(NotificationSlot::NotificationLevel &importance);
 
     /**
-     * Subscribes to notifications from all applications. This method can be called only by applications
+     * @brief Subscribes to notifications from all applications. This method can be called only by applications
      * with required system permissions.
      * @note  To subscribe to a notification, inherit the {NotificationSubscriber} class, override its
      *        callback methods and create a subscriber. The subscriber will be used as a parameter of this method.
@@ -362,7 +366,7 @@ public:
     ErrCode SubscribeNotification(const NotificationSubscriber &subscriber);
 
     /**
-     * Subscribes to all notifications based on the filtering criteria. This method can be called only
+     * @brief Subscribes to all notifications based on the filtering criteria. This method can be called only
      * by applications with required system permissions.
      * @note  After {subscribeInfo} is specified, a subscriber receives only the notifications that
      *        meet the filter criteria specified by {subscribeInfo}.
@@ -382,7 +386,7 @@ public:
         const NotificationSubscriber &subscriber, const NotificationSubscribeInfo &subscribeInfo);
 
     /**
-     * Unsubscribes from all notifications. This method can be called only by applications with required
+     * @brief Unsubscribes from all notifications. This method can be called only by applications with required
      * system permissions.
      * @note Generally, you subscribe to a notification by calling the
      *       {SubscribeNotification(NotificationSubscriber)} method. If you do not want your application
@@ -399,7 +403,7 @@ public:
     ErrCode UnSubscribeNotification(NotificationSubscriber &subscriber);
 
     /**
-     * Unsubscribes from all notifications based on the filtering criteria. This method can be called
+     * @brief Unsubscribes from all notifications based on the filtering criteria. This method can be called
      * only by applications with required system permissions.
      * @note A subscriber will no longer receive the notifications from specified notification sources.
      *
@@ -412,7 +416,7 @@ public:
     ErrCode UnSubscribeNotification(NotificationSubscriber &subscriber, NotificationSubscribeInfo subscribeInfo);
 
     /**
-     * Removes a specified removable notification of other applications.
+     * @brief Removes a specified removable notification of other applications.
      * @note Your application must have platform signature to use this method.
      *
      * @param key Indicates the key of the notification to remove.
@@ -421,7 +425,7 @@ public:
     ErrCode RemoveNotification(const std::string &key);
 
     /**
-     * Removes a specified removable notification of other applications.
+     * @brief Removes a specified removable notification of other applications.
      * @note Your application must have platform signature to use this method.
      *
      * @param bundleOption Indicates the bundle name and uid of the application whose notifications are to be removed.
@@ -433,7 +437,7 @@ public:
         const NotificationBundleOption &bundleOption, const int32_t notificationId, const std::string &label);
 
     /**
-     * Removes a specified removable notification of other applications.
+     * @brief Removes a specified removable notification of other applications.
      * @note Your application must have platform signature to use this method.
      *
      * @param bundleOption Indicates the bundle name and uid of the application whose notifications are to be removed.
@@ -442,7 +446,7 @@ public:
     ErrCode RemoveAllNotifications(const NotificationBundleOption &bundleOption);
 
     /**
-     * Removes all removable notifications of a specified bundle.
+     * @brief Removes all removable notifications of a specified bundle.
      * @note Your application must have platform signature to use this method.
      *
      * @param bundleOption Indicates the bundle name and uid of the application whose notifications are to be removed.
@@ -451,14 +455,15 @@ public:
     ErrCode RemoveNotificationsByBundle(const NotificationBundleOption &bundleOption);
 
     /**
-     * Removes all removable notifications in the system.
+     * @brief Removes all removable notifications in the system.
      * @note Your application must have platform signature to use this method.
+     *
      * @return Returns remove notifications result.
      */
     ErrCode RemoveNotifications();
 
     /**
-     * Returns all notification slots belonging to the specified bundle.
+     * @brief Obtains all notification slots belonging to the specified bundle.
      *
      * @param bundleOption Indicates the bundle name and uid of the application.
      * @param slots Indicates a list of notification slots.
@@ -468,7 +473,7 @@ public:
         const NotificationBundleOption &bundleOption, std::vector<sptr<NotificationSlot>> &slots);
 
     /**
-     * Update all notification slots for the specified bundle.
+     * @brief Updates all notification slots for the specified bundle.
      *
      * @param bundleOption Indicates the bundle name and uid of the application.
      * @param slots Indicates a list of new notification slots.
@@ -478,7 +483,7 @@ public:
         const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlot>> &slots);
 
     /**
-     * Update all notification slot groups for the specified bundle.
+     * @brief Updates all notification slot groups for the specified bundle.
      *
      * @param bundleOption Indicates the bundle name and uid of the application.
      * @param groups Indicates a list of new notification slot groups.
@@ -488,7 +493,7 @@ public:
         const NotificationBundleOption &bundleOption, const std::vector<sptr<NotificationSlotGroup>> &groups);
 
     /**
-     * Obtains all active notifications in the current system. The caller must have system permissions to
+     * @brief Obtains all active notifications in the current system. The caller must have system permissions to
      * call this method.
      *
      * @param notification Indicates all active notifications of this application.
@@ -497,7 +502,7 @@ public:
     ErrCode GetAllActiveNotifications(std::vector<sptr<Notification>> &notification);
 
     /**
-     * Obtains the active notifications corresponding to the specified key in the system. To call this method
+     * @brief Obtains the active notifications corresponding to the specified key in the system. To call this method
      * to obtain particular active notifications, you must have received the notifications and obtained the key
      * via {Notification::GetKey()}.
      *
@@ -510,7 +515,7 @@ public:
         const std::vector<std::string> key, std::vector<sptr<Notification>> &notification);
 
     /**
-     * Checks whether a specified application has the permission to publish notifications. If bundle specifies
+     * @brief Checks whether a specified application has the permission to publish notifications. If bundle specifies
      * the current application, no permission is required for calling this method. If bundle specifies another
      * application, the caller must have system permissions.
      *
@@ -521,8 +526,8 @@ public:
     ErrCode IsAllowedNotify(const NotificationBundleOption &bundleOption, bool &allowed);
 
     /**
-     * Sets whether to allow all applications to publish notifications on a specified device. The caller must have
-     * system permissions to call this method.
+     * @brief Sets whether to allow all applications to publish notifications on a specified device. The caller must
+     * have system permissions to call this method.
      *
      * @param deviceId Indicates the ID of the device running the application. At present, this parameter can only
      *                 be null or an empty string, indicating the current device.
@@ -534,7 +539,7 @@ public:
     ErrCode SetNotificationsEnabledForAllBundles(const std::string &deviceId, bool enabled);
 
     /**
-     * Sets whether to allow the current application to publish notifications on a specified device. The caller
+     * @brief Sets whether to allow the current application to publish notifications on a specified device. The caller
      * must have system permissions to call this method.
      *
      * @param deviceId Indicates the ID of the device running the application. At present, this parameter can
@@ -547,7 +552,7 @@ public:
     ErrCode SetNotificationsEnabledForDefaultBundle(const std::string &deviceId, bool enabled);
 
     /**
-     * Sets whether to allow a specified application to publish notifications on a specified device. The caller
+     * @brief Sets whether to allow a specified application to publish notifications on a specified device. The caller
      * must have system permissions to call this method.
      *
      * @param bundleOption Indicates the bundle name and uid of the application.
@@ -562,7 +567,7 @@ public:
         const NotificationBundleOption &bundleOption, const std::string &deviceId, bool enabled);
 
     /**
-     * Sets whether to allow a specified application to to show badge.
+     * @brief Sets whether to allow a specified application to to show badge.
      *
      * @param bundleOption Indicates the bundle name and uid of the application.
      * @param enabled Specifies whether to allow the given application to show badge.
@@ -571,7 +576,7 @@ public:
     ErrCode SetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool enabled);
 
     /**
-     * Obtains the flag that whether to allow a specified application to to show badge.
+     * @brief Obtains the flag that whether to allow a specified application to to show badge.
      *
      * @param bundleOption Indicates the bundle name and uid of the application.
      * @param enabled Specifies whether to allow the given application to show badge.
@@ -580,7 +585,7 @@ public:
     ErrCode GetShowBadgeEnabledForBundle(const NotificationBundleOption &bundleOption, bool &enabled);
 
     /**
-     * Obtains the flag that whether to allow the current application to to show badge.
+     * @brief Obtains the flag that whether to allow the current application to to show badge.
      *
      * @param enabled Specifies whether to allow the given application to show badge.
      * @return Returns get result.
@@ -588,7 +593,7 @@ public:
     ErrCode GetShowBadgeEnabled(bool &enabled);
 
     /**
-     * Cancel the notification of the specified group of this application.
+     * @brief Cancels the notification of the specified group of this application.
      *
      * @param groupName the specified group name.
      * @return Returns cancel group result.
@@ -596,16 +601,16 @@ public:
     ErrCode CancelGroup(const std::string &groupName);
 
     /**
-     * Remove the notification of the specified group of the specified application.
+     * @brief Removes the notification of the specified group of the specified application.
      *
      * @param bundleOption Indicates the bundle name and uid of the specified application.
-     * @param groupName the specified group name.
+     * @param groupName Indicates the specified group name.
      * @return Returns remove group by bundle result.
      */
     ErrCode RemoveGroupByBundle(const NotificationBundleOption &bundleOption, const std::string &groupName);
 
     /**
-     * Sets the do not disturb time.
+     * @brief Sets the do not disturb time.
      * @note Your application must have system signature to call this method.
      *
      * @param doNotDisturbDate Indicates the do not disturb time to set.
@@ -614,7 +619,7 @@ public:
     ErrCode SetDoNotDisturbDate(const NotificationDoNotDisturbDate &doNotDisturbDate);
 
     /**
-     * Obtains the do not disturb time.
+     * @brief Obtains the do not disturb time.
      * @note Your application must have system signature to call this method.
      *
      * @param doNotDisturbDate Indicates the do not disturb time to get.
@@ -623,7 +628,7 @@ public:
     ErrCode GetDoNotDisturbDate(NotificationDoNotDisturbDate &doNotDisturbDate);
 
     /**
-     * Obtains the flag that whether to support do not disturb mode.
+     * @brief Obtains the flag that whether to support do not disturb mode.
      *
      * @param doesSupport Specifies whether to support do not disturb mode.
      * @return Returns check result.
@@ -631,7 +636,7 @@ public:
     ErrCode DoesSupportDoNotDisturbMode(bool &doesSupport);
 
     /**
-     * Check if the device supports distributed notification.
+     * @brief Checks if the device supports distributed notification.
      *
      * @param enabled True if the device supports distributed notification; false otherwise.
      * @return Returns is distributed enabled result.
@@ -639,7 +644,7 @@ public:
     ErrCode IsDistributedEnabled(bool &enabled);
 
     /**
-     * Set whether the device supports distributed notifications.
+     * @brief Sets whether the device supports distributed notifications.
      *
      * @param enable Specifies whether to enable the device to support distributed notification.
      *               The value true indicates that the device is enabled to support distributed notifications, and
@@ -649,7 +654,7 @@ public:
     ErrCode EnableDistributed(const bool enabled);
 
     /**
-     * Set whether an application supports distributed notifications.
+     * @brief Sets whether an application supports distributed notifications.
      *
      * @param bundleOption Indicates the bundle name and uid of an application.
      * @param enabled Specifies whether to enable an application to support distributed notification.
@@ -661,7 +666,7 @@ public:
     ErrCode EnableDistributedByBundle(const NotificationBundleOption &bundleOption, const bool enabled);
 
     /**
-     * Set whether this application supports distributed notifications.
+     * @brief Sets whether this application supports distributed notifications.
      *
      * @param enabled Specifies whether to enable this application to support distributed notification.
      *                The value true indicates that this application is enabled to support distributed notifications,
@@ -672,7 +677,7 @@ public:
     ErrCode EnableDistributedSelf(const bool enabled);
 
     /**
-     * Check whether an application supports distributed notifications.
+     * @brief Checks whether an application supports distributed notifications.
      *
      * @param bundleOption Indicates the bundle name and uid of an application.
      * @param enabled True if the application supports distributed notification; false otherwise.
@@ -681,7 +686,7 @@ public:
     ErrCode IsDistributedEnableByBundle(const NotificationBundleOption &bundleOption, bool &enabled);
 
     /**
-     * Obtains the device remind type.
+     * @brief Obtains the device remind type.
      * @note Your application must have system signature to call this method.
      *
      * @param remindType Indicates the device remind type to get.
@@ -690,7 +695,8 @@ public:
     ErrCode GetDeviceRemindType(NotificationConstant::RemindType &remindType);
 
     /**
-     * Publishes a continuous task notification.
+     * @brief Publishes a continuous task notification.
+     *
      * @param request Indicates the NotificationRequest object for setting the notification content.
      *                This parameter must be specified.
      * @return Returns publish continuous task notification result.
@@ -698,7 +704,7 @@ public:
     ErrCode PublishContinuousTaskNotification(const NotificationRequest &request);
 
     /**
-     * Cancels a published continuous task notification matching the specified label and notificationId.
+     * @brief Cancels a published continuous task notification matching the specified label and notificationId.
      *
      * @param label Indicates the label of the continuous task notification to cancel.
      * @param notificationId Indicates the ID of the continuous task notification to cancel.
@@ -707,7 +713,7 @@ public:
     ErrCode CancelContinuousTaskNotification(const std::string &label, int32_t notificationId);
 
     /**
-     * Obtains whether the template is supported by the system.
+     * @brief Obtains whether the template is supported by the system.
      *
      * @param support whether is it a system supported template.
      * @return Returns check result.
@@ -715,17 +721,21 @@ public:
     ErrCode IsSupportTemplate(const std::string &templateName, bool &support);
 
     /**
-     * Reset ans manager proxy when OnRemoteDied called.
+     * @brief Resets ans manager proxy when OnRemoteDied called.
      */
     void ResetAnsManagerProxy();
 
     /**
-     * Shell dump.
+     * @brief Obtains specific informations via specified dump option.
+     *
+     * @param dumpOption Indicates the specified dump option.
+     * @param dumpInfo Indicates the container containing informations.
+     * @return Returns check result.
      */
     ErrCode ShellDump(const std::string &dumpOption, std::vector<std::string> &dumpInfo);
 
     /**
-     * Publishes a scheduled reminder.
+     * @brief Publishes a scheduled reminder.
      *
      * @param reminder Indicates a reminder.
      * @return Returns publish result.
@@ -733,21 +743,22 @@ public:
     ErrCode PublishReminder(ReminderRequest &reminder);
 
     /**
-     * Cancels a specified reminder.
+     * @brief Cancels a specified reminder.
      *
+     * @param reminderId Indicates reminder Id.
      * @return Returns cancel result.
      */
     ErrCode CancelReminder(const int32_t reminderId);
 
     /**
-     * Cancels all reminders of current third part application.
+     * @brief Cancels all reminders of current third part application.
      *
      * @return Returns cancel result.
      */
     ErrCode CancelAllReminders();
 
     /**
-     * Obtains all valid reminder notifications set by the current application.
+     * @brief Obtains all valid reminder notifications set by the current application.
      *
      * @param[out] validReminders Indicates the vector to store the result.
      * @return Returns get valid reminders result.
@@ -755,7 +766,7 @@ public:
     ErrCode GetValidReminders(std::vector<sptr<ReminderRequest>> &validReminders);
 
     /**
-     * Checks whether this application has permission to publish notifications under the user.
+     * @brief Checks whether this application has permission to publish notifications under the user.
      *
      * @param userId Indicates the userId of the application.
      * @param allowed True if the application has permissions; returns false otherwise.
@@ -764,7 +775,7 @@ public:
     ErrCode IsAllowedNotify(const int32_t &userId, bool &allowed);
 
     /**
-     * Sets whether to allow all applications to publish notifications on a specified user.
+     * @brief Sets whether to allow all applications to publish notifications on a specified user.
      * The caller must have system permissions to call this method.
      *
      * @param userId Indicates the ID of the user running the application.
@@ -776,7 +787,7 @@ public:
     ErrCode SetNotificationsEnabledForAllBundles(const int32_t &userId, bool enabled);
 
     /**
-     * Removes notifications under specified user.
+     * @brief Removes notifications under specified user.
      * @note Your application must have platform signature to use this method.
      *
      * @param userId Indicates the ID of user whose notifications are to be removed.
@@ -785,7 +796,7 @@ public:
     ErrCode RemoveNotifications(const int32_t &userId);
 
     /**
-     * Sets the do not disturb time on a specified user.
+     * @brief Sets the do not disturb time on a specified user.
      * @note Your application must have system signature to call this method.
      *
      * @param userId Indicates the specific user.
@@ -795,7 +806,7 @@ public:
     ErrCode SetDoNotDisturbDate(const int32_t &userId, const NotificationDoNotDisturbDate &doNotDisturbDate);
 
     /**
-     * Obtains the do not disturb time on a specified user.
+     * @brief Obtains the do not disturb time on a specified user.
      * @note Your application must have system signature to call this method.
      *
      * @param userId Indicates the specific user.
@@ -806,44 +817,50 @@ public:
 
 private:
     /**
-     * Get Ans Manager proxy.
+     * @brief Gets Ans Manager proxy.
      *
-     * @return Get Ans Manager proxy success or not
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool GetAnsManagerProxy();
 
     /**
-     * Can Publish Media Content
+     * @brief Checks if the MediaContent can be published.
      *
-     * @return Can publish return true otherwise return false
+     * @param request Indicates the specified request.
+     * @return Returns true if the MediaContent can be published; returns false otherwise.
      */
     bool CanPublishMediaContent(const NotificationRequest &request) const;
 
     /**
-     * Check whether the picture size exceeds the limit in PixelMap
+     * @brief Checks whether the picture size exceeds the limit in PixelMap.
      *
+     * @param pixelMap Indicates the specified image.
+     * @param maxSize Indicates the limit size.
      * @return Returns true if the limit size is exceeded; returns false otherwise.
      */
     bool CheckImageOverSizeForPixelMap(
         const std::shared_ptr<Media::PixelMap> &pixelMap, uint32_t maxSize);
 
     /**
-     * Check whether the picture size exceeds the limit in NotificationRequest's content
+     * @brief Checks whether the picture size exceeds the limit in NotificationRequest's content.
      *
-     * @return the ErrCode.
+     * @param request Indicates the specified request.
+     * @return Returns the ErrCode.
      */
     ErrCode CheckImageSizeForContent(const NotificationRequest &request);
 
     /**
-     * Check whether the picture size exceeds the limit
+     * @brief Checks whether the picture size exceeds the limit.
      *
-     * @return the ErrCode.
+     * @param request Indicates the specified request.
+     * @return Returns the ErrCode.
      */
     ErrCode CheckImageSize(const NotificationRequest &request);
 
     /**
-     * Check whether the notification doesn't support distribution
+     * @brief Checks whether the notification doesn't support distribution.
      *
+     * @param type Indicates the specified NotificationContent::Type.
      * @return Returns true if the notification doesn't support distribution; returns false otherwise.
      */
     bool IsNonDistributedNotificationType(const NotificationContent::Type &type);

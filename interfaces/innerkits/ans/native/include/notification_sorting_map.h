@@ -23,20 +23,14 @@ namespace OHOS {
 namespace Notification {
 class NotificationSortingMap final : public Parcelable {
 public:
-    /**
-     * @brief Default constructor used to create an empty NotificationMap instance.
-     */
     NotificationSortingMap();
 
-    /**
-     * @brief Default deconstructor used to deconstruct.
-     */
     ~NotificationSortingMap();
 
     /**
      * @brief A constructor used to create a NotificationSortingMap instance by copying parameters from an existing one.
      *
-     * @param Indicates the NotificationSortingMap object.
+     * @param sortingList Indicates the NotificationSortingMap object.
      */
     NotificationSortingMap(const std::vector<NotificationSorting> &sortingList);
 
@@ -54,9 +48,8 @@ public:
      * @brief Obtains NotificationSorting based on the hash codes.
      *
      * @param key Indicates the hash codes obtained by using getkey().
-     *
      * @param sorting Indicates the sorting information about the hash codes.
-     *
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool GetNotificationSorting(const std::string &key, NotificationSorting &sorting) const;
 
@@ -64,7 +57,6 @@ public:
      * @brief Marshals a NotificationSortingMap object into a Parcel.
      *
      * @param parcel Indicates the Parcel object for marshalling.
-     *
      * @return Returns true if the marshalling is successful; returns false otherwise.
      */
     bool Marshalling(Parcel &parcel) const override;
@@ -72,14 +64,15 @@ public:
     /**
      * @brief Unmarshals a NotificationSortingMap object from a Parcel.
      *
-     * @param Indicates the Parcel object for unmarshalling.
+     * @param parcel Indicates the Parcel object for unmarshalling.
+     * @return Returns the NotificationSortingMap object.
      */
     static NotificationSortingMap *Unmarshalling(Parcel &parcel);
 
     /**
-     * @brief Dump sorting map info
+     * @brief Dumps sorting map info
      *
-     * @return Return sorting map info to string.
+     * @return Returns sorting map info to string.
      */
     std::string Dump() const;
 

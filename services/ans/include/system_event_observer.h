@@ -28,7 +28,16 @@ namespace OHOS {
 namespace Notification {
 class SystemEventObserver {
 public:
+    /**
+     * @brief The constructor.
+     *
+     * @param callbacks Indicates the ISystemEvent object.
+     */
     explicit SystemEventObserver(const ISystemEvent &callbacks);
+
+    /**
+     * @brief The deconstructor.
+     */
     ~SystemEventObserver();
 
 private:

@@ -38,16 +38,64 @@ namespace OHOS {
 namespace Notification {
 class NotificationSubscriberManager : public DelayedSingleton<NotificationSubscriberManager> {
 public:
+    /**
+     * @brief Add a subscriber.
+     *
+     * @param subscriber Indicates the IAnsSubscriber object.
+     * @param subscribeInfo Indicates the NotificationSubscribeInfo object.
+     * @return Indicates the result code.
+     */
     ErrCode AddSubscriber(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
+
+    /**
+     * @brief Remove a subscriber.
+     *
+     * @param subscriber Indicates the IAnsSubscriber object.
+     * @param subscribeInfo Indicates the NotificationSubscribeInfo object.
+     * @return Indicates the result code.
+     */
     ErrCode RemoveSubscriber(
         const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
 
+    /**
+     * @brief Notify all subscribers on counsumed.
+     *
+     * @param notification Indicates the Notification object.
+     * @param notificationMap Indicates the NotificationSortingMap object.
+     */
     void NotifyConsumed(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap);
+
+    /**
+     * @brief Notify all subscribers on canceled.
+     *
+     * @param notification Indicates the Notification object.
+     * @param notificationMap Indicates the NotificationSortingMap object.
+     * @param deleteReason Indicates the delete reason.
+     */
     void NotifyCanceled(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
+
+    /**
+     * @brief Notify all subscribers on updated.
+     *
+     * @param notificationMap Indicates the NotificationSortingMap object.
+     */
     void NotifyUpdated(const sptr<NotificationSortingMap> &notificationMap);
+
+    /**
+     * @brief Notify all subscribers on dnd date changed.
+     *
+     * @param date Indicates the NotificationDoNotDisturbDate object.
+     */
     void NotifyDoNotDisturbDateChanged(const sptr<NotificationDoNotDisturbDate> &date);
+
     void NotifyEnabledNotificationChanged(const sptr<EnabledNotificationCallbackData> &callbackData);
+
+    /**
+     * @brief Obtains the death event.
+     *
+     * @param object Indicates the death object.
+     */
     void OnRemoteDied(const wptr<IRemoteObject> &object);
 
 private:

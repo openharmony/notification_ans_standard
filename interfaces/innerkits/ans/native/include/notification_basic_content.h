@@ -23,82 +23,89 @@ namespace OHOS {
 namespace Notification {
 class NotificationBasicContent : public Parcelable, public NotificationJsonConvertionBase {
 public:
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     virtual ~NotificationBasicContent();
 
     /**
-     * Sets the additional text to be included in a notification.
+     * @brief Sets the additional text to be included in a notification.
      * The additional text is mainly a supplement to the notification text set by calling setText(std::string).
      * The font of the additional text is smaller than the notification text and is displayed in a separate line.
+     *
      * @param text Indicates the additional text to be included.
      */
     virtual void SetAdditionalText(const std::string &additionalText);
 
     /**
-     * Obtains the additional text of a notification specified by calling setAdditionalText(std::string).
-     * @return the additional text of the notification.
+     * @brief Obtains the additional text of a notification specified by calling setAdditionalText(std::string).
+     *
+     * @return Returns the additional text of the notification.
      */
     virtual std::string GetAdditionalText() const;
 
     /**
-     * Sets the text to be included in a notification.
+     * @brief Sets the text to be included in a notification.
+     *
      * @param text Indicates the text to be included.
      */
     virtual void SetText(const std::string &text);
 
     /**
-     * Obtains the text of a notification specified by calling setText(std::string).
-     * @return the text of the notification.
+     * @brief Obtains the text of a notification specified by calling setText(std::string).
+     *
+     * @return Returns the text of the notification.
      */
     virtual std::string GetText() const;
 
     /**
-     * Sets the title of a notification.
+     * @brief Sets the title of a notification.
+     *
      * @param title Indicates the title of the notification.
      */
     virtual void SetTitle(const std::string &title);
 
     /**
-     * Obtains the title of a notification specified by calling the setTitle(std::string) method.
-     * @return the title of the notification.
+     * @brief Obtains the title of a notification specified by calling the setTitle(std::string) method.
+     *
+     * @return Returns the title of the notification.
      */
     virtual std::string GetTitle() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     virtual std::string Dump();
 
     /**
-     * Converts a NotificationBasicContent object into a Json.
+     * @brief Converts a NotificationBasicContent object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
 protected:
-    /**
-     * Default constructor.
-     */
     NotificationBasicContent() = default;
 
     /**
-     * Read data from a Parcel.
-     * @param parcel the parcel
-     * @return true if read success; returns false otherwise.
+     * @brief Read data from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if read success; returns false otherwise.
      */
     virtual bool ReadFromParcel(Parcel &parcel);
 
     /**
-     * Creates a NotificationBasicContent object from a Json.
+     * @brief Creates a NotificationBasicContent object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
      */
     void ReadFromJson(const nlohmann::json &jsonObject);

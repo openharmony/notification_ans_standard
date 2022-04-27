@@ -24,11 +24,24 @@ namespace OHOS {
 namespace Notification {
 class DistributedDeviceCallback : public DistributedKv::DeviceStatusChangeListener {
 public:
+    /**
+     * @brief Device connection status changed callback function structure.
+     */
     struct IDeviceChange {
         std::function<void(const std::string &deviceId)> OnConnected;
         std::function<void(const std::string &deviceId)> OnDisconnected;
     };
+
+    /**
+     * @brief The constructor.
+     *
+     * @param callback Device connection status changed callback.
+     */
     explicit DistributedDeviceCallback(const IDeviceChange &callback);
+
+    /**
+     * @brief The deconstructor.
+     */
     ~DistributedDeviceCallback();
 
 private:

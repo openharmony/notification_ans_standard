@@ -34,18 +34,93 @@ class DistributedDatabase : private DistributedFlowControl {
 public:
     using Entry = DistributedKv::Entry;
     using DeviceInfo = DistributedKv::DeviceInfo;
+
+    /**
+     * @brief The constructor.
+     *
+     * @param databaseCb Distributed notification info changed callback object.
+     * @param deviceCb Device connection info changed callback object.
+     */
     DistributedDatabase(
         std::shared_ptr<DistributedDatabaseCallback> databaseCb, std::shared_ptr<DistributedDeviceCallback> deviceCb);
+
+    /**
+     * @brief The deconstructor.
+     */
     ~DistributedDatabase();
 
+    /**
+     * @brief Put a key-value to database.
+     *
+     * @param key Indicates the key.
+     * @param value Indicates the value.
+     * @return Whether to put key-value success.
+     */
     bool PutToDistributedDB(const std::string &key, const std::string &value);
+
+    /**
+     * @brief Get the value of its key from database.
+     *
+     * @param key Indicates the key.
+     * @param value Indicates the value.
+     * @return Whether to get key-value success.
+     */
     bool GetFromDistributedDB(const std::string &key, std::string &value);
+
+    /**
+     * @brief Get all entries which key start with prefixKey.
+     *
+     * @param perfixkey Indicates the prefix to be searched.
+     * @param entries Indicates the entries will be returned in this parameter.
+     * @return Whether to get entries success.
+     */
     bool GetEntriesFromDistributedDB(const std::string &prefixKey, std::vector<Entry> &entries);
+
+    /**
+     * @brief Delete a key-value of its key from database.
+     *
+     * @param key Indicates the key.
+     * @return Whether to delete key-value success.
+     */
     bool DeleteToDistributedDB(const std::string &key);
+
+    /**
+     * @brief Clear all entries which put by specified device.
+     *
+     * @param deviceId Indicates the id of specified device.
+     * @return Whether to clear device entries success.
+     */
     bool ClearDataByDevice(const std::string &deviceId);
+
+    /**
+     * @brief Get local device id.
+     *
+     * @param deviceId Indicates the id of local device.
+     * @return Whether to get device id success.
+     */
     bool GetLocalDeviceId(std::string &deviceId);
+
+    /**
+     * @brief Get local device info.
+     *
+     * @param localInfo Indicates the infomation of local device.
+     * @return Whether to get device infomation success.
+     */
     bool GetLocalDeviceInfo(DeviceInfo &localInfo);
+
+    /**
+     * @brief Get all devices info on the network.
+     *
+     * @param deviceList Indicates the infomation list of devices.
+     * @return Whether to get devices infomation success.
+     */
     bool GetDeviceInfoList(std::vector<DeviceInfo> &deviceList);
+
+    /**
+     * @brief Recreate the database of distributed notification
+     *
+     * @return Whether to recreate the database success.
+     */
     bool RecreateDistributedDB();
 
 private:

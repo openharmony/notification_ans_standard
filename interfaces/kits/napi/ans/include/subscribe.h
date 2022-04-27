@@ -24,34 +24,98 @@ using namespace OHOS::Notification;
 class SubscriberInstance : public NotificationSubscriber {
 public:
     SubscriberInstance();
-
     virtual ~SubscriberInstance();
 
+    /**
+     * @brief Called back when a notification is canceled.
+     *
+     * @param request Indicates the canceled NotificationRequest object.
+     */
     virtual void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request) override;
 
+    /**
+     * @brief Called back when a notification is canceled.
+     *
+     * @param request Indicates the canceled NotificationRequest object.
+     * @param sortingMap Indicates the sorting map used by the current subscriber to obtain notification ranking
+     * information.
+     * @param deleteReason Indicates the reason for the deletion. For details, see NotificationConstant.
+     */
     virtual void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override;
 
+    /**
+     * @brief Called back when a notification is canceled.
+     *
+     * @param request Indicates the received NotificationRequest object.
+     */
     virtual void OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request) override;
 
+    /**
+     * @brief Called back when a notification is canceled.
+     *
+     * @param request Indicates the received NotificationRequest object.
+     * @param sortingMap Indicates the sorting map used by the current subscriber to obtain notification ranking
+     * information.
+     */
     virtual void OnConsumed(const std::shared_ptr<OHOS::Notification::Notification> &request,
         const std::shared_ptr<NotificationSortingMap> &sortingMap) override;
 
+    /**
+     * @brief Called back when a notification is canceled.
+     *
+     * @param sortingMap Indicates the sorting map used to obtain notification ranking information.
+     */
     virtual void OnUpdate(const std::shared_ptr<NotificationSortingMap> &sortingMap) override;
 
+    /**
+     * @brief Called back when a notification is canceled.
+     *
+     */
     virtual void OnConnected() override;
 
+    /**
+     * @brief Called back when the subscriber is disconnected from the ANS.
+     *
+     */
     virtual void OnDisconnected() override;
 
+    /**
+     * @brief Called back when connection to the ANS has died.
+     *
+     */
     virtual void OnDied() override;
 
+    /**
+     * @brief Called when the Do Not Disturb mode type changes.
+     *
+     * @param date Indicates the NotificationDoNotDisturbDate object.
+     */
     virtual void OnDoNotDisturbDateChange(const std::shared_ptr<NotificationDoNotDisturbDate> &date) override;
 
+    /**
+     * @brief Called when the enabled notification changes.
+     *
+     * @param callbackData Indicates the EnabledNotificationCallbackData object.
+     */
     virtual void OnEnabledNotificationChanged(
         const std::shared_ptr<EnabledNotificationCallbackData> &callbackData) override;
 
+    /**
+     * @brief Sets the callback information by type.
+     *
+     * @param env Indicates the environment that the API is invoked under.
+     * @param type Indicates the type of callback.
+     * @param ref Indicates the napi_ref of callback.
+     */
     void SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref);
 
+    /**
+     * @brief Sets the object deleting status.
+     *
+     * @param status Indicates the deleting status.
+     * @return Returns true if success, returns false otherwise
+     */
     bool SetObjectDeleting(bool status);
 
 private:

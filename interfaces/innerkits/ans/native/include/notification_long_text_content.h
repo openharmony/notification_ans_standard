@@ -23,98 +23,110 @@ namespace OHOS {
 namespace Notification {
 class NotificationLongTextContent : public NotificationBasicContent {
 public:
-    /**
-     * Default constructor used to create a NotificationLongTextContent instance.
-     */
     NotificationLongTextContent() = default;
 
     /**
-     * A constructor used to create a NotificationLongTextContent instance with the input parameter longText passed.
+     * @brief A constructor used to create a NotificationLongTextContent instance with the input parameter longText
+     * passed.
+     *
      * @param longText Indicates the long text to be included. The value contains a maximum of 1024 characters.
      */
     explicit NotificationLongTextContent(const std::string &longText);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationLongTextContent() = default;
 
     /**
-     * Sets the title to be displayed when this long text notification is expanded. After this title is set,
+     * @brief Sets the title to be displayed when this long text notification is expanded. After this title is set,
      * the title set by setTitle(string) will be displayed only when this notification is in the collapsed state.
+     *
      * @param exTitle Indicates the title to be displayed when this notification is expanded.
      */
     void SetExpandedTitle(const std::string &exTitle);
 
     /**
-     * Obtains the title that will be displayed for this long text notification when it is expanded.
-     * @return the title to be displayed when this notification is expanded.
+     * @brief Obtains the title that will be displayed for this long text notification when it is expanded.
+     *
+     * @return Returns the title to be displayed when this notification is expanded.
      */
     std::string GetExpandedTitle() const;
 
     /**
-     * Sets the brief text to be included in a long text notification.
+     * @brief Sets the brief text to be included in a long text notification.
      * The brief text is a summary of a long text notification and is displayed in the first line of the notification.
      * Similar to setAdditionalText(string), the font of the brief text is also smaller than the notification text.
      * The positions where the brief text and additional text will display may conflict.
      * If both texts are set, only the additional text will be displayed.
+     *
      * @param briefText Indicates the brief text to be included.
      */
     void SetBriefText(const std::string &briefText);
 
     /**
-     * Obtains the brief text of a long text notification specified by calling the setBriefText(string) method.
-     * @return the brief text of the long text notification.
+     * @brief Obtains the brief text of a long text notification specified by calling the setBriefText(string) method.
+     *
+     * @return Returns the brief text of the long text notification.
      */
     std::string GetBriefText() const;
 
     /**
-     * Sets the long text to be included in a long text notification.
+     * @brief Sets the long text to be included in a long text notification.
+     *
      * @param longText Indicates the long text to be included. The value contains a maximum of 1024 characters.
      */
     void SetLongText(const std::string &longText);
 
     /**
-     * Obtains a notification's long text, which is set by calling the setLongText(string) method.
-     * @return the long text.
+     * @brief Obtains a notification's long text, which is set by calling the setLongText(string) method.
+     *
+     * @return Returns the long text.
      */
     std::string GetLongText() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump() override;
 
     /**
-     * Converts a NotificationLongTextContent object into a Json.
+     * @brief Converts a NotificationLongTextContent object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationLongTextContent object from a Json.
+     * @brief Creates a NotificationLongTextContent object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationLongTextContent.
+     * @return Returns the NotificationLongTextContent.
      */
     static NotificationLongTextContent *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel Indicates the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationLongTextContent
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationLongTextContent object.
      */
     static NotificationLongTextContent *Unmarshalling(Parcel &parcel);
 
 protected:
     /**
-     * Read a NotificationLongTextContent object from a Parcel.
-     * @param parcel the parcel
+     * @brief Read a NotificationLongTextContent object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel) override;
 

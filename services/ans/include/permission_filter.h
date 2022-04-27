@@ -25,9 +25,22 @@ public:
     PermissionFilter() {};
     ~PermissionFilter() {};
 
+    /**
+     * @brief Start the filter. Inherited from INotificationFilter.
+     */
     void OnStart() override;
+
+    /**
+     * @brief Stop the filter. Inherited from INotificationFilter.
+     */
     void OnStop() override;
 
+    /**
+     * @brief Filters the publish operation. Inherited from INotificationFilter.
+     *
+     * @param record Indicates the NotificationRecord.
+     * @return Returns the filter result.
+     */
     ErrCode OnPublish(const std::shared_ptr<NotificationRecord> &record) override;
 };
 }  // namespace Notification

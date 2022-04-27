@@ -31,7 +31,20 @@ namespace Notification {
 class DistributedScreenStatusManager : private DistributedFlowControl,
                                        public DelayedSingleton<DistributedScreenStatusManager> {
 public:
+    /**
+     * @brief Check if any other device screen is on.
+     *
+     * @param isUsing True for any other device screen is on, otherwise false.
+     * @return Returns the error code.
+     */
     ErrCode CheckRemoteDevicesIsUsing(bool &isUsing);
+
+    /**
+     * @brief Set screen status of local device.
+     *
+     * @param screenOn Indicates the local device screen status.
+     * @return Returns the error code.
+     */
     ErrCode SetLocalScreenStatus(bool screenOn);
 
 private:

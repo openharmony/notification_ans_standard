@@ -30,55 +30,58 @@ public:
     using MessageVector = std::vector<MessagePtr>;
 
     /**
-     * A constructor used to create a NotificationConversationalContent instance with the MessageUser specified.
+     * @brief A constructor used to create a NotificationConversationalContent instance with the MessageUser specified.
+     *
      * @param messageUser Indicates the MessageUser who sends all Message objects in this conversation-like
      * notification. This parameter cannot be null.
      */
     explicit NotificationConversationalContent(const MessageUser &messageUser);
 
-    /**
-     * Default deconstructor used to deconstruct.
-     */
     ~NotificationConversationalContent() = default;
 
     /**
-     * Obtains the message sender to be displayed for any messages
-     * sent by the user in this conversation-like notification.
-     * @return the message sender.
+     * @brief Obtains the message sender to be displayed for any messages sent by the user in this conversation-like
+     * notification.
+     *
+     * @return Returns the message sender.
      */
     MessageUser GetMessageUser() const;
 
     /**
-     * Sets the title to be displayed for the conversation.
-     * The title set in this method will overwrite the one set by calling setTitle(std::string).
+     * @brief Sets the title to be displayed for the conversation.The title set in this method will overwrite the one
+     * set by calling setTitle(std::string).
+     *
      * @param conversationTitle Indicates the title to be displayed for the conversation.
      */
     void SetConversationTitle(const std::string &conversationTitle);
 
     /**
-     * Obtains the title to be displayed for the conversation.
-     * @return the title to be displayed for the conversation.
+     * @brief Obtains the title to be displayed for the conversation.
+     *
+     * @return Returns the title to be displayed for the conversation.
      */
     std::string GetConversationTitle() const;
 
     /**
-     * Checks whether this notification represents a group conversation.
-     * @return true if this notification represents a group conversation; returns false otherwise.
+     * @brief Checks whether this notification represents a group conversation.
+     *
+     * @return Returns true if this notification represents a group conversation; returns false otherwise.
      */
     bool IsConversationGroup() const;
 
     /**
-     * Sets whether this notification represents a group conversation.
+     * @brief Sets whether this notification represents a group conversation.
      * The big icon, if any, set for this notification by calling NotificationRequest::setBigIcon(PixelMap)
      * will be displayed only when this method is set to true.
+     *
      * @param isGroup Specifies whether this notification represents a group conversation.
      */
     void SetConversationGroup(bool isGroup);
 
     /**
-     * Adds a message to this conversation-like notification based on
-     * the specified message content, timestamp, and MessageUser.
-     * All messages will be displayed in the order they are added.
+     * @brief Adds a message to this conversation-like notification based on the specified message content, timestamp,
+     * and MessageUser.All messages will be displayed in the order they are added.
+     *
      * @param text Indicates the text to be displayed as the message content.
      * @param timestamp Indicates the time when the message arrived.
      * @param sender Indicates the MessageUser who sent the message.
@@ -87,60 +90,69 @@ public:
         const std::string &text, int64_t timestamp, const MessageUser &sender);
 
     /**
-     * Adds a specified message to this conversation-like notification.
-     * All messages will be displayed in the order they are added.
+     * @brief Adds a specified message to this conversation-like notification.All messages will be displayed in the
+     * order they are added.
+     *
      * @param message Indicates the ConversationalMessage object to add.
      */
     void AddConversationalMessage(const MessagePtr &message);
 
     /**
-     * Obtains all messages included in this conversation-like notification.
-     * @return the list of all Message objects included.
+     * @brief Obtains all messages included in this conversation-like notification.
+     *
+     * @return Returns the list of all Message objects included.
      */
     MessageVector GetAllConversationalMessages() const;
 
     /**
-     * Returns a string representation of the object.
-     * @return a string representation of the object.
+     * @brief Returns a string representation of the object.
+     *
+     * @return Returns a string representation of the object.
      */
     std::string Dump() override;
 
     /**
-     * Converts a NotificationConversationalContent object into a Json.
+     * @brief Converts a NotificationConversationalContent object into a Json.
+     *
      * @param jsonObject Indicates the Json object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool ToJson(nlohmann::json &jsonObject) const override;
 
     /**
-     * Creates a NotificationConversationalContent object from a Json.
+     * @brief Creates a NotificationConversationalContent object from a Json.
+     *
      * @param jsonObject Indicates the Json object.
-     * @return the NotificationConversationalContent.
+     * @return Returns the NotificationConversationalContent.
      */
     static NotificationConversationalContent *FromJson(const nlohmann::json &jsonObject);
 
     /**
-     * Marshal a object into a Parcel.
-     * @param parcel the object into the parcel
+     * @brief Marshal a object into a Parcel.
+     *
+     * @param parcel Indicates the object into the parcel.
+     * @return Returns true if succeed; returns false otherwise.
      */
     virtual bool Marshalling(Parcel &parcel) const override;
 
     /**
-     * Unmarshal object from a Parcel.
-     * @return the NotificationConversationalContent
+     * @brief Unmarshal object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns the NotificationConversationalContent.
      */
     static NotificationConversationalContent *Unmarshalling(Parcel &parcel);
 
 protected:
     /**
-     * Read a NotificationConversationalContent object from a Parcel.
-     * @param parcel the parcel
+     * @brief Read a NotificationConversationalContent object from a Parcel.
+     *
+     * @param parcel Indicates the parcel object.
+     * @return Returns true if succeed; returns false otherwise.
      */
     bool ReadFromParcel(Parcel &parcel) override;
 
 private:
-    /**
-     * Default constructor used to create an empty NotificationConversationalContent instance.
-     */
     NotificationConversationalContent() = default;
 
 private:

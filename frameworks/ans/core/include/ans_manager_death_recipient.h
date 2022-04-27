@@ -22,9 +22,13 @@ namespace Notification {
 class AnsManagerDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
     AnsManagerDeathRecipient() = default;
-
     virtual ~AnsManagerDeathRecipient() = default;
 
+    /**
+     * @brief The callback function on remote object died.
+     *
+     * @param remote Indicates the died object.
+     */
     virtual void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 };
 }  // namespace Notification
