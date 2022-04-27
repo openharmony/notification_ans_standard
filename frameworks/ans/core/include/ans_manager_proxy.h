@@ -685,6 +685,10 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode SetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool enabled) override;
+    ErrCode GetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool &enabled) override;
 
 private:
     ErrCode InnerTransact(uint32_t code, MessageOption &flags, MessageParcel &data, MessageParcel &reply);

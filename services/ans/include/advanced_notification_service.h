@@ -680,6 +680,10 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
+    ErrCode SetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool enabled) override;
+    ErrCode GetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool &enabled) override;
 
     // SystemEvent
 
@@ -788,6 +792,8 @@ private:
     ErrCode GetHasPoppedDialog(const sptr<NotificationBundleOption> bundleOption, bool &hasPopped);
     ErrCode GetAppTargetBundle(const sptr<NotificationBundleOption> &bundleOption,
         sptr<NotificationBundleOption> &targetBundle);
+    bool PublishSlotChangeCommonEvent(
+        const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType);
 
 private:
     static sptr<AdvancedNotificationService> instance_;

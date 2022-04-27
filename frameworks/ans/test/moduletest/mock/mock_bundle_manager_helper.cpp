@@ -51,6 +51,11 @@ bool BundleManagerHelper::GetBundleInfoByBundleName(
     return true;
 }
 
+bool BundleManagerHelper::CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption)
+{
+    return true;
+}
+
 void BundleManagerHelper::Connect()
 {}
 

@@ -29,6 +29,7 @@
 #include "ans_watchdog.h"
 #include "ans_permission_def.h"
 #include "bundle_manager_helper.h"
+#include "common_event_manager.h"
 #include "display_manager.h"
 #include "ipc_skeleton.h"
 #include "notification_constant.h"
@@ -160,7 +161,12 @@ inline ErrCode AssignValidNotificationSlot(const std::shared_ptr<NotificationRec
         result = NotificationPreferences::GetInstance().AddNotificationSlots(record->bundleOption, slots);
     }
     if (result == ERR_OK) {
-        record->slot = slot;
+        if (slot != nullptr && slot->GetEnable()) {
+            record->slot = slot;
+        } else {
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_ENABLED;
+            ANS_LOGE("Type[%{public}d] slot enable closed", slotType);
+        }
     }
     return result;
 }
@@ -3364,6 +3370,118 @@ void AdvancedNotificationService::GetDisplayPosition(
     }
     ANS_LOGD("GetDisplayPosition: %{public}d, %{public}d (%{public}d x %{public}d)",
         offsetX, offsetY, width, height);
+}
+
+ErrCode AdvancedNotificationService::SetEnabledForBundleSlot(
+    const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType, bool enabled)
+{
+    ANS_LOGD("slotType: %{public}d, enabled: %{public}d", slotType, enabled);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission()) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<NotificationSlot> slot;
+        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot);
+        if (result == ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST ||
+            result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
+            slot = new (std::nothrow) NotificationSlot(slotType);
+            if (slot == nullptr) {
+                ANS_LOGE("Failed to create NotificationSlot ptr.");
+                result = ERR_ANS_NO_MEMORY;
+                return;
+            }
+        } else if ((result == ERR_OK) && (slot != nullptr)) {
+            if (slot->GetEnable() == enabled) {
+                return;
+            }
+            NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleOption, slotType);
+        } else {
+            ANS_LOGE("Set enable slot: GetNotificationSlot failed");
+            return;
+        }
+
+        slot->SetEnable(enabled);
+        std::vector<sptr<NotificationSlot>> slots;
+        slots.push_back(slot);
+        result = NotificationPreferences::GetInstance().AddNotificationSlots(bundleOption, slots);
+        if (result != ERR_OK) {
+            ANS_LOGE("Set enable slot: AddNotificationSlot failed");
+            return;
+        }
+
+        PublishSlotChangeCommonEvent(bundleOption, slotType);
+    }));
+    return result;
+}
+
+ErrCode AdvancedNotificationService::GetEnabledForBundleSlot(
+    const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType, bool &enabled)
+{
+    ANS_LOGD("slotType: %{public}d", slotType);
+
+    if (!IsSystemApp()) {
+        return ERR_ANS_NON_SYSTEM_APP;
+    }
+
+    if (!CheckPermission()) {
+        return ERR_ANS_PERMISSION_DENIED;
+    }
+
+    sptr<NotificationBundleOption> bundle = GenerateValidBundleOption(bundleOption);
+    if (bundle == nullptr) {
+        return ERR_ANS_INVALID_BUNDLE;
+    }
+
+    ErrCode result = ERR_OK;
+    handler_->PostSyncTask(std::bind([&]() {
+        sptr<NotificationSlot> slot;
+        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot);
+        if (result != ERR_OK) {
+            ANS_LOGE("Get enable slot: GetNotificationSlot failed");
+            return;
+        }
+        if (slot == nullptr) {
+            ANS_LOGE("Get enable slot: object is null");
+            result = ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST;
+            return;
+        }
+        enabled = slot->GetEnable();
+    }));
+
+    return result;
+}
+
+bool AdvancedNotificationService::PublishSlotChangeCommonEvent(
+    const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType)
+{
+    ANS_LOGD("slotType: %{public}d", slotType);
+
+    EventFwk::Want want;
+    AppExecFwk::ElementName element;
+    element.SetBundleName(bundleOption->GetBundleName());
+    want.SetElement(element);
+    want.SetParam(AppExecFwk::Constants::UID, bundleOption->GetUid());
+    want.SetParam("SlotType", slotType);
+    want.SetAction("EventFwk::CommonEventSupport::COMMON_EVENT_SLOT_CHANGE");
+    EventFwk::CommonEventData commonData {want};
+    if (EventFwk::CommonEventManager::PublishCommonEvent(commonData) != ERR_OK) {
+        ANS_LOGE("PublishCommonEvent failed");
+        return false;
+    }
+
+    return true;
 }
 }  // namespace Notification
 }  // namespace OHOS

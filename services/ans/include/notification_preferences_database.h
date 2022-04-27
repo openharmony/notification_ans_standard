@@ -266,6 +266,7 @@ private:
     void ParseSlotSound(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotVibrationSytle(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotEnableBypassDnd(sptr<NotificationSlot> &slot, const std::string &value) const;
+    void ParseSlotEnabled(sptr<NotificationSlot> &slot, const std::string &value) const;
 
     std::string GenerateBundleLablel(const NotificationPreferencesInfo::BundleInfo &bundleInfo) const;
     void GetDoNotDisturbType(NotificationPreferencesInfo &info, int userId);

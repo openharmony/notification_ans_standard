@@ -1335,5 +1335,39 @@ ErrCode AnsNotification::GetDoNotDisturbDate(const int32_t &userId, Notification
     doNotDisturbDate = *dndDate;
     return ret;
 }
+
+ErrCode AnsNotification::SetEnabledForBundleSlot(
+    const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool enabled)
+{
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("SetEnabledForBundleSlot fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
+    return ansManagerProxy_->SetEnabledForBundleSlot(bo, slotType, enabled);
+}
+
+ErrCode AnsNotification::GetEnabledForBundleSlot(
+    const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool &enabled)
+{
+    if (bundleOption.GetBundleName().empty()) {
+        ANS_LOGE("Invalid bundle name.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetEnabledForBundleSlot fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+
+    sptr<NotificationBundleOption> bo(new (std::nothrow) NotificationBundleOption(bundleOption));
+    return ansManagerProxy_->GetEnabledForBundleSlot(bo, slotType, enabled);
+}
 }  // namespace Notification
 }  // namespace OHOS

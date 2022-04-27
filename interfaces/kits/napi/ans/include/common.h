@@ -31,6 +31,7 @@ const int ERROR = -1;
 const int PARAM0 = 0;
 const int PARAM1 = 1;
 const int PARAM2 = 2;
+const int32_t PARAM3 = 3;
 
 enum class ContentType {
     NOTIFICATION_CONTENT_BASIC_TEXT,
@@ -146,6 +147,7 @@ struct CallbackPromiseInfo {
 
 class Common {
     Common();
+
     ~Common();
 
 public:
@@ -181,7 +183,7 @@ public:
      * @param errCode Indicates specified err code
      * @return Returns a napi value with specified error code for callback
      */
-    static napi_value GetCallbackErrorValue(napi_env env, int errCode);
+    static napi_value GetCallbackErrorValue(napi_env env, int32_t errCode);
 
     /**
      * @brief Pads the CallbackPromiseInfo struct
@@ -212,7 +214,7 @@ public:
      * @param result Indicates the result returned by the callback
      */
     static void SetCallback(
-        const napi_env &env, const napi_ref &callbackIn, const int &errorCode, const napi_value &result);
+        const napi_env &env, const napi_ref &callbackIn, const int32_t &errorCode, const napi_value &result);
 
     /**
      * @brief Calls the callback with the result
@@ -233,7 +235,7 @@ public:
      * @param result Indicates the result returned by the callback
      */
     static void SetPromise(
-        const napi_env &env, const napi_deferred &deferred, const int &errorCode, const napi_value &result);
+        const napi_env &env, const napi_deferred &deferred, const int32_t &errorCode, const napi_value &result);
 
     /**
      * @brief Gets the returned result by the callback when an error occurs
@@ -1434,7 +1436,7 @@ public:
      * @param outType Indicates a js reason type
      * @return Returns true if success, returns false otherwise
      */
-    static bool ReasonCToJS(const int &inType, int &outType);
+    static bool ReasonCToJS(const int32_t &inType, int32_t &outType);
 
     /**
      * @brief Converts do-not-disturb type from js to native

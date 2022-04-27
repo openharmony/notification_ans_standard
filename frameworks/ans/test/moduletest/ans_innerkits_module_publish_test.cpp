@@ -1449,5 +1449,72 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_06000, Function
     EXPECT_EQ(0, NotificationHelper::UnSubscribeNotification(subscriber, info));
     WaitOnUnsubscribeResult();
 }
+
+/**
+ * @tc.number    : ANS_Interface_MT_Slot_Enalbe_00100
+ * @tc.name      : Slot_Enalbe_00100
+ * @tc.desc      : Add notification slot(type is CONTENT_INFORMATION),
+ * make a subscriber and publish a flags notification.
+ * @tc.expected  : Add notification slot success, make a subscriber and publish default flags notification success.
+ */
+HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Slot_Enalbe_00100, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::CONTENT_INFORMATION);
+    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
+
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
+    NotificationRequest req;
+    req.SetContent(content);
+    req.SetSlotType(NotificationConstant::CONTENT_INFORMATION);
+    req.SetNotificationId(CASE_SIXTEEN);
+    g_consumed_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+
+    bool enable = false;
+    NotificationBundleOption bo("bundleName", 1);
+    EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::CONTENT_INFORMATION, enable));
+    EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::CONTENT_INFORMATION, enable));
+    EXPECT_EQ(enable, false);
+    EXPECT_EQ(ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_ENABLED, NotificationHelper::PublishNotification(req));
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_Slot_Enalbe_00200
+ * @tc.name      : Slot_Enalbe_00200
+ * @tc.desc      : Add notification slot(type is SERVICE_REMINDER), make a subscriber and publish a flags notification.
+ * @tc.expected  : Add notification slot success, make a subscriber and publish default flags notification success.
+ */
+HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Slot_Enalbe_00200, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::SERVICE_REMINDER);
+    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
+
+    std::shared_ptr<NotificationNormalContent> normalContent = std::make_shared<NotificationNormalContent>();
+    EXPECT_NE(normalContent, nullptr);
+    std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(normalContent);
+    EXPECT_NE(content, nullptr);
+    NotificationRequest req;
+    req.SetContent(content);
+    req.SetSlotType(NotificationConstant::SERVICE_REMINDER);
+    req.SetNotificationId(CASE_SIXTEEN);
+    g_consumed_mtx.lock();
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+
+    bool enable = false;
+    NotificationBundleOption bo("bundleName", 1);
+    EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
+    EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
+    EXPECT_EQ(enable, false);
+    EXPECT_EQ((uint32_t)ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_ENABLED, NotificationHelper::PublishNotification(req));
+
+    enable = true;
+    EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
+    EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
+    EXPECT_EQ(enable, true);
+    EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
+}
 }  // namespace Notification
 }  // namespace OHOS
