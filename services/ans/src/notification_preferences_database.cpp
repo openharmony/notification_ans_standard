@@ -1036,7 +1036,7 @@ int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
 
 int64_t NotificationPreferencesDatabase::StringToInt64(const std::string &str) const
 {
-    int value = 0;
+    int64_t value = 0;
     if (!str.empty()) {
         value = stoll(str, nullptr);
     }
