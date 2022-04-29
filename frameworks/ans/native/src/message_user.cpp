@@ -212,7 +212,7 @@ bool MessageUser::ReadFromParcel(Parcel &parcel)
     isMachine_ = parcel.ReadBool();
     isUserImportant_ = parcel.ReadBool();
 
-    int empty = VALUE_NULL;
+    int32_t empty = VALUE_NULL;
     if (!parcel.ReadInt32(empty)) {
         ANS_LOGE("Failed to read VALUE");
         return false;

@@ -41,7 +41,7 @@ public:
      *
      * @return Returns the sequence number of the notification.
      */
-    inline int32_t GetRanking() const
+    inline uint64_t GetRanking() const
     {
         return ranking_;
     };
@@ -148,7 +148,7 @@ private:
     void SetGroupKeyOverride(const std::string &str);
     void SetKey(const std::string &key);
     void SetImportance(const int32_t &importance);
-    void SetRanking(const int32_t &ranking);
+    void SetRanking(const uint64_t &ranking);
     void SetSlot(const sptr<NotificationSlot> &slot);
     void SetVisiblenessOverride(const int32_t &visibleness);
     void SetDisplayBadge(const bool &isDisplayBadge);
@@ -157,7 +157,7 @@ private:
 
 private:
     std::string key_ {};
-    int32_t ranking_ {-1};
+    uint64_t ranking_ {0};
     int32_t importance_ {-1};
     bool isDisplayBadge_ {true};
     bool isHiddenNotification_ {};

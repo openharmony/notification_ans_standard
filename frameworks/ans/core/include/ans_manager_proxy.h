@@ -60,7 +60,7 @@ public:
      * @param label Indicates the label of the notification to cancel.
      * @return Returns cancel notification result.
      */
-    ErrCode Cancel(int notificationId, const std::string &label) override;
+    ErrCode Cancel(int32_t notificationId, const std::string &label) override;
 
     /**
      * @brief Cancels all the published notifications.
@@ -153,7 +153,7 @@ public:
      * @param num Indicates the number of slot.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num) override;
+    ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, uint64_t &num) override;
 
     /**
      * @brief Deletes multiple notification slot groups.
@@ -178,7 +178,7 @@ public:
      * @param num Indicates the number of active notifications of the current application.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetActiveNotificationNums(int &num) override;
+    ErrCode GetActiveNotificationNums(uint64_t &num) override;
 
     /**
      * @brief Obtains all active notifications in the current system. The caller must have system permissions to
@@ -252,7 +252,7 @@ public:
      * @param num Indicates the badge number.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode SetNotificationBadgeNum(int num) override;
+    ErrCode SetNotificationBadgeNum(int32_t num) override;
 
     /**
      * @brief Obtains the importance level of this application.
@@ -261,7 +261,7 @@ public:
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetBundleImportance(int &importance) override;
+    ErrCode GetBundleImportance(int32_t &importance) override;
 
     /**
      * @brief Checks whether this application has permission to modify the Do Not Disturb (DND) notification policy.
@@ -296,7 +296,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RemoveNotification(
-        const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label) override;
+        const sptr<NotificationBundleOption> &bundleOption, int32_t notificationId, const std::string &label) override;
 
     /**
      * @brief Delete all notifications.

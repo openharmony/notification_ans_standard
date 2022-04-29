@@ -51,7 +51,7 @@ sptr<NotificationBundleOption> SystemEventObserver::GetBundleOption(AAFwk::Want 
 {
     auto element = want.GetElement();
     std::string bundleName = element.GetBundleName();
-    int uid = want.GetIntParam(AppExecFwk::Constants::UID, -1);
+    int32_t uid = want.GetIntParam(AppExecFwk::Constants::UID, -1);
     sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(bundleName, uid);
     if (bundleOption == nullptr) {
         ANS_LOGE("Failed to create bundleOption.");

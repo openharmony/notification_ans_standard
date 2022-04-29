@@ -148,7 +148,7 @@ public:
      * @param num Indicates number of slot.
      * @return Returns get slot number by bundle result.
      */
-    ErrCode GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num);
+    ErrCode GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, uint64_t &num);
 
     /**
      * @brief Publishes a notification.
@@ -219,7 +219,7 @@ public:
      * @param num Indicates the number of active notifications of the current application.
      * @return Returns get active notification nums result.
      */
-    ErrCode GetActiveNotificationNums(int32_t &num);
+    ErrCode GetActiveNotificationNums(uint64_t &num);
 
     /**
      * @brief Obtains active notifications of the current application in the system.

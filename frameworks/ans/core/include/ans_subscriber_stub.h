@@ -35,7 +35,7 @@ public:
      * @param option Indicates the message option.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int OnRemoteRequest(
+    virtual int32_t OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
     /**
@@ -79,7 +79,7 @@ public:
      * @param deleteReason Indicates the delete reason.
      */
     void OnCanceled(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap,
-        int deleteReason) override;
+        int32_t deleteReason) override;
 
     /**
      * @brief The callback function on the notifications updated.

@@ -43,7 +43,7 @@ void BundleManagerHelper::OnRemoteDied(const wptr<IRemoteObject> &object)
     Disconnect();
 }
 
-std::string BundleManagerHelper::GetBundleNameByUid(int uid)
+std::string BundleManagerHelper::GetBundleNameByUid(int32_t uid)
 {
     std::string bundle;
 
@@ -57,7 +57,7 @@ std::string BundleManagerHelper::GetBundleNameByUid(int uid)
 
     return bundle;
 }
-bool BundleManagerHelper::IsSystemApp(int uid)
+bool BundleManagerHelper::IsSystemApp(int32_t uid)
 {
     bool isSystemApp = false;
 
@@ -131,9 +131,9 @@ void BundleManagerHelper::Disconnect()
     }
 }
 
-int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId)
+int32_t BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId)
 {
-    int uid = -1;
+    int32_t uid = -1;
 
     std::lock_guard<std::mutex> lock(connectionMutex_);
 
@@ -150,7 +150,7 @@ int BundleManagerHelper::GetDefaultUidByBundleName(const std::string &bundle, co
 }
 
 #ifdef DISTRIBUTED_NOTIFICATION_SUPPORTED
-bool BundleManagerHelper::GetDistributedNotificationEnabled(const std::string &bundleName, const int userId)
+bool BundleManagerHelper::GetDistributedNotificationEnabled(const std::string &bundleName, const int32_t userId)
 {
     std::lock_guard<std::mutex> lock(connectionMutex_);
 

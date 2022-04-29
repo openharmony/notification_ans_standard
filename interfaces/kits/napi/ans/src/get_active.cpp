@@ -23,7 +23,7 @@ struct AsyncCallbackInfoActive {
     CallbackPromiseInfo info;
     std::vector<sptr<OHOS::Notification::Notification>> notifications;
     std::vector<sptr<OHOS::Notification::NotificationRequest>> requests;
-    int32_t num = 0;
+    uint64_t num = 0;
 };
 
 void AsyncCompleteCallbackGetAllActiveNotifications(napi_env env, napi_status status, void *data)
@@ -41,7 +41,7 @@ void AsyncCompleteCallbackGetAllActiveNotifications(napi_env env, napi_status st
         result = Common::NapiGetNull(env);
     } else {
         napi_value arr = nullptr;
-        int count = 0;
+        int32_t count = 0;
         napi_create_array(env, &arr);
         for (auto vec : asynccallbackinfo->notifications) {
             if (!vec) {
@@ -132,7 +132,7 @@ void AsyncCompleteCallbackGetActiveNotifications(napi_env env, napi_status statu
         result = Common::NapiGetNull(env);
     } else {
         napi_value arr = nullptr;
-        int count = 0;
+        int32_t count = 0;
         napi_create_array(env, &arr);
         for (auto vec : asynccallbackinfo->requests) {
             if (!vec) {
@@ -222,7 +222,7 @@ void AsyncCompleteCallbackGetActiveNotificationCount(napi_env env, napi_status s
     if (asynccallbackinfo->info.errorCode != ERR_OK) {
         result = Common::NapiGetNull(env);
     } else {
-        napi_create_int32(env, asynccallbackinfo->num, &result);
+        napi_create_uint32(env, asynccallbackinfo->num, &result);
     }
     Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
     if (asynccallbackinfo->info.callback != nullptr) {
@@ -262,7 +262,7 @@ napi_value GetActiveNotificationCount(napi_env env, napi_callback_info info)
             auto asynccallbackinfo = static_cast<AsyncCallbackInfoActive *>(data);
 
             asynccallbackinfo->info.errorCode = NotificationHelper::GetActiveNotificationNums(asynccallbackinfo->num);
-            ANS_LOGI("GetActiveNotificationCount count = %{public}d", asynccallbackinfo->num);
+            ANS_LOGI("GetActiveNotificationCount count = %{public}" PRIu64 "", asynccallbackinfo->num);
         },
         AsyncCompleteCallbackGetActiveNotificationCount,
         (void *)asynccallbackinfo,
