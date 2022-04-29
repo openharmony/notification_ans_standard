@@ -91,7 +91,7 @@ HWTEST_F(ReminderRequestCalendarTest, initDateTime_00100, Function | SmallTest |
     if (calendar == nullptr) {
         EXPECT_TRUE(false) << "calendar is null";
     }
-    int firstDesignateYear = calendar->GetActualTime(ReminderRequest::TimeTransferType::YEAR, nowTime.tm_year);
+    int32_t firstDesignateYear = calendar->GetActualTime(ReminderRequest::TimeTransferType::YEAR, nowTime.tm_year);
     EXPECT_TRUE(firstDesignateYear == calendar->GetFirstDesignateYear()) << "Set first designate year error.";
 }
 

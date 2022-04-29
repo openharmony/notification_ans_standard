@@ -953,8 +953,7 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
     }
 
     // write map
-    int32_t buttonMapSize = static_cast<int32_t>(actionButtonMap_.size());
-    if (!parcel.WriteInt32(buttonMapSize)) {
+    if (!parcel.WriteUint64(static_cast<uint64_t>(actionButtonMap_.size()))) {
         ANSR_LOGE("Failed to write action button size");
         return false;
     }
@@ -1084,12 +1083,12 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
     slotType_ = static_cast<NotificationConstant::SlotType>(slotType);
 
     // read map
-    int32_t buttonMapSize = 0;
-    if (!parcel.ReadInt32(buttonMapSize)) {
+    uint64_t buttonMapSize = 0;
+    if (!parcel.ReadUint64(buttonMapSize)) {
         ANSR_LOGE("Failed to read buttonMapSize");
         return false;
     }
-    for (int32_t i = 0; i < buttonMapSize; i++) {
+    for (uint64_t i = 0; i < buttonMapSize; i++) {
         uint8_t buttonType = static_cast<uint8_t>(ActionButtonType::INVALID);
         if (!parcel.ReadUint8(buttonType)) {
             ANSR_LOGE("Failed to read buttonType");

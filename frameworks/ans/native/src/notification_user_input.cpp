@@ -336,7 +336,7 @@ bool NotificationUserInput::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    if (!parcel.WriteInt32(static_cast<int32_t>(permitMimeTypes_.size()))) {
+    if (!parcel.WriteUint64(static_cast<uint64_t>(permitMimeTypes_.size()))) {
         ANS_LOGE("Failed to write the size of permitMimeTypes");
         return false;
     }
@@ -392,7 +392,7 @@ bool NotificationUserInput::ReadFromParcel(Parcel &parcel)
         return false;
     }
 
-    auto ssize = parcel.ReadInt32();
+    auto ssize = parcel.ReadUint64();
     for (auto it = 0; it < ssize; ++it) {
         std::string member {};
         if (!parcel.ReadString(member)) {

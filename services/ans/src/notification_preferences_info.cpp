@@ -31,12 +31,12 @@ std::string NotificationPreferencesInfo::BundleInfo::GetBundleName() const
     return bundleName_;
 }
 
-void NotificationPreferencesInfo::BundleInfo::SetImportance(const int &level)
+void NotificationPreferencesInfo::BundleInfo::SetImportance(const int32_t &level)
 {
     importance_ = level;
 }
 
-int NotificationPreferencesInfo::BundleInfo::GetImportance() const
+int32_t NotificationPreferencesInfo::BundleInfo::GetImportance() const
 {
     return importance_;
 }
@@ -51,12 +51,12 @@ bool NotificationPreferencesInfo::BundleInfo::GetIsShowBadge() const
     return isShowBadge_;
 }
 
-void NotificationPreferencesInfo::BundleInfo::SetBadgeTotalNum(const int &num)
+void NotificationPreferencesInfo::BundleInfo::SetBadgeTotalNum(const int32_t &num)
 {
     badgeTotalNum_ = num;
 }
 
-int NotificationPreferencesInfo::BundleInfo::GetBadgeTotalNum() const
+int32_t NotificationPreferencesInfo::BundleInfo::GetBadgeTotalNum() const
 {
     return badgeTotalNum_;
 }
@@ -182,7 +182,7 @@ bool NotificationPreferencesInfo::BundleInfo::GetAllGroups(std::vector<sptr<Noti
     return true;
 }
 
-uint32_t NotificationPreferencesInfo::BundleInfo::GetGroupSize() const
+size_t NotificationPreferencesInfo::BundleInfo::GetGroupSize() const
 {
     return groups_.size();
 }
@@ -227,12 +227,12 @@ bool NotificationPreferencesInfo::BundleInfo::RemoveSlotGroup(const std::string 
     return false;
 }
 
-void NotificationPreferencesInfo::BundleInfo::SetBundleUid(const int &uid)
+void NotificationPreferencesInfo::BundleInfo::SetBundleUid(const int32_t &uid)
 {
     uid_ = uid;
 }
 
-int NotificationPreferencesInfo::BundleInfo::GetBundleUid() const
+int32_t NotificationPreferencesInfo::BundleInfo::GetBundleUid() const
 {
     return uid_;
 }

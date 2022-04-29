@@ -110,7 +110,7 @@ ErrCode AnsManagerProxy::PublishToDevice(const sptr<NotificationRequest> &notifi
     return result;
 }
 
-ErrCode AnsManagerProxy::Cancel(int notificationId, const std::string &label)
+ErrCode AnsManagerProxy::Cancel(int32_t notificationId, const std::string &label)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
@@ -204,7 +204,7 @@ ErrCode AnsManagerProxy::AddSlots(const std::vector<sptr<NotificationSlot>> &slo
         return ERR_ANS_INVALID_PARAM;
     }
 
-    uint32_t slotsSize = slots.size();
+    size_t slotsSize = slots.size();
     if (slotsSize > MAX_SLOT_NUM) {
         ANS_LOGW("[AddSlots] fail: slotsSize over max size.");
         return ERR_ANS_INVALID_PARAM;
@@ -297,7 +297,7 @@ ErrCode AnsManagerProxy::AddSlotGroups(std::vector<sptr<NotificationSlotGroup>> 
         return ERR_ANS_INVALID_PARAM;
     }
 
-    uint32_t groupsSize = groups.size();
+    size_t groupsSize = groups.size();
     if (groupsSize > MAX_SLOT_GROUP_NUM) {
         ANS_LOGW("[AddSlotGroups] fail: groupsSize over max size.");
         return ERR_ANS_INVALID_PARAM;
@@ -457,7 +457,7 @@ ErrCode AnsManagerProxy::GetSlotGroups(std::vector<sptr<NotificationSlotGroup>> 
     return result;
 }
 
-ErrCode AnsManagerProxy::GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num)
+ErrCode AnsManagerProxy::GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, uint64_t &num)
 {
     if (bundleOption == nullptr) {
         ANS_LOGW("[GetSlotNumAsBundle] fail: bundle is empty.");
@@ -488,7 +488,7 @@ ErrCode AnsManagerProxy::GetSlotNumAsBundle(const sptr<NotificationBundleOption>
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!reply.ReadInt32(num)) {
+    if (!reply.ReadUint64(num)) {
         ANS_LOGW("[GetShowBadgeEnabledForBundle] fail: read enabled failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -554,7 +554,7 @@ ErrCode AnsManagerProxy::GetActiveNotifications(std::vector<sptr<NotificationReq
     return result;
 }
 
-ErrCode AnsManagerProxy::GetActiveNotificationNums(int &num)
+ErrCode AnsManagerProxy::GetActiveNotificationNums(uint64_t &num)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
@@ -575,7 +575,7 @@ ErrCode AnsManagerProxy::GetActiveNotificationNums(int &num)
         return ERR_ANS_PARCELABLE_FAILED;
     }
 
-    if (!reply.ReadInt32(num)) {
+    if (!reply.ReadUint64(num)) {
         ANS_LOGW("[GetActiveNotificationNums] fail: read notification num failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
@@ -789,7 +789,7 @@ ErrCode AnsManagerProxy::PublishAsBundle(
     return result;
 }
 
-ErrCode AnsManagerProxy::SetNotificationBadgeNum(int num)
+ErrCode AnsManagerProxy::SetNotificationBadgeNum(int32_t num)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
@@ -818,7 +818,7 @@ ErrCode AnsManagerProxy::SetNotificationBadgeNum(int num)
     return result;
 }
 
-ErrCode AnsManagerProxy::GetBundleImportance(int &importance)
+ErrCode AnsManagerProxy::GetBundleImportance(int32_t &importance)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
@@ -935,7 +935,7 @@ ErrCode AnsManagerProxy::GetPrivateNotificationsAllowed(bool &allow)
 }
 
 ErrCode AnsManagerProxy::RemoveNotification(
-    const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label)
+    const sptr<NotificationBundleOption> &bundleOption, int32_t notificationId, const std::string &label)
 {
     if (bundleOption == nullptr) {
         ANS_LOGW("[RemoveNotification] fail: bundle is empty.");
@@ -1153,7 +1153,7 @@ ErrCode AnsManagerProxy::UpdateSlots(
         return ERR_ANS_INVALID_PARAM;
     }
 
-    uint32_t slotSize = slots.size();
+    size_t slotSize = slots.size();
     if (slotSize > MAX_SLOT_NUM) {
         ANS_LOGW("[UpdateSlots] fail: slotSize over max size.");
         return ERR_ANS_INVALID_PARAM;
@@ -1204,7 +1204,7 @@ ErrCode AnsManagerProxy::UpdateSlotGroups(
         return ERR_ANS_INVALID_PARAM;
     }
 
-    uint32_t groupSize = groups.size();
+    size_t groupSize = groups.size();
     if (groupSize > MAX_SLOT_GROUP_NUM) {
         ANS_LOGW("[UpdateSlotGroups] fail: groupSize over max size.");
         return ERR_ANS_INVALID_PARAM;
@@ -2353,7 +2353,7 @@ ErrCode AnsManagerProxy::InnerTransact(uint32_t code, MessageOption &flags, Mess
         ANS_LOGW("[InnerTransact] fail: get Remote fail code %{public}u", code);
         return ERR_DEAD_OBJECT;
     }
-    int err = remote->SendRequest(code, data, reply, flags);
+    int32_t err = remote->SendRequest(code, data, reply, flags);
     switch (err) {
         case NO_ERROR: {
             return ERR_OK;

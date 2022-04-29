@@ -69,7 +69,7 @@ public:
      * @param deleteReason Indicates the delete reason.
      */
     void OnCanceled(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap,
-        int deleteReason) override;
+        int32_t deleteReason) override;
 
     /**
      * @brief The callback function on the notifications updated.
