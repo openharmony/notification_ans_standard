@@ -274,23 +274,6 @@ public:
     }
 
     /**
-     * @brief Confirms with the permission management module to check whether a request prompt is required for granting
-     * a certain permission.
-     *
-     * @param bundleName Indicates the name of the bundle to check.
-     * @param permission Indicates the permission to check.
-     * @param userId Indicates the user id.
-     * @return Returns true if the current application does not have the permission and the user does not turn off
-     * further requests; returns false if the current application already has the permission, the permission is rejected
-     * by the system, or the permission is denied by the user and the user has turned off further requests.
-     */
-    virtual bool CanRequestPermission(
-        const std::string &bundleName, const std::string &permissionName, const int userId) override
-    {
-        return true;
-    }
-
-    /**
      * @brief Checks whether the publickeys of two bundles are the same.
      *
      * @param firstBundleName Indicates the first bundle name.
@@ -305,15 +288,6 @@ public:
     }
 
     /**
-     * @brief Checks whether a specified bundle has been granted a specific permission.
-     *
-     * @param bundleName Indicates the name of the bundle to check.
-     * @param permission Indicates the permission to check.
-     * @return Returns 0 if the bundle has the permission; returns -1 otherwise.
-     */
-    virtual int CheckPermission(const std::string &bundleName, const std::string &permission) override;
-
-    /**
      * @brief Obtains detailed information about a specified permission.
      *
      * @param permissionName Indicates the name of the ohos permission.
@@ -321,79 +295,6 @@ public:
      * @return Returns true if the PermissionDef object is successfully obtained; returns false otherwise.
      */
     virtual bool GetPermissionDef(const std::string &permissionName, PermissionDef &permissionDef) override
-    {
-        return true;
-    }
-
-    /**
-     * @brief Obtains all known permission groups in the system.
-     *
-     * @param permissionDefs Indicates the list of objects containing the permission group information.
-     * @return Returns true if the PermissionDef objects is successfully obtained; returns false otherwise.
-     */
-    virtual bool GetAllPermissionGroupDefs(std::vector<PermissionDef> &permissionDefs) override
-    {
-        return true;
-    }
-
-    /**
-     * @brief Obtains all known permission groups in the system.
-     *
-     * @param permissions Indicates the permission array.
-     * @param appNames Indicates the list of application names that have the specified permissions.
-     * @return Returns true if the application names is successfully obtained; returns false otherwise.
-     */
-    virtual bool GetAppsGrantedPermissions(
-        const std::vector<std::string> &permissions, std::vector<std::string> &appNames) override
-    {
-        return true;
-    }
-
-    /**
-     * @brief Requests a certain permission from user.
-     *
-     * @param bundleName Indicates the name of the bundle to request permission.
-     * @param permission Indicates the permission to request permission.
-     * @param userId Indicates the user id.
-     * @return Returns true if the permission request successfully; returns false otherwise.
-     */
-    virtual bool RequestPermissionFromUser(
-        const std::string &bundleName, const std::string &permission, const int userId) override
-    {
-        return true;
-    }
-
-    /**
-     * @brief Registers a callback for listening for permission changes of all UIDs.
-     *
-     * @param callback Indicates the callback method to register.
-     * @return Returns true if this function is successfully called; returns false otherwise.
-     */
-    virtual bool RegisterAllPermissionsChanged(const sptr<OnPermissionChangedCallback> &callback) override
-    {
-        return true;
-    }
-
-    /**
-     * @brief Registers a callback for listening for permission changes of specified UIDs.
-     *
-     * @param uids Indicates the list of UIDs whose permission changes will be monitored.
-     * @param callback Indicates the callback method to register.
-     * @return Returns true if this function is successfully called; returns false otherwise.
-     */
-    virtual bool RegisterPermissionsChanged(
-        const std::vector<int> &uids, const sptr<OnPermissionChangedCallback> &callback) override
-    {
-        return true;
-    }
-
-    /**
-     * @brief Unregisters a specified callback for listening for permission changes.
-     *
-     * @param callback Indicates the callback method to register.
-     * @return Returns true if this function is successfully called; returns false otherwise.
-     */
-    virtual bool UnregisterPermissionsChanged(const sptr<OnPermissionChangedCallback> &callback) override
     {
         return true;
     }
