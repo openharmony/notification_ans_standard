@@ -153,7 +153,7 @@ public:
      *
      * @return Returns the UID of the notification creator.
      */
-    pid_t GetUid() const;
+    uid_t GetUid() const;
 
     /**
      * @brief Obtains the PID of the notification creator.

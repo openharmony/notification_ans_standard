@@ -22,6 +22,7 @@ namespace NotificationNapi {
 using namespace OHOS::Notification;
 napi_value Publish(napi_env env, napi_callback_info info);
 napi_value ShowNotification(napi_env env, napi_callback_info info);
+napi_value PublishAsBundle(napi_env env, napi_callback_info info);
 }  // namespace NotificationNapi
 }  // namespace OHOS
 #endif  // BASE_NOTIFICATION_ANS_STANDARD_KITS_NAPI_INCLUDE_PUBLISH_H

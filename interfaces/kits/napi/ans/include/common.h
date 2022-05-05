@@ -24,14 +24,14 @@ namespace OHOS {
 namespace NotificationNapi {
 using namespace OHOS::Notification;
 
-const std::int32_t STR_MAX_SIZE = 200;
-const std::int32_t LONG_STR_MAX_SIZE = 1024;
-const int32_t NO_ERROR = 0;
-const int32_t ERROR = -1;
-const int32_t PARAM0 = 0;
-const int32_t PARAM1 = 1;
-const int32_t PARAM2 = 2;
-const int32_t PARAM3 = 3;
+constexpr int32_t STR_MAX_SIZE = 200;
+constexpr int32_t LONG_STR_MAX_SIZE = 1024;
+constexpr uint8_t NO_ERROR = 0;
+constexpr uint8_t ERROR = -1;
+constexpr uint8_t PARAM0 = 0;
+constexpr uint8_t PARAM1 = 1;
+constexpr uint8_t PARAM2 = 2;
+constexpr uint8_t PARAM3 = 3;
 
 enum class ContentType {
     NOTIFICATION_CONTENT_BASIC_TEXT,
@@ -277,7 +277,7 @@ public:
      */
     static napi_value SetNotificationRequest(
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the string obejcts of specified NotificationRequest object
      *
@@ -288,7 +288,7 @@ public:
      */
     static napi_value SetNotificationRequestByString(
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the number obejcts of specified NotificationRequest object
      *
@@ -299,7 +299,7 @@ public:
      */
     static napi_value SetNotificationRequestByNumber(
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the bool obejcts of specified NotificationRequest object
      *
@@ -310,7 +310,7 @@ public:
      */
     static napi_value SetNotificationRequestByBool(
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the WantAgent obejct of specified NotificationRequest object
      *
@@ -321,7 +321,7 @@ public:
      */
     static napi_value SetNotificationRequestByWantAgent(
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the PixelMap obejct of specified NotificationRequest object
      *
@@ -332,7 +332,7 @@ public:
      */
     static napi_value SetNotificationRequestByPixelMap(
         const napi_env &env, const OHOS::Notification::NotificationRequest *request, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the custom obejcts of specified NotificationRequest object
      *
@@ -397,7 +397,7 @@ public:
      */
     static napi_value SetNotificationContent(
         const napi_env &env, const std::shared_ptr<NotificationContent> &content, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the object of specified type in specified NotificationContent object
      *
@@ -507,7 +507,7 @@ public:
      */
     static napi_value SetNotificationActionButton(
         const napi_env &env, const std::shared_ptr<NotificationActionButton> &actionButton, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by the extra objects of specified NotificationActionButton object
      *
@@ -518,7 +518,7 @@ public:
      */
     static napi_value SetNotificationActionButtonByExtras(
         const napi_env &env, const std::shared_ptr<NotificationActionButton> &actionButton, napi_value &result);
-    
+
     /**
      * @brief Sets a js object by specified NotificationUserInput object
      *
@@ -627,7 +627,7 @@ public:
      * @return Returns the null object if success, returns the null value otherwise
      */
     static napi_value GetNotificationId(const napi_env &env, const napi_value &value, NotificationRequest &request);
-    
+
     /**
      * @brief Gets the slot type of NotificationRequest object from specified js object
      *
@@ -649,7 +649,7 @@ public:
      */
     static napi_value GetNotificationIsOngoing(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
-    
+
     /**
      * @brief Gets the isUnremovable flag of NotificationRequest object from specified js object
      *
@@ -715,7 +715,7 @@ public:
      */
     static napi_value GetNotificationRemovalWantAgent(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
-    
+
     /**
      * @brief Gets the max screen WantAgent object of NotificationRequest object from specified js object
      *
@@ -758,7 +758,7 @@ public:
      * @return Returns the null object if success, returns the null value otherwise
      */
     static napi_value GetNotificationColor(const napi_env &env, const napi_value &value, NotificationRequest &request);
-    
+
     /**
      * @brief Gets the colorEnabled flag of NotificationRequest object from specified js object
      *
@@ -813,7 +813,7 @@ public:
      */
     static napi_value GetNotificationStatusBarText(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
-    
+
     /**
      * @brief Gets the label of NotificationRequest object from specified js object
      *
@@ -823,7 +823,7 @@ public:
      * @return Returns the null object if success, returns the null value otherwise
      */
     static napi_value GetNotificationLabel(const napi_env &env, const napi_value &value, NotificationRequest &request);
-    
+
     /**
      * @brief Gets the badge icon style of NotificationRequest object from specified js object
      *
@@ -944,7 +944,7 @@ public:
      */
     static napi_value GetNotificationActionButtonsDetailed(
         const napi_env &env, const napi_value &actionButton, std::shared_ptr<NotificationActionButton> &pActionButton);
-    
+
     /**
      * @brief Gets the basic information of NotificationActionButton object from specified js object
      *
@@ -955,7 +955,7 @@ public:
      */
     static napi_value GetNotificationActionButtonsDetailedBasicInfo(
         const napi_env &env, const napi_value &actionButton, std::shared_ptr<NotificationActionButton> &pActionButton);
-    
+
     /**
      * @brief Gets the extras of NotificationActionButton object from specified js object
      *
@@ -966,7 +966,7 @@ public:
      */
     static napi_value GetNotificationActionButtonsDetailedByExtras(
         const napi_env &env, const napi_value &actionButton, std::shared_ptr<NotificationActionButton> &pActionButton);
-    
+
     /**
      * @brief Gets the user input of NotificationActionButton object from specified js object
      *
@@ -977,7 +977,7 @@ public:
      */
     static napi_value GetNotificationUserInput(
         const napi_env &env, const napi_value &actionButton, std::shared_ptr<NotificationActionButton> &pActionButton);
-    
+
     /**
      * @brief Gets the input key of NotificationUserInput object from specified js object
      *
@@ -988,7 +988,7 @@ public:
      */
     static napi_value GetNotificationUserInputByInputKey(
         const napi_env &env, const napi_value &userInputResult, std::shared_ptr<NotificationUserInput> &userInput);
-    
+
     /**
      * @brief Gets the tag of NotificationUserInput object from specified js object
      *
@@ -999,7 +999,7 @@ public:
      */
     static napi_value GetNotificationUserInputByTag(
         const napi_env &env, const napi_value &userInputResult, std::shared_ptr<NotificationUserInput> &userInput);
-    
+
     /**
      * @brief Gets the options of NotificationUserInput object from specified js object
      *
@@ -1010,7 +1010,7 @@ public:
      */
     static napi_value GetNotificationUserInputByOptions(
         const napi_env &env, const napi_value &userInputResult, std::shared_ptr<NotificationUserInput> &userInput);
-    
+
     /**
      * @brief Gets the permit mime types of NotificationUserInput object from specified js object
      *
@@ -1021,7 +1021,7 @@ public:
      */
     static napi_value GetNotificationUserInputByPermitMimeTypes(
         const napi_env &env, const napi_value &userInputResult, std::shared_ptr<NotificationUserInput> &userInput);
-    
+
     /**
      * @brief Gets the permit free from input of NotificationUserInput object from specified js object
      *
@@ -1032,7 +1032,7 @@ public:
      */
     static napi_value GetNotificationUserInputByPermitFreeFormInput(
         const napi_env &env, const napi_value &userInputResult, std::shared_ptr<NotificationUserInput> &userInput);
-    
+
     /**
      * @brief Gets the edit type of NotificationUserInput object from specified js object
      *
@@ -1043,7 +1043,7 @@ public:
      */
     static napi_value GetNotificationUserInputByEditType(
         const napi_env &env, const napi_value &userInputResult, std::shared_ptr<NotificationUserInput> &userInput);
-    
+
     /**
      * @brief Gets the additional data of NotificationUserInput object from specified js object
      *
@@ -1065,7 +1065,7 @@ public:
      */
     static napi_value GetNotificationSmallIcon(
         const napi_env &env, const napi_value &value, NotificationRequest &request);
-    
+
     /**
      * @brief Gets the large icon of NotificationRequest object from specified js object
      *
@@ -1130,7 +1130,7 @@ public:
      * @return Returns the null object if success, returns the null value otherwise
      */
     static napi_value GetNotificationContentType(const napi_env &env, const napi_value &result, int32_t &type);
-    
+
     /**
      * @brief Gets a basic content of NotificationRequest object from specified js object
      *
@@ -1232,7 +1232,7 @@ public:
     static napi_value GetNotificationConversationalContentTitle(
         const napi_env &env, const napi_value &contentResult,
         std::shared_ptr<OHOS::Notification::NotificationConversationalContent> &conversationalContent);
-    
+
     /**
      * @brief Gets the group of NotificationConversationalContent object from specified js object
      *
@@ -1244,7 +1244,7 @@ public:
     static napi_value GetNotificationConversationalContentGroup(
         const napi_env &env, const napi_value &contentResult,
         std::shared_ptr<OHOS::Notification::NotificationConversationalContent> &conversationalContent);
-    
+
     /**
      * @brief Gets the messages of NotificationConversationalContent object from specified js object
      *
@@ -1256,7 +1256,7 @@ public:
     static napi_value GetNotificationConversationalContentMessages(
         const napi_env &env, const napi_value &contentResult,
         std::shared_ptr<OHOS::Notification::NotificationConversationalContent> &conversationalContent);
-    
+
     /**
      * @brief Gets a NotificationConversationalMessage object from specified js object
      *
@@ -1268,7 +1268,7 @@ public:
     static napi_value GetConversationalMessage(
         const napi_env &env, const napi_value &conversationalMessage,
         std::shared_ptr<NotificationConversationalMessage> &message);
-    
+
     /**
      * @brief Gets the basic information of NotificationConversationalMessage object from specified js object
      *
@@ -1302,7 +1302,7 @@ public:
      * @return Returns the null object if success, returns the null value otherwise
      */
     static napi_value GetMessageUser(const napi_env &env, const napi_value &result, MessageUser &messageUser);
-    
+
     /**
      * @brief Gets a MessageUser object from specified js object
      *
@@ -1312,7 +1312,7 @@ public:
      * @return Returns the null object if success, returns the null value otherwise
      */
     static napi_value GetMessageUserByString(const napi_env &env, const napi_value &result, MessageUser &messageUser);
-    
+
     /**
      * @brief Gets the bool objects of MessageUser object from specified js object
      *
@@ -1322,7 +1322,7 @@ public:
      * @return Returns the null object if success, returns the null value otherwise
      */
     static napi_value GetMessageUserByBool(const napi_env &env, const napi_value &result, MessageUser &messageUser);
-    
+
     /**
      * @brief Gets the custom objects of MessageUser object from specified js object
      *

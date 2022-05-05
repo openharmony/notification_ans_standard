@@ -360,6 +360,10 @@ public:
      */
     void SetPermitSystemGeneratedContextualActionButtons(bool permitted);
 
+    bool IsAgentNotification() const;
+
+    void SetIsAgentNotification(bool isAgent);
+
     /**
      * @brief Adds a MessageUser object and associates it with this notification.
      *
@@ -905,14 +909,28 @@ public:
      *
      * @param uid Indicates the UID of the notification creator.
      */
-    void SetCreatorUid(pid_t uid);
+    void SetCreatorUid(uid_t uid);
 
     /**
      * @brief Obtains the UID of the notification creator.
      *
      * @return Returns the UID of the notification creator.
      */
-    pid_t GetCreatorUid() const;
+    uid_t GetCreatorUid() const;
+
+    /**
+     * @brief Sets the UID of the notification owner.
+     *
+     * @param uid the UID of the notification owner.
+     */
+    void SetOwnerUid(uid_t uid);
+
+    /**
+     * @brief Obtains the UID of the notification owner.
+     *
+     * @return the UID of the notification owner.
+     */
+    uid_t GetOwnerUid() const;
 
     /**
      * @brief Sets the label of this notification.
@@ -971,6 +989,20 @@ public:
      * @return Returns the UserId of the notification creator.
      */
     int32_t GetCreatorUserId() const;
+
+    /**
+     * @brief Sets the UserId of the notification owner.
+     *
+     * @param userId the UserId of the notification owner.
+     */
+    void SetOwnerUserId(int32_t userId);
+
+    /**
+     * @brief Obtains the UserId of the notification owner.
+     *
+     * @return the UserId of the notification owner.
+     */
+    int32_t GetOwnerUserId() const;
 
     /**
      * @brief Returns a string representation of the object.
@@ -1112,8 +1144,10 @@ private:
     int64_t autoDeletedTime_ {0};
 
     pid_t creatorPid_ {0};
-    pid_t creatorUid_ {0};
+    uid_t creatorUid_ {0};
+    uid_t ownerUid_ {0};
     int32_t creatorUserId_ {SUBSCRIBE_USER_INIT};
+    int32_t ownerUserId_ {SUBSCRIBE_USER_INIT};
     int32_t receiverUserId_ {SUBSCRIBE_USER_INIT};
 
     std::string settingsText_ {};
@@ -1145,6 +1179,7 @@ private:
     bool floatingIcon_ {false};
     bool onlyLocal_ {false};
     bool permitted_ {true};
+    bool isAgent_ {false};
 
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> wantAgent_ {};
     std::shared_ptr<AbilityRuntime::WantAgent::WantAgent> removalWantAgent_ {};

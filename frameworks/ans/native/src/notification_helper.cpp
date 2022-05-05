@@ -115,6 +115,13 @@ ErrCode NotificationHelper::CancelAllNotifications()
     return DelayedSingleton<AnsNotification>::GetInstance()->CancelAllNotifications();
 }
 
+ErrCode NotificationHelper::CancelAsBundle(
+    int32_t notificationId, const std::string &representativeBundle, int32_t userId)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->CancelAsBundle(
+        notificationId, representativeBundle, userId);
+}
+
 ErrCode NotificationHelper::GetActiveNotificationNums(uint64_t &num)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetActiveNotificationNums(num);

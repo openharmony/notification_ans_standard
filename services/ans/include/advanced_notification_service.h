@@ -81,6 +81,19 @@ public:
     ErrCode CancelAll() override;
 
     /**
+     * @brief Cancels a published agent notification.
+     *
+     * @param notificationId Indicates the unique notification ID in the application.
+     *                       The value must be the ID of a published notification.
+     *                       Otherwise, this method does not take effect.
+     * @param representativeBundle Indicates the name of application bundle your application is representing.
+     * @param userId Indicates the specific user.
+     * @return Returns cancel notification result.
+     */
+    ErrCode CancelAsBundle(
+        int32_t notificationId, const std::string &representativeBundle, int32_t userId) override;
+
+    /**
      * @brief Adds a notification slot by type.
      *
      * @param slotType Indicates the notification slot type to be added.
@@ -760,8 +773,9 @@ private:
     void UpdateRecentNotification(sptr<Notification> &notification, bool isDelete, int32_t reason);
 
     void AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate);
-    bool CheckPermission();
-    ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int32_t &uid);
+    bool CheckPermission(const std::string &permission);
+    ErrCode PrepareNotificationRequest(const sptr<NotificationRequest> &request);
+    ErrCode PrepareContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int32_t &uid);
     bool GetActiveUserId(int& userId);
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
     bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);
