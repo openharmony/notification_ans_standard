@@ -64,12 +64,12 @@ void NotificationSortingMap::SetNotificationSorting(const std::vector<Notificati
 bool NotificationSortingMap::Marshalling(Parcel &parcel) const
 {
     bool ret = true;
-    if (!parcel.WriteInt32(sortings_.size())) {
+    if (!parcel.WriteUint64(sortings_.size())) {
         ANS_LOGE("Can't write sorting size");
         return false;
     }
 
-    int count = 0;
+    size_t count = 0;
     for (auto &sorting : sortings_) {
         if (!parcel.WriteParcelable(&sorting.second)) {
             ANS_LOGE("Can't write sorting");
@@ -89,11 +89,11 @@ NotificationSortingMap *NotificationSortingMap::Unmarshalling(Parcel &parcel)
 {
     std::vector<NotificationSorting> sortings;
     // read sorting num
-    int32_t size = 0;
-    parcel.ReadInt32(size);
+    uint64_t size = 0;
+    parcel.ReadUint64(size);
     size = (size <= MAX_ACTIVE_NUM) ? size : MAX_ACTIVE_NUM;
 
-    for (int i = 0; i < size; i++) {
+    for (uint64_t i = 0; i < size; i++) {
         // read sorting
         NotificationSorting *sorting = parcel.ReadParcelable<NotificationSorting>();
         if (sorting != nullptr) {

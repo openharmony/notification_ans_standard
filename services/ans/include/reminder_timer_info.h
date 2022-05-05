@@ -44,7 +44,7 @@ public:
     /**
      * Indicates the timing type.
      */
-    void SetType(const int &type) override;
+    void SetType(const int32_t &type) override;
 
     /**
      * Indicates the repeat policy.

@@ -45,7 +45,7 @@ std::vector<std::string> NotificationSubscribeInfo::GetAppNames() const
     return appNames_;
 }
 
-void NotificationSubscribeInfo::AddAppUserId(const int userId)
+void NotificationSubscribeInfo::AddAppUserId(const int32_t userId)
 {
     userId_ = userId;
 }

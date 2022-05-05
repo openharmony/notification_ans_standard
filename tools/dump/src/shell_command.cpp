@@ -41,7 +41,7 @@ ShellCommand::~ShellCommand()
 
 ErrCode ShellCommand::OnCommand()
 {
-    int result = OHOS::ERR_OK;
+    int32_t result = OHOS::ERR_OK;
     auto respond = commandMap_[cmd_];
     if (respond == nullptr) {
         resultReceiver_.append(GetCommandErrorMsg());
@@ -57,7 +57,7 @@ ErrCode ShellCommand::OnCommand()
 
 std::string ShellCommand::ExecCommand()
 {
-    int result = CreateCommandMap();
+    int32_t result = CreateCommandMap();
     if (result != OHOS::ERR_OK) {
         ANS_LOGE("failed to create command map.\n");
     }
