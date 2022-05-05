@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Notification {
-const int MAX_TEXT_LENGTH = 1000;
+const int32_t MAX_TEXT_LENGTH = 1000;
 
 NotificationSlot::NotificationSlot(NotificationConstant::SlotType type) : sound_("")
 {
@@ -321,7 +321,7 @@ bool NotificationSlot::ReadFromParcel(Parcel &parcel)
     lockScreenVisibleness_ = static_cast<NotificationConstant::VisiblenessType>(parcel.ReadInt32());
     groupId_ = parcel.ReadString();
 
-    int empty = VALUE_NULL;
+    int32_t empty = VALUE_NULL;
     if (!parcel.ReadInt32(empty)) {
         ANS_LOGE("Failed to read int");
         return false;

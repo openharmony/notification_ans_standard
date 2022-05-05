@@ -163,7 +163,7 @@ ErrCode AnsSubscriberStub::HandleOnCanceledMap(MessageParcel &data, MessageParce
         }
     }
 
-    int reason = 0;
+    int32_t reason = 0;
     if (!data.ReadInt32(reason)) {
         ANS_LOGW("[HandleOnCanceledMap] fail: read reason failed");
         return ERR_ANS_PARCELABLE_FAILED;
@@ -224,7 +224,7 @@ void AnsSubscriberStub::OnCanceled(const sptr<Notification> &notification)
 {}
 
 void AnsSubscriberStub::OnCanceled(
-    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason)
+    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason)
 {}
 
 void AnsSubscriberStub::OnUpdated(const sptr<NotificationSortingMap> &notificationMap)

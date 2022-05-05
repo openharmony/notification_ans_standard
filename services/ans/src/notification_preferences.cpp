@@ -308,7 +308,7 @@ ErrCode NotificationPreferences::GetNotificationAllSlots(
 }
 
 ErrCode NotificationPreferences::GetNotificationSlotsNumForBundle(
-    const sptr<NotificationBundleOption> &bundleOption, int &num)
+    const sptr<NotificationBundleOption> &bundleOption, uint64_t &num)
 {
     if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
@@ -317,7 +317,7 @@ ErrCode NotificationPreferences::GetNotificationSlotsNumForBundle(
     ErrCode result = ERR_OK;
     NotificationPreferencesInfo::BundleInfo bundleInfo;
     if (preferencesInfo_.GetBundleInfo(bundleOption, bundleInfo)) {
-        num = static_cast<int>(bundleInfo.GetAllSlotsSize());
+        num = static_cast<uint64_t>(bundleInfo.GetAllSlotsSize());
     } else {
         result = ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST;
     }
@@ -402,7 +402,7 @@ ErrCode NotificationPreferences::SetShowBadge(const sptr<NotificationBundleOptio
     return result;
 }
 
-ErrCode NotificationPreferences::GetImportance(const sptr<NotificationBundleOption> &bundleOption, int &importance)
+ErrCode NotificationPreferences::GetImportance(const sptr<NotificationBundleOption> &bundleOption, int32_t &importance)
 {
     if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
@@ -412,7 +412,7 @@ ErrCode NotificationPreferences::GetImportance(const sptr<NotificationBundleOpti
 }
 
 ErrCode NotificationPreferences::SetImportance(
-    const sptr<NotificationBundleOption> &bundleOption, const int &importance)
+    const sptr<NotificationBundleOption> &bundleOption, const int32_t &importance)
 {
     if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
@@ -426,7 +426,7 @@ ErrCode NotificationPreferences::SetImportance(
 }
 
 ErrCode NotificationPreferences::GetTotalBadgeNums(
-    const sptr<NotificationBundleOption> &bundleOption, int &totalBadgeNum)
+    const sptr<NotificationBundleOption> &bundleOption, int32_t &totalBadgeNum)
 {
     if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;
@@ -434,7 +434,8 @@ ErrCode NotificationPreferences::GetTotalBadgeNums(
     return GetBundleProperty(bundleOption, BundleType::BUNDLE_BADGE_TOTAL_NUM_TYPE, totalBadgeNum);
 }
 
-ErrCode NotificationPreferences::SetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, const int num)
+ErrCode NotificationPreferences::SetTotalBadgeNums(
+    const sptr<NotificationBundleOption> &bundleOption, const int32_t num)
 {
     if (bundleOption == nullptr || bundleOption->GetBundleName().empty()) {
         return ERR_ANS_INVALID_PARAM;

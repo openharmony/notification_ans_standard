@@ -53,14 +53,14 @@ public:
          *
          * @param name Indicates the bundle importance.
          */
-        void SetImportance(const int &level);
+        void SetImportance(const int32_t &level);
 
         /**
          * @brief Get bundle importance.
          *
          * @return Return importance.
          */
-        int GetImportance() const;
+        int32_t GetImportance() const;
 
         /**
          * @brief Set bundle Whether to show badge.
@@ -81,14 +81,14 @@ public:
          *
          * @param name Indicates the set bundle total badge num.
          */
-        void SetBadgeTotalNum(const int &num);
+        void SetBadgeTotalNum(const int32_t &num);
 
         /**
          * @brief Get bundle total badge num.
          *
          * @return Return badge total num.
          */
-        int GetBadgeTotalNum() const;
+        int32_t GetBadgeTotalNum() const;
 
         /**
          * @brief Set bundle Whether to private allowed.
@@ -199,7 +199,7 @@ public:
          *
          * @return Return num is group size.
          */
-        uint32_t GetGroupSize() const;
+        size_t GetGroupSize() const;
 
         /**
          * @brief Check whether to exsist slot in the of bundle.
@@ -239,15 +239,15 @@ public:
          * @return Return true on success, false on failure.
          */
         bool RemoveSlotGroup(const std::string &groupId);
-        void SetBundleUid(const int &uid);
-        int GetBundleUid() const;
+        void SetBundleUid(const int32_t &uid);
+        int32_t GetBundleUid() const;
 
     private:
         std::string bundleName_;
-        int uid_ = 0;
-        int importance_ = BUNDLE_IMPORTANCE;
+        int32_t uid_ = 0;
+        int32_t importance_ = BUNDLE_IMPORTANCE;
         bool isShowBadge_ = BUNDLE_SHOW_BADGE;
-        int badgeTotalNum_ = BUNDLE_BADGE_TOTAL_NUM;
+        int32_t badgeTotalNum_ = BUNDLE_BADGE_TOTAL_NUM;
         bool isPrivateAllowed_ = BUNDLE_PRIVATE_ALLOWED;
         bool isEnabledNotification_ = BUNDLE_ENABLE_NOTIFICATION;
         bool hasPoppedDialog_ = BUNDLE_POPPED_DIALOG;

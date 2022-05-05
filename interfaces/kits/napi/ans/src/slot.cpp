@@ -17,13 +17,13 @@
 
 namespace OHOS {
 namespace NotificationNapi {
-const int ADD_SLOT_MAX_PARA = 2;
-const int ADD_SLOTS_MAX_PARA = 2;
-const int SET_SLOT_AS_BUNDLE_MAX_PARA = 3;
-const int GET_SLOT_MAX_PARA = 2;
-const int GET_SLOT_NUM_AS_BUNDLE_MAX_PARA = 2;
-const int GET_SLOTS_AS_BUNDLE_MAX_PARA = 2;
-const int REMOVE_SLOT_MAX_PARA = 2;
+const int32_t ADD_SLOT_MAX_PARA = 2;
+const int32_t ADD_SLOTS_MAX_PARA = 2;
+const int32_t SET_SLOT_AS_BUNDLE_MAX_PARA = 3;
+const int32_t GET_SLOT_MAX_PARA = 2;
+const int32_t GET_SLOT_NUM_AS_BUNDLE_MAX_PARA = 2;
+const int32_t GET_SLOTS_AS_BUNDLE_MAX_PARA = 2;
+const int32_t REMOVE_SLOT_MAX_PARA = 2;
 
 struct ParametersInfoAddSlot {
     NotificationSlot slot;
@@ -89,7 +89,7 @@ struct AsyncCallbackInfoGetSlotNumByBundle {
     napi_async_work asyncWork = nullptr;
     ParametersInfoGetSlotNumByBundle params;
     CallbackPromiseInfo info;
-    int num = 0;
+    uint64_t num = 0;
 };
 
 struct AsyncCallbackInfoGetSlots {
@@ -146,7 +146,7 @@ napi_value ParseParametersByAddSlot(const napi_env &env, const napi_callback_inf
         env, (valuetype == napi_object || valuetype == napi_number), "Wrong argument type. Object or number expected.");
     if (valuetype == napi_number) {
         paras.isAddSlotByType = true;
-        int slotType = 0;
+        int32_t slotType = 0;
         napi_get_value_int32(env, argv[PARAM0], &slotType);
         if (!Common::SlotTypeJSToC(SlotType(slotType), paras.inType)) {
             return nullptr;
@@ -268,7 +268,7 @@ napi_value ParseParametersByGetSlot(const napi_env &env, const napi_callback_inf
     // argv[0]: SlotType
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-    int slotType = 0;
+    int32_t slotType = 0;
     napi_get_value_int32(env, argv[PARAM0], &slotType);
     if (!Common::SlotTypeJSToC(SlotType(slotType), paras.outType)) {
         return nullptr;
@@ -359,7 +359,7 @@ napi_value ParseParametersByRemoveSlot(
     // argv[0]: SlotType
     NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
     NAPI_ASSERT(env, valuetype == napi_number, "Wrong argument type. Number expected.");
-    int slotType = 0;
+    int32_t slotType = 0;
     napi_get_value_int32(env, argv[PARAM0], &slotType);
     if (!Common::SlotTypeJSToC(SlotType(slotType), paras.outType)) {
         return nullptr;
@@ -654,7 +654,7 @@ napi_value GetSlotNumByBundle(napi_env env, napi_callback_info info)
             auto asynccallbackinfo = static_cast<AsyncCallbackInfoGetSlotNumByBundle *>(data);
             if (asynccallbackinfo) {
                 napi_value result = nullptr;
-                napi_create_int32(env, asynccallbackinfo->num, &result);
+                napi_create_uint32(env, asynccallbackinfo->num, &result);
                 Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
                 if (asynccallbackinfo->info.callback != nullptr) {
                     napi_delete_reference(env, asynccallbackinfo->info.callback);

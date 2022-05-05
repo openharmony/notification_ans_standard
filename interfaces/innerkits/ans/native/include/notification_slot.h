@@ -358,9 +358,9 @@ private:
     std::vector<int64_t> vibrationValues_ {};
 
     // no object in parcel
-    static constexpr int VALUE_NULL = -1;
+    static constexpr int32_t VALUE_NULL = -1;
     // object exist in parcel
-    static constexpr int VALUE_OBJECT = 1;
+    static constexpr int32_t VALUE_OBJECT = 1;
 };
 }  // namespace Notification
 }  // namespace OHOS

@@ -31,10 +31,10 @@ public:
      * @param kvStoreSecondMaxinum The maximum number of calls to SingleKvStore interface per second.
      * @param kvStoreMinuteMaxinum The maximum number of calls to SingleKvStore interface per minute.
      */
-    DistributedFlowControl(int kvManagerSecondMaxinum = KVMANAGER_MAXINUM_PER_SECOND,
-        int kvManagerMinuteMaxinum = KVMANAGER_MAXINUM_PER_MINUTE,
-        int kvStoreSecondMaxinum = KVSTORE_MAXINUM_PER_SECOND,
-        int kvStoreMinuteMaxinum = KVSTORE_MAXINUM_PER_MINUTE);
+    DistributedFlowControl(size_t kvManagerSecondMaxinum = KVMANAGER_MAXINUM_PER_SECOND,
+        size_t kvManagerMinuteMaxinum = KVMANAGER_MAXINUM_PER_MINUTE,
+        size_t kvStoreSecondMaxinum = KVSTORE_MAXINUM_PER_SECOND,
+        size_t kvStoreMinuteMaxinum = KVSTORE_MAXINUM_PER_MINUTE);
 
     /**
      * @brief Check if DistributedKvDataManager interface flow control can pass.
@@ -61,16 +61,16 @@ public:
     void KvStoreFlowControlClear(void);
 
 protected:
-    static const int KVMANAGER_MAXINUM_PER_SECOND = 50;
-    static const int KVMANAGER_MAXINUM_PER_MINUTE = 500;
-    static const int KVSTORE_MAXINUM_PER_SECOND = 1000;
-    static const int KVSTORE_MAXINUM_PER_MINUTE = 10000;
+    static const size_t KVMANAGER_MAXINUM_PER_SECOND = 50;
+    static const size_t KVMANAGER_MAXINUM_PER_MINUTE = 500;
+    static const size_t KVSTORE_MAXINUM_PER_SECOND = 1000;
+    static const size_t KVSTORE_MAXINUM_PER_MINUTE = 10000;
 
 private:
-    int kvManagerSecondMaxinum_;
-    int kvManagerMinuteMaxinum_;
-    int kvStoreSecondMaxinum_;
-    int kvStoreMinuteMaxinum_;
+    size_t kvManagerSecondMaxinum_;
+    size_t kvManagerMinuteMaxinum_;
+    size_t kvStoreSecondMaxinum_;
+    size_t kvStoreMinuteMaxinum_;
     std::list<std::chrono::system_clock::time_point> kvDataManagerTimestampList_;
     std::list<std::chrono::system_clock::time_point> kvStoreTimestampList_;
 };

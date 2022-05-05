@@ -37,7 +37,7 @@ ErrCode AnsSubscriberProxy::InnerTransact(
         return ERR_DEAD_OBJECT;
     }
 
-    int err = remote->SendRequest(code, data, reply, flags);
+    int32_t err = remote->SendRequest(code, data, reply, flags);
     switch (err) {
         case NO_ERROR: {
             return ERR_OK;
@@ -182,7 +182,7 @@ void AnsSubscriberProxy::OnCanceled(const sptr<Notification> &notification)
 }
 
 void AnsSubscriberProxy::OnCanceled(
-    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason)
+    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason)
 {
     if (notification == nullptr) {
         ANS_LOGW("[OnCanceled] fail: notification is nullptr.");
