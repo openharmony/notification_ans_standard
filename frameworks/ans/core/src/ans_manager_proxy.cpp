@@ -168,6 +168,46 @@ ErrCode AnsManagerProxy::CancelAll()
     return result;
 }
 
+ErrCode AnsManagerProxy::CancelAsBundle(
+    int32_t notificationId, const std::string &representativeBundle, int32_t userId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[CancelAsBundle] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(notificationId)) {
+        ANS_LOGW("[CancelAsBundle] fail: write notificationId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteString(representativeBundle)) {
+        ANS_LOGW("[CancelAsBundle] fail: write representativeBundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(userId)) {
+        ANS_LOGW("[CancelAsBundle] fail: write userId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(CANCEL_AS_BUNDLE, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[CancelAsBundle] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[CancelAsBundle] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
 ErrCode AnsManagerProxy::AddSlotByType(NotificationConstant::SlotType slotType)
 {
     MessageParcel data;

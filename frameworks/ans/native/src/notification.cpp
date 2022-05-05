@@ -145,7 +145,7 @@ Uri Notification::GetSound() const
     return Uri("");
 }
 
-pid_t Notification::GetUid() const
+uid_t Notification::GetUid() const
 {
     if (request_ == nullptr) {
         return 0;

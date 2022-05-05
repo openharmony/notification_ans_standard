@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,9 @@ const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &
         {AnsManagerStub::CANCEL_ALL_NOTIFICATIONS,
             std::bind(
                 &AnsManagerStub::HandleCancelAll, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
+        {AnsManagerStub::CANCEL_AS_BUNDLE,
+            std::bind(&AnsManagerStub::HandleCancelAsBundle, std::placeholders::_1, std::placeholders::_2,
+                std::placeholders::_3)},
         {AnsManagerStub::ADD_SLOT_BY_TYPE,
             std::bind(&AnsManagerStub::HandleAddSlotByType, std::placeholders::_1, std::placeholders::_2,
                 std::placeholders::_3)},
@@ -369,6 +372,34 @@ ErrCode AnsManagerStub::HandleCancelAll(MessageParcel &data, MessageParcel &repl
     ErrCode result = CancelAll();
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleCancelAll] fail: write result failed, ErrCode=%{public}d", result);
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode AnsManagerStub::HandleCancelAsBundle(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t notificationId = 0;
+    if (!data.ReadInt32(notificationId)) {
+        ANS_LOGW("[HandleCancelAsBundle] fail: read notificationId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    std::string representativeBundle;
+    if (!data.ReadString(representativeBundle)) {
+        ANS_LOGW("[HandleCancelAsBundle] fail: read representativeBundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    int32_t userId = 0;
+    if (!data.ReadInt32(userId)) {
+        ANS_LOGW("[HandleCancelAsBundle] fail: read userId failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    ErrCode result = CancelAsBundle(notificationId, representativeBundle, userId);
+    if (!reply.WriteInt32(result)) {
+        ANS_LOGW("[HandleCancelAsBundle] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
     }
     return ERR_OK;
@@ -1800,6 +1831,12 @@ ErrCode AnsManagerStub::Cancel(int notificationId, const std::string &label)
 ErrCode AnsManagerStub::CancelAll()
 {
     ANS_LOGW("AnsManagerStub::CancelAll called!");
+    return ERR_INVALID_OPERATION;
+}
+
+ErrCode AnsManagerStub::CancelAsBundle(int32_t notificationId, const std::string &representativeBundle, int32_t userId)
+{
+    ANS_LOGW("AnsManagerStub::CancelAsBundle called!");
     return ERR_INVALID_OPERATION;
 }
 

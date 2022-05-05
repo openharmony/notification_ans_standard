@@ -242,21 +242,37 @@ napi_value Common::SetNotification(
     napi_get_boolean(env, notification->IsFloatingIcon(), &value);
     napi_set_named_property(env, result, "isFloatingIcon", value);
 
-    // readonly creatorBundleName?: string
-    napi_create_string_utf8(env, notification->GetCreateBundle().c_str(), NAPI_AUTO_LENGTH, &value);
-    napi_set_named_property(env, result, "creatorBundleName", value);
+    if (notification->GetNotificationRequest().IsAgentNotification()) {
+        // Agent notification, replace creator with owner
+        // readonly creatorBundleName?: string
+        napi_create_string_utf8(
+            env, notification->GetNotificationRequest().GetOwnerBundleName().c_str(), NAPI_AUTO_LENGTH, &value);
+        napi_set_named_property(env, result, "creatorBundleName", value);
 
-    // readonly creatorUid?: number
-    napi_create_int32(env, notification->GetUid(), &value);
-    napi_set_named_property(env, result, "creatorUid", value);
+        // readonly creatorUid?: number
+        napi_create_int32(env, notification->GetNotificationRequest().GetOwnerUid(), &value);
+        napi_set_named_property(env, result, "creatorUid", value);
+
+        // readonly creatorUserId?: number
+        napi_create_int32(env, notification->GetNotificationRequest().GetOwnerUserId(), &value);
+        napi_set_named_property(env, result, "creatorUserId", value);
+    } else {
+        // readonly creatorBundleName?: string
+        napi_create_string_utf8(env, notification->GetCreateBundle().c_str(), NAPI_AUTO_LENGTH, &value);
+        napi_set_named_property(env, result, "creatorBundleName", value);
+
+        // readonly creatorUid?: number
+        napi_create_int32(env, notification->GetUid(), &value);
+        napi_set_named_property(env, result, "creatorUid", value);
+
+        // readonly creatorUserId?: number
+        napi_create_int32(env, notification->GetUserId(), &value);
+        napi_set_named_property(env, result, "creatorUserId", value);
+    }
 
     // readonly creatorPid?: number
     napi_create_int32(env, notification->GetPid(), &value);
     napi_set_named_property(env, result, "creatorPid", value);
-
-    // readonly creatorUserId?: number
-    napi_create_int32(env, notification->GetUserId(), &value);
-    napi_set_named_property(env, result, "creatorUserId", value);
 
     // distributedOption?:DistributedOptions
     napi_value distributedResult = nullptr;
