@@ -79,7 +79,6 @@ ohos_shared_library("notification") {
     "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:wantagent_innerkits",
-    "bundle_framework:appexecfwk_base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
