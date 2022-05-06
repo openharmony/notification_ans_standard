@@ -80,7 +80,7 @@ ohos_shared_library("libans") {
     "distributeddatamgr:distributeddata_inner",
     "multimedia_image_standard:image_native",
     "multimedia_media_standard:media_client",
-    "os_account_standard:os_account_innerkits",
+    "os_account:os_account_innerkits",
     "time_native:time_service",
     "window_manager:libwm",
   ]
