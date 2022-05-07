@@ -31,6 +31,7 @@ const int32_t ERROR = -1;
 const int32_t PARAM0 = 0;
 const int32_t PARAM1 = 1;
 const int32_t PARAM2 = 2;
+const int32_t PARAM3 = 3;
 
 enum class ContentType {
     NOTIFICATION_CONTENT_BASIC_TEXT,
@@ -146,6 +147,7 @@ struct CallbackPromiseInfo {
 
 class Common {
     Common();
+
     ~Common();
 
 public:

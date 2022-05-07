@@ -770,6 +770,28 @@ public:
      * @return Returns set do not disturb time result.
      */
     static ErrCode GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate);
+
+    /**
+     * Set whether the application slot is enabled.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param slotType Indicates type of slot.
+     * @param enabled the type of slot enabled.
+     * @return Returns get slot number by bundle result.
+     */
+    static ErrCode SetEnabledForBundleSlot(
+        const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool enabled);
+
+    /**
+     * Obtains whether the application slot is enabled.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param slotType Indicates type of slot.
+     * @param enabled the type of slot enabled to get.
+     * @return Returns get slot number by bundle result.
+     */
+    static ErrCode GetEnabledForBundleSlot(
+        const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool &enabled);
 };
 }  // namespace Notification
 }  // namespace OHOS
