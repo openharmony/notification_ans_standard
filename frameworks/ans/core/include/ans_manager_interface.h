@@ -698,6 +698,10 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) = 0;
+    virtual ErrCode SetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool enabled) = 0;
+    virtual ErrCode GetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool &enabled) = 0;
 
 protected:
     enum TransactId : uint32_t {
@@ -774,7 +778,9 @@ protected:
         SET_NOTIFICATION_ENABLED_BY_USER,
         DELETE_ALL_NOTIFICATIONS_BY_USER,
         SET_DO_NOT_DISTURB_DATE_BY_USER,
-        GET_DO_NOT_DISTURB_DATE_BY_USER
+        GET_DO_NOT_DISTURB_DATE_BY_USER,
+        SET_ENABLED_FOR_BUNDLE_SLOT,
+        GET_ENABLED_FOR_BUNDLE_SLOT
     };
 };
 }  // namespace Notification

@@ -200,6 +200,16 @@ void NotificationSlot::EnableBadge(bool isShowBadge)
     isShowBadge_ = isShowBadge;
 }
 
+void NotificationSlot::SetEnable(bool enabled)
+{
+    enabled_ = enabled;
+}
+
+bool NotificationSlot::GetEnable() const
+{
+    return enabled_;
+}
+
 std::string NotificationSlot::Dump() const
 {
     return "NotificationSlot{ "
@@ -217,6 +227,7 @@ std::string NotificationSlot::Dump() const
             ", vibration = " + MergeVectorToString(vibrationValues_) +
             ", isShowBadge = " + (isShowBadge_ ? "true" : "false") +
             ", groupId = " + groupId_ +
+            ", enabled = " + (enabled_ ? "true" : "false") +
             " }";
 }
 
@@ -303,6 +314,11 @@ bool NotificationSlot::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    if (!parcel.WriteBool(enabled_)) {
+        ANS_LOGE("Failed to write isShowBadge");
+        return false;
+    }
+
     return true;
 }
 
@@ -332,6 +348,7 @@ bool NotificationSlot::ReadFromParcel(Parcel &parcel)
     }
 
     parcel.ReadInt64Vector(&vibrationValues_);
+    enabled_ = parcel.ReadBool();
     return true;
 }
 

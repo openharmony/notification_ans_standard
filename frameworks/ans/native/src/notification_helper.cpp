@@ -403,5 +403,17 @@ ErrCode NotificationHelper::GetDoNotDisturbDate(const int32_t &userId, Notificat
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetDoNotDisturbDate(userId, doNotDisturbDate);
 }
+
+ErrCode NotificationHelper::SetEnabledForBundleSlot(
+    const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetEnabledForBundleSlot(bundleOption, slotType, enabled);
+}
+
+ErrCode NotificationHelper::GetEnabledForBundleSlot(
+    const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool &enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetEnabledForBundleSlot(bundleOption, slotType, enabled);
+}
 }  // namespace Notification
 }  // namespace OHOS

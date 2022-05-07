@@ -2619,5 +2619,95 @@ ErrCode AnsManagerProxy::GetDoNotDisturbDate(const int32_t &userId, sptr<Notific
 
     return result;
 }
+
+ErrCode AnsManagerProxy::SetEnabledForBundleSlot(
+    const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType, bool enabled)
+{
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[SetEnabledForBundleSlot] fail: bundle is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[SetEnabledForBundleSlot] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteStrongParcelable(bundleOption)) {
+        ANS_LOGW("[SetEnabledForBundleSlot] fail:: write bundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(slotType)) {
+        ANS_LOGW("[SetEnabledForBundleSlot] fail:: write slotType failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteBool(enabled)) {
+        ANS_LOGW("[SetEnabledForBundleSlot] fail: write enabled failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(SET_ENABLED_FOR_BUNDLE_SLOT, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[SetEnabledForBundleSlot] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[SetEnabledForBundleSlot] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
+
+ErrCode AnsManagerProxy::GetEnabledForBundleSlot(
+    const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType, bool &enabled)
+{
+    if (bundleOption == nullptr) {
+        ANS_LOGW("[GetEnabledForBundleSlot] fail: bundle is empty.");
+        return ERR_ANS_INVALID_PARAM;
+    }
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(AnsManagerProxy::GetDescriptor())) {
+        ANS_LOGW("[GetEnabledForBundleSlot] fail: write interface token failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteStrongParcelable(bundleOption)) {
+        ANS_LOGW("[GetEnabledForBundleSlot] fail:: write bundle failed");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!data.WriteInt32(slotType)) {
+        ANS_LOGW("[GetEnabledForBundleSlot] fail:: write slotType failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    MessageParcel reply;
+    MessageOption option = {MessageOption::TF_SYNC};
+    ErrCode result = InnerTransact(GET_ENABLED_FOR_BUNDLE_SLOT, option, data, reply);
+    if (result != ERR_OK) {
+        ANS_LOGW("[GetEnabledForBundleSlot] fail: transact ErrCode=%{public}d", result);
+        return ERR_ANS_TRANSACT_FAILED;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        ANS_LOGW("[GetEnabledForBundleSlot] fail: read result failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    if (!reply.ReadBool(enabled)) {
+        ANS_LOGW("[GetEnabledForBundleSlot] fail: read canPublish failed.");
+        return ERR_ANS_PARCELABLE_FAILED;
+    }
+
+    return result;
+}
 }  // namespace Notification
 }  // namespace OHOS

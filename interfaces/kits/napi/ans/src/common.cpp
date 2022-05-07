@@ -770,6 +770,10 @@ napi_value Common::SetNotificationSlot(const napi_env &env, const NotificationSl
     }
     napi_set_named_property(env, result, "vibrationValues", arr);
 
+    // enabled?: boolean
+    napi_get_boolean(env, slot.GetEnable(), &value);
+    napi_set_named_property(env, result, "enabled", value);
+
     return NapiGetBoolean(env, true);
 }
 
