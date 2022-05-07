@@ -59,7 +59,7 @@ bool DistributedPreferences::InitDistributedAllInfo(void)
         }
 
         if (resolveKey.isMainKey) {
-            int value = atoi(entry.value.ToString().data());
+            int32_t value = atoi(entry.value.ToString().data());
             preferencesInfo_->SetDistributedEnable(static_cast<bool>(value));
         } else {
             preferencesInfo_->SetDistributedBundleEnable(

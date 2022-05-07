@@ -74,7 +74,7 @@ void NotificationSubscriber::SubscriberImpl::OnCanceled(const sptr<Notification>
 }
 
 void NotificationSubscriber::SubscriberImpl::OnCanceled(
-    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason)
+    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason)
 {
     subscriber_.OnCanceled(std::make_shared<Notification>(*notification),
         std::make_shared<NotificationSortingMap>(*notificationMap),

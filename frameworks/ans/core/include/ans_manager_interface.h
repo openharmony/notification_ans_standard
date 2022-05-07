@@ -165,7 +165,7 @@ public:
      * @param num Indicates the number of slot.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num) = 0;
+    virtual ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, uint64_t &num) = 0;
 
     /**
      * @brief Deletes multiple notification slot groups.
@@ -190,7 +190,7 @@ public:
      * @param num Indicates the number of active notifications of the current application.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode GetActiveNotificationNums(int &num) = 0;
+    virtual ErrCode GetActiveNotificationNums(uint64_t &num) = 0;
 
     /**
      * @brief Obtains all active notifications in the current system. The caller must have system permissions to

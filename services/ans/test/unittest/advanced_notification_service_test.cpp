@@ -96,7 +96,7 @@ public:
     void OnCanceled(const std::shared_ptr<Notification> &request) override
     {}
     void OnCanceled(const std::shared_ptr<Notification> &request,
-        const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override
+        const std::shared_ptr<NotificationSortingMap> &sortingMap, int32_t deleteReason) override
     {}
     void OnConsumed(const std::shared_ptr<Notification> &request) override
     {}

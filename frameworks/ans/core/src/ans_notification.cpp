@@ -158,7 +158,7 @@ ErrCode AnsNotification::GetNotificationSlotGroups(std::vector<sptr<Notification
     return ansManagerProxy_->GetSlotGroups(groups);
 }
 
-ErrCode AnsNotification::GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num)
+ErrCode AnsNotification::GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, uint64_t &num)
 {
     if (bundleOption.GetBundleName().empty()) {
         ANS_LOGE("Invalid bundle name.");
@@ -278,7 +278,7 @@ ErrCode AnsNotification::CancelAllNotifications()
     return ansManagerProxy_->CancelAll();
 }
 
-ErrCode AnsNotification::GetActiveNotificationNums(int32_t &num)
+ErrCode AnsNotification::GetActiveNotificationNums(uint64_t &num)
 {
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
@@ -450,7 +450,7 @@ ErrCode AnsNotification::GetBundleImportance(NotificationSlot::NotificationLevel
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;
     }
-    int importanceTemp;
+    int32_t importanceTemp;
     ErrCode ret = ansManagerProxy_->GetBundleImportance(importanceTemp);
     if ((NotificationSlot::LEVEL_NONE <= importanceTemp) && (importanceTemp <= NotificationSlot::LEVEL_HIGH)) {
         importance = static_cast<NotificationSlot::NotificationLevel>(importanceTemp);
@@ -1097,13 +1097,11 @@ bool AnsNotification::CanPublishMediaContent(const NotificationRequest &request)
     }
 
     auto showActions = media->GetShownActions();
-    uint32_t size = request.GetActionButtons().size();
+    size_t size = request.GetActionButtons().size();
     for (auto it = showActions.begin(); it != showActions.end(); ++it) {
         if (*it > size) {
             ANS_LOGE("The sequence numbers actions is: %{public}d, the assigned to added action buttons size is: "
-                     "%{public}d.",
-                *it,
-                size);
+                     "%{public}zu.", *it, size);
             return false;
         }
     }

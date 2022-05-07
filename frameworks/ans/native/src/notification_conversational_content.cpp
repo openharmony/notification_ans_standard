@@ -196,7 +196,7 @@ bool NotificationConversationalContent::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    if (!parcel.WriteInt32(static_cast<int32_t>(messages_.size()))) {
+    if (!parcel.WriteUint64(messages_.size())) {
         ANS_LOGE("Failed to write the size of messages");
         return false;
     }
@@ -254,7 +254,7 @@ bool NotificationConversationalContent::ReadFromParcel(Parcel &parcel)
     }
     messageUser_ = *pUser;
 
-    auto vsize = parcel.ReadInt32();
+    auto vsize = parcel.ReadUint64();
     for (auto it = 0; it < vsize; ++it) {
         auto valid = parcel.ReadBool();
         if (!valid) {

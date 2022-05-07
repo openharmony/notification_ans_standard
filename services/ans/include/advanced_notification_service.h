@@ -71,7 +71,7 @@ public:
      * @param label Indicates the label of the notification to cancel.
      * @return Returns cancel notification result.
      */
-    ErrCode Cancel(int notificationId, const std::string &label) override;
+    ErrCode Cancel(int32_t notificationId, const std::string &label) override;
 
     /**
      * @brief Cancels all the published notifications.
@@ -164,7 +164,7 @@ public:
      * @param num Indicates the number of slot.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num) override;
+    ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, uint64_t &num) override;
 
     /**
      * @brief Deletes multiple notification slot groups.
@@ -189,7 +189,7 @@ public:
      * @param num Indicates the number of active notifications of the current application.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetActiveNotificationNums(int &num) override;
+    ErrCode GetActiveNotificationNums(uint64_t &num) override;
 
     /**
      * @brief Obtains all active notifications in the current system. The caller must have system permissions to
@@ -263,7 +263,7 @@ public:
      * @param num Indicates the badge number.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode SetNotificationBadgeNum(int num) override;
+    ErrCode SetNotificationBadgeNum(int32_t num) override;
 
     /**
      * @brief Obtains the importance level of this application.
@@ -272,7 +272,7 @@ public:
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetBundleImportance(int &importance) override;
+    ErrCode GetBundleImportance(int32_t &importance) override;
 
     /**
      * @brief Checks whether this application has permission to modify the Do Not Disturb (DND) notification policy.
@@ -307,7 +307,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RemoveNotification(
-        const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label) override;
+        const sptr<NotificationBundleOption> &bundleOption, int32_t notificationId, const std::string &label) override;
 
     /**
      * @brief Delete all notifications.
@@ -716,7 +716,7 @@ public:
     void OnDistributedKvStoreDeathRecipient();
 
     ErrCode CancelPreparedNotification(
-        int notificationId, const std::string &label, const sptr<NotificationBundleOption> &bundleOption);
+        int32_t notificationId, const std::string &label, const sptr<NotificationBundleOption> &bundleOption);
     ErrCode PrepareNotificationInfo(
         const sptr<NotificationRequest> &request, sptr<NotificationBundleOption> &bundleOption);
     ErrCode PublishPreparedNotification(
@@ -734,10 +734,10 @@ private:
     void UpdateInNotificationList(const std::shared_ptr<NotificationRecord> &record);
     ErrCode AssignToNotificationList(const std::shared_ptr<NotificationRecord> &record);
     ErrCode RemoveFromNotificationList(const sptr<NotificationBundleOption> &bundleOption, const std::string &label,
-        int notificationId, sptr<Notification> &notification, bool isCancel = false);
+        int32_t notificationId, sptr<Notification> &notification, bool isCancel = false);
     ErrCode RemoveFromNotificationList(const std::string &key, sptr<Notification> &notification, bool isCancel = false);
     ErrCode RemoveFromNotificationListForDeleteAll(const std::string &key,
-        const int &userId, sptr<Notification> &notification);
+        const int32_t &userId, sptr<Notification> &notification);
     std::vector<std::string> GetNotificationKeys(const sptr<NotificationBundleOption> &bundleOption);
     bool IsNotificationExists(const std::string &key);
     void SortNotificationList();
@@ -757,11 +757,11 @@ private:
     ErrCode DistributedNotificationDump(std::vector<std::string> &dumpInfo);
 #endif
     ErrCode SetRecentNotificationCount(const std::string arg);
-    void UpdateRecentNotification(sptr<Notification> &notification, bool isDelete, int reason);
+    void UpdateRecentNotification(sptr<Notification> &notification, bool isDelete, int32_t reason);
 
     void AdjustDateForDndTypeOnce(int64_t &beginDate, int64_t &endDate);
     bool CheckPermission();
-    ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int &uid);
+    ErrCode PrepereContinuousTaskNotificationRequest(const sptr<NotificationRequest> &request, const int32_t &uid);
     bool GetActiveUserId(int& userId);
     void TriggerRemoveWantAgent(const sptr<NotificationRequest> &request);
     bool CheckApiCompatibility(const sptr<NotificationBundleOption> &bundleOption);

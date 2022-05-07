@@ -129,52 +129,52 @@ public:
     /**
      * Indicates that a notification is deleted because it is clicked.
      */
-    static const int CLICK_REASON_DELETE = 1;
+    static const int32_t CLICK_REASON_DELETE = 1;
 
     /**
      * Indicates that a notification is deleted because the user clears it.
      */
-    static const int CANCEL_REASON_DELETE = 2;
+    static const int32_t CANCEL_REASON_DELETE = 2;
 
     /**
      * Indicates that a notification is deleted because the user clears all notifications.
      */
-    static const int CANCEL_ALL_REASON_DELETE = 3;
+    static const int32_t CANCEL_ALL_REASON_DELETE = 3;
 
     /**
      * Indicates that a notification is deleted because of a UI error.
      */
-    static const int ERROR_REASON_DELETE = 4;
+    static const int32_t ERROR_REASON_DELETE = 4;
 
     /**
      * Indicates that a notification is deleted because a change has been made to the application.
      */
-    static const int PACKAGE_CHANGED_REASON_DELETE = 5;
+    static const int32_t PACKAGE_CHANGED_REASON_DELETE = 5;
 
     /**
      * Indicates that a notification is deleted because the application context is stopped.
      */
-    static const int USER_STOPPED_REASON_DELETE = 6;
+    static const int32_t USER_STOPPED_REASON_DELETE = 6;
 
     /**
      * Indicates that a notification is deleted because the application is banned from sending notifications.
      */
-    static const int PACKAGE_BANNED_REASON_DELETE = 7;
+    static const int32_t PACKAGE_BANNED_REASON_DELETE = 7;
 
     /**
      * Indicates that a notification is deleted because the application cancels it.
      */
-    static const int APP_CANCEL_REASON_DELETE = 8;
+    static const int32_t APP_CANCEL_REASON_DELETE = 8;
 
     /**
      * Indicates that a notification is deleted because the application cancels all notifications.
      */
-    static const int APP_CANCEL_ALL_REASON_DELETE = 9;
+    static const int32_t APP_CANCEL_ALL_REASON_DELETE = 9;
 
     /**
      * Indicates that a notification is deleted for other reasons.
      */
-    static const int APP_CANCEL_REASON_OTHER = 10;
+    static const int32_t APP_CANCEL_REASON_OTHER = 10;
 
     /**
      * The key indicates input source.

@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Notification {
-const int MAX_TEXT_LENGTH = 1000;
+const int32_t MAX_TEXT_LENGTH = 1000;
 const std::string LINE_SEPARATOR = "\n";
 
 NotificationSlotGroup::NotificationSlotGroup()
@@ -104,13 +104,13 @@ bool NotificationSlotGroup::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    if (slots_.size() == 0) {
-        if (!parcel.WriteInt32(0)) {
+    if (slots_.empty()) {
+        if (!parcel.WriteUint64(0)) {
             ANS_LOGE("Failed to write the size of slots");
             return false;
         }
     } else {
-        if (!parcel.WriteInt32(slots_.size())) {
+        if (!parcel.WriteUint64(slots_.size())) {
             ANS_LOGE("Failed to write the size of slots");
             return false;
         }
@@ -135,9 +135,9 @@ bool NotificationSlotGroup::ReadFromParcel(Parcel &parcel)
     id_ = parcel.ReadString();
     name_ = parcel.ReadString();
     description_ = parcel.ReadString();
-    int32_t size = parcel.ReadInt32();
+    uint64_t size = parcel.ReadUint64();
     if (size) {
-        for (int32_t i = 0; i < size; ++i) {
+        for (uint64_t i = 0; i < size; ++i) {
             auto slot = parcel.ReadParcelable<NotificationSlot>();
             if (slot == nullptr) {
                 ANS_LOGE("Failed to read slot");

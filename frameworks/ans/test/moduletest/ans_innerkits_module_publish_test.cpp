@@ -40,7 +40,7 @@ bool OnConsumedReceived = false;
 bool OnCanceledReceived = false;
 bool OnWantReceived = false;
 const int32_t SLEEP_TIME = 5;
-const int32_t ACTIVE_NUMS = 2;
+const uint64_t ACTIVE_NUMS = 2;
 const int32_t CASE_ONE = 1;
 const int32_t CASE_TWO = 2;
 const int32_t CASE_THREE = 3;
@@ -1151,7 +1151,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     EXPECT_EQ((int)ERR_OK, (int)NotificationHelper::CancelAllNotifications());
     sleep(SLEEP_TIME);
     EXPECT_EQ(OnCanceledReceived, true);
-    int countBefor = 0;
+    uint64_t countBefor = 0;
     EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countBefor));
     EXPECT_EQ(0, countBefor);
     std::string label1 = "Label1";
@@ -1172,7 +1172,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_GetActiveNotifications_
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req2));
     WaitOnConsumed();
-    int countAfter = 0;
+    uint64_t countAfter = 0;
     EXPECT_EQ((int)ERR_OK, NotificationHelper::GetActiveNotificationNums(countAfter));
     EXPECT_EQ(ACTIVE_NUMS, countAfter);
     std::vector<sptr<NotificationRequest>> requests;

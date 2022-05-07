@@ -18,7 +18,8 @@
 namespace OHOS {
 namespace Notification {
 DistributedFlowControl::DistributedFlowControl(
-    int kvManagerSecondMaxinum, int kvManagerMinuteMaxinum, int kvStoreSecondMaxinum, int kvStoreMinuteMaxinum)
+    size_t kvManagerSecondMaxinum, size_t kvManagerMinuteMaxinum, size_t kvStoreSecondMaxinum,
+    size_t kvStoreMinuteMaxinum)
     : kvManagerSecondMaxinum_(kvManagerSecondMaxinum),
       kvManagerMinuteMaxinum_(kvManagerMinuteMaxinum),
       kvStoreSecondMaxinum_(kvStoreSecondMaxinum),
@@ -32,12 +33,12 @@ bool DistributedFlowControl::KvManagerFlowControl(void)
         return now - value > std::chrono::minutes(1);
     });
 
-    int listSize = kvStoreTimestampList_.size();
+    size_t listSize = kvStoreTimestampList_.size();
     if (listSize >= kvManagerMinuteMaxinum_) {
         return false;
     }
 
-    int count = 0;
+    size_t count = 0;
     for (auto value : kvDataManagerTimestampList_) {
         if (now - value > std::chrono::seconds(1)) {
             if (count >= kvManagerSecondMaxinum_) {
@@ -60,12 +61,12 @@ bool DistributedFlowControl::KvStoreFlowControl(void)
         return now - value > std::chrono::minutes(1);
     });
 
-    int listSize = kvStoreTimestampList_.size();
+    size_t listSize = kvStoreTimestampList_.size();
     if (listSize >= kvStoreMinuteMaxinum_) {
         return false;
     }
 
-    int count = 0;
+    size_t count = 0;
     for (auto value : kvStoreTimestampList_) {
         if (now - value > std::chrono::seconds(1)) {
             if (count >= kvStoreSecondMaxinum_) {
