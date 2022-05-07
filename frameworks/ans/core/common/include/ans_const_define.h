@@ -25,11 +25,11 @@
 namespace OHOS {
 namespace Notification {
 // Max active notification number
-constexpr uint32_t MAX_ACTIVE_NUM = 1000;
+constexpr size_t MAX_ACTIVE_NUM = 1000;
 constexpr uint32_t MAX_ACTIVE_NUM_PERAPP = 100;
 constexpr uint32_t MAX_ACTIVE_NUM_PERSECOND = 10;
-constexpr uint32_t MAX_SLOT_NUM = 5;
-constexpr uint32_t MAX_SLOT_GROUP_NUM = 4;
+constexpr size_t MAX_SLOT_NUM = 5;
+constexpr size_t MAX_SLOT_GROUP_NUM = 4;
 constexpr uint32_t MAX_ICON_SIZE = 50 * 1024;
 constexpr uint32_t MAX_PICTURE_SIZE = 2 * 1024 * 1024;
 constexpr bool SUPPORT_DO_NOT_DISTRUB = true;

@@ -48,7 +48,7 @@ napi_value Common::NapiGetUndefined(napi_env env)
     return result;
 }
 
-napi_value Common::GetCallbackErrorValue(napi_env env, int errCode)
+napi_value Common::GetCallbackErrorValue(napi_env env, int32_t errCode)
 {
     napi_value result = nullptr;
     napi_value eCode = nullptr;
@@ -86,7 +86,7 @@ void Common::ReturnCallbackPromise(const napi_env &env, const CallbackPromiseInf
 }
 
 void Common::SetCallback(
-    const napi_env &env, const napi_ref &callbackIn, const int &errorCode, const napi_value &result)
+    const napi_env &env, const napi_ref &callbackIn, const int32_t &errorCode, const napi_value &result)
 {
     ANS_LOGI("enter");
     napi_value undefined = nullptr;
@@ -117,7 +117,7 @@ void Common::SetCallback(
 }
 
 void Common::SetPromise(
-    const napi_env &env, const napi_deferred &deferred, const int &errorCode, const napi_value &result)
+    const napi_env &env, const napi_deferred &deferred, const int32_t &errorCode, const napi_value &result)
 {
     ANS_LOGI("enter");
     if (errorCode == ERR_OK) {
@@ -181,7 +181,7 @@ napi_value Common::SetNotificationByDistributedOptions(
     napi_set_named_property(env, result, "isDistributed", value);
 
     // supportDisplayDevices?: Array<string>
-    int count = 0;
+    uint32_t count = 0;
     napi_value arrSupportDisplayDevices = nullptr;
     napi_create_array(env, &arrSupportDisplayDevices);
     std::vector<std::string> displayDevices = options.GetDevicesSupportDisplay();
@@ -357,7 +357,7 @@ napi_value Common::SetNotificationRequestByNumber(
     napi_set_named_property(env, result, "color", value);
 
     // badgeIconStyle ?: number
-    int badgeIconStyle = static_cast<int>(request->GetBadgeIconStyle());
+    auto badgeIconStyle = static_cast<int32_t>(request->GetBadgeIconStyle());
     napi_create_int32(env, badgeIconStyle, &value);
     napi_set_named_property(env, result, "badgeIconStyle", value);
 
@@ -541,7 +541,7 @@ napi_value Common::SetNotificationRequestByCustom(
 
     // actionButtons?: Array<NotificationActionButton>
     napi_value arr = nullptr;
-    int count = 0;
+    uint32_t count = 0;
     napi_create_array(env, &arr);
     for (auto vec : request->GetActionButtons()) {
         if (vec) {

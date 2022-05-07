@@ -72,7 +72,7 @@ bool NotificationSorting::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    if (!parcel.WriteInt32(ranking_)) {
+    if (!parcel.WriteUint64(ranking_)) {
         ANS_LOGE("Can't write ranking");
         return false;
     }
@@ -116,7 +116,7 @@ bool NotificationSorting::ReadFromParcel(Parcel &parcel)
     key_ = parcel.ReadString();
 
     // read ranking_
-    ranking_ = parcel.ReadInt32();
+    ranking_ = parcel.ReadUint64();
 
     // read importance_
     importance_ = parcel.ReadInt32();
@@ -159,7 +159,7 @@ void NotificationSorting::SetImportance(const int32_t &importance)
     importance_ = importance;
 }
 
-void NotificationSorting::SetRanking(const int32_t &ranking)
+void NotificationSorting::SetRanking(const uint64_t &ranking)
 {
     ranking_ = ranking;
 }

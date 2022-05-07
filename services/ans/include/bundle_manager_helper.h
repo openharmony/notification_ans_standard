@@ -38,7 +38,7 @@ public:
      * @param uid Indicates the specified uid.
      * @return Returns the bundle name.
      */
-    std::string GetBundleNameByUid(int uid);
+    std::string GetBundleNameByUid(int32_t uid);
 
     /**
      * @brief Check whether the caller is a system application base on the specified uid.
@@ -46,7 +46,7 @@ public:
      * @param uid Indicates the specified uid.
      * @return Returns the check result.
      */
-    bool IsSystemApp(int uid);
+    bool IsSystemApp(int32_t uid);
 
     /**
      * @brief Check API compatibility.
@@ -63,7 +63,7 @@ public:
      * @param userId Indicates the user id.
      * @return Returns the uid.
      */
-    int GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId);
+    int32_t GetDefaultUidByBundleName(const std::string &bundle, const int32_t userId);
 
     /**
      * @brief Obtains the bundle info.
@@ -83,7 +83,7 @@ public:
      * @param userId Indicates the user id.
      * @return Returns the check result.
      */
-    bool GetDistributedNotificationEnabled(const std::string &bundleName, const int userId);
+    bool GetDistributedNotificationEnabled(const std::string &bundleName, const int32_t userId);
 #endif
 
 private:

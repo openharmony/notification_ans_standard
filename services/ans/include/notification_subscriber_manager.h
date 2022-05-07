@@ -72,8 +72,8 @@ public:
      * @param notificationMap Indicates the NotificationSortingMap object.
      * @param deleteReason Indicates the delete reason.
      */
-    void NotifyCanceled(
-        const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
+    void NotifyCanceled(const sptr<Notification> &notification,
+        const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason);
 
     /**
      * @brief Notify all subscribers on updated.
@@ -115,8 +115,8 @@ private:
 
     void NotifyConsumedInner(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap);
-    void NotifyCanceledInner(
-        const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason);
+    void NotifyCanceledInner(const sptr<Notification> &notification,
+        const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason);
     void NotifyUpdatedInner(const sptr<NotificationSortingMap> &notificationMap);
     void NotifyDoNotDisturbDateChangedInner(const sptr<NotificationDoNotDisturbDate> &date);
     void NotifyEnabledNotificationChangedInner(const sptr<EnabledNotificationCallbackData> &callbackData);

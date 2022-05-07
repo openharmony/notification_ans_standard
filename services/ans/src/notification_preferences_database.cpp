@@ -183,7 +183,7 @@ bool NotificationPreferencesDatabase::CheckKvStore()
 }
 
 bool NotificationPreferencesDatabase::PutSlotsToDisturbeDB(
-    const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlot>> &slots)
+    const std::string &bundleName, const int32_t &bundleUid, const std::vector<sptr<NotificationSlot>> &slots)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
     if (bundleName.empty()) {
@@ -214,7 +214,7 @@ bool NotificationPreferencesDatabase::PutSlotsToDisturbeDB(
 }
 
 bool NotificationPreferencesDatabase::PutGroupsToDisturbeDB(
-    const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlotGroup>> &groups)
+    const std::string &bundleName, const int32_t &bundleUid, const std::vector<sptr<NotificationSlotGroup>> &groups)
 {
     if (bundleName.empty()) {
         ANS_LOGE("Bundle name is null.");
@@ -295,7 +295,7 @@ bool NotificationPreferencesDatabase::PutShowBadge(
 }
 
 bool NotificationPreferencesDatabase::PutImportance(
-    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &importance)
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int32_t &importance)
 {
     if (bundleInfo.GetBundleName().empty()) {
         ANS_LOGE("Bundle name is null.");
@@ -313,7 +313,7 @@ bool NotificationPreferencesDatabase::PutImportance(
 }
 
 bool NotificationPreferencesDatabase::PutTotalBadgeNums(
-    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &totalBadgeNum)
+    const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int32_t &totalBadgeNum)
 {
     if (bundleInfo.GetBundleName().empty()) {
         ANS_LOGE("Bundle name is null.");
@@ -487,7 +487,7 @@ void NotificationPreferencesDatabase::GetValueFromDisturbeDB(
     callback(status, value);
 }
 
-bool NotificationPreferencesDatabase::CheckBundle(const std::string &bundleName, const int &bundleUid)
+bool NotificationPreferencesDatabase::CheckBundle(const std::string &bundleName, const int32_t &bundleUid)
 {
     std::string bundleKeyStr = KEY_BUNDLE_LABEL + bundleName + std::to_string(bundleUid);
     ANS_LOGD("CheckBundle bundleKeyStr %{public}s", bundleKeyStr.c_str());
@@ -815,7 +815,7 @@ void NotificationPreferencesDatabase::GenerateEntry(
     entries.push_back(entry);
 }
 
-bool NotificationPreferencesDatabase::SlotToEntry(const std::string &bundleName, const int &bundleUid,
+bool NotificationPreferencesDatabase::SlotToEntry(const std::string &bundleName, const int32_t &bundleUid,
     const sptr<NotificationSlot> &slot, std::vector<DistributedKv::Entry> &entries)
 {
     if (slot == nullptr) {
@@ -864,7 +864,7 @@ void NotificationPreferencesDatabase::GenerateSlotEntry(const std::string &bundl
     GenerateEntry(GenerateSlotKey(bundleKey, slotType, KEY_SLOT_ENABLED), std::to_string(slot->GetEnable()), entries);
 }
 
-bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleName, const int &bundleUid,
+bool NotificationPreferencesDatabase::GroupToEntry(const std::string &bundleName, const int32_t &bundleUid,
     const sptr<NotificationSlotGroup> &group, std::vector<DistributedKv::Entry> &entries)
 {
 
@@ -1031,9 +1031,9 @@ void NotificationPreferencesDatabase::StringToVector(const std::string &str, std
     }
 }
 
-int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
+int32_t NotificationPreferencesDatabase::StringToInt(const std::string &str) const
 {
-    int value = 0;
+    int32_t value = 0;
     if (!str.empty()) {
         value = stoi(str, nullptr);
     }
@@ -1042,7 +1042,7 @@ int NotificationPreferencesDatabase::StringToInt(const std::string &str) const
 
 int64_t NotificationPreferencesDatabase::StringToInt64(const std::string &str) const
 {
-    int value = 0;
+    int64_t value = 0;
     if (!str.empty()) {
         value = stoll(str, nullptr);
     }
@@ -1359,7 +1359,7 @@ std::string NotificationPreferencesDatabase::GenerateBundleLablel(
     return bundleInfo.GetBundleName().append(std::to_string(bundleInfo.GetBundleUid()));
 }
 
-void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreferencesInfo &info, int userId)
+void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreferencesInfo &info, int32_t userId)
 {
     std::string key =
         std::string().append(KEY_DO_NOT_DISTURB_TYPE).append(KEY_UNDER_LINE).append(std::to_string(userId));
@@ -1384,7 +1384,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbType(NotificationPreference
         });
 }
 
-void NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(NotificationPreferencesInfo &info, int userId)
+void NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(NotificationPreferencesInfo &info, int32_t userId)
 {
     std::string key =
         std::string().append(KEY_DO_NOT_DISTURB_BEGIN_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
@@ -1408,7 +1408,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbBeginDate(NotificationPrefe
         });
 }
 
-void NotificationPreferencesDatabase::GetDoNotDisturbEndDate(NotificationPreferencesInfo &info, int userId)
+void NotificationPreferencesDatabase::GetDoNotDisturbEndDate(NotificationPreferencesInfo &info, int32_t userId)
 {
     std::string key =
         std::string().append(KEY_DO_NOT_DISTURB_END_DATE).append(KEY_UNDER_LINE).append(std::to_string(userId));
@@ -1432,7 +1432,7 @@ void NotificationPreferencesDatabase::GetDoNotDisturbEndDate(NotificationPrefere
         });
 }
 
-void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPreferencesInfo &info, int userId)
+void NotificationPreferencesDatabase::GetEnableAllNotification(NotificationPreferencesInfo &info, int32_t userId)
 {
     std::string key =
         std::string().append(KEY_ENABLE_ALL_NOTIFICATION).append(KEY_UNDER_LINE).append(std::to_string(userId));

@@ -68,8 +68,8 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
     }
 
     if (subInfo->GetAppUserId() == SUBSCRIBE_USER_INIT) {
-        int userId = SUBSCRIBE_USER_INIT;
-        int callingUid = IPCSkeleton::GetCallingUid();
+        int32_t userId = SUBSCRIBE_USER_INIT;
+        int32_t callingUid = IPCSkeleton::GetCallingUid();
         ErrCode ret = OHOS::AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
         if (ret != ERR_OK) {
             ANS_LOGD("Get userId failed, callingUid = <%{public}d>", callingUid);
@@ -118,7 +118,7 @@ void NotificationSubscriberManager::NotifyConsumed(
 }
 
 void NotificationSubscriberManager::NotifyCanceled(
-    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason)
+    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason)
 {
     if (handler_ == nullptr) {
         ANS_LOGE("handler is nullptr");
@@ -325,7 +325,7 @@ void NotificationSubscriberManager::NotifyConsumedInner(
 }
 
 void NotificationSubscriberManager::NotifyCanceledInner(
-    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int deleteReason)
+    const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason)
 {
     ANS_LOGD("%{public}s notification->GetUserId <%{public}d>", __FUNCTION__, notification->GetUserId());
     int32_t recvUserId = notification->GetNotificationRequest().GetReceiverUserId();

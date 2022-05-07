@@ -26,11 +26,11 @@ using namespace OHOS::Notification;
 
 const std::int32_t STR_MAX_SIZE = 200;
 const std::int32_t LONG_STR_MAX_SIZE = 1024;
-const int NO_ERROR = 0;
-const int ERROR = -1;
-const int PARAM0 = 0;
-const int PARAM1 = 1;
-const int PARAM2 = 2;
+const int32_t NO_ERROR = 0;
+const int32_t ERROR = -1;
+const int32_t PARAM0 = 0;
+const int32_t PARAM1 = 1;
+const int32_t PARAM2 = 2;
 const int32_t PARAM3 = 3;
 
 enum class ContentType {
@@ -129,12 +129,12 @@ enum class NotificationFlagStatus {
 
 struct NotificationSubscribeInfo {
     std::vector<std::string> bundleNames;
-    int userId = 0;
+    int32_t userId = 0;
     bool hasSubscribeInfo = false;
 };
 
 struct NotificationKey {
-    int id {};
+    int32_t id {};
     std::string label {};
 };
 
@@ -142,7 +142,7 @@ struct CallbackPromiseInfo {
     napi_ref callback = nullptr;
     napi_deferred deferred = nullptr;
     bool isCallback = false;
-    int errorCode = 0;
+    int32_t errorCode = 0;
 };
 
 class Common {
@@ -1529,10 +1529,10 @@ public:
         const napi_env &env, const std::shared_ptr<NotificationFlags> &flags, napi_value &result);
 
 private:
-    static const int ARGS_ONE = 1;
-    static const int ARGS_TWO = 2;
-    static const int ONLY_CALLBACK_MAX_PARA = 1;
-    static const int ONLY_CALLBACK_MIN_PARA = 0;
+    static const int32_t ARGS_ONE = 1;
+    static const int32_t ARGS_TWO = 2;
+    static const int32_t ONLY_CALLBACK_MAX_PARA = 1;
+    static const int32_t ONLY_CALLBACK_MIN_PARA = 0;
     static std::set<std::shared_ptr<AbilityRuntime::WantAgent::WantAgent>> wantAgent_;
 };
 }  // namespace NotificationNapi
