@@ -1349,7 +1349,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     }
 
     vsize = parcel.ReadInt32();
-    for (auto it = 0; it < vsize; ++it) {
+    for (uint64_t it = 0; it < vsize; ++it) {
         auto member = parcel.ReadParcelable<MessageUser>();
         if (member == nullptr) {
             ANS_LOGE("Failed to read messageUser");

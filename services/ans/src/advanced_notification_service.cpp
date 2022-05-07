@@ -1231,8 +1231,9 @@ ErrCode AdvancedNotificationService::Subscribe(
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    if (!IsSystemApp()) {
-        ANS_LOGE("Client is not a system app");
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(IPCSkeleton::GetCallingTokenID());
+    if (!IsSystemApp() && !isSubsystem) {
+        ANS_LOGE("Client is not a system app or subsystem");
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
@@ -1252,8 +1253,9 @@ ErrCode AdvancedNotificationService::Unsubscribe(
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    if (!IsSystemApp()) {
-        ANS_LOGE("Client is not a system app");
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(IPCSkeleton::GetCallingTokenID());
+    if (!IsSystemApp() && !isSubsystem) {
+        ANS_LOGE("Client is not a system app or subsystem");
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
@@ -1311,7 +1313,8 @@ ErrCode AdvancedNotificationService::GetAllActiveNotifications(std::vector<sptr<
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    if (!IsSystemApp()) {
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(IPCSkeleton::GetCallingTokenID());
+    if (!IsSystemApp() && !isSubsystem) {
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
@@ -1606,8 +1609,7 @@ ErrCode AdvancedNotificationService::IsSpecialBundleAllowedNotify(
     }
 
     sptr<NotificationBundleOption> targetBundle = nullptr;
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
-    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(IPCSkeleton::GetCallingTokenID());
     if (isSubsystem) {
         if (bundleOption != nullptr) {
             targetBundle = GenerateValidBundleOption(bundleOption);
@@ -1672,8 +1674,7 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
-    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(IPCSkeleton::GetCallingTokenID());
     if (!isSubsystem) {
         return ERR_ANS_NOT_SYSTEM_SERVICE;
     }
@@ -1734,8 +1735,8 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
 ErrCode AdvancedNotificationService::CancelContinuousTaskNotification(const std::string &label, int32_t notificationId)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
-    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(IPCSkeleton::GetCallingTokenID());
     if (!isSubsystem) {
         return ERR_ANS_NOT_SYSTEM_SERVICE;
     }
@@ -2518,8 +2519,8 @@ ErrCode AdvancedNotificationService::DoesSupportDoNotDisturbMode(bool &doesSuppo
 bool AdvancedNotificationService::CheckPermission()
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
-    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(callerToken);
+
+    bool isSubsystem = AccessTokenHelper::VerifyNativeToken(IPCSkeleton::GetCallingTokenID());
     if (isSubsystem) {
         return true;
     }
