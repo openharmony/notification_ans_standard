@@ -22,8 +22,9 @@ namespace NotificationNapi {
 using namespace AbilityRuntime::WantAgent;
 
 namespace {
-static const int8_t PUBLISH_NOTIFICATION_MAX = 3;
-static const int8_t SHOW_NOTIFICATION_MAX = 1;
+constexpr int8_t PUBLISH_NOTIFICATION_MAX = 3;
+constexpr int8_t SHOW_NOTIFICATION_MAX = 1;
+constexpr int8_t PUBLISH_AS_BUNDLE_MAX = 4;
 }
 
 struct AsyncCallbackInfoPublish {
@@ -61,7 +62,7 @@ napi_value ParseParameters(const napi_env &env, const napi_callback_info &info, 
     napi_value argv[PUBLISH_NOTIFICATION_MAX] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
     if (argc < 1) {
-        ANS_LOGW("Wrong argument type. Function expected.");
+        ANS_LOGW("Wrong number of arguments.");
         return nullptr;
     }
 
@@ -356,6 +357,127 @@ napi_value ShowNotification(napi_env env, napi_callback_info info)
 
     NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
     return nullptr;
+}
+
+napi_value ParsePublishAsBundleParameters(
+    const napi_env &env, const napi_callback_info &info, ParametersInfoPublish &params)
+{
+    ANS_LOGI("enter");
+
+    size_t argc = PUBLISH_AS_BUNDLE_MAX;
+    napi_value argv[PUBLISH_AS_BUNDLE_MAX] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, NULL, NULL));
+    if (argc < 1) {
+        ANS_LOGW("Wrong number of arguments");
+        return nullptr;
+    }
+
+    napi_valuetype valuetype = napi_undefined;
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valuetype));
+    if (valuetype != napi_object) {
+        ANS_LOGW("Wrong argument type. Object expected.");
+        return nullptr;
+    }
+
+    // argv[0] : NotificationRequest
+    if (Common::GetNotificationRequest(env, argv[PARAM0], params.request) == nullptr) {
+        return nullptr;
+    }
+
+    // argv[1] : bundleName
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valuetype));
+    if (valuetype != napi_string) {
+        ANS_LOGW("Wrong argument type. String expected.");
+        return nullptr;
+    }
+
+    char str[STR_MAX_SIZE] = {0};
+    size_t strLen = 0;
+    napi_get_value_string_utf8(env, argv[PARAM1], str, STR_MAX_SIZE - 1, &strLen);
+    params.request.SetOwnerBundleName(str);
+
+    // argv[2] : userId
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
+    if (valuetype != napi_number) {
+        ANS_LOGW("Wrong argument type. Number expected.");
+        return nullptr;
+    }
+    int32_t userId = 0;
+    napi_get_value_int32(env, argv[PARAM2], &userId);
+    params.request.SetOwnerUserId(userId);
+    params.request.SetIsAgentNotification(true);
+
+    // argv[3] : callback
+    if (argc >= PUBLISH_AS_BUNDLE_MAX) {
+        if (GetCallback(env, argv[PARAM3], params) == nullptr) {
+            return nullptr;
+        }
+    }
+
+    ANS_LOGI("end");
+    return Common::NapiGetNull(env);
+}
+
+napi_value PublishAsBundle(napi_env env, napi_callback_info info)
+{
+    ANS_LOGI("enter");
+
+    ParametersInfoPublish params;
+    if (ParsePublishAsBundleParameters(env, info, params) == nullptr) {
+        return Common::NapiGetUndefined(env);
+    }
+
+    napi_value promise = nullptr;
+    AsyncCallbackInfoPublish *asynccallbackinfo =
+        new (std::nothrow) AsyncCallbackInfoPublish {.env = env, .asyncWork = nullptr};
+    if (!asynccallbackinfo) {
+        return Common::JSParaError(env, params.callback);
+    }
+
+    asynccallbackinfo->request = params.request;
+    Common::PaddingCallbackPromiseInfo(env, params.callback, asynccallbackinfo->info, promise);
+
+    napi_value resourceName = nullptr;
+    napi_create_string_latin1(env, "publishasbundle", NAPI_AUTO_LENGTH, &resourceName);
+
+    napi_create_async_work(env,
+        nullptr,
+        resourceName,
+        [](napi_env env, void *data) {
+            ANS_LOGI("PublishAsBundle napi_create_async_work start");
+            AsyncCallbackInfoPublish *asynccallbackinfo = static_cast<AsyncCallbackInfoPublish *>(data);
+            ANS_LOGI("PublishAsBundle napi_create_async_work start notificationId = %{public}d, contentType = "
+                     "%{public}d",
+                asynccallbackinfo->request.GetNotificationId(),
+                asynccallbackinfo->request.GetContent()->GetContentType());
+
+            asynccallbackinfo->info.errorCode =
+                NotificationHelper::PublishNotification(asynccallbackinfo->request);
+        },
+        [](napi_env env, napi_status status, void *data) {
+            ANS_LOGI("PublishAsBundle napi_create_async_work complete start");
+            AsyncCallbackInfoPublish *asynccallbackinfo = static_cast<AsyncCallbackInfoPublish *>(data);
+            if (asynccallbackinfo) {
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                if (asynccallbackinfo->info.callback != nullptr) {
+                    napi_delete_reference(env, asynccallbackinfo->info.callback);
+                }
+                napi_delete_async_work(env, asynccallbackinfo->asyncWork);
+                delete asynccallbackinfo;
+                asynccallbackinfo = nullptr;
+            }
+            ANS_LOGI("PublishAsBundle napi_create_async_work complete end");
+        },
+        (void *)asynccallbackinfo,
+        &asynccallbackinfo->asyncWork);
+
+    NAPI_CALL(env, napi_queue_async_work(env, asynccallbackinfo->asyncWork));
+
+    if (asynccallbackinfo->info.isCallback) {
+        return Common::NapiGetNull(env);
+    } else {
+        return promise;
+    }
 }
 }  // namespace NotificationNapi
 }  // namespace OHOS
