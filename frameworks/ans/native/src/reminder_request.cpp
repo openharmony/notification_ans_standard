@@ -953,8 +953,7 @@ bool ReminderRequest::Marshalling(Parcel &parcel) const
     }
 
     // write map
-    int32_t buttonMapSize = static_cast<int32_t>(actionButtonMap_.size());
-    if (!parcel.WriteInt32(buttonMapSize)) {
+    if (!parcel.WriteUint64(static_cast<uint64_t>(actionButtonMap_.size()))) {
         ANSR_LOGE("Failed to write action button size");
         return false;
     }
@@ -1084,12 +1083,12 @@ bool ReminderRequest::ReadFromParcel(Parcel &parcel)
     slotType_ = static_cast<NotificationConstant::SlotType>(slotType);
 
     // read map
-    int32_t buttonMapSize = 0;
-    if (!parcel.ReadInt32(buttonMapSize)) {
+    uint64_t buttonMapSize = 0;
+    if (!parcel.ReadUint64(buttonMapSize)) {
         ANSR_LOGE("Failed to read buttonMapSize");
         return false;
     }
-    for (int32_t i = 0; i < buttonMapSize; i++) {
+    for (uint64_t i = 0; i < buttonMapSize; i++) {
         uint8_t buttonType = static_cast<uint8_t>(ActionButtonType::INVALID);
         if (!parcel.ReadUint8(buttonType)) {
             ANSR_LOGE("Failed to read buttonType");
@@ -1453,12 +1452,12 @@ void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
         if (timeIntervalInMilli_ != 0) {
             // snooze the reminder by manual
             extendContent = GetShowTime(triggerTimeInMilli_) +
-                snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")");
+                (snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")"));
             notificationRequest_->SetTapDismissed(false);
         } else {
             // the reminder is expired now, when timeInterval is 0
             extendContent = GetShowTime(reminderTimeInMilli_) +
-                expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")");
+                (expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")"));
         }
     } else if (IsAlerting()) {
         // the reminder is alerting, or ring duration is 0
@@ -1466,12 +1465,12 @@ void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
     } else if (snoozeTimesDynamic_ != snoozeTimes_) {
         // the reminder is snoozing by period artithmetic, when the ring duration is over.
         extendContent = GetShowTime(triggerTimeInMilli_) +
-            snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")");
+            (snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")"));
         notificationRequest_->SetTapDismissed(false);
     } else {
         // the reminder has already snoozed by period arithmetic, when the ring duration is over.
         extendContent = GetShowTime(reminderTimeInMilli_) +
-            expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")");
+            (expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")"));
     }
     displayContent_ = content_ + " " + extendContent;
     ANSR_LOGD("Display content=%{public}s", displayContent_.c_str());

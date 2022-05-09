@@ -175,9 +175,9 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_002, Function | SmallTest | Level1)
     EXPECT_EQ((int)g_advancedNotificationService->Publish(label, req1), (int)ERR_OK);
     EXPECT_EQ((int)g_advancedNotificationService->Publish("testLabel1", req2), (int)ERR_OK);
     EXPECT_EQ((int)g_advancedNotificationService->GetActiveNotifications(notificationsReqs), (int)ERR_OK);
-    int num;
+    uint64_t num;
     g_advancedNotificationService->GetActiveNotificationNums(num);
-    EXPECT_EQ((int)num, (int)3);
+    EXPECT_EQ(num, 3);
     EXPECT_EQ((int)g_advancedNotificationService->Cancel(2, "testLabel1"), (int)ERR_OK);
     EXPECT_EQ((int)g_advancedNotificationService->GetAllActiveNotifications(notifications), (int)ERR_OK);
     EXPECT_EQ((int)notifications.size(), (int)2);
@@ -1748,7 +1748,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0107, Function | SmallTest | Level1)
     // remove request
     g_advancedNotificationService->Delete("_0_1_testLabel_0");
     g_advancedNotificationService->Delete("_0_1_testLabel_1");
-    int nums = -1;
+    uint64_t nums = 0;
     g_advancedNotificationService->GetActiveNotificationNums(nums);
     EXPECT_EQ(nums, 0);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);
@@ -1797,7 +1797,7 @@ HWTEST_F(AnsModuleTest, AnsModuleTest_0108, Function | SmallTest | Level1)
 
     // remove request
     g_advancedNotificationService->DeleteAllByUser(0);
-    int nums = -1;
+    uint64_t nums = 0;
     g_advancedNotificationService->GetActiveNotificationNums(nums);
     EXPECT_EQ(nums, 0);
     g_advancedNotificationService->Unsubscribe(subscriber->GetImpl(), subscriberInfo);

@@ -483,5 +483,79 @@ HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_NotificationSlotGroup_0030
     EXPECT_EQ((int)ERR_ANS_PREFERENCES_NOTIFICATION_SLOTGROUP_NOT_EXIST,
         NotificationHelper::GetNotificationSlotGroup("id", spSlotGroup));
 }
+
+/**
+ * @tc.number    : ANS_Interface_MT_SetEnabledForBundleSlot_00100
+ * @tc.name      : SetEnabledForBundleSlot_00100
+ * @tc.desc      : Add notification slot(type is SOCIAL_COMMUNICATION), get slot default enable,
+ * set and get slot enable.
+ * @tc.expected  : Add notification slot success, slot default enalbe is true, get is the same as setting.
+ */
+HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_SetEnabledForBundleSlot_00100, Function | MediumTest | Level1)
+{
+    NotificationSlot slot(NotificationConstant::SOCIAL_COMMUNICATION);
+    slot.SetEnableLight(true);
+    slot.SetDescription("description");
+    slot.SetLedLightColor(0);
+    slot.SetLevel(NotificationSlot::NotificationLevel::LEVEL_LOW);
+    slot.SetSlotGroup("group");
+    slot.SetSound(Uri("."));
+    std::vector<int64_t> style;
+    style.push_back(0);
+    slot.SetVibrationStyle(style);
+    slot.EnableBypassDnd(true);
+    slot.EnableBadge(true);
+    EXPECT_EQ(0, NotificationHelper::AddNotificationSlot(slot));
+    sptr<NotificationSlot> spSlot;
+    EXPECT_EQ(0, NotificationHelper::GetNotificationSlot(NotificationConstant::SOCIAL_COMMUNICATION, spSlot));
+    EXPECT_NE(spSlot, nullptr);
+    EXPECT_EQ(spSlot->GetEnable(), true);
+
+    bool enable = false;
+    NotificationBundleOption bo("bundleName", CALLING_UID);
+    EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::SOCIAL_COMMUNICATION, enable));
+    EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::SOCIAL_COMMUNICATION, enable));
+    EXPECT_EQ(enable, false);
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_SetEnabledForBundleSlot_00200
+ * @tc.name      : SetEnabledForBundleSlot_00200
+ * @tc.desc      : Add slot when there is no type slot, add it. (SOCIAL_COMMUNICATION)
+ * @tc.expected  : Set success, and get success.
+ */
+HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_SetEnabledForBundleSlot_00200, Function | MediumTest | Level1)
+{
+    bool enable = true;
+    NotificationBundleOption bo("bundleName", CALLING_UID);
+    EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::SOCIAL_COMMUNICATION, enable));
+    EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::SOCIAL_COMMUNICATION, enable));
+    EXPECT_EQ(enable, true);
+
+    sptr<NotificationSlot> spSlot;
+    EXPECT_EQ(0, NotificationHelper::GetNotificationSlot(NotificationConstant::SOCIAL_COMMUNICATION, spSlot));
+    EXPECT_NE(spSlot, nullptr);
+    EXPECT_EQ(spSlot->GetEnable(), true);
+}
+
+/**
+ * @tc.number    : ANS_Interface_MT_SetEnabledForBundleSlot_00300
+ * @tc.name      : SetEnabledForBundleSlot_00300
+ * @tc.desc      : Add slot when there is no type slot, add it. (SERVICE_REMINDER)
+ * @tc.expected  : Set false, and get false.
+ */
+HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_SetEnabledForBundleSlot_00300, Function | MediumTest | Level1)
+{
+    bool enable = false;
+    NotificationBundleOption bo("bundleName", CALLING_UID);
+    EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
+    EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
+    EXPECT_EQ(enable, false);
+
+    sptr<NotificationSlot> spSlot;
+    EXPECT_EQ(0, NotificationHelper::GetNotificationSlot(NotificationConstant::SERVICE_REMINDER, spSlot));
+    EXPECT_NE(spSlot, nullptr);
+    EXPECT_EQ(spSlot->GetEnable(), false);
+}
 }  // namespace Notification
 }  // namespace OHOS

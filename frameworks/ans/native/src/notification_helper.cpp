@@ -80,7 +80,7 @@ ErrCode NotificationHelper::GetNotificationSlotGroups(std::vector<sptr<Notificat
     return DelayedSingleton<AnsNotification>::GetInstance()->GetNotificationSlotGroups(groups);
 }
 
-ErrCode NotificationHelper::GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num)
+ErrCode NotificationHelper::GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, uint64_t &num)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetNotificationSlotNumAsBundle(bundleOption, num);
 }
@@ -115,7 +115,7 @@ ErrCode NotificationHelper::CancelAllNotifications()
     return DelayedSingleton<AnsNotification>::GetInstance()->CancelAllNotifications();
 }
 
-ErrCode NotificationHelper::GetActiveNotificationNums(int32_t &num)
+ErrCode NotificationHelper::GetActiveNotificationNums(uint64_t &num)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetActiveNotificationNums(num);
 }
@@ -402,6 +402,18 @@ ErrCode NotificationHelper::SetDoNotDisturbDate(const int32_t &userId,
 ErrCode NotificationHelper::GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate)
 {
     return DelayedSingleton<AnsNotification>::GetInstance()->GetDoNotDisturbDate(userId, doNotDisturbDate);
+}
+
+ErrCode NotificationHelper::SetEnabledForBundleSlot(
+    const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->SetEnabledForBundleSlot(bundleOption, slotType, enabled);
+}
+
+ErrCode NotificationHelper::GetEnabledForBundleSlot(
+    const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool &enabled)
+{
+    return DelayedSingleton<AnsNotification>::GetInstance()->GetEnabledForBundleSlot(bundleOption, slotType, enabled);
 }
 }  // namespace Notification
 }  // namespace OHOS

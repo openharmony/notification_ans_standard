@@ -100,7 +100,7 @@ public:
     virtual ErrCode init() = 0;
 
 protected:
-    static constexpr int MIN_ARGUMENT_NUMBER = 2;
+    static constexpr int32_t MIN_ARGUMENT_NUMBER = 2;
 
     int argc_;
     char **argv_;

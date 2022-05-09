@@ -22,6 +22,7 @@ namespace OHOS {
 namespace Notification {
 // Permission
 const std::string OHOS_PERMISSION_NOTIFICATION_CONTROLLER = "ohos.permission.NOTIFICATION_CONTROLLER";
+const std::string OHOS_PERMISSION_NOTIFICATION_AGENT_CONTROLLER = "ohos.permission.NOTIFICATION_AGENT_CONTROLLER";
 }  // namespace Notification
 }  // namespace OHOS
 

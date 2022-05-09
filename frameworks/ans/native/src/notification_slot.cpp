@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Notification {
-const int MAX_TEXT_LENGTH = 1000;
+const int32_t MAX_TEXT_LENGTH = 1000;
 
 NotificationSlot::NotificationSlot(NotificationConstant::SlotType type) : sound_("")
 {
@@ -200,6 +200,16 @@ void NotificationSlot::EnableBadge(bool isShowBadge)
     isShowBadge_ = isShowBadge;
 }
 
+void NotificationSlot::SetEnable(bool enabled)
+{
+    enabled_ = enabled;
+}
+
+bool NotificationSlot::GetEnable() const
+{
+    return enabled_;
+}
+
 std::string NotificationSlot::Dump() const
 {
     return "NotificationSlot{ "
@@ -217,6 +227,7 @@ std::string NotificationSlot::Dump() const
             ", vibration = " + MergeVectorToString(vibrationValues_) +
             ", isShowBadge = " + (isShowBadge_ ? "true" : "false") +
             ", groupId = " + groupId_ +
+            ", enabled = " + (enabled_ ? "true" : "false") +
             " }";
 }
 
@@ -303,6 +314,11 @@ bool NotificationSlot::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    if (!parcel.WriteBool(enabled_)) {
+        ANS_LOGE("Failed to write isShowBadge");
+        return false;
+    }
+
     return true;
 }
 
@@ -321,7 +337,7 @@ bool NotificationSlot::ReadFromParcel(Parcel &parcel)
     lockScreenVisibleness_ = static_cast<NotificationConstant::VisiblenessType>(parcel.ReadInt32());
     groupId_ = parcel.ReadString();
 
-    int empty = VALUE_NULL;
+    int32_t empty = VALUE_NULL;
     if (!parcel.ReadInt32(empty)) {
         ANS_LOGE("Failed to read int");
         return false;
@@ -332,6 +348,7 @@ bool NotificationSlot::ReadFromParcel(Parcel &parcel)
     }
 
     parcel.ReadInt64Vector(&vibrationValues_);
+    enabled_ = parcel.ReadBool();
     return true;
 }
 
