@@ -255,7 +255,7 @@ bool NotificationConversationalContent::ReadFromParcel(Parcel &parcel)
     messageUser_ = *pUser;
 
     auto vsize = parcel.ReadUint64();
-    for (auto it = 0; it < vsize; ++it) {
+    for (uint64_t it = 0; it < vsize; ++it) {
         auto valid = parcel.ReadBool();
         if (!valid) {
             ANS_LOGE("Invalid message, read from parcel failed");
