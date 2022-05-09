@@ -34,14 +34,5 @@ bool MockBundleMgrService::CheckIsSystemAppByUid(const int uid)
     }
     return (uid < SYSTEMAPP_UUID) ? false : true;
 }
-
-int MockBundleMgrService::CheckPermission(const std::string &bundleName, const std::string &permission)
-{
-    if (!bundleName.compare("hello")) {
-        return 0;
-    } else {
-        return -1;
-    }
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS
