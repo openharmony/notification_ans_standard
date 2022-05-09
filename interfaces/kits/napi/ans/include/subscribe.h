@@ -42,7 +42,7 @@ public:
      * @param deleteReason Indicates the reason for the deletion. For details, see NotificationConstant.
      */
     virtual void OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request,
-        const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) override;
+        const std::shared_ptr<NotificationSortingMap> &sortingMap, int32_t deleteReason) override;
 
     /**
      * @brief Called back when a notification is canceled.

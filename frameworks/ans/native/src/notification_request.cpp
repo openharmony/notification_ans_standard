@@ -1105,7 +1105,7 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
     }
 
     // write std::vector
-    if (!parcel.WriteInt32(static_cast<int32_t>(actionButtons_.size()))) {
+    if (!parcel.WriteUint64(actionButtons_.size())) {
         ANS_LOGE("Failed to write the size of actionButtons");
         return false;
     }
@@ -1117,7 +1117,7 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         }
     }
 
-    if (!parcel.WriteInt32(static_cast<int32_t>(messageUsers_.size()))) {
+    if (!parcel.WriteUint64(messageUsers_.size())) {
         ANS_LOGE("Failed to write the size of messageUsers");
         return false;
     }
@@ -1337,7 +1337,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
         }
     }
 
-    auto vsize = parcel.ReadInt32();
+    auto vsize = parcel.ReadUint64();
     for (auto it = 0; it < vsize; ++it) {
         auto member = parcel.ReadParcelable<NotificationActionButton>();
         if (member == nullptr) {
@@ -1348,7 +1348,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
         actionButtons_.emplace_back(member);
     }
 
-    vsize = parcel.ReadInt32();
+    vsize = parcel.ReadUint64();
     for (uint64_t it = 0; it < vsize; ++it) {
         auto member = parcel.ReadParcelable<MessageUser>();
         if (member == nullptr) {

@@ -17,15 +17,15 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    # "AddNotificationSlotGroups_fuzzer:AddNotificationSlotGroupsFuzzTest",
-    # "AddNotificationSlots_fuzzer:AddNotificationSlotsFuzzTest",
-    # "AddSlotByType_fuzzer:AddSlotByTypeFuzzTest",
-    # "GetNotificationSlotGroup_fuzzer:GetNotificationSlotGroupFuzzTest",
-    # "GetNotificationSlotNumAsBundle_fuzzer:GetNotificationSlotNumAsBundleFuzzTest",
-    # "GetNotificationSlot_fuzzer:GetNotificationSlotFuzzTest",
-    # "RemoveNotificationSlotGroup_fuzzer:RemoveNotificationSlotGroupFuzzTest",
-    # "RemoveNotificationSlot_fuzzer:RemoveNotificationSlotFuzzTest",
-    # "RemoveNotification_fuzzer:RemoveNotificationFuzzTest",
-    # "SetNotificationBadgeNum_fuzzer:SetNotificationBadgeNumFuzzTest",
+    "addnotificationslotgroups_fuzzer:AddNotificationSlotGroupsFuzzTest",
+    "addnotificationslots_fuzzer:AddNotificationSlotsFuzzTest",
+    "addslotbytype_fuzzer:AddSlotByTypeFuzzTest",
+    "getnotificationslot_fuzzer:GetNotificationSlotFuzzTest",
+    "getnotificationslotgroup_fuzzer:GetNotificationSlotGroupFuzzTest",
+    "getnotificationslotnumasbundle_fuzzer:GetNotificationSlotNumAsBundleFuzzTest",
+    "removenotification_fuzzer:RemoveNotificationFuzzTest",
+    "removenotificationslot_fuzzer:RemoveNotificationSlotFuzzTest",
+    "removenotificationslotgroup_fuzzer:RemoveNotificationSlotGroupFuzzTest",
+    "setnotificationbadgenum_fuzzer:SetNotificationBadgeNumFuzzTest",
   ]
 }

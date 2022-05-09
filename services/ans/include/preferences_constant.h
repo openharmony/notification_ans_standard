@@ -194,6 +194,11 @@ const static std::string KEY_SLOT_VIBRATION_STYLE = "vibrationSytle";
 const static std::string KEY_SLOT_ENABLE_BYPASS_DND = "enableBypassDnd";
 
 /**
+ * Indicates whether the type of slot is enabled.
+ */
+const static std::string KEY_SLOT_ENABLED = "enabled";
+
+/**
  * Indicates distributed database app id.
  */
 const std::string APP_ID = "advanced_notification_service";

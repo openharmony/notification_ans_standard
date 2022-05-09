@@ -144,7 +144,7 @@ public:
      * @param num Indicates to get slot num.
      * @return Return ERR_OK on success, others on failure.
      */
-    ErrCode GetNotificationSlotsNumForBundle(const sptr<NotificationBundleOption> &bundleOption, int &num);
+    ErrCode GetNotificationSlotsNumForBundle(const sptr<NotificationBundleOption> &bundleOption, uint64_t &num);
 
     /**
      * @brief Get notification group in a bundle from DB.
@@ -204,7 +204,7 @@ public:
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
     * @return Return ERR_OK on success, others on failure.
     */
-    ErrCode GetImportance(const sptr<NotificationBundleOption> &bundleOption, int &importance);
+    ErrCode GetImportance(const sptr<NotificationBundleOption> &bundleOption, int32_t &importance);
 
     /**
     * @brief Set importance in the of bunlde from DB.
@@ -214,7 +214,7 @@ public:
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
     * @return Return ERR_OK on success, others on failure.
     */
-    ErrCode SetImportance(const sptr<NotificationBundleOption> &bundleOption, const int &importance);
+    ErrCode SetImportance(const sptr<NotificationBundleOption> &bundleOption, const int32_t &importance);
 
     /**
      * @brief Get total badge nums in the of bunlde from DB.
@@ -223,7 +223,7 @@ public:
      * @param totalBadgeNum Indicates to get badge num.
      * @return Return ERR_OK on success, others on failure.
      */
-    ErrCode GetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, int &totalBadgeNum);
+    ErrCode GetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, int32_t &totalBadgeNum);
 
     /**
      * @brief Set total badge nums in the of bunlde from DB.
@@ -232,7 +232,7 @@ public:
      * @param totalBadgeNum Indicates to set badge num.
      * @return Return ERR_OK on success, others on failure.
      */
-    ErrCode SetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, const int num);
+    ErrCode SetTotalBadgeNums(const sptr<NotificationBundleOption> &bundleOption, const int32_t num);
 
     /**
      * @brief Get private notification allowed in the of bunlde from DB.

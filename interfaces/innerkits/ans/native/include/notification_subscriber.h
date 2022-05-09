@@ -46,7 +46,7 @@ public:
      * @param deleteReason Indicates the reason for the deletion. For details, see NotificationConstant.
      **/
     virtual void OnCanceled(const std::shared_ptr<Notification> &request,
-        const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason) = 0;
+        const std::shared_ptr<NotificationSortingMap> &sortingMap, int32_t deleteReason) = 0;
 
     /**
      * @brief Called back when the subscriber is connected to the Advanced Notification Service (ANS).
@@ -132,7 +132,7 @@ private:
         void OnCanceled(const sptr<Notification> &notification) override;
 
         void OnCanceled(const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap,
-            int deleteReason) override;
+            int32_t deleteReason) override;
 
         void OnUpdated(const sptr<NotificationSortingMap> &notificationMap) override;
 

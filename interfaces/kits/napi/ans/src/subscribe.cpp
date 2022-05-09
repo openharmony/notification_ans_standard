@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace NotificationNapi {
-const int SUBSRIBE_MAX_PARA = 3;
-const int NO_DELETE_REASON = -1;
+const int32_t SUBSRIBE_MAX_PARA = 3;
+const int32_t NO_DELETE_REASON = -1;
 const std::string CONSUME = "onConsume";
 const std::string CANCEL = "onCancel";
 const std::string UPDATE = "onUpdate";
@@ -39,15 +39,15 @@ struct NotificationReceiveDataWorker {
     std::shared_ptr<NotificationSortingMap> sortingMap;
     NotificationDoNotDisturbDate date;
     EnabledNotificationCallbackData callbackData;
-    int deleteReason = 0;
-    int result = 0;
-    int disturbMode = 0;
+    int32_t deleteReason = 0;
+    int32_t result = 0;
+    int32_t disturbMode = 0;
     SubscriberInstance *subscriber = nullptr;
 };
 
 napi_value SetSubscribeCallbackData(const napi_env &env,
     const std::shared_ptr<OHOS::Notification::Notification> &request,
-    const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason, napi_value &result)
+    const std::shared_ptr<NotificationSortingMap> &sortingMap, int32_t deleteReason, napi_value &result)
 {
     ANS_LOGI("enter");
     if (request == nullptr) {
@@ -81,7 +81,7 @@ napi_value SetSubscribeCallbackData(const napi_env &env,
     // reason?: number
     if (deleteReason != NO_DELETE_REASON) {
         napi_value value = nullptr;
-        int outReason = 0;
+        int32_t outReason = 0;
         if (!Common::ReasonCToJS(deleteReason, outReason)) {
             return Common::NapiGetBoolean(env, false);
         }
@@ -184,7 +184,7 @@ void UvQueueWorkOnCanceled(uv_work_t *work, int status)
 }
 
 void SubscriberInstance::OnCanceled(const std::shared_ptr<OHOS::Notification::Notification> &request,
-    const std::shared_ptr<NotificationSortingMap> &sortingMap, int deleteReason)
+    const std::shared_ptr<NotificationSortingMap> &sortingMap, int32_t deleteReason)
 {
     ANS_LOGI("enter");
 

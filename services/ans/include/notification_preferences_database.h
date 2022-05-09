@@ -38,7 +38,7 @@ public:
      * @return Return true on success, false on failure.
      */
     bool PutSlotsToDisturbeDB(
-        const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlot>> &slots);
+        const std::string &bundleName, const int32_t &bundleUid, const std::vector<sptr<NotificationSlot>> &slots);
 
     /**
      * @brief Put notification slot groups into disturbe DB.
@@ -48,8 +48,8 @@ public:
      * @param groups Indicates notification groups.
      * @return Return true on success, false on failure.
      */
-    bool PutGroupsToDisturbeDB(
-        const std::string &bundleName, const int &bundleUid, const std::vector<sptr<NotificationSlotGroup>> &groups);
+    bool PutGroupsToDisturbeDB(const std::string &bundleName, const int32_t &bundleUid,
+         const std::vector<sptr<NotificationSlotGroup>> &groups);
 
     /**
      * @brief Put notification bundle into disturbe DB.
@@ -76,7 +76,7 @@ public:
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
      * @return Return true on success, false on failure.
      */
-    bool PutImportance(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &importance);
+    bool PutImportance(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int32_t &importance);
 
     /**
      * @brief Put badge total nums in the of  bundle into disturbe DB.
@@ -85,7 +85,7 @@ public:
      * @param totalBadgeNum Indicates to total badge num.
      * @return Return true on success, false on failure.
      */
-    bool PutTotalBadgeNums(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int &totalBadgeNum);
+    bool PutTotalBadgeNums(const NotificationPreferencesInfo::BundleInfo &bundleInfo, const int32_t &totalBadgeNum);
 
     /**
      * @brief Put private notification allowed in the of  bundle into disturbe DB.
@@ -190,7 +190,7 @@ private:
     void CloseKvStore();
     bool CheckKvStore();
 
-    bool CheckBundle(const std::string &bundleName, const int &bundleUid);
+    bool CheckBundle(const std::string &bundleName, const int32_t &bundleUid);
     bool PutBundlePropertyValueToDisturbeDB(const NotificationPreferencesInfo::BundleInfo &bundleInfo);
     template <typename T>
     DistributedKv::Status PutBundlePropertyToDisturbeDB(
@@ -204,9 +204,9 @@ private:
     bool GetRemoveGroupKeysFromDisturbeDB(
         const std::string &bundleKey, const std::string &groupId, std::vector<DistributedKv::Key> &keys);
 
-    bool SlotToEntry(const std::string &bundleName, const int &bundleUid, const sptr<NotificationSlot> &slot,
+    bool SlotToEntry(const std::string &bundleName, const int32_t &bundleUid, const sptr<NotificationSlot> &slot,
         std::vector<DistributedKv::Entry> &entries);
-    bool GroupToEntry(const std::string &bundleName, const int &bundleUid, const sptr<NotificationSlotGroup> &group,
+    bool GroupToEntry(const std::string &bundleName, const int32_t &bundleUid, const sptr<NotificationSlotGroup> &group,
         std::vector<DistributedKv::Entry> &entries);
     void GenerateGroupEntry(const std::string &bundleKey, const sptr<NotificationSlotGroup> &group,
         std::vector<DistributedKv::Entry> &entries) const;
@@ -219,7 +219,7 @@ private:
     std::string SubUniqueIdentifyFromString(const std::string &findString, const std::string &keyStr) const;
     std::string VectorToString(const std::vector<int64_t> &data) const;
     void StringToVector(const std::string &str, std::vector<int64_t> &data) const;
-    int StringToInt(const std::string &str) const;
+    int32_t StringToInt(const std::string &str) const;
     int64_t StringToInt64(const std::string &str) const;
     bool IsSlotKey(const std::string &bundleKey, const std::string &key) const;
     bool IsGroupKey(const std::string &bundleKey, const std::string &key) const;
@@ -266,12 +266,13 @@ private:
     void ParseSlotSound(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotVibrationSytle(sptr<NotificationSlot> &slot, const std::string &value) const;
     void ParseSlotEnableBypassDnd(sptr<NotificationSlot> &slot, const std::string &value) const;
+    void ParseSlotEnabled(sptr<NotificationSlot> &slot, const std::string &value) const;
 
     std::string GenerateBundleLablel(const NotificationPreferencesInfo::BundleInfo &bundleInfo) const;
-    void GetDoNotDisturbType(NotificationPreferencesInfo &info, int userId);
-    void GetDoNotDisturbBeginDate(NotificationPreferencesInfo &info, int userId);
-    void GetDoNotDisturbEndDate(NotificationPreferencesInfo &info, int userId);
-    void GetEnableAllNotification(NotificationPreferencesInfo &info, int userId);
+    void GetDoNotDisturbType(NotificationPreferencesInfo &info, int32_t userId);
+    void GetDoNotDisturbBeginDate(NotificationPreferencesInfo &info, int32_t userId);
+    void GetDoNotDisturbEndDate(NotificationPreferencesInfo &info, int32_t userId);
+    void GetEnableAllNotification(NotificationPreferencesInfo &info, int32_t userId);
 
     static const std::map<std::string,
         std::function<void(NotificationPreferencesDatabase *, sptr<NotificationSlot> &, std::string &)>>

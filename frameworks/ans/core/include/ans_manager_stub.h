@@ -74,7 +74,7 @@ public:
      * @param label Indicates the label of the notification to cancel.
      * @return Returns cancel notification result.
      */
-    virtual ErrCode Cancel(int notificationId, const std::string &label) override;
+    virtual ErrCode Cancel(int32_t notificationId, const std::string &label) override;
 
     /**
      * @brief Cancels all the published notifications.
@@ -168,7 +168,7 @@ public:
      * @param num Indicates the number of slot.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, int &num) override;
+    virtual ErrCode GetSlotNumAsBundle(const sptr<NotificationBundleOption> &bundleOption, uint64_t &num) override;
 
     /**
      * @brief Deletes multiple notification slot groups.
@@ -193,7 +193,7 @@ public:
      * @param num Indicates the number of active notifications of the current application.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode GetActiveNotificationNums(int &num) override;
+    virtual ErrCode GetActiveNotificationNums(uint64_t &num) override;
 
     /**
      * @brief Obtains all active notifications in the current system. The caller must have system permissions to
@@ -267,7 +267,7 @@ public:
      * @param num Indicates the badge number.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode SetNotificationBadgeNum(int num) override;
+    virtual ErrCode SetNotificationBadgeNum(int32_t num) override;
 
     /**
      * @brief Obtains the importance level of this application.
@@ -276,7 +276,7 @@ public:
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode GetBundleImportance(int &importance) override;
+    virtual ErrCode GetBundleImportance(int32_t &importance) override;
 
     /**
      * @brief Checks whether this application has permission to modify the Do Not Disturb (DND) notification policy.
@@ -311,7 +311,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual ErrCode RemoveNotification(
-        const sptr<NotificationBundleOption> &bundleOption, int notificationId, const std::string &label) override;
+        const sptr<NotificationBundleOption> &bundleOption, int32_t notificationId, const std::string &label) override;
 
     /**
      * @brief Delete all notifications.
@@ -707,6 +707,10 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual ErrCode GetDoNotDisturbDate(const int32_t &userId, sptr<NotificationDoNotDisturbDate> &date) override;
+    virtual ErrCode SetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool enabled) override;
+    virtual ErrCode GetEnabledForBundleSlot(const sptr<NotificationBundleOption> &bundleOption,
+        const NotificationConstant::SlotType &slotType, bool &enabled) override;
 
 private:
     static const std::map<uint32_t, std::function<ErrCode(AnsManagerStub *, MessageParcel &, MessageParcel &)>>
@@ -786,6 +790,8 @@ private:
     ErrCode HandleDeleteAllByUser(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleSetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
     ErrCode HandleGetDoNotDisturbDateByUser(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleSetEnabledForBundleSlot(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetEnabledForBundleSlot(MessageParcel &data, MessageParcel &reply);
 
     template<typename T>
     bool WriteParcelableVector(const std::vector<sptr<T>> &parcelableVector, MessageParcel &reply, ErrCode &result);

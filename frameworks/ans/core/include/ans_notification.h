@@ -148,7 +148,7 @@ public:
      * @param num Indicates number of slot.
      * @return Returns get slot number by bundle result.
      */
-    ErrCode GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, int &num);
+    ErrCode GetNotificationSlotNumAsBundle(const NotificationBundleOption &bundleOption, uint64_t &num);
 
     /**
      * @brief Publishes a notification.
@@ -219,7 +219,7 @@ public:
      * @param num Indicates the number of active notifications of the current application.
      * @return Returns get active notification nums result.
      */
-    ErrCode GetActiveNotificationNums(int32_t &num);
+    ErrCode GetActiveNotificationNums(uint64_t &num);
 
     /**
      * @brief Obtains active notifications of the current application in the system.
@@ -815,6 +815,27 @@ public:
      */
     ErrCode GetDoNotDisturbDate(const int32_t &userId, NotificationDoNotDisturbDate &doNotDisturbDate);
 
+    /**
+     * Set whether the application slot is enabled.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param slotType Indicates type of slot.
+     * @param enable the type of slot enabled.
+     * @return Returns get slot number by bundle result.
+     */
+    ErrCode SetEnabledForBundleSlot(
+        const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool enabled);
+
+    /**
+     * Obtains whether the application slot is enabled.
+     *
+     * @param bundleOption Indicates the bundle name and uid of the application.
+     * @param slotType Indicates type of slot.
+     * @param enable the type of slot enabled to get.
+     * @return Returns get slot number by bundle result.
+     */
+    ErrCode GetEnabledForBundleSlot(
+        const NotificationBundleOption &bundleOption, const NotificationConstant::SlotType &slotType, bool &enabled);
 private:
     /**
      * @brief Gets Ans Manager proxy.
