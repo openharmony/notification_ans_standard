@@ -82,6 +82,19 @@ public:
     virtual ErrCode CancelAll() = 0;
 
     /**
+     * @brief Cancels a published agent notification.
+     *
+     * @param notificationId Indicates the unique notification ID in the application.
+     *                       The value must be the ID of a published notification.
+     *                       Otherwise, this method does not take effect.
+     * @param representativeBundle Indicates the name of application bundle your application is representing.
+     * @param userId Indicates the specific user.
+     * @return Returns cancel notification result.
+     */
+    virtual ErrCode CancelAsBundle(
+        int32_t notificationId, const std::string &representativeBundle, int32_t userId) = 0;
+
+    /**
      * @brief Adds a notification slot by type.
      *
      * @param slotType Indicates the notification slot type to be added.
@@ -709,6 +722,7 @@ protected:
         PUBLISH_NOTIFICATION_TO_DEVICE,
         CANCEL_NOTIFICATION,
         CANCEL_ALL_NOTIFICATIONS,
+        CANCEL_AS_BUNDLE,
         ADD_SLOT_BY_TYPE,
         ADD_SLOTS,
         REMOVE_SLOT_BY_TYPE,

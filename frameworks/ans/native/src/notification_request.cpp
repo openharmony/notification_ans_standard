@@ -203,6 +203,16 @@ void NotificationRequest::SetPermitSystemGeneratedContextualActionButtons(bool p
     permitted_ = permitted;
 }
 
+bool NotificationRequest::IsAgentNotification() const
+{
+    return isAgent_;
+}
+
+void NotificationRequest::SetIsAgentNotification(bool isAgent)
+{
+    isAgent_ = isAgent;
+}
+
 void NotificationRequest::AddMessageUser(const std::shared_ptr<MessageUser> &messageUser)
 {
     if (!messageUser) {
@@ -585,14 +595,24 @@ pid_t NotificationRequest::GetCreatorPid() const
     return creatorPid_;
 }
 
-void NotificationRequest::SetCreatorUid(pid_t uid)
+void NotificationRequest::SetCreatorUid(uid_t uid)
 {
     creatorUid_ = uid;
 }
 
-pid_t NotificationRequest::GetCreatorUid() const
+uid_t NotificationRequest::GetCreatorUid() const
 {
     return creatorUid_;
+}
+
+void NotificationRequest::SetOwnerUid(uid_t uid)
+{
+    ownerUid_ = uid;
+}
+
+uid_t NotificationRequest::GetOwnerUid() const
+{
+    return ownerUid_;
 }
 
 void NotificationRequest::SetLabel(const std::string &label)
@@ -635,6 +655,16 @@ int32_t NotificationRequest::GetCreatorUserId() const
     return creatorUserId_;
 }
 
+void NotificationRequest::SetOwnerUserId(int32_t userId)
+{
+    ownerUserId_ = userId;
+}
+
+int32_t NotificationRequest::GetOwnerUserId() const
+{
+    return ownerUserId_;
+}
+
 std::string NotificationRequest::Dump()
 {
     return "NotificationRequest{ "
@@ -645,7 +675,9 @@ std::string NotificationRequest::Dump()
             ", creatorBundleName = " + creatorBundleName_ +
             ", creatorPid = " + std::to_string(static_cast<int32_t>(creatorPid_)) +
             ", creatorUid = " + std::to_string(static_cast<int32_t>(creatorUid_)) +
-            ", ownerBundleName = " + ownerBundleName_ + ", groupName = " + groupName_ +
+            ", ownerBundleName = " + ownerBundleName_ +
+            ", ownerUid = " + std::to_string(static_cast<int32_t>(ownerUid_)) +
+            ", groupName = " + groupName_ +
             ", statusBarText = " + statusBarText_ + ", label = " + label_ + ", shortcutId = " + shortcutId_ +
             ", sortingKey = " + sortingKey_ +
             ", groupAlertType = " + std::to_string(static_cast<int32_t>(groupAlertType_)) +
@@ -667,6 +699,7 @@ std::string NotificationRequest::Dump()
             ", unremovable = " + (unremovable_ ? "true" : "false") +
             ", floatingIcon = " + (floatingIcon_ ? "true" : "false") +
             ", onlyLocal = " + (onlyLocal_ ? "true" : "false") + ", permitted = " + (permitted_ ? "true" : "false") +
+            ", isAgent = " + (isAgent_ ? "true" : "false") +
             ", removalWantAgent = " + (removalWantAgent_ ? "not null" : "null") +
             ", maxScreenWantAgent = " + (maxScreenWantAgent_ ? "not null" : "null") +
             ", additionalParams = " + (additionalParams_ ? "not null" : "null") +
@@ -681,6 +714,7 @@ std::string NotificationRequest::Dump()
             ", distributedOptions = " + distributedOptions_.Dump() +
             ", notificationFlags = " + (notificationFlags_ ? "not null" : "null") +
             ", creatorUserId = " + std::to_string(creatorUserId_) +
+            ", ownerUserId = " + std::to_string(ownerUserId_) +
             ", receiverUserId = " + std::to_string(receiverUserId_) +
             " }";
 }
@@ -848,8 +882,18 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    if (!parcel.WriteInt32(static_cast<int32_t>(ownerUid_))) {
+        ANS_LOGE("Failed to write owner uid");
+        return false;
+    }
+
     if (!parcel.WriteInt32(static_cast<int32_t>(creatorUserId_))) {
         ANS_LOGE("Failed to write creator userId");
+        return false;
+    }
+
+    if (!parcel.WriteInt32(static_cast<int32_t>(ownerUserId_))) {
+        ANS_LOGE("Failed to write owner userId");
         return false;
     }
 
@@ -994,6 +1038,11 @@ bool NotificationRequest::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(permitted_)) {
         ANS_LOGE("Failed to write flag indicating whether to allow the platform to \
             generate contextual NotificationActionButton objects");
+        return false;
+    }
+
+    if (!parcel.WriteBool(isAgent_)) {
+        ANS_LOGE("Failed to write flag indicating whether an agent notification");
         return false;
     }
 
@@ -1191,8 +1240,10 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     autoDeletedTime_ = parcel.ReadInt64();
 
     creatorPid_ = static_cast<pid_t>(parcel.ReadInt32());
-    creatorUid_ = static_cast<pid_t>(parcel.ReadInt32());
+    creatorUid_ = static_cast<uid_t>(parcel.ReadInt32());
+    ownerUid_ = static_cast<uid_t>(parcel.ReadInt32());
     creatorUserId_ = parcel.ReadInt32();
+    ownerUserId_ = parcel.ReadInt32();
     receiverUserId_ = parcel.ReadInt32();
 
     if (!parcel.ReadString(settingsText_)) {
@@ -1259,6 +1310,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     floatingIcon_ = parcel.ReadBool();
     onlyLocal_ = parcel.ReadBool();
     permitted_ = parcel.ReadBool();
+    isAgent_ = parcel.ReadBool();
 
     bool valid {false};
 
@@ -1444,8 +1496,11 @@ void NotificationRequest::CopyBase(const NotificationRequest &other)
 
     this->creatorPid_ = other.creatorPid_;
     this->creatorUid_ = other.creatorUid_;
+    this->ownerUid_ = other.ownerUid_;
     this->creatorUserId_ = other.creatorUserId_;
+    this->ownerUserId_ = other.ownerUserId_;
     this->receiverUserId_ = other.receiverUserId_;
+    this->isAgent_ = other.isAgent_;
 
     this->slotType_ = other.slotType_;
     this->settingsText_ = other.settingsText_;

@@ -278,6 +278,16 @@ ErrCode AnsNotification::CancelAllNotifications()
     return ansManagerProxy_->CancelAll();
 }
 
+ErrCode AnsNotification::CancelAsBundle(
+    int32_t notificationId, const std::string &representativeBundle, int32_t userId)
+{
+    if (!GetAnsManagerProxy()) {
+        ANS_LOGE("GetAnsManagerProxy fail.");
+        return ERR_ANS_SERVICE_NOT_CONNECTED;
+    }
+    return ansManagerProxy_->CancelAsBundle(notificationId, representativeBundle, userId);
+}
+
 ErrCode AnsNotification::GetActiveNotificationNums(uint64_t &num)
 {
     if (!GetAnsManagerProxy()) {
@@ -1312,7 +1322,7 @@ ErrCode AnsNotification::GetDoNotDisturbDate(const int32_t &userId, Notification
         ANS_LOGE("Input userId is invalid.");
         return ERR_ANS_INVALID_PARAM;
     }
-    
+
     if (!GetAnsManagerProxy()) {
         ANS_LOGE("GetAnsManagerProxy fail.");
         return ERR_ANS_SERVICE_NOT_CONNECTED;

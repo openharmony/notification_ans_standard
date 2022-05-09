@@ -214,6 +214,18 @@ public:
     ErrCode CancelAllNotifications();
 
     /**
+     * @brief Cancels a published agent notification.
+     *
+     * @param notificationId Indicates the unique notification ID in the application.
+     *                       The value must be the ID of a published notification.
+     *                       Otherwise, this method does not take effect.
+     * @param representativeBundle Indicates the name of application bundle your application is representing.
+     * @param userId Indicates the specific user.
+     * @return Returns cancel notification result.
+     */
+    ErrCode CancelAsBundle(int32_t notificationId, const std::string &representativeBundle, int32_t userId);
+
+    /**
      * @brief Obtains the number of active notifications of the current application in the system.
      *
      * @param num Indicates the number of active notifications of the current application.
