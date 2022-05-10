@@ -85,7 +85,6 @@ ohos_shared_library("ans_core") {
   public_configs = [ ":public_ans_core_config" ]
 
   deps = [
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
