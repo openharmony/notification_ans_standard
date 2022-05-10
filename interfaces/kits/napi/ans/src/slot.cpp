@@ -1034,7 +1034,7 @@ napi_value ParseParametersEnableSlot(
     // argv[3]:callback
     if (argc >= SET_ENABLE_SLOT_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valuetype));
-        if (valuetype == napi_function) {
+        if (valuetype != napi_function) {
             ANS_LOGW("Wrong argument type. Function expected.");
             return nullptr;
         }
@@ -1141,7 +1141,7 @@ napi_value ParseParametersIsEnableSlot(
     // argv[2]:callback
     if (argc >= GET_ENABLE_SLOT_MAX_PARA) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valuetype));
-        if (valuetype == napi_function) {
+        if (valuetype != napi_function) {
             ANS_LOGW("Wrong argument type. Function expected.");
             return nullptr;
         }
@@ -1185,7 +1185,9 @@ napi_value IsEnableNotificationSlot(napi_env env, napi_callback_info info)
             ANS_LOGI("IsEnableNotificationSlot napi_create_async_work end");
             auto asynccallbackinfo = static_cast<AsyncCallbackInfoInfoIsEnableSlot *>(data);
             if (asynccallbackinfo) {
-                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, Common::NapiGetNull(env));
+                napi_value result = nullptr;
+                napi_get_boolean(env, asynccallbackinfo->isEnable, &result);
+                Common::ReturnCallbackPromise(env, asynccallbackinfo->info, result);
                 if (asynccallbackinfo->info.callback != nullptr) {
                     napi_delete_reference(env, asynccallbackinfo->info.callback);
                 }
