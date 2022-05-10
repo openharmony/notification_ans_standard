@@ -29,7 +29,10 @@ config("ans_innerkits_public_config") {
     "//third_party/jsoncpp/include",
     "//utils/system/safwk/native/include",
   ]
-  configs = [ "//foundation/aafwk/standard/frameworks/kits/wantagent:wantagent_innerkits_public_config" ]
+  configs = [
+    "//foundation/aafwk/standard/frameworks/kits/wantagent:wantagent_innerkits_public_config",
+    "//foundation/multimedia/image_standard/interfaces/innerkits:image_external_config",
+  ]
 }
 
 ohos_shared_library("ans_innerkits") {
