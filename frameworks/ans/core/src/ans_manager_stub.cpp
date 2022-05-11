@@ -1796,7 +1796,7 @@ ErrCode AnsManagerStub::HandleGetEnabledForBundleSlot(MessageParcel &data, Messa
     NotificationConstant::SlotType slotType = static_cast<NotificationConstant::SlotType>(type);
 
     bool enabled = false;
-    ErrCode result = SetEnabledForBundleSlot(bundleOption, slotType, enabled);
+    ErrCode result = GetEnabledForBundleSlot(bundleOption, slotType, enabled);
     if (!reply.WriteInt32(result)) {
         ANS_LOGW("[HandleGetEnabledForBundleSlot] fail: write result failed, ErrCode=%{public}d", result);
         return ERR_ANS_PARCELABLE_FAILED;
