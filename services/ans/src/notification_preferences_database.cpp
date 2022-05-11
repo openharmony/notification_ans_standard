@@ -908,9 +908,9 @@ void NotificationPreferencesDatabase::ParseBundleFromDistureDB(
         ANS_LOGD("Bundle key is %{public}s.", GenerateBundleKey(bundleKey).c_str());
         NotificationPreferencesInfo::BundleInfo bunldeInfo;
         for (auto bundleEntry : bundleEntries) {
-            if (IsSlotKey(bundleKey, bundleEntry.key.ToString())) {
+            if (IsSlotKey(GenerateBundleKey(bundleKey), bundleEntry.key.ToString())) {
                 ParseSlotFromDisturbeDB(bunldeInfo, bundleKey, bundleEntry);
-            } else if (IsGroupKey(bundleKey, bundleEntry.key.ToString())) {
+            } else if (IsGroupKey(GenerateBundleKey(bundleKey), bundleEntry.key.ToString())) {
                 ParseGroupFromDisturbeDB(bunldeInfo, bundleKey, bundleEntry);
             } else {
                 ParseBundlePropertyFromDisturbeDB(bunldeInfo, bundleKey, bundleEntry);
