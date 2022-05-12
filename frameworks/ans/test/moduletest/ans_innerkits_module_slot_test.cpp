@@ -529,6 +529,7 @@ HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_SetEnabledForBundleSlot_00
     bool enable = true;
     NotificationBundleOption bo("bundleName", CALLING_UID);
     EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::SOCIAL_COMMUNICATION, enable));
+    enable = false;
     EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::SOCIAL_COMMUNICATION, enable));
     EXPECT_EQ(enable, true);
 
@@ -549,6 +550,7 @@ HWTEST_F(AnsInterfaceModuleSlotTest, ANS_Interface_MT_SetEnabledForBundleSlot_00
     bool enable = false;
     NotificationBundleOption bo("bundleName", CALLING_UID);
     EXPECT_EQ(0, NotificationHelper::SetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
+    enable = true;
     EXPECT_EQ(0, NotificationHelper::GetEnabledForBundleSlot(bo, NotificationConstant::SERVICE_REMINDER, enable));
     EXPECT_EQ(enable, false);
 
