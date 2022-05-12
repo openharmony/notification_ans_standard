@@ -214,7 +214,8 @@ ErrCode AdvancedNotificationService::PrepareNotificationRequest(const sptr<Notif
             return ERR_ANS_NON_SYSTEM_APP;
         }
 
-        if (!CheckPermission(OHOS_PERMISSION_NOTIFICATION_CONTROLLER)) {
+        if (!CheckPermission(OHOS_PERMISSION_NOTIFICATION_CONTROLLER) ||
+            !CheckPermission(OHOS_PERMISSION_NOTIFICATION_AGENT_CONTROLLER)) {
             return ERR_ANS_PERMISSION_DENIED;
         }
 
@@ -624,7 +625,8 @@ ErrCode AdvancedNotificationService::CancelAsBundle(
         return ERR_ANS_NON_SYSTEM_APP;
     }
 
-    if (!CheckPermission(OHOS_PERMISSION_NOTIFICATION_CONTROLLER)) {
+    if (!CheckPermission(OHOS_PERMISSION_NOTIFICATION_CONTROLLER) ||
+        !CheckPermission(OHOS_PERMISSION_NOTIFICATION_AGENT_CONTROLLER)) {
         return ERR_ANS_PERMISSION_DENIED;
     }
 
