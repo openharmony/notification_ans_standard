@@ -1638,7 +1638,7 @@ void NotificationRequest::ConvertJsonToNum(NotificationRequest *target, const nl
     }
 
     if (jsonObject.find("creatorUid") != jsonEnd) {
-        target->creatorUid_ = jsonObject.at("creatorUid").get<int32_t>();
+        target->creatorUid_ = jsonObject.at("creatorUid").get<uint32_t>();
     }
 
     if (jsonObject.find("creatorPid") != jsonEnd) {

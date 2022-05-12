@@ -220,7 +220,7 @@ ErrCode AdvancedNotificationService::PrepareNotificationRequest(const sptr<Notif
         }
 
         std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
-        uid_t uid = 0;
+        int32_t uid = -1;
         if (bundleManager != nullptr) {
             uid = bundleManager->GetDefaultUidByBundleName(request->GetOwnerBundleName(), request->GetOwnerUserId());
         }
@@ -407,7 +407,8 @@ ErrCode AdvancedNotificationService::PrepareNotificationInfo(
     }
 
     if (request->IsAgentNotification()) {
-        bundleOption = new NotificationBundleOption(request->GetOwnerBundleName(), request->GetOwnerUid());
+        bundleOption = new (std::nothrow) NotificationBundleOption(request->GetOwnerBundleName(),
+            request->GetOwnerUid());
     } else {
         bundleOption = GenerateBundleOption();
     }
@@ -630,7 +631,7 @@ ErrCode AdvancedNotificationService::CancelAsBundle(
         return ERR_ANS_PERMISSION_DENIED;
     }
 
-    uid_t uid = -1;
+    int32_t uid = -1;
     std::shared_ptr<BundleManagerHelper> bundleManager = BundleManagerHelper::GetInstance();
     if (bundleManager != nullptr) {
         uid = BundleManagerHelper::GetInstance()->GetDefaultUidByBundleName(representativeBundle, userId);
@@ -638,7 +639,8 @@ ErrCode AdvancedNotificationService::CancelAsBundle(
     if (uid < 0) {
         return ERR_ANS_INVALID_UID;
     }
-    sptr<NotificationBundleOption> bundleOption = new NotificationBundleOption(representativeBundle, uid);
+    sptr<NotificationBundleOption> bundleOption = new (std::nothrow) NotificationBundleOption(
+        representativeBundle, uid);
     return CancelPreparedNotification(notificationId, "", bundleOption);
 }
 
@@ -3452,7 +3454,7 @@ ErrCode AdvancedNotificationService::SetEnabledForBundleSlot(
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         sptr<NotificationSlot> slot;
-        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot);
+        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundle, slotType, slot);
         if (result == ERR_ANS_PREFERENCES_NOTIFICATION_SLOT_TYPE_NOT_EXIST ||
             result == ERR_ANS_PREFERENCES_NOTIFICATION_BUNDLE_NOT_EXIST) {
             slot = new (std::nothrow) NotificationSlot(slotType);
@@ -3465,7 +3467,7 @@ ErrCode AdvancedNotificationService::SetEnabledForBundleSlot(
             if (slot->GetEnable() == enabled) {
                 return;
             }
-            NotificationPreferences::GetInstance().RemoveNotificationSlot(bundleOption, slotType);
+            NotificationPreferences::GetInstance().RemoveNotificationSlot(bundle, slotType);
         } else {
             ANS_LOGE("Set enable slot: GetNotificationSlot failed");
             return;
@@ -3474,13 +3476,13 @@ ErrCode AdvancedNotificationService::SetEnabledForBundleSlot(
         slot->SetEnable(enabled);
         std::vector<sptr<NotificationSlot>> slots;
         slots.push_back(slot);
-        result = NotificationPreferences::GetInstance().AddNotificationSlots(bundleOption, slots);
+        result = NotificationPreferences::GetInstance().AddNotificationSlots(bundle, slots);
         if (result != ERR_OK) {
             ANS_LOGE("Set enable slot: AddNotificationSlot failed");
             return;
         }
 
-        PublishSlotChangeCommonEvent(bundleOption, slotType);
+        PublishSlotChangeCommonEvent(bundle, slotType);
     }));
     return result;
 }
@@ -3506,7 +3508,7 @@ ErrCode AdvancedNotificationService::GetEnabledForBundleSlot(
     ErrCode result = ERR_OK;
     handler_->PostSyncTask(std::bind([&]() {
         sptr<NotificationSlot> slot;
-        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundleOption, slotType, slot);
+        result = NotificationPreferences::GetInstance().GetNotificationSlot(bundle, slotType, slot);
         if (result != ERR_OK) {
             ANS_LOGE("Get enable slot: GetNotificationSlot failed");
             return;
@@ -3535,7 +3537,7 @@ bool AdvancedNotificationService::PublishSlotChangeCommonEvent(
     want.SetParam("SlotType", slotType);
     want.SetAction("EventFwk::CommonEventSupport::COMMON_EVENT_SLOT_CHANGE");
     EventFwk::CommonEventData commonData {want};
-    if (EventFwk::CommonEventManager::PublishCommonEvent(commonData) != ERR_OK) {
+    if (!EventFwk::CommonEventManager::PublishCommonEvent(commonData)) {
         ANS_LOGE("PublishCommonEvent failed");
         return false;
     }
