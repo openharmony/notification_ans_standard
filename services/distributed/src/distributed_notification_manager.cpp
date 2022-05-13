@@ -143,7 +143,7 @@ void DistributedNotificationManager::OnDatabaseInsert(
         }
 
         sptr<NotificationRequest> request =
-            NotificationJsonConverter::ConvertFromJosnString<NotificationRequest>(value);
+            NotificationJsonConverter::ConvertFromJsonString<NotificationRequest>(value);
         if (request == nullptr) {
             ANS_LOGE("convert json to request failed. key:%{public}s", key.c_str());
             return;
@@ -169,7 +169,7 @@ void DistributedNotificationManager::OnDatabaseUpdate(
         }
 
         sptr<NotificationRequest> request =
-            NotificationJsonConverter::ConvertFromJosnString<NotificationRequest>(value);
+            NotificationJsonConverter::ConvertFromJsonString<NotificationRequest>(value);
         if (request == nullptr) {
             ANS_LOGE("convert json to request failed. key:%{public}s", key.c_str());
             return;
@@ -284,7 +284,7 @@ ErrCode DistributedNotificationManager::Publish(
     }
 
     std::string value;
-    if (!NotificationJsonConverter::ConvertToJosnString(request, value)) {
+    if (!NotificationJsonConverter::ConvertToJsonString(request, value)) {
         ANS_LOGE("convert request to json failed. key:%{public}s", key.c_str());
         return ERR_ANS_DISTRIBUTED_OPERATION_FAILED;
     }
@@ -308,7 +308,7 @@ ErrCode DistributedNotificationManager::Update(
     }
 
     std::string value;
-    if (!NotificationJsonConverter::ConvertToJosnString(request, value)) {
+    if (!NotificationJsonConverter::ConvertToJsonString(request, value)) {
         ANS_LOGE("convert request to json failed. key:%{public}s", key.c_str());
         return ERR_ANS_DISTRIBUTED_OPERATION_FAILED;
     }
@@ -384,7 +384,7 @@ ErrCode DistributedNotificationManager::GetCurrentDistributedNotification(
         }
 
         sptr<NotificationRequest> request =
-            NotificationJsonConverter::ConvertFromJosnString<NotificationRequest>(index.value.ToString());
+            NotificationJsonConverter::ConvertFromJsonString<NotificationRequest>(index.value.ToString());
         if (request == nullptr) {
             ANS_LOGE("convert json to request failed. key:%{public}s", index.key.ToString().c_str());
             continue;

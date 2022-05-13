@@ -38,10 +38,10 @@ ErrCode NotificationSlotFilter::OnPublish(const std::shared_ptr<NotificationReco
         }
 
         if (record->slot->CanVibrate()) {
-            record->notification->SetEnableViration(true);
+            record->notification->SetEnableVibration(true);
             record->notification->SetVibrationStyle(record->slot->GetVibrationStyle());
         } else {
-            record->notification->SetEnableViration(false);
+            record->notification->SetEnableVibration(false);
         }
 
         auto sound = record->slot->GetSound();

@@ -101,7 +101,7 @@ bool NotificationConversationalContent::ToJson(nlohmann::json &jsonObject) const
     }
 
     nlohmann::json userObj;
-    if (!NotificationJsonConverter::ConvertToJosn(&messageUser_, userObj)) {
+    if (!NotificationJsonConverter::ConvertToJson(&messageUser_, userObj)) {
         ANS_LOGE("Cannot convert messageUser to JSON");
         return false;
     }
@@ -117,7 +117,7 @@ bool NotificationConversationalContent::ToJson(nlohmann::json &jsonObject) const
         }
 
         nlohmann::json msgObj;
-        if (!NotificationJsonConverter::ConvertToJosn(msg.get(), msgObj)) {
+        if (!NotificationJsonConverter::ConvertToJson(msg.get(), msgObj)) {
             ANS_LOGE("Cannot convert conversationalMessage to JSON");
             return false;
         }
@@ -146,7 +146,7 @@ NotificationConversationalContent *NotificationConversationalContent::FromJson(c
     const auto &jsonEnd = jsonObject.cend();
     if (jsonObject.find("messageUser") != jsonEnd) {
         auto userObj = jsonObject.at("messageUser");
-        auto pUser = NotificationJsonConverter::ConvertFromJosn<MessageUser>(userObj);
+        auto pUser = NotificationJsonConverter::ConvertFromJson<MessageUser>(userObj);
         if (pUser != nullptr) {
             pContent->messageUser_ = *pUser;
 
@@ -158,7 +158,7 @@ NotificationConversationalContent *NotificationConversationalContent::FromJson(c
     if (jsonObject.find("messages") != jsonEnd) {
         nlohmann::json msgsArr = jsonObject.at("messages");
         for (auto &msgObj : msgsArr) {
-            auto pMsg = NotificationJsonConverter::ConvertFromJosn<NotificationConversationalMessage>(msgObj);
+            auto pMsg = NotificationJsonConverter::ConvertFromJson<NotificationConversationalMessage>(msgObj);
             if (pMsg == nullptr) {
                 ANS_LOGE("Failed to parse message ");
 

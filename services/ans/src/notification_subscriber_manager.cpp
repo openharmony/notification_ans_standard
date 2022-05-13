@@ -76,10 +76,10 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
             return ERR_ANS_INVALID_PARAM;
         }
 
-        ANS_LOGD("Get userId successed, callingUid = <%{public}d> userId = <%{public}d>", callingUid, userId);
+        ANS_LOGD("Get userId succeeded, callingUid = <%{public}d> userId = <%{public}d>", callingUid, userId);
         subInfo->AddAppUserId(userId);
     }
-    
+
     ErrCode result = ERR_ANS_TASK_ERR;
     handler_->PostSyncTask(std::bind([this, &subscriber, &subInfo, &result]() {
         result = this->AddSubscriberInner(subscriber, subInfo);
