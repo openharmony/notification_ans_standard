@@ -71,7 +71,7 @@ bool NotificationConversationalMessage::ToJson(nlohmann::json &jsonObject) const
     jsonObject["text"]        = text_;
 
     nlohmann::json userObj;
-    if (!NotificationJsonConverter::ConvertToJosn(&sender_, userObj)) {
+    if (!NotificationJsonConverter::ConvertToJson(&sender_, userObj)) {
         ANS_LOGE("Cannot convert sender to JSON");
         return false;
     }
@@ -107,7 +107,7 @@ NotificationConversationalMessage *NotificationConversationalMessage::FromJson(c
 
     if (jsonObject.find("sender") != jsonEnd) {
         auto userObj = jsonObject.at("sender");
-        auto pUser   = NotificationJsonConverter::ConvertFromJosn<MessageUser>(userObj);
+        auto pUser   = NotificationJsonConverter::ConvertFromJson<MessageUser>(userObj);
         if (pUser != nullptr) {
             pMessage->sender_ = *pUser;
 
