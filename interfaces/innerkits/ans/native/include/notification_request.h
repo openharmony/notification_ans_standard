@@ -24,10 +24,10 @@
 #include "notification_flags.h"
 #include "notification_json_convert.h"
 #include "notification_template.h"
-#include "ohos/aafwk/content/want_params.h"
 #include "parcel.h"
 #include "pixel_map.h"
 #include "want_agent.h"
+#include "want_params.h"
 
 namespace OHOS {
 namespace Notification {
