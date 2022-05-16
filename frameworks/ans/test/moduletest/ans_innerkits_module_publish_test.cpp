@@ -20,6 +20,7 @@
 #include "advanced_notification_service.h"
 #include "datetime_ex.h"
 #include "if_system_ability_manager.h"
+#include "int_wrapper.h"
 #include "iservice_registry.h"
 #include "notification_helper.h"
 #include "notification_json_convert.h"
@@ -29,7 +30,6 @@
 #include "want_agent_info.h"
 #include "want_agent_helper.h"
 #include "want_params.h"
-#include "ohos/aafwk/base/int_wrapper.h"
 
 using namespace testing::ext;
 namespace OHOS {

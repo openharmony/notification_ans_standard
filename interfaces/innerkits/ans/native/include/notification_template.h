@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 #include "parcel.h"
-#include "ohos/aafwk/content/want_params.h"
+#include "want_params.h"
 
 namespace OHOS {
 namespace Notification {
