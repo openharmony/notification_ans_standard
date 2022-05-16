@@ -1390,7 +1390,7 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     }
 
     auto vsize = parcel.ReadUint64();
-    for (auto it = 0; it < vsize; ++it) {
+    for (uint64_t it = 0; it < vsize; ++it) {
         auto member = parcel.ReadParcelable<NotificationActionButton>();
         if (member == nullptr) {
             ANS_LOGE("Failed to read actionButton");

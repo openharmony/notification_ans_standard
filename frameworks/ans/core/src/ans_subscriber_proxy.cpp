@@ -33,7 +33,7 @@ ErrCode AnsSubscriberProxy::InnerTransact(
 {
     auto remote = Remote();
     if (remote == nullptr) {
-        ANS_LOGW("[InnerTransact] fail: get Remote fail code %{public}u", code);
+        ANS_LOGE("[InnerTransact] fail: get Remote fail code %{public}u", code);
         return ERR_DEAD_OBJECT;
     }
 
@@ -43,11 +43,11 @@ ErrCode AnsSubscriberProxy::InnerTransact(
             return ERR_OK;
         }
         case DEAD_OBJECT: {
-            ANS_LOGW("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
+            ANS_LOGE("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
             return ERR_DEAD_OBJECT;
         }
         default: {
-            ANS_LOGW("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
+            ANS_LOGE("[InnerTransact] fail: ipcErr=%{public}d code %{public}d", err, code);
             return ERR_ANS_TRANSACT_FAILED;
         }
     }
@@ -57,7 +57,7 @@ void AnsSubscriberProxy::OnConnected()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnConnected] fail: write interface token failed.");
+        ANS_LOGE("[OnConnected] fail: write interface token failed.");
         return;
     }
 
@@ -65,7 +65,7 @@ void AnsSubscriberProxy::OnConnected()
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_CONNECTED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnConnected] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnConnected] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -74,7 +74,7 @@ void AnsSubscriberProxy::OnDisconnected()
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnDisconnected] fail: write interface token failed.");
+        ANS_LOGE("[OnDisconnected] fail: write interface token failed.");
         return;
     }
 
@@ -82,7 +82,7 @@ void AnsSubscriberProxy::OnDisconnected()
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_DISCONNECTED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnDisconnected] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnDisconnected] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -90,18 +90,18 @@ void AnsSubscriberProxy::OnDisconnected()
 void AnsSubscriberProxy::OnConsumed(const sptr<Notification> &notification)
 {
     if (notification == nullptr) {
-        ANS_LOGW("[OnConsumed] fail: notification is nullptr.");
+        ANS_LOGE("[OnConsumed] fail: notification is nullptr.");
         return;
     }
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnConsumed] fail: write interface token failed.");
+        ANS_LOGE("[OnConsumed] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteParcelable(notification)) {
-        ANS_LOGW("[OnConsumed] fail: write notification failed.");
+        ANS_LOGE("[OnConsumed] fail: write notification failed.");
         return;
     }
 
@@ -109,7 +109,7 @@ void AnsSubscriberProxy::OnConsumed(const sptr<Notification> &notification)
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_CONSUMED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnConsumed] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnConsumed] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -118,29 +118,29 @@ void AnsSubscriberProxy::OnConsumed(
     const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap)
 {
     if (notification == nullptr) {
-        ANS_LOGW("[OnConsumed] fail: notification is nullptr.");
+        ANS_LOGE("[OnConsumed] fail: notification is nullptr.");
         return;
     }
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnConsumed] fail: write interface token failed.");
+        ANS_LOGE("[OnConsumed] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteParcelable(notification)) {
-        ANS_LOGW("[OnConsumed] fail: write notification failed.");
+        ANS_LOGE("[OnConsumed] fail: write notification failed.");
         return;
     }
 
     if (!data.WriteBool(notificationMap != nullptr)) {
-        ANS_LOGW("[OnConsumed] fail: write existMap failed");
+        ANS_LOGE("[OnConsumed] fail: write existMap failed");
         return;
     }
 
     if (notificationMap != nullptr) {
         if (!data.WriteParcelable(notificationMap)) {
-            ANS_LOGW("[OnConsumed] fail: write notificationMap failed");
+            ANS_LOGE("[OnConsumed] fail: write notificationMap failed");
             return;
         }
     }
@@ -149,7 +149,7 @@ void AnsSubscriberProxy::OnConsumed(
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_CONSUMED_MAP, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnConsumed] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnConsumed] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -157,18 +157,18 @@ void AnsSubscriberProxy::OnConsumed(
 void AnsSubscriberProxy::OnCanceled(const sptr<Notification> &notification)
 {
     if (notification == nullptr) {
-        ANS_LOGW("[OnCanceled] fail: notification is nullptr.");
+        ANS_LOGE("[OnCanceled] fail: notification is nullptr.");
         return;
     }
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnCanceled] fail: write interface token failed.");
+        ANS_LOGE("[OnCanceled] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteParcelable(notification)) {
-        ANS_LOGW("[OnCanceled] fail: write notification failed.");
+        ANS_LOGE("[OnCanceled] fail: write notification failed.");
         return;
     }
 
@@ -176,7 +176,7 @@ void AnsSubscriberProxy::OnCanceled(const sptr<Notification> &notification)
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_CANCELED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnCanceled] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnCanceled] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -185,35 +185,35 @@ void AnsSubscriberProxy::OnCanceled(
     const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap, int32_t deleteReason)
 {
     if (notification == nullptr) {
-        ANS_LOGW("[OnCanceled] fail: notification is nullptr.");
+        ANS_LOGE("[OnCanceled] fail: notification is nullptr.");
         return;
     }
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnCanceled] fail: write interface token failed.");
+        ANS_LOGE("[OnCanceled] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteParcelable(notification)) {
-        ANS_LOGW("[OnCanceled] fail: write notification failed.");
+        ANS_LOGE("[OnCanceled] fail: write notification failed.");
         return;
     }
 
     if (!data.WriteBool(notificationMap != nullptr)) {
-        ANS_LOGW("[OnCanceled] fail: write existMap failed");
+        ANS_LOGE("[OnCanceled] fail: write existMap failed");
         return;
     }
 
     if (notificationMap != nullptr) {
         if (!data.WriteParcelable(notificationMap)) {
-            ANS_LOGW("[OnCanceled] fail: write notificationMap failed");
+            ANS_LOGE("[OnCanceled] fail: write notificationMap failed");
             return;
         }
     }
 
     if (!data.WriteInt32(deleteReason)) {
-        ANS_LOGW("[OnCanceled] fail: write deleteReason failed.");
+        ANS_LOGE("[OnCanceled] fail: write deleteReason failed.");
         return;
     }
 
@@ -221,7 +221,7 @@ void AnsSubscriberProxy::OnCanceled(
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_CANCELED_MAP, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnCanceled] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnCanceled] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -229,18 +229,18 @@ void AnsSubscriberProxy::OnCanceled(
 void AnsSubscriberProxy::OnUpdated(const sptr<NotificationSortingMap> &notificationMap)
 {
     if (notificationMap == nullptr) {
-        ANS_LOGW("[OnUpdated] fail: notificationMap is empty.");
+        ANS_LOGE("[OnUpdated] fail: notificationMap is empty.");
         return;
     }
 
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnUpdated] fail: write interface token failed.");
+        ANS_LOGE("[OnUpdated] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteParcelable(notificationMap)) {
-        ANS_LOGW("[OnUpdated] fail: write notificationMap failed.");
+        ANS_LOGE("[OnUpdated] fail: write notificationMap failed.");
         return;
     }
 
@@ -248,7 +248,7 @@ void AnsSubscriberProxy::OnUpdated(const sptr<NotificationSortingMap> &notificat
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_UPDATED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnUpdated] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnUpdated] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -257,12 +257,12 @@ void AnsSubscriberProxy::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDi
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnDoNotDisturbDateChange] fail: write interface token failed.");
+        ANS_LOGE("[OnDoNotDisturbDateChange] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteParcelable(date)) {
-        ANS_LOGW("[OnDoNotDisturbDateChange] fail: write date failed");
+        ANS_LOGE("[OnDoNotDisturbDateChange] fail: write date failed");
         return;
     }
 
@@ -270,7 +270,7 @@ void AnsSubscriberProxy::OnDoNotDisturbDateChange(const sptr<NotificationDoNotDi
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_DND_DATE_CHANGED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnDoNotDisturbDateChange] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnDoNotDisturbDateChange] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
@@ -279,12 +279,12 @@ void AnsSubscriberProxy::OnEnabledNotificationChanged(const sptr<EnabledNotifica
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(AnsSubscriberProxy::GetDescriptor())) {
-        ANS_LOGW("[OnEnabledNotificationChanged] fail: write interface token failed.");
+        ANS_LOGE("[OnEnabledNotificationChanged] fail: write interface token failed.");
         return;
     }
 
     if (!data.WriteParcelable(callbackData)) {
-        ANS_LOGW("[OnEnabledNotificationChanged] fail: write callbackData failed");
+        ANS_LOGE("[OnEnabledNotificationChanged] fail: write callbackData failed");
         return;
     }
 
@@ -292,7 +292,7 @@ void AnsSubscriberProxy::OnEnabledNotificationChanged(const sptr<EnabledNotifica
     MessageOption option = {MessageOption::TF_ASYNC};
     ErrCode result = InnerTransact(ON_ENABLED_NOTIFICATION_CHANGED, option, data, reply);
     if (result != ERR_OK) {
-        ANS_LOGW("[OnEnabledNotificationChanged] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
+        ANS_LOGE("[OnEnabledNotificationChanged] fail: transact ErrCode=ERR_ANS_TRANSACT_FAILED");
         return;
     }
 }
