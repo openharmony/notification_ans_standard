@@ -189,21 +189,5 @@ Status AnsTestSingleKvStore::UnsubscribeWithQuery(const std::vector<std::string>
 {
     return Status::SUCCESS;
 }
-
-Status AnsTestSingleKvStore::GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
-                                                std::shared_ptr<KvStoreSnapshot> &snapshot) const
-{
-    return Status::NOT_SUPPORT;
-}
-
-Status AnsTestSingleKvStore::ReleaseKvStoreSnapshot(std::shared_ptr<KvStoreSnapshot> &snapshot)
-{
-    return Status::NOT_SUPPORT;
-}
-
-Status AnsTestSingleKvStore::Clear()
-{
-    return Status::NOT_SUPPORT;
-}
 }  // namespace DistributedKv
 }  // namespace OHOS
