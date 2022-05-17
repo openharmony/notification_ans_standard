@@ -174,17 +174,6 @@ Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
-                                                std::shared_ptr<KvStoreSnapshot> &snapshot) const
-{
-    return Status::NOT_SUPPORT;
-}
-
-Status AnsTestSingleKvStore::ReleaseKvStoreSnapshot(std::shared_ptr<KvStoreSnapshot> &snapshot)
-{
-    return Status::NOT_SUPPORT;
-}
-
 Status AnsTestSingleKvStore::SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
     const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback)
 {
@@ -199,11 +188,6 @@ Status AnsTestSingleKvStore::SubscribeWithQuery(const std::vector<std::string> &
 Status AnsTestSingleKvStore::UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
 {
     return Status::SUCCESS;
-}
-
-Status AnsTestSingleKvStore::Clear()
-{
-    return Status::NOT_SUPPORT;
 }
 }  // namespace DistributedKv
 }  // namespace OHOS
