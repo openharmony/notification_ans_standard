@@ -42,7 +42,7 @@ public:
      * @param jsonObject Indicates the json object.
      * @return Returns true if the conversion is successful; returns false otherwise.
      */
-    static bool ConvertToJosn(const NotificationJsonConvertionBase *convertionBase, nlohmann::json &jsonObject)
+    static bool ConvertToJson(const NotificationJsonConvertionBase *convertionBase, nlohmann::json &jsonObject)
     {
         if (convertionBase == nullptr) {
             ANS_LOGE("Converter : Invalid base object");
@@ -59,7 +59,7 @@ public:
      * @param jsonString Indicates the json string.
      * @return Returns true if the conversion is successful; returns false otherwise.
      */
-    static bool ConvertToJosnString(const NotificationJsonConvertionBase *convertionBase, std::string &jsonString)
+    static bool ConvertToJsonString(const NotificationJsonConvertionBase *convertionBase, std::string &jsonString)
     {
         if (convertionBase == nullptr) {
             ANS_LOGE("Converter : Invalid base object");
@@ -83,7 +83,7 @@ public:
      * @return Returns the subclass object.
      */
     template <typename T>
-    static T *ConvertFromJosn(const nlohmann::json &jsonObject)
+    static T *ConvertFromJson(const nlohmann::json &jsonObject)
     {
         if (jsonObject.is_null() or !jsonObject.is_object()) {
             ANS_LOGE("Converter : Invalid JSON object");
@@ -100,7 +100,7 @@ public:
      * @return Returns the subclass object.
      */
     template <typename T>
-    static T *ConvertFromJosnString(const std::string &jsonString)
+    static T *ConvertFromJsonString(const std::string &jsonString)
     {
         if (jsonString.empty()) {
             ANS_LOGE("Converter : Invalid JSON string");

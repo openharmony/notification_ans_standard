@@ -122,7 +122,7 @@ bool NotificationContent::ToJson(nlohmann::json &jsonObject) const
     }
 
     nlohmann::json contentObj;
-    if (!NotificationJsonConverter::ConvertToJosn(content_.get(), contentObj)) {
+    if (!NotificationJsonConverter::ConvertToJson(content_.get(), contentObj)) {
         ANS_LOGE("Cannot convert content to JSON");
         return false;
     }
@@ -258,19 +258,19 @@ bool NotificationContent::ConvertJsonToContent(NotificationContent *target, cons
     NotificationBasicContent *pBasicContent {nullptr};
     switch (target->contentType_) {
         case NotificationContent::Type::BASIC_TEXT:
-            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationNormalContent>(contentObj);
+            pBasicContent = NotificationJsonConverter::ConvertFromJson<NotificationNormalContent>(contentObj);
             break;
         case NotificationContent::Type::CONVERSATION:
-            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationConversationalContent>(contentObj);
+            pBasicContent = NotificationJsonConverter::ConvertFromJson<NotificationConversationalContent>(contentObj);
             break;
         case NotificationContent::Type::LONG_TEXT:
-            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationLongTextContent>(contentObj);
+            pBasicContent = NotificationJsonConverter::ConvertFromJson<NotificationLongTextContent>(contentObj);
             break;
         case NotificationContent::Type::MULTILINE:
-            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationMultiLineContent>(contentObj);
+            pBasicContent = NotificationJsonConverter::ConvertFromJson<NotificationMultiLineContent>(contentObj);
             break;
         case NotificationContent::Type::PICTURE:
-            pBasicContent = NotificationJsonConverter::ConvertFromJosn<NotificationPictureContent>(contentObj);
+            pBasicContent = NotificationJsonConverter::ConvertFromJson<NotificationPictureContent>(contentObj);
             break;
         default:
             ANS_LOGE("Invalid contentType");

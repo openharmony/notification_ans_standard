@@ -909,28 +909,28 @@ public:
      *
      * @param uid Indicates the UID of the notification creator.
      */
-    void SetCreatorUid(uid_t uid);
+    void SetCreatorUid(int32_t uid);
 
     /**
      * @brief Obtains the UID of the notification creator.
      *
      * @return Returns the UID of the notification creator.
      */
-    uid_t GetCreatorUid() const;
+    int32_t GetCreatorUid() const;
 
     /**
      * @brief Sets the UID of the notification owner.
      *
      * @param uid the UID of the notification owner.
      */
-    void SetOwnerUid(uid_t uid);
+    void SetOwnerUid(int32_t uid);
 
     /**
      * @brief Obtains the UID of the notification owner.
      *
      * @return the UID of the notification owner.
      */
-    uid_t GetOwnerUid() const;
+    int32_t GetOwnerUid() const;
 
     /**
      * @brief Sets the label of this notification.
@@ -1144,8 +1144,8 @@ private:
     int64_t autoDeletedTime_ {0};
 
     pid_t creatorPid_ {0};
-    uid_t creatorUid_ {0};
-    uid_t ownerUid_ {0};
+    int32_t creatorUid_ {0};
+    int32_t ownerUid_ {0};
     int32_t creatorUserId_ {SUBSCRIBE_USER_INIT};
     int32_t ownerUserId_ {SUBSCRIBE_USER_INIT};
     int32_t receiverUserId_ {SUBSCRIBE_USER_INIT};

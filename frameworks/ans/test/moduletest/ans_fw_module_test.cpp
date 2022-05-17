@@ -659,7 +659,7 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | L
         if (i < MAX_ACTIVE_NUM_PERSECOND) {
             EXPECT_EQ(NotificationHelper::PublishNotification(req), ERR_OK);
         } else {
-            EXPECT_EQ(NotificationHelper::PublishNotification(req), (int)ERR_ANS_OVER_MAX_ACITVE_PERSECOND);
+            EXPECT_EQ(NotificationHelper::PublishNotification(req), (int)ERR_ANS_OVER_MAX_ACTIVE_PERSECOND);
         }
     }
     SleepForFC();
@@ -701,11 +701,11 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_FlowControl_00100, Function | MediumTest | L
 
 /**
  *
- * @tc.number    : ANS_FW_MT_RemoveNotificaitonsByKey_00100
- * @tc.name      : RemoveNotificaitonsByKey_00100
+ * @tc.number    : ANS_FW_MT_RemoveNotificationsByKey_00100
+ * @tc.name      : RemoveNotificationsByKey_00100
  * @tc.desc      : Remove Notification by key.
  */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00100, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificationsByKey_00100, Function | MediumTest | Level1)
 {
     TestAnsSubscriber subscriber;
     NotificationSubscribeInfo info;
@@ -747,11 +747,11 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00100, Function | M
 
 /**
  *
- * @tc.number    : ANS_FW_MT_RemoveNotificaitonsByKey_00200
- * @tc.name      : RemoveNotificaitonsByKey_00200
+ * @tc.number    : ANS_FW_MT_RemoveNotificationsByKey_00200
+ * @tc.name      : RemoveNotificationsByKey_00200
  * @tc.desc      : Remove Notification by a nonexistent key.
  */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00200, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificationsByKey_00200, Function | MediumTest | Level1)
 {
     TestAnsSubscriber subscriber;
     NotificationSubscribeInfo info;
@@ -790,11 +790,11 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitonsByKey_00200, Function | M
 
 /**
  *
- * @tc.number    : ANS_FW_MT_RemoveNotificaitons_00100
- * @tc.name      : RemoveNotificaitons_00100
+ * @tc.number    : ANS_FW_MT_RemoveNotifications_00100
+ * @tc.name      : RemoveNotifications_00100
  * @tc.desc      : Remove all Notifications.
  */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00100, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotifications_00100, Function | MediumTest | Level1)
 {
     TestAnsSubscriber subscriber;
     NotificationSubscribeInfo info;
@@ -840,11 +840,11 @@ HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00100, Function | Medium
 
 /**
  *
- * @tc.number    : ANS_FW_MT_RemoveNotificaitons_00200
- * @tc.name      : RemoveNotificaitons_00200
+ * @tc.number    : ANS_FW_MT_RemoveNotifications_00200
+ * @tc.name      : RemoveNotifications_00200
  * @tc.desc      : Remove Notifications when no Notification.
  */
-HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotificaitons_00200, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_FW_MT_RemoveNotifications_00200, Function | MediumTest | Level1)
 {
     EventParser eventParser;
     TestAnsSubscriber subscriber;
@@ -1968,7 +1968,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00100, Function | Me
     ANS_LOGI("%{public}s", test_info_->name());
     NotificationRequest request = CreateDistributedRequest(test_info_->name());
     std::string jsonString;
-    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+    NotificationJsonConverter::ConvertToJsonString(&request, jsonString);
 
     DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
     DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
@@ -2029,7 +2029,7 @@ HWTEST_F(AnsFWModuleTest, DistributedNotification_Subscribe_00200, Function | Me
     request.SetOwnerBundleName(APP_NAME);
     request.SetCreatorBundleName(APP_NAME);
     std::string jsonString;
-    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+    NotificationJsonConverter::ConvertToJsonString(&request, jsonString);
 
     DistributedKv::AppId appId = {.appId = KVSTORE_APP_ID};
     DistributedKv::StoreId storeId = {.storeId = KVSTORE_NOTIFICATION_STORE_ID};
@@ -2244,7 +2244,7 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00500, Function | MediumTest | Lev
     request.SetCreatorBundleName(APP_NAME);
     request.SetDevicesSupportDisplay(devices);
     std::string jsonString;
-    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+    NotificationJsonConverter::ConvertToJsonString(&request, jsonString);
 
     PublishCommonEventScreenStatus(true);
 
@@ -2289,7 +2289,7 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00600, Function | MediumTest | Lev
     request.SetCreatorBundleName(APP_NAME);
     request.SetDevicesSupportDisplay(devices);
     std::string jsonString;
-    NotificationJsonConverter::ConvertToJosnString(&request, jsonString);
+    NotificationJsonConverter::ConvertToJsonString(&request, jsonString);
 
     PublishCommonEventScreenStatus(false);
 
@@ -2319,7 +2319,7 @@ HWTEST_F(AnsFWModuleTest, DefaultRemindPolicy_00600, Function | MediumTest | Lev
 }
 #endif
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07100, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07100, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -2358,7 +2358,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07100, Function
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07200, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07200, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -2399,7 +2399,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07200, Function
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07300, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07300, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -2439,7 +2439,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07300, Function
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07400, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07400, Function | MediumTest | Level1)
 {
     std::shared_ptr<NotificationNormalContent> implContent = std::make_shared<NotificationNormalContent>();
     std::shared_ptr<NotificationContent> content = std::make_shared<NotificationContent>(implContent);
@@ -2449,7 +2449,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07400, Function
     EXPECT_EQ(NotificationHelper::PublishContinuousTaskNotification(req), (int)ERR_ANS_NOT_SYSTEM_SERVICE);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07500, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07500, Function | MediumTest | Level1)
 {
     TestAnsSubscriber subscriber;
     NotificationSubscribeInfo info;
@@ -2485,7 +2485,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07500, Function
     SleepForFC();
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07600, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07600, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -2515,7 +2515,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07600, Function
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07700, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07700, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
@@ -2557,7 +2557,7 @@ HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07700, Function
     IPCSkeleton::SetCallingUid(1);
 }
 
-HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PulbishContinuousTask_07800, Function | MediumTest | Level1)
+HWTEST_F(AnsFWModuleTest, ANS_Interface_MT_PublishContinuousTask_07800, Function | MediumTest | Level1)
 {
     IPCSkeleton::SetCallingUid(SYSTEM_SERVICE_UID);
     TestAnsSubscriber subscriber;
