@@ -54,6 +54,9 @@ ohos_shared_library("libans") {
   defines = []
 
   deps = [
+    ":downloadTemplate.abc",
+    ":downloadTemplate.js",
+    ":external.json",
     "${core_path}:ans_core",
     "${frameworks_path}/ans/dialog/dialog_ui/js:dialog_js_files_etc",
     "${frameworks_path}/ans/native:ans_innerkits",
@@ -85,6 +88,28 @@ ohos_shared_library("libans") {
   ]
   external_deps += ans_standard_external_deps
 
+  subsystem_name = "notification"
+  part_name = "ans_standard"
+}
+
+ohos_prebuilt_etc("external.json") {
+  source =
+      "//base/notification/ans_standard/services/ans/resource/external.json"
+  relative_install_dir = "notification_template"
+  subsystem_name = "notification"
+  part_name = "ans_standard"
+}
+
+ohos_prebuilt_etc("downloadTemplate.abc") {
+  source = "//base/notification/ans_standard/services/ans/resource/downloadTemplate.abc"
+  relative_install_dir = "notification_template/assets/js"
+  subsystem_name = "notification"
+  part_name = "ans_standard"
+}
+
+ohos_prebuilt_etc("downloadTemplate.js") {
+  source = "//base/notification/ans_standard/services/ans/resource/downloadTemplate.js"
+  relative_install_dir = "notification_template/assets/js"
   subsystem_name = "notification"
   part_name = "ans_standard"
 }
