@@ -333,28 +333,6 @@ public:
      */
     virtual Status UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
 
-    /**
-     * @brief Release snapshot created by calling GetKvStoreSnapshot.
-     *
-     * @return Indicates the status of this operation.
-     */
-    Status GetKvStoreSnapshot(std::shared_ptr<KvStoreObserver> observer,
-                              std::shared_ptr<KvStoreSnapshot> &snapshot) const override;
-
-    /**
-     * @brief Release snapshot created by calling GetKvStoreSnapshot.
-     *
-     * @return Indicates the status of this operation.
-     */
-    Status ReleaseKvStoreSnapshot(std::shared_ptr<KvStoreSnapshot> &snapshot) override;
-
-    /**
-     * @brief Clear the object.
-     *
-     * @return Indicates the status of this operation.
-     */
-    Status Clear() override;
-
 public:
     /**
      * @brief Mock insert into kv store.
