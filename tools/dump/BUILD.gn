@@ -50,7 +50,7 @@ ohos_executable("anm") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_image_standard:image_native",
-    "native_appdatamgr:native_rdb",
+    "relational_store:native_rdb",
   ]
   external_deps += ans_standard_external_deps
 

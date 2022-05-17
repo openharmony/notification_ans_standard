@@ -77,9 +77,9 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
-    "native_appdatamgr:native_appdatafwk",
-    "native_appdatamgr:native_dataability",
-    "native_appdatamgr:native_rdb",
+    "relational_store:native_appdatafwk",
+    "dataability:native_dataability",
+    "relational_store:native_rdb",
     "samgr_standard:samgr_proxy",
   ]
 }

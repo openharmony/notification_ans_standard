@@ -38,7 +38,7 @@ ohos_benchmarktest("Benchmark_Publish_Test") {
     "ability_base:zuri",
     "ability_runtime:wantagent_innerkits",
     "multimedia_image_standard:image_native",
-    "native_appdatamgr:native_rdb",
+    "relational_store:native_rdb",
   ]
   subsystem_name = "notification"
   part_name = "ans_standard"
