@@ -45,7 +45,7 @@ ohos_benchmarktest("Benchmark_Notification_Servece_Test") {
     "ability_runtime:wantagent_innerkits",
     "common_event_service:cesfwk_innerkits",
     "multimedia_image_standard:image_native",
-    "native_appdatamgr:native_rdb",
+    "relational_store:native_rdb",
   ]
   subsystem_name = "notification"
   part_name = "ans_standard"

@@ -71,7 +71,7 @@ ohos_shared_library("reminderagent") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
-    "native_appdatamgr:native_rdb",
+    "relational_store:native_rdb",
   ]
 
   relative_install_dir = "module"
