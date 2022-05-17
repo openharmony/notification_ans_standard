@@ -40,7 +40,7 @@ Notification::Notification(const Notification &other)
 {
     enableSound_ = other.enableSound_;
     enableLight_ = other.enableLight_;
-    enableViration_ = other.enableViration_;
+    enableVibration_ = other.enableVibration_;
     key_ = other.key_;
     ledLightColor_ = other.ledLightColor_;
     lockscreenVisibleness_ = other.lockscreenVisibleness_;
@@ -69,7 +69,7 @@ bool Notification::EnableSound() const
 
 bool Notification::EnableVibrate() const
 {
-    return enableViration_;
+    return enableVibration_;
 }
 
 std::string Notification::GetBundleName() const
@@ -145,7 +145,7 @@ Uri Notification::GetSound() const
     return Uri("");
 }
 
-uid_t Notification::GetUid() const
+int32_t Notification::GetUid() const
 {
     if (request_ == nullptr) {
         return 0;
@@ -230,8 +230,8 @@ bool Notification::MarshallingBool(Parcel &parcel) const
         return false;
     }
 
-    if (!parcel.WriteBool(enableViration_)) {
-        ANS_LOGE("Can't write enableViration_");
+    if (!parcel.WriteBool(enableVibration_)) {
+        ANS_LOGE("Can't write enableVibration_");
         return false;
     }
 
@@ -344,8 +344,8 @@ void Notification::ReadFromParcelBool(Parcel &parcel)
     // Read enableSound_
     enableSound_ = parcel.ReadBool();
 
-    // Read enableViration_
-    enableViration_ = parcel.ReadBool();
+    // Read enableVibration_
+    enableVibration_ = parcel.ReadBool();
 
     // Read isRemoveAllowed_
     isRemoveAllowed_ = parcel.ReadBool();
@@ -427,9 +427,9 @@ void Notification::SetEnableLight(const bool &enable)
     enableLight_ = enable;
 }
 
-void Notification::SetEnableViration(const bool &enable)
+void Notification::SetEnableVibration(const bool &enable)
 {
-    enableViration_ = enable;
+    enableVibration_ = enable;
 }
 
 void Notification::SetLedLightColor(const int32_t &color)

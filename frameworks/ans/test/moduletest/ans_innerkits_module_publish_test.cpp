@@ -501,34 +501,34 @@ void AnsInterfaceModulePublishTest::WaitOnUnsubscribeResult()
 void AnsInterfaceModulePublishTest::CheckJsonConverter(const NotificationRequest *request)
 {
     nlohmann::json jsonObject;
-    auto ret0 = NotificationJsonConverter::ConvertToJosn(request, jsonObject);
+    auto ret0 = NotificationJsonConverter::ConvertToJson(request, jsonObject);
     EXPECT_EQ(ret0, true);
-    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosn object dump ==========>" << jsonObject.dump();
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJson object dump ==========>" << jsonObject.dump();
 
     std::string jsonString;
-    auto ret1 = NotificationJsonConverter::ConvertToJosnString(request, jsonString);
-    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosnString ret1 ==========>"
+    auto ret1 = NotificationJsonConverter::ConvertToJsonString(request, jsonString);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJsonString ret1 ==========>"
         << (ret1 ? "true" : "false");
     EXPECT_EQ(ret1, true);
-    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosnString string ==========>" << jsonString;
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJsonString string ==========>" << jsonString;
 
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::convert Json sleep start ==========>";
     sleep(SLEEP_TIME);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::convert Json sleep end ==========>";
 
-    auto pRequest1 = NotificationJsonConverter::ConvertFromJosn<NotificationRequest>(jsonObject);
+    auto pRequest1 = NotificationJsonConverter::ConvertFromJson<NotificationRequest>(jsonObject);
     EXPECT_NE(pRequest1, nullptr);
-    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertFromJosn jsonObject dump request ==========>"
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertFromJson jsonObject dump request ==========>"
         << pRequest1->Dump();
 
-    auto pRequest2 = NotificationJsonConverter::ConvertFromJosnString<NotificationRequest>(jsonString);
+    auto pRequest2 = NotificationJsonConverter::ConvertFromJsonString<NotificationRequest>(jsonString);
     EXPECT_NE(pRequest2, nullptr);
-    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertFromJosnString jsonString dump request ==========>"
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertFromJsonString jsonString dump request ==========>"
         << pRequest2->Dump();
 
     nlohmann::json jsonObject2;
-    auto ret2 = NotificationJsonConverter::ConvertToJosn(pRequest1, jsonObject2);
-    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJosn ret2 ==========>" << (ret2 ? "true" : "false");
+    auto ret2 = NotificationJsonConverter::ConvertToJson(pRequest1, jsonObject2);
+    GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::ConvertToJson ret2 ==========>" << (ret2 ? "true" : "false");
     EXPECT_EQ(ret2, true);
     GTEST_LOG_(INFO) << "ANS_Interface_MT_Publish_08000::FromJson -> ToJson object dump ==========>"
         << jsonObject2.dump();

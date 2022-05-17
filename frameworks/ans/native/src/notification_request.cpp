@@ -595,22 +595,22 @@ pid_t NotificationRequest::GetCreatorPid() const
     return creatorPid_;
 }
 
-void NotificationRequest::SetCreatorUid(uid_t uid)
+void NotificationRequest::SetCreatorUid(int32_t uid)
 {
     creatorUid_ = uid;
 }
 
-uid_t NotificationRequest::GetCreatorUid() const
+int32_t NotificationRequest::GetCreatorUid() const
 {
     return creatorUid_;
 }
 
-void NotificationRequest::SetOwnerUid(uid_t uid)
+void NotificationRequest::SetOwnerUid(int32_t uid)
 {
     ownerUid_ = uid;
 }
 
-uid_t NotificationRequest::GetOwnerUid() const
+int32_t NotificationRequest::GetOwnerUid() const
 {
     return ownerUid_;
 }
@@ -1240,8 +1240,8 @@ bool NotificationRequest::ReadFromParcel(Parcel &parcel)
     autoDeletedTime_ = parcel.ReadInt64();
 
     creatorPid_ = static_cast<pid_t>(parcel.ReadInt32());
-    creatorUid_ = static_cast<uid_t>(parcel.ReadInt32());
-    ownerUid_ = static_cast<uid_t>(parcel.ReadInt32());
+    creatorUid_ = parcel.ReadInt32();
+    ownerUid_ = parcel.ReadInt32();
     creatorUserId_ = parcel.ReadInt32();
     ownerUserId_ = parcel.ReadInt32();
     receiverUserId_ = parcel.ReadInt32();
@@ -1560,7 +1560,7 @@ bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
 
     nlohmann::json contentObj;
     if (notificationContent_) {
-        if (!NotificationJsonConverter::ConvertToJosn(notificationContent_.get(), contentObj)) {
+        if (!NotificationJsonConverter::ConvertToJson(notificationContent_.get(), contentObj)) {
             ANS_LOGE("Cannot convert notificationContent to JSON");
             return false;
         }
@@ -1574,7 +1574,7 @@ bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
         }
 
         nlohmann::json btnObj;
-        if (!NotificationJsonConverter::ConvertToJosn(btn.get(), btnObj)) {
+        if (!NotificationJsonConverter::ConvertToJson(btn.get(), btnObj)) {
             ANS_LOGE("Cannot convert actionButton to JSON");
             return false;
         }
@@ -1594,7 +1594,7 @@ bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
     jsonObject["largeIcon"] = AnsImageUtil::PackImage(bigIcon_);
 
     nlohmann::json optObj;
-    if (!NotificationJsonConverter::ConvertToJosn(&distributedOptions_, optObj)) {
+    if (!NotificationJsonConverter::ConvertToJson(&distributedOptions_, optObj)) {
         ANS_LOGE("Cannot convert distributedOptions to JSON");
         return false;
     }
@@ -1602,7 +1602,7 @@ bool NotificationRequest::ConvertObjectsToJson(nlohmann::json &jsonObject) const
 
     if (notificationFlags_) {
         nlohmann::json flagsObj;
-        if (!NotificationJsonConverter::ConvertToJosn(notificationFlags_.get(), flagsObj)) {
+        if (!NotificationJsonConverter::ConvertToJson(notificationFlags_.get(), flagsObj)) {
             ANS_LOGE("Cannot convert notificationFlags to JSON");
             return false;
         }
@@ -1787,7 +1787,7 @@ bool NotificationRequest::ConvertJsonToNotificationContent(
     if (jsonObject.find("content") != jsonEnd) {
         auto contentObj = jsonObject.at("content");
         if (!contentObj.is_null()) {
-            auto pContent = NotificationJsonConverter::ConvertFromJosn<NotificationContent>(contentObj);
+            auto pContent = NotificationJsonConverter::ConvertFromJson<NotificationContent>(contentObj);
             if (pContent == nullptr) {
                 ANS_LOGE("Failed to parse notification content!");
                 return false;
@@ -1813,7 +1813,7 @@ bool NotificationRequest::ConvertJsonToNotificationActionButton(
     if (jsonObject.find("actionButtons") != jsonEnd) {
         auto buttonArr = jsonObject.at("actionButtons");
         for (auto &btnObj : buttonArr) {
-            auto pBtn = NotificationJsonConverter::ConvertFromJosn<NotificationActionButton>(btnObj);
+            auto pBtn = NotificationJsonConverter::ConvertFromJson<NotificationActionButton>(btnObj);
             if (pBtn == nullptr) {
                 ANS_LOGE("Failed to parse actionButton!");
                 return false;
@@ -1839,7 +1839,7 @@ bool NotificationRequest::ConvertJsonToNotificationDistributedOptions(
     if (jsonObject.find("distributedOptions") != jsonEnd) {
         auto optObj = jsonObject.at("distributedOptions");
         if (!optObj.is_null()) {
-            auto pOpt = NotificationJsonConverter::ConvertFromJosn<NotificationDistributedOptions>(optObj);
+            auto pOpt = NotificationJsonConverter::ConvertFromJson<NotificationDistributedOptions>(optObj);
             if (pOpt == nullptr) {
                 ANS_LOGE("Failed to parse distributedOptions!");
                 return false;
@@ -1865,7 +1865,7 @@ bool NotificationRequest::ConvertJsonToNotificationFlags(
     if (jsonObject.find("notificationFlags") != jsonEnd) {
         auto flagsObj = jsonObject.at("notificationFlags");
         if (!flagsObj.is_null()) {
-            auto pFlags = NotificationJsonConverter::ConvertFromJosn<NotificationFlags>(flagsObj);
+            auto pFlags = NotificationJsonConverter::ConvertFromJson<NotificationFlags>(flagsObj);
             if (pFlags == nullptr) {
                 ANS_LOGE("Failed to parse notificationFlags!");
                 return false;

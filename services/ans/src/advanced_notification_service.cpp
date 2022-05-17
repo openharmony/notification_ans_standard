@@ -361,7 +361,7 @@ ErrCode AdvancedNotificationService::AssignToNotificationList(const std::shared_
         if (record->request->IsAlertOneTime()) {
             record->notification->SetEnableLight(false);
             record->notification->SetEnableSound(false);
-            record->notification->SetEnableViration(false);
+            record->notification->SetEnableVibration(false);
         }
         UpdateInNotificationList(record);
     }
@@ -1783,7 +1783,7 @@ ErrCode AdvancedNotificationService::PublishContinuousTaskNotification(const spt
             if (record->request->IsAlertOneTime()) {
                 record->notification->SetEnableLight(false);
                 record->notification->SetEnableSound(false);
-                record->notification->SetEnableViration(false);
+                record->notification->SetEnableVibration(false);
             }
             UpdateInNotificationList(record);
         }
@@ -2079,7 +2079,7 @@ ErrCode AdvancedNotificationService::FlowControl(const std::shared_ptr<Notificat
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     RemoveExpired(flowControlTimestampList_, now);
     if (flowControlTimestampList_.size() >= MAX_ACTIVE_NUM_PERSECOND) {
-        return ERR_ANS_OVER_MAX_ACITVE_PERSECOND;
+        return ERR_ANS_OVER_MAX_ACTIVE_PERSECOND;
     }
 
     flowControlTimestampList_.push_back(now);
@@ -3003,7 +3003,7 @@ void AdvancedNotificationService::OnDistributedUpdate(
             if (record->request->IsAlertOneTime()) {
                 record->notification->SetEnableLight(false);
                 record->notification->SetEnableSound(false);
-                record->notification->SetEnableViration(false);
+                record->notification->SetEnableVibration(false);
             }
             UpdateInNotificationList(record);
         }

@@ -128,7 +128,7 @@ public:
     std::string GetKey() const;
 
     /**
-     * @brief Obtains the notificanton request set by ANS.
+     * @brief Obtains the notification request set by ANS.
      *
      * @return Returns NotificationRequest object.
      */
@@ -153,7 +153,7 @@ public:
      *
      * @return Returns the UID of the notification creator.
      */
-    uid_t GetUid() const;
+    int32_t GetUid() const;
 
     /**
      * @brief Obtains the PID of the notification creator.
@@ -248,7 +248,7 @@ private:
     Notification();
     void SetEnableSound(const bool &enable);
     void SetEnableLight(const bool &enable);
-    void SetEnableViration(const bool &enable);
+    void SetEnableVibration(const bool &enable);
     void SetLedLightColor(const int32_t &color);
     void SetLockScreenVisbleness(const NotificationConstant::VisiblenessType &visbleness);
     void SetPostTime(const int64_t &time);
@@ -274,7 +274,7 @@ private:
 private:
     bool enableSound_ {false};
     bool enableLight_ {false};
-    bool enableViration_ {false};
+    bool enableVibration_ {false};
     bool isRemoveAllowed_ {true};
     std::string key_ {""};
     std::string deviceId_ {""};
