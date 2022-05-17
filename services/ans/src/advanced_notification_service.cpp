@@ -30,6 +30,7 @@
 #include "ans_permission_def.h"
 #include "bundle_manager_helper.h"
 #include "common_event_manager.h"
+#include "common_event_support.h"
 #include "display_manager.h"
 #include "ipc_skeleton.h"
 #include "notification_constant.h"
@@ -3533,7 +3534,7 @@ bool AdvancedNotificationService::PublishSlotChangeCommonEvent(
     want.SetElement(element);
     want.SetParam(AppExecFwk::Constants::UID, bundleOption->GetUid());
     want.SetParam("SlotType", slotType);
-    want.SetAction("EventFwk::CommonEventSupport::COMMON_EVENT_SLOT_CHANGE");
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SLOT_CHANGE);
     EventFwk::CommonEventData commonData {want};
     if (!EventFwk::CommonEventManager::PublishCommonEvent(commonData)) {
         ANS_LOGE("PublishCommonEvent failed");
