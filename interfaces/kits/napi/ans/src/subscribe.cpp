@@ -851,17 +851,6 @@ void SubscriberInstance::SetDisturbDateCallbackInfo(const napi_env &env, const n
     disturbDateCallbackInfo_.ref = ref;
 }
 
-bool SubscriberInstance::SetObjectDeleting(bool status)
-{
-    std::lock_guard<std::mutex> lock(delMutex_);
-    if (isDelete_ && isDelete_ == status) {
-        return false;
-    } else {
-        isDelete_ = status;
-        return true;
-    }
-}
-
 void SubscriberInstance::SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref)
 {
     if (type == CONSUME) {
@@ -1081,6 +1070,7 @@ bool DelSubscriberInstancesInfo(const napi_env &env, SubscriberInstance *subscri
             if ((*it).ref != nullptr) {
                 napi_delete_reference(env, (*it).ref);
             }
+            DelDeletingSubscriber((*it).subscriber);
             delete (*it).subscriber;
             (*it).subscriber = nullptr;
             subscriberInstances_.erase(it);
@@ -1246,6 +1236,27 @@ napi_value Subscribe(napi_env env, napi_callback_info info)
         return Common::NapiGetNull(env);
     } else {
         return promise;
+    }
+}
+
+bool AddDeletingSubscriber(SubscriberInstance *subscriber)
+{
+    std::lock_guard<std::mutex> lock(delMutex_);
+    auto iter = std::find(DeletingSubscriber.begin(), DeletingSubscriber.end(), subscriber);
+    if (iter != DeletingSubscriber.end()) {
+        return false;
+    }
+
+    DeletingSubscriber.push_back(subscriber);
+    return true;
+}
+
+void DelDeletingSubscriber(SubscriberInstance *subscriber)
+{
+    std::lock_guard<std::mutex> lock(delMutex_);
+    auto iter = std::find(DeletingSubscriber.begin(), DeletingSubscriber.end(), subscriber);
+    if (iter != DeletingSubscriber.end()) {
+        DeletingSubscriber.erase(iter);
     }
 }
 }  // namespace NotificationNapi
