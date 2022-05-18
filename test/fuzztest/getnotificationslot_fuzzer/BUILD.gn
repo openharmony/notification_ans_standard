@@ -20,8 +20,7 @@ module_output_path = "ans_standard/services"
 ##############################fuzztest##########################################
 ohos_fuzztest("GetNotificationSlotFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//base/notification/ans_standard/test/fuzztest/getnotificationslot_fuzzer"
+  fuzz_config_file = "//base/notification/ans_standard/test/fuzztest/getnotificationslot_fuzzer"
 
   include_dirs = []
   cflags = [
