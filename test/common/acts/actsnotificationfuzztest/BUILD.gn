@@ -73,12 +73,12 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "dataability:native_dataability",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "relational_store:native_appdatafwk",
-    "dataability:native_dataability",
     "relational_store:native_rdb",
     "samgr_standard:samgr_proxy",
   ]
