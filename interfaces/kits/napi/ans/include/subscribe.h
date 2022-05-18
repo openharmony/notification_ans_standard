@@ -110,14 +110,6 @@ public:
      */
     void SetCallbackInfo(const napi_env &env, const std::string &type, const napi_ref &ref);
 
-    /**
-     * @brief Sets the object deleting status.
-     *
-     * @param status Indicates the deleting status.
-     * @return Returns true if success, returns false otherwise
-     */
-    bool SetObjectDeleting(bool status);
-
 private:
     void SetCancelCallbackInfo(const napi_env &env, const napi_ref &ref);
 
@@ -152,9 +144,6 @@ private:
     CallbackInfo disturbModeCallbackInfo_;
     CallbackInfo disturbDateCallbackInfo_;
     CallbackInfo enabledNotificationCallbackInfo_;
-
-    std::mutex delMutex_;
-    bool isDelete_ = false;
 };
 
 struct SubscriberInstancesInfo {
@@ -165,9 +154,15 @@ struct SubscriberInstancesInfo {
 static std::mutex mutex_;
 static thread_local std::vector<SubscriberInstancesInfo> subscriberInstances_;
 
+static std::mutex delMutex_;
+static std::vector<SubscriberInstance*> DeletingSubscriber;
+
 bool HasNotificationSubscriber(const napi_env &env, const napi_value &value, SubscriberInstancesInfo &subscriberInfo);
 bool AddSubscriberInstancesInfo(const napi_env &env, const SubscriberInstancesInfo &subscriberInfo);
 bool DelSubscriberInstancesInfo(const napi_env &env, SubscriberInstance *subscriber);
+
+bool AddDeletingSubscriber(SubscriberInstance *subscriber);
+void DelDeletingSubscriber(SubscriberInstance *subscriber);
 
 napi_value Subscribe(napi_env env, napi_callback_info info);
 }  // namespace NotificationNapi
