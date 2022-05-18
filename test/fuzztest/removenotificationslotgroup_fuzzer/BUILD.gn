@@ -20,8 +20,7 @@ module_output_path = "ans_standard/services"
 ##############################fuzztest##########################################
 ohos_fuzztest("RemoveNotificationSlotGroupFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//base/notification/ans_standard/test/fuzztest/removenotificationslotgroup_fuzzer"
+  fuzz_config_file = "//base/notification/ans_standard/test/fuzztest/removenotificationslotgroup_fuzzer"
 
   include_dirs = []
   cflags = [
