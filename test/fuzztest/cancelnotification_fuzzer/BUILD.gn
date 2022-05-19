@@ -42,7 +42,7 @@ ohos_fuzztest("CancelNotificationFuzzTest") {
     "ability_base:zuri",
     "hiviewdfx_hilog_native:libhilog",
     "multimedia_image_standard:image_native",
-    "native_appdatamgr:native_rdb",
+    "relational_store:native_rdb",
   ]
 }
 
