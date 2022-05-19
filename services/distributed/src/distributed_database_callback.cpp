@@ -25,12 +25,6 @@ DistributedDatabaseCallback::DistributedDatabaseCallback(const IDatabaseChange &
 DistributedDatabaseCallback::~DistributedDatabaseCallback()
 {}
 
-void DistributedDatabaseCallback::OnChange(const DistributedKv::ChangeNotification &changeNotification,
-    std::shared_ptr<DistributedKv::KvStoreSnapshot> snapshot)
-{
-    ANS_LOGI("%{public}s start", __FUNCTION__);
-    return;
-}
 void DistributedDatabaseCallback::OnChange(const DistributedKv::ChangeNotification &changeNotification)
 {
     ANS_LOGI("%{public}s start", __FUNCTION__);
