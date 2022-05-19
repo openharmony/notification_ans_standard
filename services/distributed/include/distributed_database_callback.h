@@ -46,8 +46,6 @@ public:
     ~DistributedDatabaseCallback();
 
 private:
-    void OnChange(const DistributedKv::ChangeNotification &changeNotification,
-        std::shared_ptr<DistributedKv::KvStoreSnapshot> snapshot) override;
     void OnChange(const DistributedKv::ChangeNotification &changeNotification) override;
 
 private:
