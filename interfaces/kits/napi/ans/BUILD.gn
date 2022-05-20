@@ -33,7 +33,7 @@ config("native_module_config") {
 
 ohos_shared_library("notification") {
   include_dirs = [
-    "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
+    "${aafwk_kits_path}/ability/native/include",
     "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common",
     "//foundation/multimedia/image_standard/interfaces/kits/js/common/include/",
     "include",
