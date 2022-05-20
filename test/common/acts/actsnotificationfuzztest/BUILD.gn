@@ -35,11 +35,11 @@ ohos_systemtest("ActsNotificationFuzzTest") {
     "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
     "//base/notification/ans_standard/services/ans/include",
     "//third_party/json/single_include",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native/include",
-    "//foundation/aafwk/standard/services/abilitymgr/include",
+    "${aafwk_inner_api_path}/ability_manager/include",
+    "${aafwk_kits_path}/ability/native/include",
+    "${aafwk_services_path}/abilitymgr/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/aafwk/standard/frameworks/kits/app/native/app/include/task",
+    "${aafwk_kits_path}/app/native/app/include/task",
   ]
 
   cflags = []
@@ -49,13 +49,13 @@ ohos_systemtest("ActsNotificationFuzzTest") {
   }
 
   deps = [
+    "${aafwk_kits_path}/appkit:appkit_native",
+    "${aafwk_services_path}/abilitymgr:abilityms",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//base/notification/ans_standard/frameworks/ans/core:ans_core",
     "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
     "//base/notification/ans_standard/frameworks/wantagent:native_wantagent",
     "//base/notification/ans_standard/services/ans:ans_targets",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
-    "//foundation/aafwk/standard/services/abilitymgr:abilityms",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",

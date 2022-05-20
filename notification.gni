@@ -11,6 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+aafwk_inner_api_path = "//foundation/aafwk/standard/interfaces/innerkits"
+
+aafwk_services_path = "//foundation/aafwk/standard/services"
+
+aafwk_kits_path = "//foundation/aafwk/standard/frameworks/kits"
+
 ans_standard_path = "//base/notification/ans_standard"
 
 services_path = "${ans_standard_path}/services"
