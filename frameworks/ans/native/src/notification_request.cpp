@@ -1638,7 +1638,7 @@ void NotificationRequest::ConvertJsonToNum(NotificationRequest *target, const nl
     }
 
     if (jsonObject.find("creatorUid") != jsonEnd) {
-        target->creatorUid_ = static_cast<uid_t>(jsonObject.at("creatorUid").get<uint32_t>());
+        target->creatorUid_ = jsonObject.at("creatorUid").get<int32_t>();
     }
 
     if (jsonObject.find("creatorPid") != jsonEnd) {
@@ -1651,6 +1651,10 @@ void NotificationRequest::ConvertJsonToNum(NotificationRequest *target, const nl
 
     if (jsonObject.find("receiverUserId") != jsonEnd) {
         target->receiverUserId_ = jsonObject.at("receiverUserId").get<int32_t>();
+    }
+
+    if (jsonObject.find("badgeNumber") != jsonEnd) {
+        target->badgeNumber_ = jsonObject.at("badgeNumber").get<int32_t>();
     }
 }
 

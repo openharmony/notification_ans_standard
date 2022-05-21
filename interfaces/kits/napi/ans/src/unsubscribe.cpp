@@ -104,6 +104,9 @@ napi_value Unsubscribe(napi_env env, napi_callback_info info)
             if (ret) {
                 asynccallbackinfo->info.errorCode =
                     NotificationHelper::UnSubscribeNotification(*(asynccallbackinfo->objectInfo));
+                if (asynccallbackinfo->info.errorCode != ERR_OK) {
+                    DelDeletingSubscriber(asynccallbackinfo->objectInfo);
+                }
             } else {
                 asynccallbackinfo->info.errorCode = ERR_ANS_SUBSCRIBER_IS_DELETING;
             }

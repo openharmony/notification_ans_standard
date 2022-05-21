@@ -365,6 +365,7 @@ private:
         EXPECT_EQ(0, notificationRequest.GetProgressMax());
         EXPECT_EQ(0, notificationRequest.GetProgressValue());
         EXPECT_EQ(false, notificationRequest.IsProgressIndeterminate());
+        EXPECT_EQ(1, notificationRequest.GetBadgeNumber());
     }
 
     void CheckCaseFourteenResult(const NotificationRequest& notificationRequest) const
@@ -985,6 +986,7 @@ HWTEST_F(AnsInterfaceModulePublishTest, ANS_Interface_MT_Publish_00900, Function
     req.SetFloatingIcon(false);
     req.SetProgressBar(0, 0, false);
     req.SetCreatorUserId(SUBSCRIBE_USER_SYSTEM_BEGIN);
+    req.SetBadgeNumber(1);
     g_consumed_mtx.lock();
     EXPECT_EQ(0, NotificationHelper::PublishNotification(req));
     WaitOnConsumed();
