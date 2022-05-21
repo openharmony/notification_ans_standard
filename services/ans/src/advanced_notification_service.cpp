@@ -1988,7 +1988,6 @@ ErrCode AdvancedNotificationService::SetRecentNotificationCount(const std::strin
 {
     ANS_LOGD("%{public}s arg = %{public}s", __FUNCTION__, arg.c_str());
     int32_t count = atoi(arg.c_str());
-
     if ((count < NOTIFICATION_MIN_COUNT) || (count > NOTIFICATION_MAX_COUNT)) {
         return ERR_ANS_INVALID_PARAM;
     }
@@ -2505,7 +2504,6 @@ void AdvancedNotificationService::AdjustDateForDndTypeOnce(int64_t &beginDate, i
 
     auto newBeginTimePoint = std::chrono::system_clock::from_time_t(todayBeginT);
     auto newEndTimePoint = std::chrono::system_clock::from_time_t(todayEndT);
-
     if (newBeginTimePoint >= newEndTimePoint) {
         newEndTimePoint += std::chrono::hours(HOURS_IN_ONE_DAY);
     }
