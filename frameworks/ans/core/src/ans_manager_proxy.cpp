@@ -2271,7 +2271,7 @@ ErrCode AnsManagerProxy::PublishReminder(sptr<ReminderRequest> &reminder)
     }
     int32_t reminderId = -1;
     if (!reply.ReadInt32(reminderId)) {
-        ANSR_LOGE("[PublishReminder] fail: derek read reminder id failed.");
+        ANSR_LOGE("[PublishReminder] fail: read reminder id failed.");
         return ERR_ANS_PARCELABLE_FAILED;
     }
     reminder->SetReminderId(reminderId);
