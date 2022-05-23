@@ -690,6 +690,10 @@ void ReminderDataManager::ShowReminder(const sptr<ReminderRequest> &reminder, co
     reminder->OnShow(toPlaySound, isSysTimeChanged, true);
     AddToShowedReminders(reminder);
     UpdateNotification(reminder);  // this should be called after OnShow
+
+    if (alertingReminderId_ != -1) {
+        TerminateAlerting(alertingReminder_, "PlaySoundAndVibration");
+    }
     ANSR_LOGD("publish notification.(reminderId=%{public}d)", reminder->GetReminderId());
     ErrCode errCode = advancedNotificationService_->PublishPreparedNotification(notificationRequest, bundleOption);
     if (errCode != ERR_OK) {
