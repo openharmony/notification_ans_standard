@@ -1454,12 +1454,12 @@ void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
         if (timeIntervalInMilli_ != 0) {
             // snooze the reminder by manual
             extendContent = GetShowTime(triggerTimeInMilli_) +
-                snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")");
+                (snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")"));
             notificationRequest_->SetTapDismissed(false);
         } else {
             // the reminder is expired now, when timeInterval is 0
             extendContent = GetShowTime(reminderTimeInMilli_) +
-                expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")");
+                (expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")"));
         }
     } else if (IsAlerting()) {
         // the reminder is alerting, or ring duration is 0
@@ -1467,12 +1467,12 @@ void ReminderRequest::UpdateNotificationContent(const bool &setSnooze)
     } else if (snoozeTimesDynamic_ != snoozeTimes_) {
         // the reminder is snoozing by period artithmetic, when the ring duration is over.
         extendContent = GetShowTime(triggerTimeInMilli_) +
-            snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")");
+            (snoozeContent_ == "" ? "" : (" (" + snoozeContent_ + ")"));
         notificationRequest_->SetTapDismissed(false);
     } else {
         // the reminder has already snoozed by period arithmetic, when the ring duration is over.
         extendContent = GetShowTime(reminderTimeInMilli_) +
-            expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")");
+            (expiredContent_ == "" ? "" : (" (" + expiredContent_ + ")"));
     }
     displayContent_ = content_ + " " + extendContent;
     ANSR_LOGD("Display content=%{public}s", displayContent_.c_str());
