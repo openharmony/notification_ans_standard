@@ -114,11 +114,6 @@ Status AnsTestSingleKvStore::GetEntries(const Key &prefixKey, std::vector<Entry>
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetEntriesWithQuery(const std::string &query, std::vector<Entry> &entries) const
-{
-    return Status::SUCCESS;
-}
-
 Status AnsTestSingleKvStore::GetEntriesWithQuery(const DataQuery &query, std::vector<Entry> &entries) const
 {
     return Status::SUCCESS;
@@ -130,23 +125,12 @@ Status AnsTestSingleKvStore::GetResultSet(const Key &prefixKey, std::shared_ptr<
 }
 
 Status AnsTestSingleKvStore::GetResultSetWithQuery(
-    const std::string &query, std::shared_ptr<KvStoreResultSet> &resultSet) const
-{
-    return Status::SUCCESS;
-}
-
-Status AnsTestSingleKvStore::GetResultSetWithQuery(
     const DataQuery &query, std::shared_ptr<KvStoreResultSet> &resultSet) const
 {
     return Status::SUCCESS;
 }
 
 Status AnsTestSingleKvStore::CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet)
-{
-    return Status::SUCCESS;
-}
-
-Status AnsTestSingleKvStore::GetCountWithQuery(const std::string &query, int &result) const
 {
     return Status::SUCCESS;
 }
@@ -273,11 +257,6 @@ Status AnsTestSingleKvStore::SetCapabilityRange(
 }
 
 Status AnsTestSingleKvStore::GetSecurityLevel(SecurityLevel &securityLevel) const
-{
-    return Status::SUCCESS;
-}
-
-Status AnsTestSingleKvStore::Control(KvControlCmd cmd, const KvParam &inputParam, KvParam &output)
 {
     return Status::SUCCESS;
 }
