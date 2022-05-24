@@ -26,8 +26,8 @@ config("ansSTSlotGroupTestConfig") {
 
   include_dirs = [
     "${SUBDEMOSYSTEM_DIR}/include",
-    "//foundation/aafwk/standard/frameworks/kits/appkit/native/app",
-    "//foundation/aafwk/standard/services/abilitymgr/include",
+    "${aafwk_kits_path}/appkit/native/app",
+    "${aafwk_services_path}/abilitymgr/include",
     "${interfaces_path}/innerkits/ans/native/include",
   ]
 
@@ -43,9 +43,9 @@ ohos_shared_library("libraryAnsSTSlotGroupTest") {
   configs = [ ":ansSTSlotGroupTestConfig" ]
 
   deps = [
+    "${aafwk_kits_path}/appkit:appkit_native",
     "${core_path}:ans_core",
     "${frameworks_path}/ans/native:ans_innerkits",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//utils/native/base:utilsbase",
   ]
 
