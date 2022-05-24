@@ -20,6 +20,7 @@ import {describe, beforeAll, beforeEach, afterEach, afterAll, it, expect} from '
 
 describe("ReminderHelperTest", function () {
     beforeAll(function() {
+
         /*
          * @tc.setup: setup invoked before all testcases
          */
@@ -27,6 +28,7 @@ describe("ReminderHelperTest", function () {
     })
 
     afterAll(function() {
+
         /*
          * @tc.teardown: teardown invoked after all testcases
          */
@@ -34,6 +36,7 @@ describe("ReminderHelperTest", function () {
     })
 
     beforeEach(function() {
+
         /*
          * @tc.setup: setup invoked before each testcases
          */
@@ -41,6 +44,7 @@ describe("ReminderHelperTest", function () {
     })
 
     afterEach(function() {
+
         /*
          * @tc.teardown: teardown invoked after each testcases
          */
@@ -705,7 +709,7 @@ describe("ReminderHelperTest", function () {
             reminderAgent.addNotificationSlot(mySlot).then(() => {
                 resolve();
             })
-            reject();
+            reject(new Error('errr occurred.'));
         });
         promise.then(() => {
         }, err => {
@@ -1028,7 +1032,7 @@ describe("ReminderHelperTest", function () {
            reminderAgent.removeNotificationSlot(1).then(() => {
                resolve();
            });
-           reject();
+           reject(new Error('errr occurred.'));
        });
        promise.then(() => {
        }, err => {
@@ -1195,12 +1199,12 @@ describe("ReminderHelperTest", function () {
                 }
             ],
             wantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             maxScreenWantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             ringDuration:5,
             snoozeTimes:2,
@@ -1223,8 +1227,10 @@ describe("ReminderHelperTest", function () {
                     }
                     console.log("getValidReminders, wantAgent.pkgName = " + reminders[i].wantAgent.pkgName);
                     console.log("getValidReminders, wantAgent.abilityName = " + reminders[i].wantAgent.abilityName);
-                    console.log("getValidReminders, maxScreenWantAgent.pkgName = " + reminders[i].maxScreenWantAgent.pkgName);
-                    console.log("getValidReminders, maxScreenWantAgent.abilityName = " + reminders[i].maxScreenWantAgent.abilityName);
+                    console.log("getValidReminders, maxScreenWantAgent.pkgName = "
+                        + reminders[i].maxScreenWantAgent.pkgName);
+                    console.log("getValidReminders, maxScreenWantAgent.abilityName = "
+                        + reminders[i].maxScreenWantAgent.abilityName);
                     expect(reminders[i].ringDuration).assertEqual(5);
                     console.log("getValidReminders, ringDuration = " + reminders[i].ringDuration);
                     expect(reminders[i].snoozeTimes).assertEqual(2);
@@ -1276,12 +1282,12 @@ describe("ReminderHelperTest", function () {
                 }
             ],
             wantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             maxScreenWantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             ringDuration:5,
             snoozeTimes:2,
@@ -1304,8 +1310,10 @@ describe("ReminderHelperTest", function () {
                     }
                     console.log("getValidReminders, wantAgent.pkgName = " + reminders[i].wantAgent.pkgName);
                     console.log("getValidReminders, wantAgent.abilityName = " + reminders[i].wantAgent.abilityName);
-                    console.log("getValidReminders, maxScreenWantAgent.pkgName = " + reminders[i].maxScreenWantAgent.pkgName);
-                    console.log("getValidReminders, maxScreenWantAgent.abilityName = " + reminders[i].maxScreenWantAgent.abilityName);
+                    console.log("getValidReminders, maxScreenWantAgent.pkgName = "
+                        + reminders[i].maxScreenWantAgent.pkgName);
+                    console.log("getValidReminders, maxScreenWantAgent.abilityName = "
+                        + reminders[i].maxScreenWantAgent.abilityName);
                     expect(reminders[i].ringDuration).assertEqual(5);
                     console.log("getValidReminders, ringDuration = " + reminders[i].ringDuration);
                     expect(reminders[i].snoozeTimes).assertEqual(2);
@@ -1357,12 +1365,12 @@ describe("ReminderHelperTest", function () {
                 }
             ],
             wantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             maxScreenWantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             ringDuration:5,
             snoozeTimes:2,
@@ -1415,12 +1423,12 @@ describe("ReminderHelperTest", function () {
                 }
             ],
             wantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             maxScreenWantAgent:{
-                pkgName:"com.huawei.phone",
-                abilityName:"com.huawei.phone.MainAbility"
+                pkgName:"com.test.pkg",
+                abilityName:"com.test.pkg.MainAbility"
             },
             ringDuration:5,
             snoozeTimes:2,
