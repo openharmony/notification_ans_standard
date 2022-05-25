@@ -49,7 +49,7 @@ public:
      * @param entries Indicates the entries.
      * @return Indicates the status of this GetEntries operation.
      */
-    virtual Status GetEntriesWithQuery(const DataQuery &query, std::vector<Entry> &entries) const override;
+    virtual Status GetEntries(const DataQuery &query, std::vector<Entry> &entries) const override;
 
     /**
      * @brief Get ResultSet in this store which key start with prefixKey.
@@ -67,8 +67,8 @@ public:
      * @param resultSet Indicates the resultSet.
      * @return Indicates the status of this GetResultSet operation.
      */
-    virtual Status GetResultSetWithQuery(const DataQuery &query,
-                                         std::shared_ptr<KvStoreResultSet> &resultSet) const override;
+    virtual Status GetResultSet(const DataQuery &query,
+                                std::shared_ptr<KvStoreResultSet> &resultSet) const override;
 
     /**
      * @brief Close the ResultSet returned by GetResultSet.
@@ -85,7 +85,7 @@ public:
      * @param result Indicates the result will be returned in this parameter.
      * @return Indicates the status of this CloseResultSet operation.
      */
-    virtual Status GetCountWithQuery(const DataQuery &query, int &result) const override;
+    virtual Status GetCount(const DataQuery &query, int &result) const override;
 
     /**
      * @brief Sync store with other devices. This is an asynchronous method,
@@ -283,8 +283,8 @@ public:
      *              PUSH_PULL will firstly push all not-local store to listed devices, then pull these stores back.
      * @return Indicates the status of this operation.
      */
-    virtual Status SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
-        const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback) override;
+    virtual Status Sync(const std::vector<std::string> &deviceIds, SyncMode mode, const DataQuery &query,
+        std::shared_ptr<KvStoreSyncCallback> syncCallback) override;
 
     /**
      * @brief Subscribe store with other devices consistently Synchronize the data which is satisfied

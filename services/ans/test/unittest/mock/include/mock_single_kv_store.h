@@ -40,7 +40,7 @@ public:
      * @param entries Indicates the entries.
      * @return Indicates the status of this GetEntries operation.
      */
-    virtual Status GetEntries(const Key &prefixKey, std::vector<Entry> &entries) const override;
+    Status GetEntries(const Key &prefixKey, std::vector<Entry> &entries) const override;
 
     /**
      * @brief Get all entries in this store by query.
@@ -49,7 +49,7 @@ public:
      * @param entries Indicates the entries.
      * @return Indicates the status of this GetEntries operation.
      */
-    virtual Status GetEntriesWithQuery(const DataQuery &query, std::vector<Entry> &entries) const override;
+    Status GetEntries(const DataQuery &query, std::vector<Entry> &entries) const override;
 
     /**
      * @brief Get ResultSet in this store which key start with prefixKey.
@@ -58,7 +58,7 @@ public:
      * @param resultSet Indicates the resultSet.
      * @return Indicates the status of this GetResultSet operation.
      */
-    virtual Status GetResultSet(const Key &prefixKey, std::shared_ptr<KvStoreResultSet> &resultSet) const override;
+    Status GetResultSet(const Key &prefixKey, std::shared_ptr<KvStoreResultSet> &resultSet) const override;
 
     /**
      * @brief Get ResultSet in this store by Query.
@@ -67,8 +67,7 @@ public:
      * @param resultSet Indicates the resultSet.
      * @return Indicates the status of this GetResultSet operation.
      */
-    virtual Status GetResultSetWithQuery(const DataQuery &query,
-                                         std::shared_ptr<KvStoreResultSet> &resultSet) const override;
+    Status GetResultSet(const DataQuery &query, std::shared_ptr<KvStoreResultSet> &resultSet) const override;
 
     /**
      * @brief Close the ResultSet returned by GetResultSet.
@@ -76,7 +75,7 @@ public:
      * @param resultSet Indicates the resultSet.
      * @return Indicates the status of this CloseResultSet operation.
      */
-    virtual Status CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet) override;
+    Status CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet) override;
 
     /**
      * @brief Get the number of result by query.
@@ -85,7 +84,7 @@ public:
      * @param result Indicates the result will be returned in this parameter.
      * @return Indicates the status of this CloseResultSet operation.
      */
-    virtual Status GetCountWithQuery(const DataQuery &query, int &result) const override;
+    Status GetCount(const DataQuery &query, int &result) const override;
 
     /**
      * @brief Sync store with other devices. This is an asynchronous method,
@@ -97,8 +96,7 @@ public:
      * @param allowedDelayMs Indicates the allowed delay milli-second to sync. default value is 0 for compatibility.
      * @return Indicates the status of this Sync operation.
      */
-    virtual Status Sync(
-        const std::vector<std::string> &deviceIds, SyncMode mode, uint32_t allowedDelayMs = 0) override;
+    Status Sync(const std::vector<std::string> &deviceIds, SyncMode mode, uint32_t delayMs) override;
 
     /**
      * @brief Remove the device data synced from remote.
@@ -106,14 +104,14 @@ public:
      * @param device Indicates the device id.
      * @return Indicates the status of this remove operation.
      */
-    virtual Status RemoveDeviceData(const std::string &device) override;
+    Status RemoveDeviceData(const std::string &device) override;
 
     /**
      * @brief Get id of this AppKvStore.
      *
      * @return Indicates the id of store.
      */
-    virtual StoreId GetStoreId() const override;
+    StoreId GetStoreId() const override;
 
     /**
      * @brief Delete an entry by its key.
@@ -121,7 +119,7 @@ public:
      * @param key Indicates the key of the entry to be deleted.
      * @return Indicates the status of this delete operation.
      */
-    virtual Status Delete(const Key &key) override;
+    Status Delete(const Key &key) override;
 
     /**
      * @brief Write a pair of key and value to this store.
@@ -130,7 +128,7 @@ public:
      * @param value Indicates the value of this entry. Should be less than (1024 * 1024) bytes.
      * @return Indicates the status of this put operation.
      */
-    virtual Status Put(const Key &key, const Value &value) override;
+    Status Put(const Key &key, const Value &value) override;
 
     /**
      * @brief Get value from AppKvStore by its key.
@@ -139,7 +137,7 @@ public:
      * @param value Indicates the value will be returned in this parameter.
      * @return Indicates the status of this get operation.
      */
-    virtual Status Get(const Key &key, Value &value) override;
+    Status Get(const Key &key, Value &value) override;
 
     /**
      * @brief Register change of this kvstore to a client-defined observer.
@@ -153,7 +151,7 @@ public:
      * @param observer Indicates the observer to subscribe changes.
      * @return Indicates the status of this subscribe operation.
      */
-    virtual Status SubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer) override;
+    Status SubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer) override;
 
     /**
      * @brief Unregister a kvstore to an observer.
@@ -163,7 +161,7 @@ public:
      * @param observer Indicates the observer to unsubscribe this store.
      * @return Indicates the status of this unsubscribe operation.
      */
-    virtual Status UnSubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer) override;
+    Status UnSubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer) override;
 
     /**
      * @brief Register message for sync operation.
@@ -171,7 +169,7 @@ public:
      * @param callback Indicates the callback to register.
      * @return Indicates the status of this register operation.
      */
-    virtual Status RegisterSyncCallback(std::shared_ptr<KvStoreSyncCallback> callback) override;
+    Status RegisterSyncCallback(std::shared_ptr<KvStoreSyncCallback> callback) override;
 
     /**
      * @brief Unregister message for sync operation.
@@ -179,7 +177,7 @@ public:
      * @param callback Indicates the callback to register.
      * @return Indicates the status of this register operation.
      */
-    virtual Status UnRegisterSyncCallback() override;
+    Status UnRegisterSyncCallback() override;
 
     /**
      * @brief See Put, PutBatch put a list of entries to kvstore,
@@ -190,7 +188,7 @@ public:
      *              The entries's size should be less than 128 and memory size must be less than IPC transport limit.
      * @return Indicates the status of this register operation.
      */
-    virtual Status PutBatch(const std::vector<Entry> &entries) override;
+    Status PutBatch(const std::vector<Entry> &entries) override;
 
     /**
      * @brief Delete a list of entries in the kvstore,
@@ -202,7 +200,7 @@ public:
      *              The keys memory size should not be greater than IPC transport limit, and can not be empty.
      * @return Indicates the status of this register operation.
      */
-    virtual Status DeleteBatch(const std::vector<Key> &keys) override;
+    Status DeleteBatch(const std::vector<Key> &keys) override;
 
     /**
      * @brief Start transaction.
@@ -283,8 +281,8 @@ public:
      *              PUSH_PULL will firstly push all not-local store to listed devices, then pull these stores back.
      * @return Indicates the status of this operation.
      */
-    virtual Status SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
-        const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback) override;
+    virtual Status Sync(const std::vector<std::string> &deviceIds, SyncMode mode, const DataQuery &query,
+        std::shared_ptr<KvStoreSyncCallback> syncCallback) override;
 
     /**
      * @brief Subscribe store with other devices consistently Synchronize the data which is satisfied
