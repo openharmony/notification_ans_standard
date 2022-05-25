@@ -45,15 +45,6 @@ public:
     /**
      * @brief Get all entries in this store by query.
      *
-     * @param query Indicates the query string.
-     * @param entries Indicates the entries.
-     * @return Indicates the status of this GetEntries operation.
-     */
-    virtual Status GetEntriesWithQuery(const std::string &query, std::vector<Entry> &entries) const override;
-
-    /**
-     * @brief Get all entries in this store by query.
-     *
      * @param query Indicates the query object.
      * @param entries Indicates the entries.
      * @return Indicates the status of this GetEntries operation.
@@ -72,16 +63,6 @@ public:
     /**
      * @brief Get ResultSet in this store by Query.
      *
-     * @param query Indicates the query string.
-     * @param resultSet Indicates the resultSet.
-     * @return Indicates the status of this GetResultSet operation.
-     */
-    virtual Status GetResultSetWithQuery(const std::string &query,
-                                         std::shared_ptr<KvStoreResultSet> &resultSet) const override;
-
-    /**
-     * @brief Get ResultSet in this store by Query.
-     *
      * @param query Indicates the query object.
      * @param resultSet Indicates the resultSet.
      * @return Indicates the status of this GetResultSet operation.
@@ -96,15 +77,6 @@ public:
      * @return Indicates the status of this CloseResultSet operation.
      */
     virtual Status CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet) override;
-
-    /**
-     * @brief Get the number of result by query.
-     *
-     * @param query Indicates the query string.
-     * @param result Indicates the result.
-     * @return Indicates the status of this CloseResultSet operation.
-     */
-    virtual Status GetCountWithQuery(const std::string &query, int &result) const override;
 
     /**
      * @brief Get the number of result by query.
@@ -333,9 +305,6 @@ public:
      * @return Indicates the status of this UnSubscribe operation.
      */
     virtual Status UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query) override;
-
-protected:
-    KVSTORE_API virtual Status Control(KvControlCmd cmd, const KvParam &inputParam, KvParam &output) override;
 };
 }  // namespace DistributedKv
 }  // namespace OHOS
