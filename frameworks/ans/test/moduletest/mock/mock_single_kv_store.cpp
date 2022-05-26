@@ -114,7 +114,7 @@ Status AnsTestSingleKvStore::GetEntries(const Key &prefixKey, std::vector<Entry>
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetEntriesWithQuery(const DataQuery &query, std::vector<Entry> &entries) const
+Status AnsTestSingleKvStore::GetEntries(const DataQuery &query, std::vector<Entry> &entries) const
 {
     return Status::SUCCESS;
 }
@@ -124,8 +124,7 @@ Status AnsTestSingleKvStore::GetResultSet(const Key &prefixKey, std::shared_ptr<
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetResultSetWithQuery(
-    const DataQuery &query, std::shared_ptr<KvStoreResultSet> &resultSet) const
+Status AnsTestSingleKvStore::GetResultSet(const DataQuery &query, std::shared_ptr<KvStoreResultSet> &resultSet) const
 {
     return Status::SUCCESS;
 }
@@ -135,7 +134,7 @@ Status AnsTestSingleKvStore::CloseResultSet(std::shared_ptr<KvStoreResultSet> &r
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetCountWithQuery(const DataQuery &query, int &result) const
+Status AnsTestSingleKvStore::GetCount(const DataQuery &query, int &result) const
 {
     return Status::SUCCESS;
 }
@@ -261,7 +260,7 @@ Status AnsTestSingleKvStore::GetSecurityLevel(SecurityLevel &securityLevel) cons
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::SyncWithCondition(const std::vector<std::string> &deviceIds, SyncMode mode,
+Status AnsTestSingleKvStore::Sync(const std::vector<std::string> &deviceIds, SyncMode mode,
     const DataQuery &query, std::shared_ptr<KvStoreSyncCallback> syncCallback)
 {
     return Status::SUCCESS;
