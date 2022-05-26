@@ -15,7 +15,7 @@
 
 #include "distributed_kv_data_manager.h"
 
-#include "ans_test_single_kv_store.h"
+#include "mock_single_kv_store.h"
 
 namespace OHOS {
 namespace DistributedKv {
@@ -38,7 +38,7 @@ Status DistributedKvDataManager::StopWatchDeviceChange(std::shared_ptr<DeviceSta
 Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const AppId &appId, const StoreId &storeId,
     std::shared_ptr<SingleKvStore> &singleKvStore)
 {
-    std::shared_ptr<AnsTestSingleKvStore> kvStore = std::make_shared<AnsTestSingleKvStore>();
+    std::shared_ptr<MockSingleKvStore> kvStore = std::make_shared<MockSingleKvStore>();
     singleKvStore = std::static_pointer_cast<SingleKvStore>(kvStore);
     return DistributedKv::Status::SUCCESS;
 }

@@ -62,13 +62,13 @@ private:
 
     static std::shared_ptr<NotificationSubscriberManager> notificationSubscriberManager_;
     static TestAnsSubscriber testAnsSubscriber_;
-    static sptr<IAnsSubscriber> subscriber_;
+    static sptr<AnsSubscriberInterface> subscriber_;
 };
 
 std::shared_ptr<NotificationSubscriberManager> NotificationSubscriberManagerTest::notificationSubscriberManager_ =
     nullptr;
 NotificationSubscriberManagerTest::TestAnsSubscriber NotificationSubscriberManagerTest::testAnsSubscriber_;
-sptr<IAnsSubscriber> NotificationSubscriberManagerTest::subscriber_ = nullptr;
+sptr<AnsSubscriberInterface> NotificationSubscriberManagerTest::subscriber_ = nullptr;
 
 void NotificationSubscriberManagerTest::SetUpTestCase()
 {

@@ -12,30 +12,22 @@
 # limitations under the License.
 
 aafwk_inner_api_path = "//foundation/aafwk/standard/interfaces/innerkits"
-
 aafwk_services_path = "//foundation/aafwk/standard/services"
-
 aafwk_kits_path = "//foundation/aafwk/standard/frameworks/kits"
-
-ans_standard_path = "//base/notification/ans_standard"
-
-services_path = "${ans_standard_path}/services"
-
-frameworks_path = "${ans_standard_path}/frameworks"
-
-interfaces_path = "${ans_standard_path}/interfaces"
-
-core_path = "${frameworks_path}/ans/core"
-
-native_path = "${frameworks_path}/ans/native"
-
-test_path = "${ans_standard_path}/test"
-
-tools_path = "${ans_standard_path}/tools"
-
+component_name = "distributed_notification_service"
+component_path = "//base/notification/distributed_notification_service"
+services_path = "${component_path}/services"
+frameworks_path = "${component_path}/frameworks"
+frameworks_module_ans_path = "${frameworks_path}/ans"
+interfaces_path = "${component_path}/interfaces"
+inner_api_path = "${interfaces_path}/inner_api"
+core_path = "${frameworks_path}/core"
+test_path = "${component_path}/test"
+tools_path = "${component_path}/tools"
 aafwk_path = "//foundation/aafwk/standard"
-
-ans_standard_external_deps = [
+distributed_notification_supported = true
+subsystem_name = "notification"
+component_external_deps = [
   "ability_base:base",
   "ability_base:want",
   "ability_base:zuri",
@@ -48,5 +40,3 @@ ans_standard_external_deps = [
   "safwk:system_ability_fwk",
   "samgr_standard:samgr_proxy",
 ]
-
-distributed_notification_supported = true

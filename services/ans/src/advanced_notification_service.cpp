@@ -1292,7 +1292,7 @@ ErrCode AdvancedNotificationService::RemoveFromNotificationListForDeleteAll(
 }
 
 ErrCode AdvancedNotificationService::Subscribe(
-    const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info)
+    const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &info)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 
@@ -1314,7 +1314,7 @@ ErrCode AdvancedNotificationService::Subscribe(
 }
 
 ErrCode AdvancedNotificationService::Unsubscribe(
-    const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info)
+    const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &info)
 {
     ANS_LOGD("%{public}s", __FUNCTION__);
 

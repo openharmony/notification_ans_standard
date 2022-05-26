@@ -12,15 +12,16 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
-import("//base/notification/ans_standard/notification.gni")
+import("//base/notification/distributed_notification_service/notification.gni")
 import("//build/config/features.gni")
 import("//build/test.gni")
-module_output_path = "ans_standard/services"
+module_output_path = "${component_name}/fuzztest"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("PublishNotificationFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//base/notification/ans_standard/test/fuzztest/publishnotification_fuzzer"
+  fuzz_config_file =
+      "${component_path}/test/fuzztest/publishnotification_fuzzer"
 
   include_dirs = []
   cflags = [
@@ -32,7 +33,7 @@ ohos_fuzztest("PublishNotificationFuzzTest") {
   sources = [ "publishnotification_fuzzer.cpp" ]
 
   deps = [
-    "${frameworks_path}/ans/native:ans_innerkits",
+    "${frameworks_module_ans_path}:ans_innerkits",
     "//utils/native/base:utils",
   ]
 
