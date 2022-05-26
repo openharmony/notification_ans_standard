@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace Notification {
 struct NotificationSubscriberManager::SubscriberRecord {
-    sptr<IAnsSubscriber> subscriber {nullptr};
+    sptr<AnsSubscriberInterface> subscriber {nullptr};
     std::set<std::string> bundleList_ {};
     bool subscribedAll {false};
     int32_t userId {SUBSCRIBE_USER_INIT};
@@ -51,7 +51,7 @@ NotificationSubscriberManager::~NotificationSubscriberManager()
 }
 
 ErrCode NotificationSubscriberManager::AddSubscriber(
-    const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
+    const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
 {
     if (subscriber == nullptr) {
         ANS_LOGE("subscriber is null.");
@@ -89,7 +89,7 @@ ErrCode NotificationSubscriberManager::AddSubscriber(
 }
 
 ErrCode NotificationSubscriberManager::RemoveSubscriber(
-    const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
+    const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
 {
     if (subscriber == nullptr) {
         ANS_LOGE("subscriber is null.");
@@ -198,7 +198,7 @@ std::shared_ptr<NotificationSubscriberManager::SubscriberRecord> NotificationSub
 }
 
 std::shared_ptr<NotificationSubscriberManager::SubscriberRecord> NotificationSubscriberManager::FindSubscriberRecord(
-    const sptr<IAnsSubscriber> &subscriber)
+    const sptr<AnsSubscriberInterface> &subscriber)
 {
     auto iter = subscriberRecordList_.begin();
 
@@ -211,7 +211,7 @@ std::shared_ptr<NotificationSubscriberManager::SubscriberRecord> NotificationSub
 }
 
 std::shared_ptr<NotificationSubscriberManager::SubscriberRecord> NotificationSubscriberManager::CreateSubscriberRecord(
-    const sptr<IAnsSubscriber> &subscriber)
+    const sptr<AnsSubscriberInterface> &subscriber)
 {
     std::shared_ptr<SubscriberRecord> record = std::make_shared<SubscriberRecord>();
     if (record != nullptr) {
@@ -255,7 +255,7 @@ void NotificationSubscriberManager::RemoveRecordInfo(
 }
 
 ErrCode NotificationSubscriberManager::AddSubscriberInner(
-    const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
+    const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
 {
     std::shared_ptr<SubscriberRecord> record = FindSubscriberRecord(subscriber);
     if (record == nullptr) {
@@ -278,7 +278,7 @@ ErrCode NotificationSubscriberManager::AddSubscriberInner(
 }
 
 ErrCode NotificationSubscriberManager::RemoveSubscriberInner(
-    const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
+    const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo)
 {
     std::shared_ptr<SubscriberRecord> record = FindSubscriberRecord(subscriber);
 

@@ -11,10 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/notification/ans_standard/notification.gni")
+import("//base/notification/distributed_notification_service/notification.gni")
 import("//build/test.gni")
 
-module_output_path = "ans_standard/systemtest"
+module_output_path = "${component_name}/systemtest"
 ohos_systemtest("AnsDumpTest") {
   module_out_path = module_output_path
 
@@ -33,7 +33,7 @@ ohos_systemtest("AnsDumpTest") {
   }
 
   deps = [
-    "${frameworks_path}/ans/core:ans_core",
+    "${core_path}:ans_core",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]

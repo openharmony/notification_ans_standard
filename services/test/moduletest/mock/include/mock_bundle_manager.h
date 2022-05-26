@@ -28,13 +28,13 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-class MockBundleMgrService : public BundleMgrHost {
+class MockBundleManager : public BundleMgrHost {
 public:
-    MockBundleMgrService()
+    MockBundleManager()
     {
     }
 
-    ~MockBundleMgrService()
+    ~MockBundleManager()
     {}
 
     /**

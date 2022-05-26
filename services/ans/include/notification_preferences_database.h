@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_NOTIFICATION_PREFERENCES_DATABASE_H
-#define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_NOTIFICATION_PREFERENCES_DATABASE_H
+#ifndef BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_NOTIFICATION_PREFERENCES_DATABASE_H
+#define BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_NOTIFICATION_PREFERENCES_DATABASE_H
 
 #include <functional>
 #include <memory>
@@ -32,8 +32,8 @@ public:
     /**
      * @brief Put notification slots into disturbe DB.
      *
-     * @param bundleName Indicates bunlde name.
-     * @param bundleUid Indicates bunlde uid.
+     * @param bundleName Indicates bundle name.
+     * @param bundleUid Indicates bundle uid.
      * @param slots Indicates notification slots.
      * @return Return true on success, false on failure.
      */
@@ -43,8 +43,8 @@ public:
     /**
      * @brief Put notification slot groups into disturbe DB.
      *
-     * @param bundleName Indicates bunlde name.
-     * @param bundleUid Indicates bunlde uid.
+     * @param bundleName Indicates bundle name.
+     * @param bundleUid Indicates bundle uid.
      * @param groups Indicates notification groups.
      * @return Return true on success, false on failure.
      */
@@ -54,7 +54,7 @@ public:
     /**
      * @brief Put notification bundle into disturbe DB.
      *
-     * @param bundleInfo Indicates bunlde info.
+     * @param bundleInfo Indicates bundle info.
      * @return Return true on success, false on failure.
      */
     bool PutBundlePropertyToDisturbeDB(const NotificationPreferencesInfo::BundleInfo &bundleInfo);
@@ -62,7 +62,7 @@ public:
     /**
      * @brief Put show badge in the of bundle into disturbe DB.
      *
-     * @param bundleInfo Indicates bunlde info.
+     * @param bundleInfo Indicates bundle info.
      * @param enable Indicates to whether show badge.
      * @return Return true on success, false on failure.
      */
@@ -71,7 +71,7 @@ public:
     /**
      * @brief Put importance in the of bundle into disturbe DB.
      *
-     * @param bundleInfo Indicates bunlde info.
+     * @param bundleInfo Indicates bundle info.
      * @param importance Indicates to importance level  which can be LEVEL_NONE,
                LEVEL_MIN, LEVEL_LOW, LEVEL_DEFAULT, LEVEL_HIGH, or LEVEL_UNDEFINED.
      * @return Return true on success, false on failure.
@@ -81,7 +81,7 @@ public:
     /**
      * @brief Put badge total nums in the of  bundle into disturbe DB.
      *
-     * @param bundleInfo Indicates bunlde info.
+     * @param bundleInfo Indicates bundle info.
      * @param totalBadgeNum Indicates to total badge num.
      * @return Return true on success, false on failure.
      */
@@ -90,7 +90,7 @@ public:
     /**
      * @brief Put private notification allowed in the of  bundle into disturbe DB.
      *
-     * @param bundleInfo Indicates bunlde info.
+     * @param bundleInfo Indicates bundle info.
      * @param allow Indicates to whether to allow
      * @return Return true on success, false on failure.
      */
@@ -99,7 +99,7 @@ public:
     /**
      * @brief Put enable notification in the of  bundle into disturbe DB.
      *
-     * @param bundleInfo Indicates bunlde info.
+     * @param bundleInfo Indicates bundle info.
      * @param enabled Indicates to whether to enabled
      * @return Return true on success, false on failure.
      */
@@ -288,4 +288,4 @@ private:
 };
 }  // namespace Notification
 }  // namespace OHOS
-#endif  // BASE_NOTIFICATION_ANS_STANDARD_SERVICES_NOTIFICATION_PREFERENCES_DATABASE_H
+#endif  // BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_NOTIFICATION_PREFERENCES_DATABASE_H
