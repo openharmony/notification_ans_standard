@@ -291,7 +291,7 @@ napi_value ParseShowOptions(const napi_env &env, const napi_callback_info &info,
         wants.emplace_back(want);
         WantAgentInfo wantAgentInfo(-1, WantAgentConstant::OperationType::START_ABILITY, wantAgentFlags,
             wants, extraInfo);
-        std::shared_ptr<AbilityRuntime::Context> context = AbilityRuntime::Context::GetApplicationContext();
+        std::shared_ptr<AbilityRuntime::ApplicationContext> context = AbilityRuntime::Context::GetApplicationContext();
 
         std::shared_ptr<WantAgent> wantAgent =
             WantAgentHelper::GetWantAgent(context, wantAgentInfo);
