@@ -31,7 +31,7 @@ Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const 
                                                   std::shared_ptr<SingleKvStore> &kvStore)
 {
     std::string storeIdTmp = storeId.storeId;
-    kvStore = std::make_shared<AnsTestSingleKvStore>();
+    kvStore = std::make_shared<MockSingleKvStore>();
     return Status::SUCCESS;
 }
 

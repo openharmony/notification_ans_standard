@@ -11,11 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/notification/ans_standard/notification.gni")
+import("//base/notification/distributed_notification_service/notification.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-group("ans_distributed_unit_test_target") {
+group("ans_unit_test") {
   testonly = true
   deps = []
 
@@ -25,7 +25,7 @@ group("ans_distributed_unit_test_target") {
 }
 
 ohos_unittest("ans_distributed_unit_test") {
-  module_out_path = "ans_standard/unittest"
+  module_out_path = "${component_name}/unittest"
   include_dirs = [
     "/${services_path}/distributed/include",
     "//utils/native/base/include",
@@ -45,17 +45,17 @@ ohos_unittest("ans_distributed_unit_test") {
     "${services_path}/distributed/test/unittest/distributed_notification_manager_test.cpp",
     "${services_path}/distributed/test/unittest/distributed_preferences_test.cpp",
     "${services_path}/distributed/test/unittest/distributed_screen_status_manager_test.cpp",
-    "${services_path}/distributed/test/unittest/mock/ans_test_single_kv_store.cpp",
     "${services_path}/distributed/test/unittest/mock/mock_blob.cpp",
     "${services_path}/distributed/test/unittest/mock/mock_change_notification.cpp",
     "${services_path}/distributed/test/unittest/mock/mock_distributed_kv_data_manager.cpp",
     "${services_path}/distributed/test/unittest/mock/mock_event_handler.cpp",
+    "${services_path}/distributed/test/unittest/mock/mock_single_kv_store.cpp",
   ]
 
   configs = [
     "${services_path}/distributed/:ans_distributed_config",
     "${core_path}:public_ans_core_config",
-    "${frameworks_path}/ans/native:ans_innerkits_public_config",
+    "${frameworks_module_ans_path}:ans_innerkits_public_config",
   ]
 
   deps = [
@@ -77,6 +77,6 @@ ohos_unittest("ans_distributed_unit_test") {
     "multimedia_image_standard:image_native",
   ]
 
-  subsystem_name = "notification"
-  part_name = "ans_standard"
+  subsystem_name = "${subsystem_name}"
+  part_name = "${component_name}"
 }

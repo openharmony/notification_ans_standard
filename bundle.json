@@ -15,7 +15,8 @@
   ],
   "keywords": [
     "notification",
-    "ans"
+    "ans",
+    "distributed_notification_service"
   ],
   "envs": [],
   "dirs": [],
@@ -32,10 +33,10 @@
     }
   ],
   "segment": {
-    "destPath": "base/notification/ans_standard"
+    "destPath": "base/notification/distributed_notification_service"
   },
   "component": {
-    "name": "ans_standard",
+    "name": "distributed_notification_service",
     "subsystem": "notification",
     "syscap": [
       "SystemCapability.Notification.Notification",
@@ -74,22 +75,23 @@
     },
     "build": {
       "sub_component": [
-        "//base/notification/ans_standard/frameworks:frameworks_target",
-        "//base/notification/ans_standard/interfaces:interfaces_target",
-        "//base/notification/ans_standard/sa_profile:ans_sa_profile",
-        "//base/notification/ans_standard/services:services_target",
-        "//base/notification/ans_standard/tools:tools_target"
+        "//base/notification/distributed_notification_service/frameworks/ans:ans_client",
+        "//base/notification/distributed_notification_service/frameworks/core:ans_core",
+        "//base/notification/distributed_notification_service/frameworks/js/napi:napi_notification",
+        "//base/notification/distributed_notification_service/frameworks/js/napi:napi_reminder",
+        "//base/notification/distributed_notification_service/sa_profile:ans_sa_profile",
+        "//base/notification/distributed_notification_service/services:ans_service",
+        "//base/notification/distributed_notification_service/tools:tools_shell"
       ],
-      "inner_kits": [],
       "test": [
-        "//base/notification/ans_standard/services/ans/test/unittest:ans_unit_test",
-        "//base/notification/ans_standard/services/distributed/test/unittest:ans_distributed_unit_test_target",
-        "//base/notification/ans_standard/services/test/moduletest:moduletest",
-        "//base/notification/ans_standard/frameworks/ans/test/moduletest:moduletest",
-        "//base/notification/ans_standard/frameworks/ans/native/test/unittest:unittest",
-        "//base/notification/ans_standard/test:systemtest",
-        "//base/notification/ans_standard/test/bechmarktest:benchmarktest",
-        "//base/notification/ans_standard/test/fuzztest:fuzztest"
+        "//base/notification/distributed_notification_service/services/ans/test/unittest:ans_unit_test",
+        "//base/notification/distributed_notification_service/services/distributed/test/unittest:ans_unit_test",
+        "//base/notification/distributed_notification_service/services/test/moduletest:moduletest",
+        "//base/notification/distributed_notification_service/frameworks/test/moduletest:moduletest",
+        "//base/notification/distributed_notification_service/frameworks/ans/test/unittest:unittest",
+        "//base/notification/distributed_notification_service/test:systemtest",
+        "//base/notification/distributed_notification_service/test/bechmarktest:benchmarktest",
+        "//base/notification/distributed_notification_service/test/fuzztest:fuzztest"
       ]
     }
   }

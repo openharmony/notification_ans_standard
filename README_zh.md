@@ -17,7 +17,7 @@ OpenHarmony通过ANS（Advanced Notification Service，通知系统服务）对�
 ## 目录
 
 ```
-/base/notification/ans_standard/
+/base/notification/distributed_notification_service/
 ├── frameworks   # 接口实现
 ├── interfaces
 │   ├── innerkits    # 对内接口目录
