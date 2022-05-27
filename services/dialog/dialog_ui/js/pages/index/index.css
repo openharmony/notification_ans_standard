@@ -57,6 +57,6 @@ text {
 .spli {
     width: 0.5vp;
     height: 24vp;
-    background-color: rgba(0, 0, 0, 2);
+    background-color: rgba(0, 0, 0, 0);
     margin-top: 24vp;
 }
