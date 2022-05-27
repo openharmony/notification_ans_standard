@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_ADVANCED_NOTIFICATION_SERVICE_H
-#define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_ANS_INCLUDE_ADVANCED_NOTIFICATION_SERVICE_H
+#ifndef BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_ANS_INCLUDE_ADVANCED_NOTIFICATION_SERVICE_H
+#define BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_ANS_INCLUDE_ADVANCED_NOTIFICATION_SERVICE_H
 
 #include <ctime>
 #include <list>
@@ -452,7 +452,8 @@ public:
      * @param info Indicates the NotificationSubscribeInfo object.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode Subscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
+    ErrCode Subscribe(const sptr<AnsSubscriberInterface> &subscriber,
+        const sptr<NotificationSubscribeInfo> &info) override;
 
     /**
      * @brief Unsubscribes notifications.
@@ -461,7 +462,8 @@ public:
      * @param info Indicates the NotificationSubscribeInfo object.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode Unsubscribe(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &info) override;
+    ErrCode Unsubscribe(const sptr<AnsSubscriberInterface> &subscriber,
+        const sptr<NotificationSubscribeInfo> &info) override;
 
     /**
      * @brief Checks whether this device is allowed to publish notifications.
@@ -829,4 +831,4 @@ private:
 }  // namespace Notification
 }  // namespace OHOS
 
-#endif  // ADVANCED_NOTIFICATION_SERVICE_H
+#endif  // BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_ANS_INCLUDE_ADVANCED_NOTIFICATION_SERVICE_H

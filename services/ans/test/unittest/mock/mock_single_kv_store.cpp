@@ -18,152 +18,151 @@
 
 namespace OHOS {
 namespace DistributedKv {
-Status AnsTestSingleKvStore::GetEntries(const Key &prefixKey, std::vector<Entry> &entries) const
+Status MockSingleKvStore::GetEntries(const Key &prefixKey, std::vector<Entry> &entries) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetEntries(const DataQuery &query, std::vector<Entry> &entries) const
+Status MockSingleKvStore::GetEntries(const DataQuery &query, std::vector<Entry> &entries) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetResultSet(const Key &prefixKey, std::shared_ptr<KvStoreResultSet> &resultSet) const
+Status MockSingleKvStore::GetResultSet(const Key &prefixKey, std::shared_ptr<KvStoreResultSet> &resultSet) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetResultSet(const DataQuery &query,
-                                          std::shared_ptr<KvStoreResultSet> &resultSet) const
+Status MockSingleKvStore::GetResultSet(const DataQuery &query, std::shared_ptr<KvStoreResultSet> &resultSet) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet)
+Status MockSingleKvStore::CloseResultSet(std::shared_ptr<KvStoreResultSet> &resultSet)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetCount(const DataQuery &query, int &result) const
+Status MockSingleKvStore::GetCount(const DataQuery &query, int &result) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Sync(const std::vector<std::string> &deviceIds, SyncMode mode, uint32_t delayMs)
+Status MockSingleKvStore::Sync(const std::vector<std::string> &deviceIds, SyncMode mode, uint32_t delayMs)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::RemoveDeviceData(const std::string &device)
+Status MockSingleKvStore::RemoveDeviceData(const std::string &device)
 {
     return Status::SUCCESS;
 }
 
-StoreId AnsTestSingleKvStore::GetStoreId() const
+StoreId MockSingleKvStore::GetStoreId() const
 {
     StoreId storeId;
     storeId.storeId = "";
     return storeId;
 }
 
-Status AnsTestSingleKvStore::Delete(const Key &key)
+Status MockSingleKvStore::Delete(const Key &key)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Put(const Key &key, const Value &value)
+Status MockSingleKvStore::Put(const Key &key, const Value &value)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Get(const Key &key, Value &value)
+Status MockSingleKvStore::Get(const Key &key, Value &value)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::SubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer)
+Status MockSingleKvStore::SubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::UnSubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer)
+Status MockSingleKvStore::UnSubscribeKvStore(SubscribeType subscribeType, std::shared_ptr<KvStoreObserver> observer)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::RegisterSyncCallback(std::shared_ptr<KvStoreSyncCallback> callback)
+Status MockSingleKvStore::RegisterSyncCallback(std::shared_ptr<KvStoreSyncCallback> callback)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::UnRegisterSyncCallback()
+Status MockSingleKvStore::UnRegisterSyncCallback()
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::PutBatch(const std::vector<Entry> &entries)
+Status MockSingleKvStore::PutBatch(const std::vector<Entry> &entries)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::DeleteBatch(const std::vector<Key> &keys)
+Status MockSingleKvStore::DeleteBatch(const std::vector<Key> &keys)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::StartTransaction()
+Status MockSingleKvStore::StartTransaction()
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Commit()
+Status MockSingleKvStore::Commit()
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Rollback()
+Status MockSingleKvStore::Rollback()
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::SetSyncParam(const KvSyncParam &syncParam)
+Status MockSingleKvStore::SetSyncParam(const KvSyncParam &syncParam)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetSyncParam(KvSyncParam &syncParam)
+Status MockSingleKvStore::GetSyncParam(KvSyncParam &syncParam)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::SetCapabilityEnabled(bool enabled) const
+Status MockSingleKvStore::SetCapabilityEnabled(bool enabled) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::SetCapabilityRange(
+Status MockSingleKvStore::SetCapabilityRange(
     const std::vector<std::string> &localLabels, const std::vector<std::string> &remoteSupportLabels) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::GetSecurityLevel(SecurityLevel &securityLevel) const
+Status MockSingleKvStore::GetSecurityLevel(SecurityLevel &securityLevel) const
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::Sync(const std::vector<std::string> &deviceIds, SyncMode mode, const DataQuery &query,
+Status MockSingleKvStore::Sync(const std::vector<std::string> &deviceIds, SyncMode mode, const DataQuery &query,
     std::shared_ptr<KvStoreSyncCallback> syncCallback)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::SubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
+Status MockSingleKvStore::SubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
 {
     return Status::SUCCESS;
 }
 
-Status AnsTestSingleKvStore::UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
+Status MockSingleKvStore::UnsubscribeWithQuery(const std::vector<std::string> &deviceIds, const DataQuery &query)
 {
     return Status::SUCCESS;
 }

@@ -21,13 +21,13 @@ namespace OHOS {
 namespace AppExecFwk {
 constexpr int SYSTEMAPP_UUID = 1000;
 
-void MockBundleMgrService::MockSetIsSystemApp(bool isSystemApp)
+void MockBundleManager::MockSetIsSystemApp(bool isSystemApp)
 {
     isSystemAppMock_ = true;
     isSystemApp_ = isSystemApp;
 }
 
-bool MockBundleMgrService::CheckIsSystemAppByUid(const int uid)
+bool MockBundleManager::CheckIsSystemAppByUid(const int uid)
 {
     if (isSystemAppMock_) {
         return isSystemApp_;

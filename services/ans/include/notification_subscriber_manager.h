@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BASE_NOTIFICATION_ANS_STANDARD_SERVICES_NOTIFICATIONMGR_INCLUDE_NOTIFICATION_SUBSCRIBER_MANAGER_H
-#define BASE_NOTIFICATION_ANS_STANDARD_SERVICES_NOTIFICATIONMGR_INCLUDE_NOTIFICATION_SUBSCRIBER_MANAGER_H
+#ifndef BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_INCLUDE_NOTIFICATION_SUBSCRIBER_MANAGER_H
+#define BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_INCLUDE_NOTIFICATION_SUBSCRIBER_MANAGER_H
 
 #include <list>
 #include <memory>
@@ -41,21 +41,22 @@ public:
     /**
      * @brief Add a subscriber.
      *
-     * @param subscriber Indicates the IAnsSubscriber object.
+     * @param subscriber Indicates the AnsSubscriberInterface object.
      * @param subscribeInfo Indicates the NotificationSubscribeInfo object.
      * @return Indicates the result code.
      */
-    ErrCode AddSubscriber(const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
+    ErrCode AddSubscriber(const sptr<AnsSubscriberInterface> &subscriber,
+        const sptr<NotificationSubscribeInfo> &subscribeInfo);
 
     /**
      * @brief Remove a subscriber.
      *
-     * @param subscriber Indicates the IAnsSubscriber object.
+     * @param subscriber Indicates the AnsSubscriberInterface object.
      * @param subscribeInfo Indicates the NotificationSubscribeInfo object.
      * @return Indicates the result code.
      */
     ErrCode RemoveSubscriber(
-        const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
+        const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
 
     /**
      * @brief Notify all subscribers on counsumed.
@@ -102,16 +103,16 @@ private:
     struct SubscriberRecord;
 
     std::shared_ptr<SubscriberRecord> FindSubscriberRecord(const wptr<IRemoteObject> &object);
-    std::shared_ptr<SubscriberRecord> FindSubscriberRecord(const sptr<IAnsSubscriber> &subscriber);
-    std::shared_ptr<SubscriberRecord> CreateSubscriberRecord(const sptr<IAnsSubscriber> &subscriber);
+    std::shared_ptr<SubscriberRecord> FindSubscriberRecord(const sptr<AnsSubscriberInterface> &subscriber);
+    std::shared_ptr<SubscriberRecord> CreateSubscriberRecord(const sptr<AnsSubscriberInterface> &subscriber);
     void AddRecordInfo(
         std::shared_ptr<SubscriberRecord> &record, const sptr<NotificationSubscribeInfo> &subscribeInfo);
     void RemoveRecordInfo(
         std::shared_ptr<SubscriberRecord> &record, const sptr<NotificationSubscribeInfo> &subscribeInfo);
     ErrCode AddSubscriberInner(
-        const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
+        const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
     ErrCode RemoveSubscriberInner(
-        const sptr<IAnsSubscriber> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
+        const sptr<AnsSubscriberInterface> &subscriber, const sptr<NotificationSubscribeInfo> &subscribeInfo);
 
     void NotifyConsumedInner(
         const sptr<Notification> &notification, const sptr<NotificationSortingMap> &notificationMap);
@@ -126,7 +127,7 @@ private:
     std::list<std::shared_ptr<SubscriberRecord>> subscriberRecordList_ {};
     std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner_ {};
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler_ {};
-    sptr<IAnsSubscriber> ansSubscriberProxy_ {};
+    sptr<AnsSubscriberInterface> ansSubscriberProxy_ {};
     sptr<IRemoteObject::DeathRecipient> recipient_ {};
 
     DECLARE_DELAYED_SINGLETON(NotificationSubscriberManager);
@@ -135,4 +136,4 @@ private:
 }  // namespace Notification
 }  // namespace OHOS
 
-#endif  // BASE_NOTIFICATION_ANS_STANDARD_SERVICES_NOTIFICATIONMGR_INCLUDE_NOTIFICATION_SUBSCRIBER_MANAGER_H
+#endif  // BASE_NOTIFICATION_DISTRIBUTED_NOTIFICATION_SERVICE_SERVICES_INCLUDE_NOTIFICATION_SUBSCRIBER_MANAGER_H

@@ -31,7 +31,7 @@ namespace OHOS {
 namespace DistributedKv {
 // This is a public interface. Implementation of this class is in AppKvStoreImpl.
 // This class provides put, delete, search, sync and subscribe functions of a key-value store.
-class AnsTestSingleKvStore : public SingleKvStore {
+class MockSingleKvStore : public SingleKvStore {
 public:
     /**
      * @brief Get all entries in this store which key start with prefixKey.

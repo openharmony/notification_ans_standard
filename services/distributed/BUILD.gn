@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/notification/ans_standard/notification.gni")
+import("//base/notification/distributed_notification_service/notification.gni")
 import("//build/ohos.gni")
 
 config("ans_distributed_config") {
@@ -39,7 +39,7 @@ ohos_shared_library("libans_distributed") {
   configs = [
     ":ans_distributed_config",
     "${core_path}:public_ans_core_config",
-    "${frameworks_path}/ans/native:ans_innerkits_public_config",
+    "${frameworks_module_ans_path}:ans_innerkits_public_config",
   ]
 
   deps = [ "${core_path}:ans_core" ]
@@ -55,6 +55,6 @@ ohos_shared_library("libans_distributed") {
     "utils_base:utils",
   ]
 
-  subsystem_name = "notification"
-  part_name = "ans_standard"
+  subsystem_name = "${subsystem_name}"
+  part_name = "${component_name}"
 }

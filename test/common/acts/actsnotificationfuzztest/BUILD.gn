@@ -11,35 +11,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/notification/ans_standard/notification.gni")
+import("//base/notification/distributed_notification_service/notification.gni")
 import("//build/test.gni")
 
-module_output_path = "ans_standard/systemtest"
+module_output_path = "${component_name}/systemtest"
 
 ohos_systemtest("ActsNotificationFuzzTest") {
   module_out_path = module_output_path
   resource_config_file =
-      "${ans_standard_path}/test/resource/notificationfuzztest/ohos_test.xml"
+      "${component_path}/test/resource/notificationfuzztest/ohos_test.xml"
 
   sources = [
-    "${ans_standard_path}/test/resource/notificationfuzztest/src/notificationfuzztestmanager.cpp",
-    "${ans_standard_path}/test/resource/notificationfuzztest/src/notificationgetparam.cpp",
+    "${component_path}/test/resource/notificationfuzztest/src/notificationfuzztestmanager.cpp",
+    "${component_path}/test/resource/notificationfuzztest/src/notificationgetparam.cpp",
     "actsnotificationfuzztest.cpp",
   ]
 
-  configs = [ "${ans_standard_path}/test/common/acts:ansfwk_kits_test_config" ]
+  configs = [ "${component_path}/test/common/acts:ansfwk_kits_test_config" ]
 
   include_dirs = [
-    "//utils/native/base/include",
-    "//base/notification/ans_standard/frameworks/ans/core/include",
-    "//base/notification/ans_standard/interfaces/innerkits/ans/native/include",
-    "//base/notification/ans_standard/services/ans/include",
-    "//third_party/json/single_include",
     "${aafwk_inner_api_path}/ability_manager/include",
     "${aafwk_kits_path}/ability/native/include",
-    "${aafwk_services_path}/abilitymgr/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "${aafwk_kits_path}/app/native/app/include/task",
+    "${aafwk_services_path}/abilitymgr/include",
+    "${core_path}/include",
+    "${inner_api_path}",
+    "${services_path}/ans/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//third_party/json/single_include",
+    "//utils/native/base/include",
   ]
 
   cflags = []
@@ -51,18 +51,17 @@ ohos_systemtest("ActsNotificationFuzzTest") {
   deps = [
     "${aafwk_kits_path}/appkit:appkit_native",
     "${aafwk_services_path}/abilitymgr:abilityms",
+    "${core_path}:ans_core",
+    "${frameworks_module_ans_path}:ans_innerkits",
+    "${services_path}/ans:ans_targets",
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
-    "//base/notification/ans_standard/frameworks/ans/core:ans_core",
-    "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
-    "//base/notification/ans_standard/frameworks/wantagent:native_wantagent",
-    "//base/notification/ans_standard/services/ans:ans_targets",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
 
   defines = [
-    "APP_LOG_TAG = \"AnsFwkKitsTest\"",
+    "ANS_LOG_TAG = \"AnsFwkKitsTest\"",
     "LOG_DOMAIN = 0xD002200",
   ]
   external_deps = [
