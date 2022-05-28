@@ -15,15 +15,11 @@ import("//base/notification/distributed_notification_service/notification.gni")
 import("//build/ohos.gni")
 
 group("napi_reminder") {
-  deps = [
-    "src/reminder:reminderagent",
-  ]
+  deps = [ "src/reminder:reminderagent" ]
 }
 
 group("napi_notification") {
-  deps = [
-    ":notification",
-  ]
+  deps = [ ":notification" ]
 }
 
 cflags = []
@@ -46,7 +42,7 @@ config("native_module_config") {
 ohos_shared_library("notification") {
   include_dirs = [
     "${aafwk_kits_path}/ability/native/include",
-    "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common",
+    "//foundation/ability/ability_runtime/interfaces/kits/napi/aafwk/inner/napi_common",
     "//foundation/multimedia/image_standard/interfaces/kits/js/common/include/",
     "include",
     "//third_party/node/src",
@@ -78,7 +74,7 @@ ohos_shared_library("notification") {
   deps = [
     "${core_path}:ans_core",
     "${frameworks_module_ans_path}:ans_innerkits",
-    "//foundation/aafwk/standard/interfaces/kits/napi/aafwk/inner/napi_common:napi_common",
+    "//foundation/ability/ability_runtime/interfaces/kits/napi/aafwk/inner/napi_common:napi_common",
     "//foundation/multimedia/image_standard/interfaces/innerkits:image",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libuv:uv_static",
