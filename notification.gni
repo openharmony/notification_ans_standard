@@ -11,9 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-aafwk_inner_api_path = "//foundation/aafwk/standard/interfaces/innerkits"
-aafwk_services_path = "//foundation/aafwk/standard/services"
-aafwk_kits_path = "//foundation/aafwk/standard/frameworks/kits"
+aafwk_inner_api_path =
+    "//foundation/ability/ability_runtime/interfaces/innerkits"
+aafwk_services_path = "//foundation/ability/ability_runtime/services"
+aafwk_kits_path = "//foundation/ability/ability_runtime/frameworks/kits"
 component_name = "distributed_notification_service"
 component_path = "//base/notification/distributed_notification_service"
 services_path = "${component_path}/services"
@@ -24,7 +25,7 @@ inner_api_path = "${interfaces_path}/inner_api"
 core_path = "${frameworks_path}/core"
 test_path = "${component_path}/test"
 tools_path = "${component_path}/tools"
-aafwk_path = "//foundation/aafwk/standard"
+aafwk_path = "//foundation/ability/ability_runtime"
 distributed_notification_supported = true
 subsystem_name = "notification"
 component_external_deps = [
