@@ -25,7 +25,7 @@
                 {{ allowButton }}
             </button>
         </div>
-        <div clas="spli" />
+        <div class="spli" />
         <div class="btnBox">
             <button class="btn" onclick="onCancel">
                 {{ cancelButton }}
