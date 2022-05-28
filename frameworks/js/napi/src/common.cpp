@@ -385,6 +385,10 @@ napi_value Common::SetNotificationRequestByNumber(
     napi_create_int32(env, request->GetCreatorPid(), &value);
     napi_set_named_property(env, result, "creatorPid", value);
 
+    // badgeNumber?: number
+    napi_create_int32(env, request->GetBadgeNumber(), &value);
+    napi_set_named_property(env, result, "badgeNumber", value);
+
     return NapiGetBoolean(env, true);
 }
 
@@ -1440,6 +1444,11 @@ napi_value Common::GetNotificationRequestByNumber(
     if (GetNotificationBadgeIconStyle(env, value, request) == nullptr) {
         return nullptr;
     }
+    // badgeNumber?: number
+    if (GetNotificationBadgeNumber(env, value, request) == nullptr) {
+        return nullptr;
+    }
+
     return NapiGetNull(env);
 }
 
@@ -4173,6 +4182,32 @@ napi_value Common::SetNotificationFlags(
     napi_set_named_property(env, result, "vibrationEnabled", value);
 
     return NapiGetBoolean(env, true);
+}
+
+napi_value Common::GetNotificationBadgeNumber(
+    const napi_env &env, const napi_value &value, NotificationRequest &request)
+{
+    ANS_LOGI("enter");
+
+    napi_valuetype valuetype = napi_undefined;
+    napi_value result = nullptr;
+    bool hasProperty = false;
+    int32_t badgeNumber = 0;
+
+    NAPI_CALL(env, napi_has_named_property(env, value, "badgeNumber", &hasProperty));
+    if (hasProperty) {
+        napi_get_named_property(env, value, "badgeNumber", &result);
+        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        if (valuetype != napi_number) {
+            ANS_LOGE("Wrong argument type. Number expected.");
+            return nullptr;
+        }
+
+        napi_get_value_int32(env, result, &badgeNumber);
+        request.SetBadgeNumber(badgeNumber);
+    }
+
+    return NapiGetNull(env);
 }
 }  // namespace NotificationNapi
 }  // namespace OHOS
