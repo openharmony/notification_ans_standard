@@ -1528,6 +1528,17 @@ public:
     static napi_value SetNotificationFlags(
         const napi_env &env, const std::shared_ptr<NotificationFlags> &flags, napi_value &result);
 
+    /**
+     * @brief Gets the number of badge of NotificationRequest object from specified js object
+     *
+     * @param env Indicates the environment that the API is invoked under
+     * @param value Indicates a js object to be converted
+     * @param request Indicates a NotificationRequest object from specified js object
+     * @return Returns the null object if success, returns the null value otherwise
+     */
+    static napi_value GetNotificationBadgeNumber(
+        const napi_env &env, const napi_value &value, NotificationRequest &request);
+
 private:
     static const int32_t ARGS_ONE = 1;
     static const int32_t ARGS_TWO = 2;
