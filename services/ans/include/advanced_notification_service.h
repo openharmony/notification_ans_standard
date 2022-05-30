@@ -810,6 +810,7 @@ private:
         sptr<NotificationBundleOption> &targetBundle);
     bool PublishSlotChangeCommonEvent(
         const sptr<NotificationBundleOption> &bundleOption, const NotificationConstant::SlotType &slotType);
+    void ReportHasSeenEvent(const int32_t userId, const std::string &bundleName);
 
 private:
     static sptr<AdvancedNotificationService> instance_;
