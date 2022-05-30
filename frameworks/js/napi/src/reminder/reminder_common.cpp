@@ -63,7 +63,7 @@ bool ReminderCommon::GenActionButtons(
     for (size_t i = 0; i < length; i++) {
         napi_value actionButton = nullptr;
         napi_get_element(env, actionButtons, i, &actionButton);
-        NAPI_CALL(env, napi_typeof(env, actionButton, &valuetype));
+        NAPI_CALL_BASE(env, napi_typeof(env, actionButton, &valuetype), false);
         if (valuetype != napi_object) {
             ANSR_LOGW("Wrong element type:%{public}s. object expected.", ACTION_BUTTON);
             return false;
@@ -259,15 +259,15 @@ bool ReminderCommon::GetStringUtf8(const napi_env &env, const napi_value &value,
     napi_valuetype valuetype = napi_undefined;
     size_t strLen = 0;
 
-    NAPI_CALL(env, napi_has_named_property(env, value, propertyName, &hasProperty));
+    NAPI_CALL_BASE(env, napi_has_named_property(env, value, propertyName, &hasProperty), false);
     if (hasProperty) {
         napi_get_named_property(env, value, propertyName, &result);
-        NAPI_CALL(env, napi_typeof(env, result, &valuetype));
+        NAPI_CALL_BASE(env, napi_typeof(env, result, &valuetype), false);
         if (valuetype != napi_string) {
             ANSR_LOGW("Wrong argument type:%{public}s. string expected.", propertyName);
             return false;
         }
-        NAPI_CALL(env, napi_get_value_string_utf8(env, result, propertyVal, size - 1, &strLen));
+        NAPI_CALL_BASE(env, napi_get_value_string_utf8(env, result, propertyVal, size - 1, &strLen), false);
     }
     return hasProperty;
 }
@@ -305,13 +305,13 @@ bool ReminderCommon::GetPropertyValIfExist(const napi_env &env, const napi_value
         propertyVal = value;
     } else {
         bool hasProperty = false;
-        NAPI_CALL(env, napi_has_named_property(env, value, propertyName, &hasProperty));
+        NAPI_CALL_BASE(env, napi_has_named_property(env, value, propertyName, &hasProperty), false);
         if (!hasProperty) {
             return false;
         }
         napi_get_named_property(env, value, propertyName, &propertyVal);
     }
-    NAPI_CALL(env, napi_typeof(env, propertyVal, &valuetype));
+    NAPI_CALL_BASE(env, napi_typeof(env, propertyVal, &valuetype), false);
     if (valuetype != napi_number) {
         if (propertyName == nullptr) {
             ANSR_LOGW("Wrong argument type. number expected.");
@@ -329,12 +329,12 @@ bool ReminderCommon::GetObject(const napi_env &env, const napi_value &value,
     bool hasProperty = false;
     napi_valuetype valuetype = napi_undefined;
 
-    NAPI_CALL(env, napi_has_named_property(env, value, propertyName, &hasProperty));
+    NAPI_CALL_BASE(env, napi_has_named_property(env, value, propertyName, &hasProperty), false);
     if (!hasProperty) {
         return false;
     }
     napi_get_named_property(env, value, propertyName, &propertyVal);
-    NAPI_CALL(env, napi_typeof(env, propertyVal, &valuetype));
+    NAPI_CALL_BASE(env, napi_typeof(env, propertyVal, &valuetype), false);
     if (valuetype != napi_object) {
         ANSR_LOGW("Wrong argument type:%{public}s. object expected.", propertyName);
         return false;
