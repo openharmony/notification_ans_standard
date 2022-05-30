@@ -174,7 +174,7 @@ bool CheckProperty(const napi_env &env, const napi_value &content, const std::st
 
     bool hasProperty = false;
 
-    NAPI_CALL(env, napi_has_named_property(env, content, property.data(), &hasProperty));
+    NAPI_CALL_BASE(env, napi_has_named_property(env, content, property.data(), &hasProperty), false);
     if (!hasProperty) {
         ANS_LOGW("Property %{public}s expected.", property.c_str());
     }
