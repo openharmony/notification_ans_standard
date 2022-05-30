@@ -478,11 +478,14 @@ ErrCode AdvancedNotificationService::Publish(const std::string &label, const spt
     if (result != ERR_OK) {
         return result;
     }
-    int32_t userId = request->GetCreatorUserId();
-    std::string bundleName = bundleOption->GetBundleName();
+    ReportHasSeenEvent(request->GetCreatorUserId(), bundleOption->GetBundleName());
+    return PublishPreparedNotification(request, bundleOption);
+}
+
+void AdvancedNotificationService::ReportHasSeenEvent(const int32_t userId, const std::string &bundleName)
+{
     DeviceUsageStats::BundleActiveEvent event(DeviceUsageStats::BundleActiveEvent::NOTIFICATION_SEEN, bundleName);
     DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
-    return PublishPreparedNotification(request, bundleOption);
 }
 
 bool AdvancedNotificationService::IsNotificationExists(const std::string &key)
