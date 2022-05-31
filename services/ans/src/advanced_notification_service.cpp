@@ -29,6 +29,7 @@
 #include "ans_watchdog.h"
 #include "ans_permission_def.h"
 #include "bundle_manager_helper.h"
+#include "bundle_active_client.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "display_manager.h"
@@ -477,7 +478,14 @@ ErrCode AdvancedNotificationService::Publish(const std::string &label, const spt
     if (result != ERR_OK) {
         return result;
     }
+    ReportHasSeenEvent(request->GetCreatorUserId(), bundleOption->GetBundleName());
     return PublishPreparedNotification(request, bundleOption);
+}
+
+void AdvancedNotificationService::ReportHasSeenEvent(const int32_t userId, const std::string &bundleName)
+{
+    DeviceUsageStats::BundleActiveEvent event(DeviceUsageStats::BundleActiveEvent::NOTIFICATION_SEEN, bundleName);
+    DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
 }
 
 bool AdvancedNotificationService::IsNotificationExists(const std::string &key)
