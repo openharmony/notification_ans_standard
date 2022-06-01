@@ -27,5 +27,10 @@ bool AccessTokenHelper::VerifyNativeToken(const Security::AccessToken::AccessTok
 {
     return true;
 }
+
+bool IsSystemHap()
+{
+    return true;
+}
 }  // namespace Notification
 }  // namespace OHOS
