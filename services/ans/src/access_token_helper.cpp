@@ -15,20 +15,45 @@
 
 #include "access_token_helper.h"
 
+#include "ans_log_wrapper.h"
+#include "ipc_skeleton.h"
+
+using namespace OHOS::Security::AccessToken;
+
 namespace OHOS {
 namespace Notification {
 bool AccessTokenHelper::VerifyCallerPermission(
-    const Security::AccessToken::AccessTokenID &tokenCaller, const std::string &permission)
+    const AccessTokenID &tokenCaller, const std::string &permission)
 {
-    int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenCaller, permission);
-    return (result == Security::AccessToken::PERMISSION_GRANTED);
+    int result = AccessTokenKit::VerifyAccessToken(tokenCaller, permission);
+    return (result == PERMISSION_GRANTED);
 }
 
-bool AccessTokenHelper::VerifyNativeToken(const Security::AccessToken::AccessTokenID &callerToken)
+bool AccessTokenHelper::VerifyNativeToken(const AccessTokenID &callerToken)
 {
-    Security::AccessToken::ATokenTypeEnum tokenType =
-        Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    return tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    ATokenTypeEnum tokenType = AccessTokenKit::GetTokenTypeFlag(callerToken);
+    return tokenType == ATokenTypeEnum::TOKEN_NATIVE;
+}
+
+bool AccessTokenHelper::IsSystemHap()
+{
+    AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
+    ATokenTypeEnum type = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (type == ATokenTypeEnum::TOKEN_NATIVE) {
+        return true;
+    }
+    if (type == ATokenTypeEnum::TOKEN_HAP) {
+        HapTokenInfo info;
+        AccessTokenKit::GetHapTokenInfo(tokenId, info);
+        if (info.apl == ATokenAplEnum::APL_SYSTEM_CORE || info.apl == ATokenAplEnum::APL_SYSTEM_BASIC) {
+            return true;
+        }
+        pid_t pid = IPCSkeleton::GetCallingPid();
+        pid_t uid = IPCSkeleton::GetCallingUid();
+        ANS_LOGW("apl not match, info.apl=%{public}d, type=%{public}d, pid=%{public}d, uid=%{public}d",
+            info.apl, type, pid, uid);
+    }
+    return false;
 }
 }  // namespace Notification
 }  // namespace OHOS
