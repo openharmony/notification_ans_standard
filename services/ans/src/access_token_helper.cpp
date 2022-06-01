@@ -15,6 +15,9 @@
 
 #include "access_token_helper.h"
 
+#include "ans_log_wrapper.h"
+#include "ipc_skeleton.h"
+
 namespace OHOS {
 namespace Notification {
 bool AccessTokenHelper::VerifyCallerPermission(
@@ -30,5 +33,27 @@ bool AccessTokenHelper::VerifyNativeToken(const Security::AccessToken::AccessTok
         Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     return tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
 }
+
+bool AccessTokenHelper::IsSystemHap()
+{
+    AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
+    ATokenTypeEnum type = AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (type == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        return true;
+    }
+    if (type == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
+        HapTokenInfo info;
+        AccessTokenKit::GetHapTokenInfo(tokenId, info);
+        if (info.apl == ATokenAplEnum::APL_SYSTEM_CORE || info.apl == ATokenAplEnum::APL_SYSTEM_BASIC) {
+            return true;
+        }
+        pid_t pid = IPCSkeleton::GetCallingPid();
+        pid_t uid = IPCSkeleton::GetCallingUid();
+        ANS_LOGW("apl not match, info.apl=%{public}d, type=%{public}d, pid=%{public}d, uid=%{public}d",
+            static_cast<int32_t>(info.apl), static_cast<int32_t>(type), pid, uid);
+    }
+    return false;
+}
+
 }  // namespace Notification
 }  // namespace OHOS
