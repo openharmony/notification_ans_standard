@@ -122,8 +122,7 @@ inline bool IsSystemApp()
     if (bundleManager != nullptr) {
         isSystemApp = bundleManager->IsSystemApp(callingUid);
     }
-
-    return isSystemApp;
+    return isSystemApp || AccessTokenHelper::IsSystemHap();
 }
 
 inline int64_t ResetSeconds(int64_t date)
