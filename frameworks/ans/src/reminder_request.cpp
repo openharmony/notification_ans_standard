@@ -15,6 +15,8 @@
 
 #include "reminder_request.h"
 
+#include <charconv>
+
 #include "ans_log_wrapper.h"
 #include "bundle_mgr_interface.h"
 #include "if_system_ability_manager.h"
@@ -550,7 +552,19 @@ void ReminderRequest::RecoverActionButton(const std::shared_ptr<NativeRdb::AbsSh
     std::vector<std::string> multiButton = StringSplit(actionButtonInfo, SEP_BUTTON_MULTI);
     for (auto button : multiButton) {
         std::vector<std::string> singleButton = StringSplit(button, SEP_BUTTON_SINGLE);
-        SetActionButton(singleButton.at(1), ActionButtonType(std::stoi(singleButton.at(0), nullptr)));
+        if (singleButton.size() < 2) {
+            ANSR_LOGE("Invalid action button data");
+            continue;
+        }
+        int32_t buttonType = 0;
+        const char *first = singleButton[0].data();
+        const char *last = first + singleButton[0].size();
+        auto result = std::from_chars(first, last, buttonType);
+        if (result.ec != std::errc{} || result.ptr != last) {
+            ANSR_LOGE("Invalid action button type");
+            continue;
+        }
+        SetActionButton(singleButton[1], ActionButtonType(buttonType));
     }
 }
 
